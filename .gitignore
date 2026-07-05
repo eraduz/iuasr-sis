@@ -1,0 +1,71 @@
+# ==========================================================================
+# IUASR SIS — .gitignore
+# HARDE REGEL: er komt NOOIT een productiedatabase of echte persoonsgegevens
+# in deze repo, in geen enkele fase. Zie PROGRESS.md (AVG-grenzen).
+# ==========================================================================
+
+# --- Databasebestanden (Access, SQLite, dumps met data) -------------------
+*.mdb
+*.accdb
+*.ldb
+*.laccdb
+*.sqlite
+*.sqlite3
+*.db
+*.sql
+*.dump
+*.bak
+# Expliciet: de oude productie-Access-database mag nooit gecommit worden
+IUTSTD-*.mdb
+
+# --- Secrets en omgeving --------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+.my.cnf
+.netrc
+auth.json
+secrets.*
+
+# --- Mappen met echte of gevoelige data -----------------------------------
+/data-echt/
+/data-productie/
+/uploads-prive/
+/migratie-bron/
+/persoonsgegevens/
+
+# --- PHP / Laravel --------------------------------------------------------
+/vendor/
+/storage/*.key
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+/bootstrap/cache/*
+/public/storage
+/public/hot
+composer.phar
+
+# --- Node / frontend build ------------------------------------------------
+/node_modules/
+/public/build/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# --- IDE / OS ------------------------------------------------------------
+/.idea/
+/.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# --- Overige artefacten ---------------------------------------------------
+*.log
+.phpunit.result.cache
+/coverage/
