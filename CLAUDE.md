@@ -36,6 +36,14 @@ strikt gescheiden van het publieke aanmeldportaal. Zie
 - BSN alleen toevoegen na expliciet akkoord (mogelijk pas bij DUO-processen).
 
 ## Werkwijze in deze repo
+- **Lees eerst de context, dan pas bouwen.** Vóór elke fase die gebouwd wordt,
+  worden ALTIJD eerst uitgelezen: (1) de git-commits (`git log`), (2) `PROGRESS.md`
+  en (3) deze `CLAUDE.md`. Zo staat vast waar het project staat, welke
+  beslissingen al genomen zijn en welke parameters nog openstaan. Begin geen
+  fase zonder deze drie te hebben gelezen.
+- **Werk elke fase bij in de continuïteitsbestanden.** Na afronding van een fase
+  worden `PROGRESS.md` (status, vinkjes, beslissingenlogboek) en waar nodig
+  `CLAUDE.md` bijgewerkt, waarna de code wordt gecommit en direct gepusht.
 - **Bouw per fase, niet alles tegelijk.** Volg de fasering uit het PvA.
   Elke fase eindigt bij een verifieerbaar opleverpunt; ga niet door voordat
   dat aantoonbaar klaar is.
