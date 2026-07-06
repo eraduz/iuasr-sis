@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard — IUASR SIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sis.css">
+<link rel="stylesheet" href="assets/iuasr-plugin-dash.css">
+</head>
+<body>
+
+<div id="sis-header"></div>
+
+<div class="iuasr-dash-app">
+  <nav class="iuasr-dash-sidebar" id="sis-sidebar" aria-label="Hoofdmenu"></nav>
+
+  <main class="iuasr-dash-main">
+
+    <!-- ======================= STUDENTENZAKEN ======================= -->
+    <div data-role-only="studentenzaken">
+      <div class="iuasr-dash-vhead">
+        <div>
+          <h1>Goedemorgen, Fatima</h1>
+          <div class="summary">Studiejaar <b>2026 / 2027</b> · periode <b>2</b> · <b>12</b> taken vragen om actie</div>
+        </div>
+        <div class="iuasr-dash-vhead__actions">
+          <a class="iuasr-dash-btn" href="verklaringen.html">Verklaring opstellen</a>
+          <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="inschrijven.html">Student inschrijven</a>
+        </div>
+      </div>
+
+      <div class="iuasr-dash-stats">
+        <div class="iuasr-dash-stat"><span class="lbl">Actieve studenten</span><span class="val">342</span><span class="delta"><b>+18</b> deze periode</span></div>
+        <div class="iuasr-dash-stat iuasr-dash-stat--alert"><span class="lbl">Openstaande acties</span><span class="val">12</span><span class="delta">inschrijving · documenten</span></div>
+        <div class="iuasr-dash-stat"><span class="lbl">Herinschrijvingen</span><span class="val">57</span><span class="delta">deadline <b>1 sep</b></span></div>
+        <div class="iuasr-dash-stat iuasr-dash-stat--ok"><span class="lbl">Verklaringen (mnd)</span><span class="val">23</span><span class="delta">studentbewijs · vertraging</span></div>
+      </div>
+
+      <div class="sis-grid-2">
+        <div class="iuasr-dash-panel">
+          <div class="iuasr-dash-panel__hd"><h3>Te behandelen</h3><span class="hint">Toegewezen aan Studentenzaken</span></div>
+          <div class="sis-worklist">
+            <a class="sis-work" href="inschrijven.html"><span class="sis-work__ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></span><div class="sis-work__bd"><b>Nieuwe inschrijving afronden — PABO</b><small>Aïsha El Bouzidi · aanmelding IUASR-2026-PB-0047</small></div><span class="sis-work__meta">vandaag</span></a>
+            <a class="sis-work" href="student-detail.html"><span class="sis-work__ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><div class="sis-work__bd"><b>Ontbrekend document — NT2-certificaat</b><small>Yasmin Demir · student 264192</small></div><span class="sis-work__meta">2 dgn</span></a>
+            <a class="sis-work" href="uitschrijven.html"><span class="sis-work__ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" y1="8" x2="22" y2="13"/><line x1="22" y1="8" x2="17" y2="13"/></svg></span><div class="sis-work__bd"><b>Uitschrijfverzoek verwerken</b><small>Rachid Belhaj · student 258871</small></div><span class="sis-work__meta">3 dgn</span></a>
+            <a class="sis-work" href="verklaringen.html"><span class="sis-work__ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M8.21 13.89 7 22l5-3 5 3-1.21-8.11"/></svg></span><div class="sis-work__bd"><b>Verklaring studievertraging opstellen</b><small>Mehmet Akın · student 251044</small></div><span class="sis-work__meta">4 dgn</span></a>
+          </div>
+        </div>
+
+        <div>
+          <div class="iuasr-dash-panel">
+            <div class="iuasr-dash-panel__hd"><h3>Snelkoppelingen</h3></div>
+            <div class="sis-quicklinks">
+              <a class="sis-quick" href="studenten.html"><span class="sis-quick__ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><span class="sis-quick__bd"><b>Student zoeken</b><span>Op studentnummer</span></span></a>
+              <a class="sis-quick" href="inschrijven.html"><span class="sis-quick__ic sis-quick__ic--crimson"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span><span class="sis-quick__bd"><b>Inschrijven</b><span>Nieuwe student</span></span></a>
+              <a class="sis-quick" href="rapporten.html"><span class="sis-quick__ic sis-quick__ic--green"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span class="sis-quick__bd"><b>Rapporten</b><span>Klassenlijst · EC</span></span></a>
+              <a class="sis-quick" href="verklaringen.html"><span class="sis-quick__ic sis-quick__ic--gold"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M8.21 13.89 7 22l5-3 5 3-1.21-8.11"/></svg></span><span class="sis-quick__bd"><b>Verklaring</b><span>A4 genereren</span></span></a>
+            </div>
+          </div>
+          <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-top:16px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Als Studentenzaken heeft u <b>geen inzage in cijfers</b>. Het tabblad Cijfers en het cijferoverzicht zijn afgeschermd voor deze rol.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================= DOCENT ======================= -->
+    <div data-role-only="docent">
+      <div class="iuasr-dash-vhead">
+        <div>
+          <h1>Welkom, dr. Aydın</h1>
+          <div class="summary">Periode <b>2</b> · <b>4</b> vakken · <b>2</b> cijferlijsten nog niet ingediend</div>
+        </div>
+        <div class="iuasr-dash-vhead__actions">
+          <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="cijferinvoer.html">Cijfers invoeren</a>
+        </div>
+      </div>
+
+      <div class="iuasr-dash-stats">
+        <div class="iuasr-dash-stat"><span class="lbl">Mijn vakken</span><span class="val">4</span><span class="delta">periode 2</span></div>
+        <div class="iuasr-dash-stat iuasr-dash-stat--alert"><span class="lbl">Cijfers open</span><span class="val">2</span><span class="delta">deadline <b>19 jun</b></span></div>
+        <div class="iuasr-dash-stat"><span class="lbl">Studenten totaal</span><span class="val">86</span><span class="delta">over 4 vakken</span></div>
+        <div class="iuasr-dash-stat iuasr-dash-stat--ok"><span class="lbl">Ingediend</span><span class="val">2</span><span class="delta">definitief vastgelegd</span></div>
+      </div>
+
+      <div class="iuasr-dash-panel">
+        <div class="iuasr-dash-panel__hd"><h3>Mijn vakken — periode 2</h3><span class="hint">Alleen uw eigen vakken</span></div>
+        <div class="iuasr-dash-tbl-card" style="border:0;">
+          <table class="iuasr-dash-tbl">
+            <thead><tr><th>Vak</th><th>Opleiding</th><th>Studenten</th><th>Cijferstatus</th><th></th></tr></thead>
+            <tbody>
+              <tr><td class="nm">Arabische grammatica II<small>ISLTH-ARA-201</small></td><td>Bachelor Islamitische Theologie</td><td class="tnum">28</td><td><span class="iuasr-dash-status s-incomplete">18/28 ingevoerd</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="cijferinvoer.html">Invoeren</a></td></tr>
+              <tr><td class="nm">Usul al-Fiqh<small>ISLTH-FIQ-210</small></td><td>Bachelor Islamitische Theologie</td><td class="tnum">31</td><td><span class="iuasr-dash-status s-draft">Nog niet gestart</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="cijferinvoer.html">Invoeren</a></td></tr>
+              <tr><td class="nm">Koranrecitatie (Tajwīd)<small>KRN-TAJ-102</small></td><td>Cursus Koran &amp; Hifz</td><td class="tnum">15</td><td><span class="iuasr-dash-status s-approved">Ingediend</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="cijferinvoer.html">Bekijken</a></td></tr>
+              <tr><td class="nm">Islamitische ethiek<small>MGV-ETH-305</small></td><td>Master Isl. Geestelijke Verzorging</td><td class="tnum">12</td><td><span class="iuasr-dash-status s-approved">Ingediend</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="cijferinvoer.html">Bekijken</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-top:16px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span>Als docent ziet u <b>alleen uw eigen vakken</b>. Studentdossiers, persoonsgegevens en cijfers van andere vakken zijn niet toegankelijk.</span>
+      </div>
+    </div>
+
+    <!-- ======================= EXAMENCOMMISSIE ======================= -->
+    <div data-role-only="examencommissie">
+      <div class="iuasr-dash-vhead">
+        <div>
+          <h1>Examencommissie</h1>
+          <div class="summary">Periode <b>2</b> · <b>6</b> cijferlijsten ter vaststelling · <b>3</b> verzoeken</div>
+        </div>
+        <div class="iuasr-dash-vhead__actions">
+          <a class="iuasr-dash-btn" href="rapporten.html">Rapporten</a>
+          <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="cijferoverzicht.html">Cijferoverzicht</a>
+        </div>
+      </div>
+
+      <div class="iuasr-dash-stats">
+        <div class="iuasr-dash-stat iuasr-dash-stat--alert"><span class="lbl">Ter vaststelling</span><span class="val">6</span><span class="delta">cijferlijsten periode 2</span></div>
+        <div class="iuasr-dash-stat"><span class="lbl">Verzoeken</span><span class="val">3</span><span class="delta">vrijstelling · herkansing</span></div>
+        <div class="iuasr-dash-stat iuasr-dash-stat--ok"><span class="lbl">Vastgesteld (jaar)</span><span class="val">48</span><span class="delta">cijferlijsten</span></div>
+        <div class="iuasr-dash-stat"><span class="lbl">Afgestudeerd</span><span class="val">37</span><span class="delta">studiejaar 25/26</span></div>
+      </div>
+
+      <div class="iuasr-dash-panel">
+        <div class="iuasr-dash-panel__hd"><h3>Cijferlijsten ter vaststelling</h3><span class="hint">Volledige inzage in cijfers</span></div>
+        <div class="iuasr-dash-tbl-card" style="border:0;">
+          <table class="iuasr-dash-tbl">
+            <thead><tr><th>Vak</th><th>Docent</th><th>Gem.</th><th>Geslaagd</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <tr><td class="nm">Arabische grammatica II<small>ISLTH-ARA-201</small></td><td>dr. Y. Aydın</td><td class="tnum">7,2</td><td class="tnum">24/28</td><td><span class="iuasr-dash-status s-submitted">Ingediend</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="cijferoverzicht.html">Beoordelen</a></td></tr>
+              <tr><td class="nm">Islamitische ethiek<small>MGV-ETH-305</small></td><td>dr. Y. Aydın</td><td class="tnum">7,8</td><td class="tnum">12/12</td><td><span class="iuasr-dash-status s-submitted">Ingediend</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="cijferoverzicht.html">Beoordelen</a></td></tr>
+              <tr><td class="nm">Islamitisch recht I<small>ISLTH-FIQ-110</small></td><td>dr. S. Boujat</td><td class="tnum">6,4</td><td class="tnum">19/26</td><td><span class="iuasr-dash-status s-submitted">Ingediend</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="cijferoverzicht.html">Beoordelen</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================= DIRECTIE ======================= -->
+    <div data-role-only="directie">
+      <div class="iuasr-dash-vhead">
+        <div>
+          <h1>Directie-overzicht</h1>
+          <div class="summary">Studiejaar <b>2026 / 2027</b> · instellingsbrede kerncijfers</div>
+        </div>
+        <div class="iuasr-dash-vhead__actions">
+          <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="rapporten.html">Rapporten</a>
+        </div>
+      </div>
+
+      <div class="iuasr-dash-stats">
+        <div class="iuasr-dash-stat"><span class="lbl">Ingeschreven</span><span class="val">342</span><span class="delta"><b>+7%</b> t.o.v. vorig jaar</span></div>
+        <div class="iuasr-dash-stat"><span class="lbl">Rendement P1</span><span class="val">81%</span><span class="delta">geslaagd eerste kans</span></div>
+        <div class="iuasr-dash-stat iuasr-dash-stat--ok"><span class="lbl">Afgestudeerd</span><span class="val">37</span><span class="delta">studiejaar 25/26</span></div>
+        <div class="iuasr-dash-stat"><span class="lbl">Uitval</span><span class="val">4,1%</span><span class="delta">binnen instellingsnorm</span></div>
+      </div>
+
+      <div class="sis-grid-2--even">
+        <div class="iuasr-dash-panel">
+          <div class="iuasr-dash-panel__hd"><h3>Instroom per opleiding</h3></div>
+          <table class="iuasr-dash-tbl"><tbody>
+            <tr><td class="nm">PABO — Leraar Basisonderwijs</td><td class="tnum" style="text-align:right;">118</td></tr>
+            <tr><td class="nm">Bachelor Islamitische Theologie</td><td class="tnum" style="text-align:right;">96</td></tr>
+            <tr><td class="nm">Master Isl. Geestelijke Verzorging</td><td class="tnum" style="text-align:right;">44</td></tr>
+            <tr><td class="nm">Cursus Koran &amp; Hifz</td><td class="tnum" style="text-align:right;">84</td></tr>
+          </tbody></table>
+        </div>
+        <div class="iuasr-dash-panel">
+          <div class="iuasr-dash-panel__hd"><h3>Aandachtspunten</h3></div>
+          <div class="iuasr-dash-alert iuasr-dash-alert--warn" style="margin-bottom:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span><b>Usul al-Fiqh</b> — rendement onder norm (58%). Advies examencommissie gevraagd.</span></div>
+          <div class="iuasr-dash-alert iuasr-dash-alert--info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span>Directie heeft <b>leesrechten</b> op cijfers en rapporten; geen invoer of wijziging.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================= BEHEERDER ======================= -->
+    <div data-role-only="beheerder">
+      <div class="iuasr-dash-vhead">
+        <div>
+          <h1>Beheer</h1>
+          <div class="summary">Gebruikers, rollen en referentiedata · systeemstatus <b>OK</b></div>
+        </div>
+        <div class="iuasr-dash-vhead__actions">
+          <a class="iuasr-dash-btn" href="audit-log.html">Audit-log</a>
+          <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="gebruikers.html">Gebruikers beheren</a>
+        </div>
+      </div>
+
+      <div class="iuasr-dash-stats">
+        <div class="iuasr-dash-stat"><span class="lbl">Gebruikers</span><span class="val">29</span><span class="delta">5 rollen</span></div>
+        <div class="iuasr-dash-stat"><span class="lbl">Opleidingen</span><span class="val">7</span><span class="delta">actief</span></div>
+        <div class="iuasr-dash-stat"><span class="lbl">Vakken</span><span class="val">142</span><span class="delta">referentiedata</span></div>
+        <div class="iuasr-dash-stat iuasr-dash-stat--ok"><span class="lbl">Audit-events (24u)</span><span class="val">218</span><span class="delta">volledig gelogd</span></div>
+      </div>
+
+      <div class="sis-grid-2--even">
+        <a class="iuasr-dash-panel" href="gebruikers.html" style="text-decoration:none;display:block;">
+          <div class="iuasr-dash-panel__hd"><h3>Gebruikers &amp; rollen</h3></div>
+          <p class="sis-muted" style="font-size:13px;margin:0 0 12px;">Beheer wie welke rol heeft. De rolscheiding hier bepaalt de zichtbaarheid van cijfers en persoonsgegevens.</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span class="sis-rolebadge r-studentenzaken">Studentenzaken · 6</span>
+            <span class="sis-rolebadge r-docent">Docent · 14</span>
+            <span class="sis-rolebadge r-examencommissie">Examencommissie · 4</span>
+            <span class="sis-rolebadge r-directie">Directie · 3</span>
+            <span class="sis-rolebadge r-beheerder">Beheerder · 2</span>
+          </div>
+        </a>
+        <a class="iuasr-dash-panel" href="opzoektabellen.html" style="text-decoration:none;display:block;">
+          <div class="iuasr-dash-panel__hd"><h3>Opzoektabellen</h3></div>
+          <p class="sis-muted" style="font-size:13px;margin:0 0 12px;">Opleidingen, vakken, perioden, klassen en docenten — de referentiedata die vroeger losse Access-tabellen waren.</p>
+          <div class="sis-quicklinks" style="grid-template-columns:1fr 1fr;">
+            <span class="sis-pill-soft">Opleidingen · 7</span>
+            <span class="sis-pill-soft">Vakken · 142</span>
+            <span class="sis-pill-soft">Perioden · 4</span>
+            <span class="sis-pill-soft">Klassen · 23</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="assets/sis-shell.js"></script>
+<script>SIS.render({ active: 'dashboard' });</script>
+</body>
+</html>

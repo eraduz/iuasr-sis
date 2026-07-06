@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student inschrijven — IUASR SIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sis.css">
+<link rel="stylesheet" href="assets/iuasr-plugin-dash.css">
+</head>
+<body>
+
+<div id="sis-header"></div>
+
+<div class="iuasr-dash-app">
+  <nav class="iuasr-dash-sidebar" id="sis-sidebar" aria-label="Hoofdmenu"></nav>
+
+  <main class="iuasr-dash-main">
+    <div class="sis-crumb"><a href="dashboard.html">Dashboard</a><span class="sep">›</span><a href="studenten.html">Studenten</a><span class="sep">›</span><b>Inschrijven</b></div>
+
+    <div class="iuasr-dash-vhead">
+      <div>
+        <h1>Student inschrijven</h1>
+        <div class="summary">Nieuwe inschrijving · studiejaar <b>2026 / 2027</b></div>
+      </div>
+    </div>
+
+    <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-bottom:16px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <span>Kandidaat komt uit een goedgekeurde aanmelding. Gegevens zijn voor-ingevuld — controleer en vul aan. Het <b>studentnummer wordt automatisch toegekend</b> bij opslaan.</span>
+    </div>
+
+    <div class="sis-grid-2">
+      <div>
+        <form class="sis-card sis-form" onsubmit="return false;">
+          <fieldset class="sis-fieldset">
+            <legend>Persoonsgegevens</legend>
+            <div class="sis-fld-row sis-fld-row--2">
+              <div class="sis-fld"><label>Voornaam <span class="req">*</span></label><input type="text" value="Aïsha"></div>
+              <div class="sis-fld"><label>Achternaam <span class="req">*</span></label><input type="text" value="El Bouzidi"></div>
+            </div>
+            <div class="sis-fld-row sis-fld-row--2">
+              <div class="sis-fld"><label>Geboortedatum <span class="req">*</span></label><input type="text" value="09-11-2003" placeholder="dd-mm-jjjj"></div>
+              <div class="sis-fld"><label>Nationaliteit <span class="req">*</span></label><input type="text" value="Nederlandse"></div>
+            </div>
+            <div class="sis-fld">
+              <label>BSN <span class="req">*</span></label>
+              <input type="text" value="•••••••••" readonly>
+              <div class="help"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Wordt versleuteld opgeslagen en gemaskeerd getoond. Alleen Studentenzaken en Beheer kunnen het tijdelijk tonen; elke inzage wordt gelogd.</div>
+            </div>
+          </fieldset>
+
+          <fieldset class="sis-fieldset" style="margin-top:8px;">
+            <legend>Contact</legend>
+            <div class="sis-fld"><label>E-mail privé <span class="req">*</span></label><input type="email" value="a.elbouzidi@email.nl"></div>
+            <div class="sis-fld-row sis-fld-row--21">
+              <div class="sis-fld"><label>Adres</label><input type="text" value="Voorbeeldkade 8"></div>
+              <div class="sis-fld"><label>Postcode</label><input type="text" value="3032 AC"></div>
+            </div>
+            <div class="sis-fld-row sis-fld-row--2">
+              <div class="sis-fld"><label>Woonplaats</label><input type="text" value="Rotterdam"></div>
+              <div class="sis-fld"><label>Telefoon</label><input type="text" value="06 12 34 56 78"></div>
+            </div>
+          </fieldset>
+
+          <fieldset class="sis-fieldset" style="margin-top:8px;">
+            <legend>Inschrijving</legend>
+            <div class="sis-fld">
+              <label>Opleiding <span class="req">*</span></label>
+              <select><option>PABO — Leraar Basisonderwijs</option><option>Bachelor Islamitische Theologie</option><option>Master Isl. Geestelijke Verzorging</option><option>Cursus Koran &amp; Hifz</option></select>
+            </div>
+            <div class="sis-fld-row sis-fld-row--3">
+              <div class="sis-fld"><label>Variant</label><select><option>Voltijd</option><option>Deeltijd</option></select></div>
+              <div class="sis-fld"><label>Cohort</label><select><option>2026</option><option>2025</option></select></div>
+              <div class="sis-fld"><label>Klas</label><select><option>PB-1A</option><option>PB-1B</option></select></div>
+            </div>
+          </fieldset>
+
+          <div class="sis-form__actions">
+            <a class="iuasr-dash-btn" href="studenten.html">Annuleren</a>
+            <div class="right">
+              <button class="iuasr-dash-btn" type="button">Opslaan als concept</button>
+              <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="bevestig-inschrijving.html" onclick="return false;">Inschrijven &amp; nummer toekennen</a>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div>
+        <div class="sis-card">
+          <div class="sis-card__hd"><h3>Automatisch toegekend</h3></div>
+          <div class="sis-fld sis-fld--auto"><label>Studentnummer</label><input type="text" value="26••••" readonly></div>
+          <div class="help" style="margin-top:-6px;">Volgend vrij nummer in reeks <b>2026</b> — definitief bij opslaan.</div>
+          <div class="sis-fld sis-fld--auto" style="margin-top:12px;"><label>IUASR e-mail</label><input type="text" value="a.elbouzidi@student.iuasr.nl" readonly></div>
+          <div class="sis-fld sis-fld--auto"><label>Inschrijfdatum</label><input type="text" value="1 september 2026" readonly></div>
+        </div>
+        <div class="sis-card">
+          <div class="sis-card__hd"><h3>Herkomst</h3></div>
+          <dl class="sis-dl">
+            <dt>Aanmelding</dt><dd><a href="#">IUASR-2026-PB-0047</a></dd>
+            <dt>Status</dt><dd><span class="iuasr-dash-status s-approved">Goedgekeurd</span></dd>
+            <dt>Intake</dt><dd>12 jun 2026 · afgerond</dd>
+          </dl>
+        </div>
+        <div class="iuasr-dash-checklist" style="margin-top:16px;">
+          <li class="is-done"><span class="iuasr-dash-checklist__tick"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Aanmelding goedgekeurd</li>
+          <li class="is-done"><span class="iuasr-dash-checklist__tick"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Documenten compleet</li>
+          <li><span class="iuasr-dash-checklist__tick"></span>Studentnummer toekennen</li>
+          <li><span class="iuasr-dash-checklist__tick"></span>Welkomstmail versturen</li>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/sis-shell.js"></script>
+<script>SIS.render({ active: 'inschrijven' });</script>
+</body>
+</html>

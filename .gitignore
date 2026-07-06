@@ -69,3 +69,13 @@ Desktop.ini
 *.log
 .phpunit.result.cache
 /coverage/
+
+# --- Design-bronmateriaal -------------------------------------------------
+# Alleen het LEIDENDE SIS-design system wordt getrackt. De overige mappen
+# onder IUASR/ (homepage, aanmeldportaal, pages, uploads, screencaptures) horen
+# bij een andere/publieke site en zijn bulky; die blijven buiten Git. Wat de
+# applicatie nodig heeft staat al in public/assets/.
+/IUASR/*
+!/IUASR/iuasr-sis/
+!/IUASR/assets/
+!/IUASR/IUASR Design System.html

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inloggen — IUASR SIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sis.css">
+<link rel="stylesheet" href="assets/iuasr-plugin-dash.css">
+</head>
+<body>
+
+<main class="sis-login">
+  <div class="sis-login__card">
+    <img class="sis-login__logo" src="assets/logo-dark.png" alt="IUASR">
+    <h1>Studentbeheersysteem</h1>
+    <p class="sub">Interne omgeving voor Studentenzaken, docenten en beheer.<br>Log in met uw IUASR-account.</p>
+
+    <a class="sis-sso-btn" href="dashboard.html">
+      <span class="sis-sso-btn__ic" aria-hidden="true">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1E1446" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </span>
+      Inloggen met IUASR-account
+    </a>
+
+    <div class="sis-login__divider">Beveiligde toegang</div>
+
+    <div class="sis-login__note">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>Toegang verloopt via <b>Single Sign-On</b> (IUASR Entra ID). Er is geen apart wachtwoord voor dit systeem. Uw rechten worden bepaald door uw toegewezen rol.</span>
+    </div>
+
+    <div class="sis-login__demo">
+      Demo — start als rol:
+      <select id="demo-role" aria-label="Demo-rol kiezen">
+        <option value="studentenzaken">Studentenzaken</option>
+        <option value="docent">Docent</option>
+        <option value="examencommissie">Examencommissie</option>
+        <option value="directie">Directie</option>
+        <option value="beheerder">Beheerder</option>
+      </select>
+    </div>
+
+    <div class="sis-login__foot">IUASR · Islamic University of Applied Sciences Rotterdam</div>
+  </div>
+</main>
+
+<script>
+(function () {
+  var sel = document.getElementById('demo-role');
+  var stored = localStorage.getItem('sis_role');
+  if (stored) sel.value = stored;
+  sel.addEventListener('change', function () { localStorage.setItem('sis_role', this.value); });
+  // Zorg dat er altijd een rol staat vóór het inloggen
+  if (!stored) localStorage.setItem('sis_role', sel.value);
+})();
+</script>
+</body>
+</html>

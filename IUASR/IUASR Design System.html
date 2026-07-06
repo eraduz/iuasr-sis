@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IUASR Design System · v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Fira+Sans:wght@200;300;400;500;600;700&family=Reem+Kufi:wght@400;500;600;700&family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/iuasr-portal-tokens.css">
+<link rel="stylesheet" href="assets/css/design-system.css">
+<style>
+/* Page-specific extras only — alle herbruikbare componenten staan in design-system.css */
+[data-motion="page"] .page-mock {
+  background: #fff; border-radius: 6px;
+  border: 1px solid var(--borderSubtleColor);
+  padding: 18px 20px;
+  width: 80%;
+  box-shadow: var(--iuasr-shadow-sm);
+}
+[data-motion="page"].do-page .page-mock {
+  animation: m-rise 520ms cubic-bezier(0.2,0,0,1);
+}
+[data-motion="page"] .page-mock .h { font-family: var(--serif-font); font-size: 18px; margin-bottom: 6px; }
+[data-motion="page"] .page-mock .l { height: 6px; background: var(--priColor102); border-radius: 999px; margin-top: 6px; }
+[data-motion="page"] .page-mock .l:nth-child(3) { width: 80%; }
+[data-motion="page"] .page-mock .l:nth-child(4) { width: 60%; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     TOPBAR
+     ============================================================ -->
+<header class="ds-topbar" data-screen-label="Topbar">
+  <div class="ds-topbar__inner">
+    <a class="ds-topbar__brand" href="#intro" aria-label="IUASR design system">
+      <img src="assets/logo/light-default-latin.png" alt="IUASR">
+      <span class="sep" aria-hidden="true"></span>
+      <span class="label">Design System</span>
+    </a>
+    <span class="ds-topbar__spacer"></span>
+    <span class="ds-topbar__pill">v1.0 · mei 2026</span>
+    <span class="ds-topbar__date">Brand &amp; Product</span>
+  </div>
+</header>
+
+<!-- ============================================================
+     LAYOUT
+     ============================================================ -->
+<div class="ds-layout">
+
+  <!-- =================== SIDEBAR =================== -->
+  <aside class="ds-nav" aria-label="Inhoudsopgave">
+    <h6>Hoofdstukken</h6>
+    <ol>
+      <li><a href="#foundation">Brand foundation</a></li>
+      <li><a href="#logo">Logo</a></li>
+      <li><a href="#color">Kleur</a></li>
+      <li><a href="#typography">Typografie</a></li>
+      <li><a href="#spacing">Spacing &amp; layout</a></li>
+      <li><a href="#components">Componenten</a></li>
+      <li><a href="#iconography">Iconografie</a></li>
+      <li><a href="#states">Statussen</a></li>
+      <li><a href="#motion">Motion</a></li>
+      <li><a href="#examples">Voorbeelden</a></li>
+    </ol>
+    <p class="ds-nav__foot">
+      Tokens uit <code style="font-family:ui-monospace,monospace; font-size: 11px;">iuasr-portal-tokens.css</code>.
+      Alle waarden 1:1 met de productie-CSS van iuasr.nl.
+    </p>
+  </aside>
+
+  <!-- =================== CONTENT =================== -->
+  <main class="ds-main">
+
+    <!-- =========================================================
+         INTRO / COVER
+         ========================================================= -->
+    <section id="intro" class="ds-section" data-screen-label="00 Cover">
+      <div class="ds-cover">
+        <div>
+          <p class="ds-eyebrow">IUASR · Design System</p>
+          <h1 class="ds-cover__title">Een rustig systeem<br>voor een <em>klassiek</em> instituut.</h1>
+          <p class="ds-cover__sub">
+            De visuele taal van het Islamic University of Applied Sciences Rotterdam — geformaliseerd
+            tot één samenhangend systeem voor het studentportaal, communicatie en marketing.
+            Helder, ingetogen en gemaakt voor de lange termijn.
+          </p>
+          <dl class="ds-cover__meta">
+            <dt>Versie</dt><dd>1.0 · mei 2026</dd>
+            <dt>Eigenaar</dt><dd>IUASR · Brand &amp; Product</dd>
+            <dt>Bron</dt><dd>Corporate Identity v1.0.1 (2024-09) · iuasr.nl</dd>
+            <dt>Schriften</dt><dd>DM Serif Display · Fira Sans · Reem Kufi · Cairo</dd>
+          </dl>
+        </div>
+        <div class="ds-cover__mark">
+          <img src="assets/logo/dark-default-latin.png" alt="IUASR-logo">
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         01. BRAND FOUNDATION
+         ========================================================= -->
+    <section id="foundation" class="ds-section" data-screen-label="01 Foundation">
+      <header class="ds-section__head">
+        <span class="ds-section__num">01 · Brand foundation</span>
+        <h2 class="ds-section__title">Een ingetogen academische identiteit.</h2>
+        <p class="ds-section__lede">
+          IUASR positioneert zich als een serieuze, internationaal verankerde universiteit van toegepaste wetenschappen.
+          Het visuele systeem volgt die belofte: hoog-contrast typografie, gedempte kleuren met één duidelijke accenttoon,
+          en compositie met veel rust eromheen.
+        </p>
+      </header>
+
+      <div class="ds-sub">
+        <h3>Ontwerpprincipes</h3>
+        <p>Vier uitgangspunten die elke ontwerp- en copybeslissing toetsen.</p>
+      </div>
+
+      <div class="ds-principles">
+        <div class="ds-principle">
+          <span class="ds-principle__num">01</span>
+          <h4>Vertrouwd &amp; verzorgd</h4>
+          <p>Een hoog-contrast didone-kop in combinatie met een rustige sans-serif. We kiezen zorgvuldig boven snel; lay-outs ademen, randen zijn fijn, schaduwen zijn zacht en getint.</p>
+        </div>
+        <div class="ds-principle">
+          <span class="ds-principle__num">02</span>
+          <h4>Helder &amp; rustig</h4>
+          <p>Eén actie per scherm staat centraal. Crimson onderbreekt het rustige indigopalet alleen waar dat nodig is — voor een knop, een waarschuwing of een link.</p>
+        </div>
+        <div class="ds-principle">
+          <span class="ds-principle__num">03</span>
+          <h4>Klassiek &amp; modern</h4>
+          <p>De serifkop verwijst naar academische traditie, de sans-body is bewust hedendaags. Samen vormen ze een stem die zowel respectvol als helder is.</p>
+        </div>
+        <div class="ds-principle">
+          <span class="ds-principle__num">04</span>
+          <h4>Cultureel verankerd</h4>
+          <p>Latijnse en Arabische varianten van het logo en de naam zijn gelijkwaardig. Tekst, padding en uitlijning houden rekening met beide leesrichtingen.</p>
+        </div>
+      </div>
+
+      <div class="ds-sub">
+        <h3>Toon &amp; taal</h3>
+        <p>De stem van IUASR is feitelijk, vriendelijk en formeel-warm. We zijn een Nederlandse universiteit; primaire copy is Nederlands, kleine details mogen Engels of Arabisch zijn.</p>
+      </div>
+
+      <div class="ds-voice">
+        <div class="ds-voice__col ds-voice__col--yes">
+          <h5><span class="dot"></span> Wel doen</h5>
+          <ul>
+            <li>"Je aanmelding is in goede orde ontvangen."</li>
+            <li>"Wij sturen een bevestiging binnen één werkdag."</li>
+            <li>"Vraag bij twijfel je studieadviseur."</li>
+            <li>Volledige zinnen. Eerst de actie, dan de context.</li>
+            <li>Cijfers zijn precies: 14 juni 2026, niet "binnenkort".</li>
+          </ul>
+        </div>
+        <div class="ds-voice__col ds-voice__col--no">
+          <h5><span class="dot"></span> Niet doen</h5>
+          <ul>
+            <li>"Yo! Klaar om te knallen op de campus?" — geen plat-modern jargon.</li>
+            <li>"Geweldig nieuws! Ongelooflijk gemakkelijk!" — geen marketingjubel.</li>
+            <li>Geen emoji in formele communicatie of dashboards.</li>
+            <li>Geen tutoyeren in juridische of financiële teksten.</li>
+            <li>Geen onnodige Engelse termen waar Nederlands volstaat.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="ds-sub">
+        <h3>Erfgoed</h3>
+        <p>De universiteit zit sinds 1997 in het monumentale Bergsingel-gebouw — gebouwd in 1921–1923 als derde HBS van Rotterdam, ontworpen door Walter Dahlen. De stenen herinneren ons aan onze rol: een eeuw onderwijs op deze plek voortzetten.</p>
+      </div>
+
+      <div class="ds-heritage">
+        <div class="ds-heritage__img">
+          <img src="assets/identity/03-heritage-photo.png" alt="Historische foto van het Bergsingel-gebouw in Rotterdam, oorspronkelijk de derde HBS.">
+        </div>
+        <div class="ds-heritage__copy">
+          <p class="ds-eyebrow" style="color: var(--secColor100);">Bergsingel 135 · Rotterdam</p>
+          <h3>Honderd jaar bouwwerk,<br>een kwart eeuw IUASR.</h3>
+          <p>Het pand is in 1921–1923 opgetrokken als de derde HBS van Rotterdam, naar ontwerp van architect Walter Dahlen. Het overleefde de oorlog ongeschonden. Sinds 1997 huist IUASR hier en voert het deze plek voort als een baken van verlichting en wetenschap.</p>
+          <p>Het logo draagt twee jaartallen — de Gregoriaanse stichtingsdatum en het Hijra-equivalent — als stille verwijzing naar onze geworteldheid in twee tradities.</p>
+          <div class="ds-heritage__dates">
+            <span class="ds-heritage__date">Gregoriaans · <b>1997</b></span>
+            <span class="ds-heritage__date">Hijra · <b>١٤١٨</b></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-sub">
+        <h3>Unificatie · common ground</h3>
+        <p>De kerngedachte achter de huisstijl: twee tradities die elkaar niet uitsluiten maar samen één cirkel vormen. Het logo, de typografie en de kleuren zijn allemaal verankerd in dat principe.</p>
+      </div>
+
+      <div class="ds-unification">
+        <div class="ds-unification__viz" aria-hidden="true">
+          <svg viewBox="0 0 280 160" width="100%" height="100%">
+            <g fill="none" stroke-width="2.4" stroke-linecap="round">
+              <!-- left half -->
+              <path d="M70 30 A50 50 0 0 0 70 130 L70 30 Z" stroke="#201547" />
+              <!-- right half -->
+              <path d="M70 30 A50 50 0 0 1 70 130 L70 30 Z" stroke="#C8102E" />
+              <!-- unified circle -->
+              <path d="M210 30 A50 50 0 0 0 210 130 L210 30 Z" stroke="#201547" />
+              <path d="M210 30 A50 50 0 0 1 210 130 L210 30 Z" stroke="#C8102E" />
+              <line x1="210" y1="28" x2="210" y2="132" stroke="rgba(32,21,71,0.25)" stroke-width="1" stroke-dasharray="2 4"/>
+            </g>
+          </svg>
+        </div>
+        <div class="ds-unification__copy">
+          <p class="ds-eyebrow">Brand-principe</p>
+          <h3>Twee helften, één cirkel.</h3>
+          <p>Latijn en Arabisch, traditie en heden, geloof en wetenschap — IUASR plaatst geen van deze tegenover elkaar. In de huisstijl zien we dat terug in gelijkwaardige scriptvarianten, in evenwichtige composities en in een rustig palet dat nooit één toon laat domineren.</p>
+        </div>
+      </div>
+
+      <div class="ds-sub">
+        <h3>Geometrische oorsprong</h3>
+        <p>Het embleem komt voort uit drie elementaire vormen. Elke laag voegt betekenis toe — van de eenvoudigste vereniging van cirkel en vierkant tot de gestileerde campus zelf.</p>
+      </div>
+
+      <div class="ds-symbol-row">
+        <div class="ds-symbol">
+          <div class="ds-symbol__geom" aria-hidden="true">
+            <svg viewBox="0 0 120 120">
+              <g fill="none" stroke="#F2F1F4" stroke-width="2">
+                <circle cx="60" cy="60" r="56"/>
+                <rect x="20" y="20" width="80" height="80"/>
+              </g>
+            </svg>
+          </div>
+          <div class="ds-symbol__cap">
+            <b>Verbinding</b>
+            <span>Hemel ontmoet aarde.</span>
+            <small>Cirkel · vierkant</small>
+          </div>
+        </div>
+        <div class="ds-symbol">
+          <div class="ds-symbol__geom" aria-hidden="true">
+            <svg viewBox="0 0 120 120">
+              <g fill="none" stroke="#F2F1F4" stroke-width="2">
+                <circle cx="60" cy="60" r="56"/>
+                <polygon points="20,20 100,20 100,100 20,100"/>
+                <polygon points="60,4 116,60 60,116 4,60"/>
+                <line x1="20" y1="20" x2="100" y2="100"/>
+                <line x1="100" y1="20" x2="20" y2="100"/>
+              </g>
+            </svg>
+          </div>
+          <div class="ds-symbol__cap">
+            <b>Oneindigheid</b>
+            <span>Vierkant wordt cirkel.</span>
+            <small>Achthoek</small>
+          </div>
+        </div>
+        <div class="ds-symbol ds-symbol--accent">
+          <div class="ds-symbol__geom" aria-hidden="true">
+            <img src="assets/logo/logo-icon.png" alt="" style="width: 100%; height: 100%; object-fit: contain;">
+          </div>
+          <div class="ds-symbol__cap">
+            <b>IUASR</b>
+            <span>De campus krijgt betekenis.</span>
+            <small>Verbonden lijnen</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-sub">
+        <h3>De drie elementen van het embleem</h3>
+        <p>Binnen de cirkel staan drie architectonische elementen voor de identiteit van een academische gemeenschap. Ze hebben elk een naam en een betekenis — en mogen alleen in deze context worden gebruikt.</p>
+      </div>
+
+      <div class="ds-symbol-row">
+        <div class="ds-symbol">
+          <div class="ds-symbol__geom" aria-hidden="true">
+            <svg viewBox="0 0 120 120">
+              <g fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="60" cy="60" r="48" stroke="rgba(242,241,244,0.25)"/>
+                <!-- qubba (dome) highlighted -->
+                <ellipse cx="60" cy="50" rx="22" ry="22" stroke="#C8102E"/>
+                <ellipse cx="60" cy="32" rx="6" ry="6" stroke="#C8102E"/>
+                <!-- base muted -->
+                <path d="M30 72 L90 72 L90 86 L30 86 Z" stroke="rgba(242,241,244,0.25)"/>
+                <path d="M44 86 L44 96 M52 86 L52 96 M60 86 L60 96 M68 86 L68 96 M76 86 L76 96" stroke="rgba(242,241,244,0.2)" stroke-width="1.5"/>
+              </g>
+            </svg>
+          </div>
+          <div class="ds-symbol__cap">
+            <b>Madrasa</b>
+            <span>De plek van onderwijs.</span>
+            <small>Qubba · de koepel</small>
+          </div>
+        </div>
+        <div class="ds-symbol">
+          <div class="ds-symbol__geom" aria-hidden="true">
+            <svg viewBox="0 0 120 120">
+              <g fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="60" cy="60" r="48" stroke="rgba(242,241,244,0.25)"/>
+                <ellipse cx="60" cy="50" rx="22" ry="22" stroke="rgba(242,241,244,0.25)"/>
+                <ellipse cx="60" cy="32" rx="6" ry="6" stroke="rgba(242,241,244,0.25)"/>
+                <!-- left + right piers highlighted -->
+                <path d="M22 72 L98 72 L94 88 L26 88 Z" stroke="#C8102E"/>
+                <path d="M44 88 L44 96 M76 88 L76 96" stroke="rgba(242,241,244,0.2)" stroke-width="1.5"/>
+              </g>
+            </svg>
+          </div>
+          <div class="ds-symbol__cap">
+            <b>Open-mindedness</b>
+            <span>Zoeken naar waarheid.</span>
+            <small>Linker- &amp; rechterpijler</small>
+          </div>
+        </div>
+        <div class="ds-symbol">
+          <div class="ds-symbol__geom" aria-hidden="true">
+            <svg viewBox="0 0 120 120">
+              <g fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="60" cy="60" r="48" stroke="rgba(242,241,244,0.25)"/>
+                <ellipse cx="60" cy="50" rx="22" ry="22" stroke="rgba(242,241,244,0.25)"/>
+                <ellipse cx="60" cy="32" rx="6" ry="6" stroke="rgba(242,241,244,0.25)"/>
+                <path d="M22 72 L98 72 L94 88 L26 88 Z" stroke="rgba(242,241,244,0.25)"/>
+                <!-- three portals highlighted -->
+                <path d="M44 96 L44 90 A4 4 0 0 1 52 90 L52 96" stroke="#C8102E"/>
+                <path d="M56 96 L56 90 A4 4 0 0 1 64 90 L64 96" stroke="#C8102E"/>
+                <path d="M68 96 L68 90 A4 4 0 0 1 76 90 L76 96" stroke="#C8102E"/>
+              </g>
+            </svg>
+          </div>
+          <div class="ds-symbol__cap">
+            <b>Gastvrijheid</b>
+            <span>Toegankelijk voor iedereen.</span>
+            <small>Drie portalen</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-sub">
+        <h3>Tessellation · het secundaire merkelement</h3>
+        <p>Het embleem mag herhaald worden tot een rozet. Deze tessellatie is naast het logo zelf het belangrijkste visuele kenmerk van IUASR — gebruikt op covers, watermerken en op de achterzijde van visitekaartjes.</p>
+      </div>
+
+      <div class="ds-pattern">
+        <div class="ds-pattern__viz">
+          <img src="assets/identity/17-tessellation.png" alt="IUASR-tessellatie: een rozet opgebouwd uit het herhaalde embleem.">
+        </div>
+        <div class="ds-pattern__copy">
+          <p class="ds-eyebrow" style="color: rgba(242,241,244,0.55);">Brand pattern</p>
+          <h3>Eén embleem,<br>een ornament zonder einde.</h3>
+          <p>De tessellatie ontstaat door het IUASR-merk rond zijn middenpunt te rangschikken. Het is geen losse illustratie — het is een directe afgeleide van het logo, en gedraagt zich als zodanig: hetzelfde kleurgebruik, dezelfde lijndikte, dezelfde minimale spacing.</p>
+          <div class="ds-pattern__rules">
+            <div class="ds-pattern__rule"><b>01</b><span>Alleen in een merkkleur — indigo, groen of crimson — nooit gemixt met fotografie of gradients.</span></div>
+            <div class="ds-pattern__rule"><b>02</b><span>Op covers en watermerken houdt het pattern minstens 50% opaciteit ten opzichte van de bg.</span></div>
+            <div class="ds-pattern__rule"><b>03</b><span>Schaal nooit zo klein dat de afzonderlijke emblemen vervallen tot ruis (≥ 80 px per emblem).</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         02. LOGO
+         ========================================================= -->
+    <section id="logo" class="ds-section" data-screen-label="02 Logo">
+      <header class="ds-section__head">
+        <span class="ds-section__num">02 · Logo</span>
+        <h2 class="ds-section__title">Het embleem &amp; de woordmerk.</h2>
+        <p class="ds-section__lede">
+          Het IUASR-merkteken combineert het embleem — een gestileerde campus binnen een ring — met de Latijnse en Arabische woordmerken.
+          Beide schriften zijn gelijkwaardig; gebruik de variant die bij de doelgroep en context past.
+        </p>
+      </header>
+
+      <div class="ds-logo-hero">
+        <div class="ds-logo-hero__mark">
+          <img src="assets/logo/light-default-latin.png" alt="Primair logo IUASR, Latijn, op licht">
+        </div>
+        <div class="ds-logo-hero__copy">
+          <p class="ds-eyebrow">Primair · Latin · licht</p>
+          <h3>De standaardvariant.</h3>
+          <p>Gebruik deze versie op zachte achtergronden (#F2F1F4) of wit, in de meeste digitale en gedrukte uitingen. Het embleem links is het herkenningspunt; het woordmerk daarnaast voert de stem.</p>
+          <p>Minimumhoogte van het volledige logo is <b>24 px</b> op scherm en <b>10 mm</b> in druk. Onder die maten gebruik je het losse embleem.</p>
+        </div>
+      </div>
+
+      <div class="ds-sub">
+        <h3>Constructie · de gulden snede</h3>
+        <p>De verhoudingen tussen embleem, woordmerk en tagline volgen de gulden snede. Niet als trucje, maar omdat het de visuele rust geeft die bij een klassieke universiteit hoort. Pas deze proporties nooit handmatig aan.</p>
+      </div>
+
+      <div class="ds-golden">
+        <div class="ds-golden__viz">
+          <img src="assets/identity/13-golden-ratio.png" alt="Constructiediagram van het logo gebaseerd op de gulden snede.">
+        </div>
+        <div class="ds-golden__copy">
+          <p class="ds-eyebrow" style="color: var(--secColor100);">Mathematical elegance</p>
+          <h3>Wat je voelt is gerekend.</h3>
+          <p>Het embleem zit op een 1 / b-deling, het woordmerk daarnaast neemt het a-deel in. De tagline gebruikt de smalste subdivisie. Wie het logo opnieuw plaatst in een lay-out, plaatst eigenlijk gewoon dezelfde rasterdeling.</p>
+          <p>Het Hijra-jaar (١٤١٨) staat in spiegelbeeld om de cirkel — gelijkwaardig met 1997, niet ondergeschikt eraan.</p>
+        </div>
+      </div>
+
+      <div class="ds-sub"><h3>Compositie · Latijn &amp; Arabisch</h3><p>Drie geldige lay-outs voor beide schriften. De keuze hangt af van de horizontale ruimte en de hiërarchie in de uiting. Stack niet wat eigenlijk horizontaal moet, en omgekeerd.</p></div>
+
+      <div class="ds-logo-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="ds-logo-tile">
+          <div class="ds-logo-tile__canvas" style="min-height: 280px;"><img src="assets/identity/15-composition-latin.png" alt="Drie Latijnse compositie-richtingen" style="max-width: 96%; max-height: 260px;"></div>
+          <div class="ds-logo-tile__foot"><b>Latijn</b><code>links · gestapeld · uitgevuld</code></div>
+        </div>
+        <div class="ds-logo-tile">
+          <div class="ds-logo-tile__canvas" style="min-height: 280px;"><img src="assets/identity/16-composition-arabic.png" alt="Drie Arabische compositie-richtingen" style="max-width: 96%; max-height: 260px;"></div>
+          <div class="ds-logo-tile__foot"><b>Arabisch</b><code>rechts · gestapeld · gespiegeld</code></div>
+        </div>
+      </div>
+
+      <div class="ds-sub"><h3>Varianten</h3><p>Drie uitlijningen × twee schriften × twee tonen. Alle bestanden in <code style="font-family:ui-monospace,monospace; font-size:12.5px">/assets/logo/</code>.</p></div>
+
+      <div class="ds-logo-grid">
+        <div class="ds-logo-tile">
+          <div class="ds-logo-tile__canvas"><img src="assets/logo/light-default-latin.png" alt=""></div>
+          <div class="ds-logo-tile__foot"><b>Default · Latin</b><code>light-default-latin.png</code></div>
+        </div>
+        <div class="ds-logo-tile">
+          <div class="ds-logo-tile__canvas"><img src="assets/logo/light-centered-latin.png" alt=""></div>
+          <div class="ds-logo-tile__foot"><b>Gecentreerd · Latin</b><code>light-centered-latin.png</code></div>
+        </div>
+        <div class="ds-logo-tile">
+          <div class="ds-logo-tile__canvas"><img src="assets/logo/light-left-latin.png" alt=""></div>
+          <div class="ds-logo-tile__foot"><b>Links uitgelijnd · Latin</b><code>light-left-latin.png</code></div>
+        </div>
+        <div class="ds-logo-tile">
+          <div class="ds-logo-tile__canvas"><img src="assets/logo/light-default-arabic.png" alt=""></div>
+          <div class="ds-logo-tile__foot"><b>Default · Arabisch</b><code>light-default-arabic.png</code></div>
+        </div>
+        <div class="ds-logo-tile">
+          <div class="ds-logo-tile__canvas"><img src="assets/logo/light-centered-arabic.png" alt=""></div>
+          <div class="ds-logo-tile__foot"><b>Gecentreerd · Arabisch</b><code>light-centered-arabic.png</code></div>
+        </div>
+        <div class="ds-logo-tile">
+          <div class="ds-logo-tile__canvas"><img src="assets/logo/light-right-arabic.png" alt=""></div>
+          <div class="ds-logo-tile__foot"><b>Rechts · Arabisch</b><code>light-right-arabic.png</code></div>
+        </div>
+        <div class="ds-logo-tile ds-logo-tile--dark">
+          <div class="ds-logo-tile__canvas"><img src="assets/logo/dark-default-latin.png" alt=""></div>
+          <div class="ds-logo-tile__foot"><b>Donker · Latin</b><code>dark-default-latin.png</code></div>
+        </div>
+        <div class="ds-logo-tile ds-logo-tile--dark">
+          <div class="ds-logo-tile__canvas"><img src="assets/logo/dark-default-arabic.png" alt=""></div>
+          <div class="ds-logo-tile__foot"><b>Donker · Arabisch</b><code>dark-default-arabic.png</code></div>
+        </div>
+        <div class="ds-logo-tile">
+          <div class="ds-logo-tile__canvas"><img src="assets/logo/logo-icon.png" alt="" style="max-width:200px; max-height:200px;"></div>
+          <div class="ds-logo-tile__foot"><b>Embleem</b><code>logo-icon.png</code></div>
+        </div>
+      </div>
+
+      <div class="ds-sub"><h3>Vrije ruimte</h3><p>Houd minimaal de hoogte van een embleem-eenheid (<code style="font-family:ui-monospace,monospace; font-size:12.5px">x</code>) vrij rond het logo. Andere elementen — tekst, beeld, randen — komen daarbinnen niet.</p></div>
+
+      <div class="ds-clearspace">
+        <div class="ds-clearspace__svg">
+          <svg viewBox="0 0 340 200" width="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <pattern id="dotted" patternUnits="userSpaceOnUse" width="6" height="6">
+                <circle cx="1" cy="1" r="1" fill="rgba(32, 21, 71,0.30)"/>
+              </pattern>
+            </defs>
+            <!-- vrije ruimte indicator -->
+            <rect x="50" y="40" width="240" height="120" fill="none" stroke="url(#dotted)" stroke-width="1"/>
+            <rect x="50" y="40" width="240" height="120" fill="none" stroke="rgba(200,16,46,0.4)" stroke-dasharray="3 3"/>
+            <!-- logo container -->
+            <rect x="90" y="70" width="160" height="60" fill="#fff" stroke="rgba(32, 21, 71,0.20)"/>
+            <!-- x markers -->
+            <text x="170" y="36" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11" fill="#201547">x</text>
+            <text x="170" y="172" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11" fill="#201547">x</text>
+            <text x="30" y="105" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11" fill="#201547">x</text>
+            <text x="310" y="105" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11" fill="#201547">x</text>
+            <!-- embleem en woordmerk indicators -->
+            <circle cx="110" cy="100" r="14" fill="none" stroke="#201547" stroke-width="1.5"/>
+            <rect x="135" y="92" width="100" height="6" fill="#201547"/>
+            <rect x="135" y="106" width="80" height="4" fill="rgba(32, 21, 71,0.4)"/>
+          </svg>
+        </div>
+        <dl>
+          <dt>Definitie van x</dt>
+          <dd>x = hoogte van het embleem in de gekozen variant<small>De vrije ruimte rondom het logo is altijd minstens 1×x.</small></dd>
+
+          <dt>Schermgebruik</dt>
+          <dd>Minimumhoogte logo: 24 px (compleet); 20 px (alleen embleem).<small>Daaronder wordt het embleem onleesbaar.</small></dd>
+
+          <dt>Drukgebruik</dt>
+          <dd>Minimumhoogte logo: 10 mm (compleet); 6 mm (embleem).<small>Hou bij visitekaartjes 4 mm vrije ruimte buiten het logo.</small></dd>
+
+          <dt>Plaatsing</dt>
+          <dd>Links bovenaan in headers; gecentreerd in formele documenten.<small>Niet roteren, niet vervormen, geen drop shadows of glows.</small></dd>
+        </dl>
+      </div>
+
+      <div class="ds-sub"><h3>Schaal</h3><p>Drie standaardmaten voor digitaal gebruik.</p></div>
+
+      <div class="ds-size-row">
+        <div class="ds-size-row__item">
+          <img src="assets/logo/light-default-latin.png" alt="" style="height:64px; width:auto;">
+          <div class="lbl">Hero · 64 px</div>
+        </div>
+        <div class="ds-size-row__item">
+          <img src="assets/logo/light-default-latin.png" alt="" style="height:40px; width:auto;">
+          <div class="lbl">Header · 40 px</div>
+        </div>
+        <div class="ds-size-row__item">
+          <img src="assets/logo/light-default-latin.png" alt="" style="height:28px; width:auto;">
+          <div class="lbl">Compact · 28 px</div>
+        </div>
+        <div class="ds-size-row__item">
+          <img src="assets/logo/logo-icon.png" alt="" style="height:28px; width:28px;">
+          <div class="lbl">Favicon · 28 px</div>
+        </div>
+        <div class="ds-size-row__item">
+          <img src="assets/logo/logo-icon.png" alt="" style="height:16px; width:16px;">
+          <div class="lbl">Tab · 16 px</div>
+        </div>
+      </div>
+
+      <div class="ds-sub"><h3>Wat niet te doen</h3><p>Vier patronen die de identiteit verzwakken. Bij twijfel: terug naar de standaardvariant.</p></div>
+
+      <div class="ds-misuse">
+        <div class="ds-misuse__tile">
+          <div class="ds-misuse__canvas" style="background:#201547;">
+            <img src="assets/logo/light-default-latin.png" alt="">
+          </div>
+          <p>Niet inverteren op verkeerde grond<small>Gebruik de donker-variant op indigo, niet de licht-variant.</small></p>
+        </div>
+        <div class="ds-misuse__tile">
+          <div class="ds-misuse__canvas">
+            <img src="assets/logo/light-default-latin.png" alt="" style="transform: rotate(-12deg) scaleX(1.3);">
+          </div>
+          <p>Niet roteren of vervormen<small>Houd het logo orthogonaal en proportioneel.</small></p>
+        </div>
+        <div class="ds-misuse__tile">
+          <div class="ds-misuse__canvas" style="background: linear-gradient(135deg, #FF8A00, #C8102E);">
+            <img src="assets/logo/light-default-latin.png" alt="">
+          </div>
+          <p>Niet op kleurverloop plaatsen<small>Wij gebruiken geen gradients. Plaats het logo op een effen merkkleur.</small></p>
+        </div>
+        <div class="ds-misuse__tile">
+          <div class="ds-misuse__canvas">
+            <img src="assets/logo/light-default-latin.png" alt="" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));">
+          </div>
+          <p>Geen drop shadow of glow<small>Het logo staat altijd plat op de achtergrond.</small></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         03. KLEUR
+         ========================================================= -->
+    <section id="color" class="ds-section" data-screen-label="03 Color">
+      <header class="ds-section__head">
+        <span class="ds-section__num">03 · Kleur</span>
+        <h2 class="ds-section__title">Vier merkkleuren, één duidelijke hiërarchie.</h2>
+        <p class="ds-section__lede">
+          Indigo (Pantone 2765 C) is het hart van de huisstijl. Crimson onderbreekt, groen markeert publicaties (IUASR Press), goud is voorbehouden aan ceremoniële uitingen. De pagina-achtergrond is bewust géén wit (#F2F1F4) zodat witte vlakken automatisch een subtiel hoogteverschil hebben.
+        </p>
+      </header>
+
+      <div class="ds-sub"><h3>Officiële basiskleuren · Pantone</h3><p>Direct uit het corporate identity-handboek. Gebruik deze Pantone-equivalenten voor drukwerk en de exacte hex-waardes voor digitaal.</p></div>
+
+      <div class="ds-pantone">
+        <div class="ds-pantone__tile">
+          <span class="ds-pantone__chip" style="background:#201547;"></span>
+          <div class="ds-pantone__foot">
+            <small>Pantone 2765 C</small>
+            <b>Indigo</b>
+            <code>#201547 · priColor100</code>
+          </div>
+        </div>
+        <div class="ds-pantone__tile">
+          <span class="ds-pantone__chip" style="background:#285C4D;"></span>
+          <div class="ds-pantone__foot">
+            <small>Pantone 626 C</small>
+            <b>Heritage groen</b>
+            <code>#285C4D · priColor200</code>
+          </div>
+        </div>
+        <div class="ds-pantone__tile">
+          <span class="ds-pantone__chip" style="background:#D69A2D;"></span>
+          <div class="ds-pantone__foot">
+            <small>Pantone 7563 C</small>
+            <b>Goud</b>
+            <code>#D69A2D · priColor300</code>
+          </div>
+        </div>
+        <div class="ds-pantone__tile">
+          <span class="ds-pantone__chip" style="background:#C8102E;"></span>
+          <div class="ds-pantone__foot">
+            <small>Pantone 186 C</small>
+            <b>Crimson</b>
+            <code>#C8102E · secColor100</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-sub"><h3>Rolverdeling in product</h3><p>Voor het studentportaal en website-UI zijn drie rollen genoeg. Groen en goud blijven voorbehouden aan publicaties en ceremoniële uitingen.</p></div>
+
+      <div class="ds-color-anchors">
+        <div class="ds-color-anchor ds-color-anchor--indigo" data-copy="#201547">
+          <small>Primair</small>
+          <div>
+            <p class="role">Hoofdtekst, navigatie, footer, donkere vlakken, illustraties.</p>
+            <b>Indigo 800</b>
+            <code>#201547 · priColor100</code>
+          </div>
+        </div>
+        <div class="ds-color-anchor ds-color-anchor--crimson" data-copy="#C8102E">
+          <small>Accent</small>
+          <div>
+            <p class="role">Primaire knoppen, links, focus rings, foutmeldingen.</p>
+            <b>Crimson 600</b>
+            <code>#C8102E · secColor100</code>
+          </div>
+        </div>
+        <div class="ds-color-anchor ds-color-anchor--peach" data-copy="#FFD2B0">
+          <small>Highlight</small>
+          <div>
+            <p class="role">Callouts, eyebrows, hover-bg's, sectie-onderscheid.</p>
+            <b>Peach 200</b>
+            <code>#FFD2B0 · secColor300</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-sub"><h3>Indigo-schaal</h3><p>Afgeleide tinten voor borders, surfaces en hover-states. Hex-anchor 800 is de officiële merkkleur.</p></div>
+      <div class="ds-scale">
+        <div class="ds-swatch ds-swatch--lt" style="background:#F0EEF5" data-copy="#F0EEF5"><b>50</b><code>#F0EEF5</code></div>
+        <div class="ds-swatch ds-swatch--lt" style="background:#D8D2E5" data-copy="#D8D2E5"><b>100</b><code>#D8D2E5</code></div>
+        <div class="ds-swatch ds-swatch--lt" style="background:#B0A6CD" data-copy="#B0A6CD"><b>200</b><code>#B0A6CD</code></div>
+        <div class="ds-swatch ds-swatch--lt" style="background:#837AAC" data-copy="#837AAC"><b>300</b><code>#837AAC</code></div>
+        <div class="ds-swatch ds-swatch--dk" style="background:#534095" data-copy="#534095"><b>400</b><code>#534095</code></div>
+        <div class="ds-swatch ds-swatch--dk ds-swatch--anchor" style="background:#201547" data-copy="#201547"><b>800 ★</b><code>#201547</code></div>
+        <div class="ds-swatch ds-swatch--dk" style="background:#15123A" data-copy="#15123A"><b>900</b><code>#15123A</code></div>
+      </div>
+
+      <div class="ds-sub"><h3>Crimson-schaal</h3><p>Voor primaire acties en kritieke staten. Niet voor decoratie.</p></div>
+      <div class="ds-scale">
+        <div class="ds-swatch ds-swatch--lt" style="background:#FBE7EB" data-copy="#FBE7EB"><b>50</b><code>#FBE7EB</code></div>
+        <div class="ds-swatch ds-swatch--lt" style="background:#F5C2CC" data-copy="#F5C2CC"><b>100</b><code>#F5C2CC</code></div>
+        <div class="ds-swatch ds-swatch--lt" style="background:#E68A98" data-copy="#E68A98"><b>200</b><code>#E68A98</code></div>
+        <div class="ds-swatch ds-swatch--lt" style="background:#DC5266" data-copy="#DC5266"><b>300</b><code>#DC5266</code></div>
+        <div class="ds-swatch ds-swatch--dk" style="background:#D02D45" data-copy="#D02D45"><b>400</b><code>#D02D45</code></div>
+        <div class="ds-swatch ds-swatch--dk ds-swatch--anchor" style="background:#C8102E" data-copy="#C8102E"><b>600 ★</b><code>#C8102E</code></div>
+        <div class="ds-swatch ds-swatch--dk" style="background:#9A0C24" data-copy="#9A0C24"><b>700</b><code>#9A0C24</code></div>
+      </div>
+
+      <div class="ds-sub"><h3>Peach-schaal</h3><p>Voor callouts en zachte vlakken; nooit als hoofdkleur in tekst.</p></div>
+      <div class="ds-scale">
+        <div class="ds-swatch ds-swatch--lt" style="background:#FFF4EC" data-copy="#FFF4EC"><b>50</b><code>#FFF4EC</code></div>
+        <div class="ds-swatch ds-swatch--lt" style="background:#FFE2CE" data-copy="#FFE2CE"><b>100</b><code>#FFE2CE</code></div>
+        <div class="ds-swatch ds-swatch--lt ds-swatch--anchor" style="background:#FFD2B0" data-copy="#FFD2B0"><b>200 ★</b><code>#FFD2B0</code></div>
+        <div class="ds-swatch ds-swatch--lt" style="background:#F5A573" data-copy="#F5A573"><b>300</b><code>#F5A573</code></div>
+        <div class="ds-swatch ds-swatch--lt" style="background:#ED7F36" data-copy="#ED7F36"><b>400</b><code>#ED7F36</code></div>
+        <div class="ds-swatch ds-swatch--dk" style="background:#D86810" data-copy="#D86810"><b>500</b><code>#D86810</code></div>
+        <div class="ds-swatch ds-swatch--dk" style="background:#A8500D" data-copy="#A8500D"><b>600</b><code>#A8500D</code></div>
+      </div>
+
+      <div class="ds-sub"><h3>Heritage-groen · IUASR Press</h3><p>Pantone 626 C wordt gebruikt op groene covers van de IUASR Press en bij sub-merken die expliciet als zustermerk gepresenteerd worden. Niet in regulier portaal-UI.</p></div>
+      <div class="ds-scale">
+        <div class="ds-swatch ds-swatch--lt" style="background:#EAF1EE" data-copy="#EAF1EE"><b>50</b><code>#EAF1EE</code></div>
+        <div class="ds-swatch ds-swatch--lt" style="background:#C8DBD3" data-copy="#C8DBD3"><b>100</b><code>#C8DBD3</code></div>
+        <div class="ds-swatch ds-swatch--lt" style="background:#7FA89B" data-copy="#7FA89B"><b>200</b><code>#7FA89B</code></div>
+        <div class="ds-swatch ds-swatch--dk" style="background:#4B8273" data-copy="#4B8273"><b>300</b><code>#4B8273</code></div>
+        <div class="ds-swatch ds-swatch--dk ds-swatch--anchor" style="background:#285C4D" data-copy="#285C4D"><b>500 ★</b><code>#285C4D</code></div>
+        <div class="ds-swatch ds-swatch--dk" style="background:#1B4338" data-copy="#1B4338"><b>700</b><code>#1B4338</code></div>
+      </div>
+
+      <div class="ds-sub"><h3>Goud · ceremonieel accent</h3><p>Pantone 7563 C voor diplomas, oorkondes en jubilea. Combineert met indigo of groen; nooit als hoofdkleur in webdesign.</p></div>
+      <div class="ds-scale">
+        <div class="ds-swatch ds-swatch--lt" style="background:#FBF3E2" data-copy="#FBF3E2"><b>50</b><code>#FBF3E2</code></div>
+        <div class="ds-swatch ds-swatch--lt" style="background:#F4E0AC" data-copy="#F4E0AC"><b>100</b><code>#F4E0AC</code></div>
+        <div class="ds-swatch ds-swatch--lt" style="background:#EAC472" data-copy="#EAC472"><b>200</b><code>#EAC472</code></div>
+        <div class="ds-swatch ds-swatch--dk ds-swatch--anchor" style="background:#D69A2D" data-copy="#D69A2D"><b>500 ★</b><code>#D69A2D</code></div>
+        <div class="ds-swatch ds-swatch--dk" style="background:#A87520" data-copy="#A87520"><b>700</b><code>#A87520</code></div>
+        <div class="ds-swatch ds-swatch--dk" style="background:#7A5616" data-copy="#7A5616"><b>800</b><code>#7A5616</code></div>
+      </div>
+
+      <div class="ds-sub"><h3>Achtergrond, randen &amp; tekst</h3><p>De pagina-achtergrond is lavendel-getint, niet wit. Witte kaarten en formulieren steken daardoor zacht naar voren.</p></div>
+
+      <div class="ds-tokens">
+        <div class="row"><span class="key">--priColor103</span><span class="val">rgb(242, 241, 244)</span><span class="role">Pagina-achtergrond</span><span class="chip" style="background:#F2F1F4"></span></div>
+        <div class="row"><span class="key">#FFFFFF</span><span class="val">rgb(255, 255, 255)</span><span class="role">Kaart, formulier, modaal</span><span class="chip" style="background:#FFFFFF"></span></div>
+        <div class="row"><span class="key">--priColor102</span><span class="val">rgba(32, 21, 71, 0.06)</span><span class="role">Subtiel surface (alt rows, hover)</span><span class="chip" style="background:rgba(32, 21, 71,.06)"></span></div>
+        <div class="row"><span class="key">--priColor101</span><span class="val">rgba(32, 21, 71, 0.03)</span><span class="role">Allerlichtste tint (tabel head)</span><span class="chip" style="background:rgba(32, 21, 71,.03)"></span></div>
+        <div class="row"><span class="key">--borderSubtleColor</span><span class="val">rgba(32, 21, 71, 0.09)</span><span class="role">Dividers en kaartranden</span><span class="chip" style="background:rgba(32, 21, 71,.09)"></span></div>
+        <div class="row"><span class="key">--borderColor</span><span class="val">rgba(32, 21, 71, 0.2)</span><span class="role">Input borders, default knoprand</span><span class="chip" style="background:rgba(32, 21, 71,.2)"></span></div>
+        <div class="row"><span class="key">--blackAltText</span><span class="val">#6F6F6F</span><span class="role">Secundaire tekst, captions</span><span class="chip" style="background:#6F6F6F"></span></div>
+        <div class="row"><span class="key">--priColor100</span><span class="val">#201547</span><span class="role">Primaire tekst (alle leesgrootte)</span><span class="chip" style="background:#201547"></span></div>
+      </div>
+
+      <div class="ds-sub"><h3>Lifecycle &amp; semantisch</h3><p>Statuskleuren voor aanmeldingsdashboards en feedback. We gebruiken peach-opaciteiten en indigo-tints uit de huisstijl; alleen "goedgekeurd" en "afgewezen" stappen buiten het palet voor leesbaarheid.</p></div>
+
+      <div class="ds-status-grid">
+        <div class="ds-status-card"><div class="swatch" style="background:#F4F4F4"></div><div><b>Concept</b><div class="meta">--st-draft-bg · #F4F4F4</div></div></div>
+        <div class="ds-status-card"><div class="swatch" style="background:rgba(255,210,176,0.3); border:1px solid rgba(255,210,176,0.6);"></div><div><b>Ingediend</b><div class="meta">--st-submitted-bg · peach 30%</div></div></div>
+        <div class="ds-status-card"><div class="swatch" style="background:#FDF4E3"></div><div><b>Onvolledig</b><div class="meta">--st-incomplete-bg · #FDF4E3</div></div></div>
+        <div class="ds-status-card"><div class="swatch" style="background:rgba(255,210,176,0.6)"></div><div><b>Wacht op documenten</b><div class="meta">--st-awaitdocs-bg · peach 60%</div></div></div>
+        <div class="ds-status-card"><div class="swatch" style="background:rgba(32, 21, 71,0.06); border:1px solid rgba(32, 21, 71,0.12);"></div><div><b>Wacht op betaling</b><div class="meta">--st-awaitpay-bg · indigo 6%</div></div></div>
+        <div class="ds-status-card"><div class="swatch" style="background:#E7F5EE"></div><div><b>Goedgekeurd</b><div class="meta">--st-approved-bg · #E7F5EE</div></div></div>
+        <div class="ds-status-card"><div class="swatch" style="background:#FBE9EB"></div><div><b>Afgewezen</b><div class="meta">--st-rejected-bg · #FBE9EB</div></div></div>
+        <div class="ds-status-card"><div class="swatch" style="background:rgba(255,210,176,0.3)"></div><div><b>Info</b><div class="meta">--iuasr-info-bg · peach 30%</div></div></div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         04. TYPOGRAFIE
+         ========================================================= -->
+    <section id="typography" class="ds-section" data-screen-label="04 Typography">
+      <header class="ds-section__head">
+        <span class="ds-section__num">04 · Typografie</span>
+        <h2 class="ds-section__title">Twee schriften, vier families.</h2>
+        <p class="ds-section__lede">
+          DM Serif Display voert de stem in titels en koppen, Fira Sans draagt alle lopende tekst, formulieren en navigatie. Voor Arabisch werken we met Reem Kufi voor displays en logo-context, en Cairo voor lopende tekst. De vier families delen openingstijden en proporties — ze ademen samen.
+        </p>
+      </header>
+
+      <div class="ds-type-hero">
+        <div class="ds-type-hero__card">
+          <div class="eye">Display · koppen</div>
+          <p class="disp disp--serif">Aa</p>
+          <p class="disp disp--serif" style="font-style: italic; font-size:48px; margin: 0;">Aanmelden bij IUASR</p>
+          <div class="meta"><span><b>DM Serif Display</b> · 400 regular &amp; 400 italic</span><span>Didone, hoog contrast</span></div>
+        </div>
+        <div class="ds-type-hero__card">
+          <div class="eye">Body · ui</div>
+          <p class="disp disp--sans">Aa</p>
+          <p class="disp disp--sans" style="font-weight:400; font-size:24px; margin: 0;">Een rustig portaal voor je studie.</p>
+          <div class="meta"><span><b>Fira Sans</b> · 200 / 300 / 400 / 500 / 600 / 700</span><span>Humanistisch, helder</span></div>
+        </div>
+      </div>
+
+      <div class="ds-sub"><h3>Typografische schaal</h3><p>Exact gescraped uit iuasr.nl. Onthoud: koppen serif, body sans, schaal blijft consistent.</p></div>
+      <div class="ds-scaletable">
+        <div class="row">
+          <span class="lbl">Display</span>
+          <span class="siz">64 / 68</span>
+          <span style="font-family:var(--serif-font); font-size:54px; line-height:60px; font-weight:400;">Klassiek &amp; nieuw</span>
+          <span class="fnt">DM Serif Display</span>
+        </div>
+        <div class="row">
+          <span class="lbl">h1</span>
+          <span class="siz">38.4 / 46</span>
+          <span style="font-family:var(--serif-font); font-size:38.4px; line-height:46px; font-weight:400;">Aanmelden voor het collegejaar</span>
+          <span class="fnt">DM Serif Display</span>
+        </div>
+        <div class="row">
+          <span class="lbl">h2</span>
+          <span class="siz">24 / 29</span>
+          <span style="font-family:var(--sans-serif-font); font-size:24px; line-height:29px; font-weight:200;">Stap 1 — persoonsgegevens</span>
+          <span class="fnt">Fira Sans 200</span>
+        </div>
+        <div class="row">
+          <span class="lbl">h3</span>
+          <span class="siz">19.2 / 23</span>
+          <span style="font-family:var(--serif-font); font-size:19.2px; line-height:23px; font-weight:400;">Voltooi je inschrijving</span>
+          <span class="fnt">DM Serif Display</span>
+        </div>
+        <div class="row">
+          <span class="lbl">h4</span>
+          <span class="siz">18 / 22</span>
+          <span style="font-family:var(--sans-serif-font); font-size:18px; line-height:22px; font-weight:500;">Persoonsgegevens</span>
+          <span class="fnt">Fira Sans 500</span>
+        </div>
+        <div class="row">
+          <span class="lbl">Body</span>
+          <span class="siz">16 / 24</span>
+          <span style="font-family:var(--sans-serif-font); font-size:16px; line-height:24px; font-weight:400;">Standaard portaaltekst — leesbaar in formulieren, dashboards en lange instructies.</span>
+          <span class="fnt">Fira Sans 400</span>
+        </div>
+        <div class="row">
+          <span class="lbl">Body light</span>
+          <span class="siz">16 / 24</span>
+          <span style="font-family:var(--sans-serif-font); font-size:16px; line-height:24px; font-weight:200;">Marketing-tekst — lichter, luchtiger, voor lange leespagina's.</span>
+          <span class="fnt">Fira Sans 200</span>
+        </div>
+        <div class="row">
+          <span class="lbl">Caption</span>
+          <span class="siz">12.5 / 18</span>
+          <span style="font-family:var(--sans-serif-font); font-size:12.5px; line-height:18px; color:#6F6F6F;">Hulptekst onder velden, voetnoten, metadata in tabellen.</span>
+          <span class="fnt">Fira Sans 300</span>
+        </div>
+        <div class="row">
+          <span class="lbl">Eyebrow</span>
+          <span class="siz">11 / 14</span>
+          <span style="font-family:ui-monospace, monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#C8102E;">Belangrijke deadline · Stap 3 van 5</span>
+          <span class="fnt">Mono · 0.1em LS</span>
+        </div>
+        <div class="row">
+          <span class="lbl">Button</span>
+          <span class="siz">16 / 24</span>
+          <span style="font-family:var(--sans-serif-font); font-size:16px; line-height:24px; font-weight:400;">Aanmelden</span>
+          <span class="fnt">Fira Sans 400</span>
+        </div>
+        <div class="row">
+          <span class="lbl">Nav</span>
+          <span class="siz">14 / 20</span>
+          <span style="font-family:var(--sans-serif-font); font-size:14px; line-height:20px; font-weight:400;">Dashboard · Documenten · Berichten</span>
+          <span class="fnt">Fira Sans 400</span>
+        </div>
+      </div>
+
+      <div class="ds-sub"><h3>Fira Sans gewichten</h3><p>Gebruik 200 voor luchtige marketingkoppen, 400 standaard, 500 voor labels en metadata, 600/700 alleen voor sterk benadrukken in lopende tekst.</p></div>
+      <div class="ds-weights">
+        <div style="font-weight:200;">Aa<small>200 · thin</small></div>
+        <div style="font-weight:300;">Aa<small>300 · light</small></div>
+        <div style="font-weight:400;">Aa<small>400 · regular</small></div>
+        <div style="font-weight:500;">Aa<small>500 · medium</small></div>
+        <div style="font-weight:600;">Aa<small>600 · semibold</small></div>
+        <div style="font-weight:700;">Aa<small>700 · bold</small></div>
+      </div>
+
+      <div class="ds-sub"><h3>Arabisch · Reem Kufi &amp; Cairo</h3><p>Reem Kufi voor displaytekst, koppen en taglines naast het logo. Cairo voor lopende tekst, formulieren en navigatie in Arabische uitingen. Beide families zijn ontworpen om naast Fira Sans en DM Serif Display te ademen.</p></div>
+
+      <div class="ds-typo-arabic">
+        <div class="specimen reem">
+          <div class="meta"><b>Reem Kufi</b><small>Display · 400 / 500 / 600 / 700</small></div>
+          <p class="sample big">جامعة روتردام<br>الإسلامية</p>
+          <p class="sample small">Gebruik bij koppen, taglines en in combinatie met het embleem. Geometrisch, kufic-geïnspireerd, hoog contrast — past optisch bij DM Serif Display.</p>
+        </div>
+        <div class="specimen cairo">
+          <div class="meta"><b>Cairo</b><small>Body · 300 / 400 / 500 / 600 / 700</small></div>
+          <p class="sample body">في عام التسجيل القادم، ستفتح الجامعة الإسلامية باب القبول لثلاثة برامج بكالوريوس.</p>
+          <p class="sample body" style="font-weight:300;">يبدأ التسجيل في الأول من فبراير. وتنتهي المهلة الأخيرة في الرابع عشر من يونيو.</p>
+          <p class="sample small">Voor alle lopende tekst, knoppen en formulieren in Arabische uitingen. Humanistisch sans-serif, lijnt mooi uit met Fira Sans bij tweetalige lay-outs.</p>
+        </div>
+      </div>
+
+      <div class="ds-sub"><h3>Specimen</h3><p>Een proefblok zoals het in een nieuwsartikel of beleidsdocument staat.</p></div>
+      <div class="ds-specimen">
+        <p class="spec-eye">Specimen · december 2025</p>
+        <h2 class="spec">Het collegejaar opent in september.</h2>
+        <p class="spec-lede">
+          De eerste collegeweek staat in het teken van introductie, kennismaking met het docententeam en
+          een rondleiding op de Bergsingel-locatie.
+        </p>
+        <div class="spec-body">
+          <p>De Islamitische Universiteit van Toegepaste Wetenschappen Rotterdam leidt studenten op tot academische professionals
+          met een diepgaande kennis van klassieke islamitische tradities én moderne maatschappelijke vraagstukken. Een opleiding
+          die zowel ruimte biedt aan reflectie als aan toepassing.</p>
+          <p>In het collegejaar 2026/2027 starten drie bacheloropleidingen: Islamitisch Recht, Pedagogische Wetenschappen en
+          Theologie. Voor elke richting geldt een vooropleidings­eis van HAVO, VWO of MBO 4, plus een intakegesprek met een
+          studieadviseur.</p>
+          <p>Aanmelden kan vanaf 1 januari via het studentportaal. Voor vragen over toelating, leningen of internationale
+          diploma's staan onze medewerkers Studentenzaken op werkdagen klaar tussen 09:00 en 17:00.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         05. SPACING & LAYOUT
+         ========================================================= -->
+    <section id="spacing" class="ds-section" data-screen-label="05 Spacing">
+      <header class="ds-section__head">
+        <span class="ds-section__num">05 · Spacing &amp; layout</span>
+        <h2 class="ds-section__title">Een logisch systeem op een basis van 4 px.</h2>
+        <p class="ds-section__lede">
+          Spacing volgt een vast ritme; afstanden zijn altijd een veelvoud van 4 px. Daardoor stapelt UI vanzelf
+          en blijven verticale ritmes consistent over componenten heen.
+        </p>
+      </header>
+
+      <div class="ds-sub"><h3>Spacing-schaal</h3><p>De zes anchors uit de portaal-tokens. Gebruik <code style="font-family:ui-monospace,monospace; font-size:12.5px">--space-*</code> in alle layout-CSS.</p></div>
+      <div class="ds-spacing-scale">
+        <div class="ds-spacing-card"><div class="bar" style="width:4px"></div><div class="key">--unitSize</div><div class="val">4 px · 0.25rem</div></div>
+        <div class="ds-spacing-card"><div class="bar" style="width:10px"></div><div class="key">--space-xs</div><div class="val">10 px · 0.625rem</div></div>
+        <div class="ds-spacing-card"><div class="bar" style="width:18px"></div><div class="key">--space-sm</div><div class="val">18 px · 1.125rem</div></div>
+        <div class="ds-spacing-card"><div class="bar" style="width:32px"></div><div class="key">--space-md</div><div class="val">32 px · 2rem</div></div>
+        <div class="ds-spacing-card"><div class="bar" style="width:44px"></div><div class="key">--space-lg</div><div class="val">44 px · 2.75rem</div></div>
+        <div class="ds-spacing-card"><div class="bar" style="width:64px"></div><div class="key">--space-xl</div><div class="val">64 px · 4rem</div></div>
+      </div>
+
+      <div class="ds-sub"><h3>Container &amp; grid</h3><p>Een 12-kolommen grid met een gutter van 16 px. Maximumbreedtes per context.</p></div>
+      <div class="ds-grid-demo">
+        <div class="lbl">12 kolommen · gutter 16 px · max 1280 px (portaal) · 960 px (lange leestekst) · 640 px (formulier)</div>
+        <div class="cols">
+          <div class="col"></div><div class="col"></div><div class="col"></div><div class="col"></div>
+          <div class="col"></div><div class="col"></div><div class="col"></div><div class="col"></div>
+          <div class="col"></div><div class="col"></div><div class="col"></div><div class="col"></div>
+        </div>
+      </div>
+
+      <div class="ds-sub"><h3>Radius</h3><p>Hoeken zijn rustig en consistent. Cirkels alleen voor avatars en kleine status-dots.</p></div>
+      <div class="ds-radius">
+        <div class="ds-radius-card">
+          <div class="demo" style="border-radius:4px;"></div>
+          <div><div class="key">--iuasr-radius-sm</div><div class="val">4 px · knoppen, inputs, badges</div></div>
+        </div>
+        <div class="ds-radius-card">
+          <div class="demo" style="border-radius:8px;"></div>
+          <div><div class="key">--iuasr-radius-md</div><div class="val">8 px · kaarten, modals, callouts</div></div>
+        </div>
+        <div class="ds-radius-card">
+          <div class="demo" style="border-radius:12px;"></div>
+          <div><div class="key">--iuasr-radius-lg</div><div class="val">12 px · hero-blokken, grote panelen</div></div>
+        </div>
+        <div class="ds-radius-card">
+          <div class="demo" style="border-radius:9999px;"></div>
+          <div><div class="key">--iuasr-radius-full</div><div class="val">∞ · status, avatars, pillen</div></div>
+        </div>
+      </div>
+
+      <div class="ds-sub"><h3>Schaduw</h3><p>Onze schaduwen zijn <b>indigo-getint</b>, niet neutraal grijs. Dat geeft het portaal zijn warme diepte.</p></div>
+      <div class="ds-shadows">
+        <div class="ds-shadow-card ds-shadow-card--sm">
+          <div class="box"></div>
+          <div class="key">--iuasr-shadow-sm</div>
+          <div class="val">rgba(32, 21, 71,0.08) 0 2px 8px</div>
+        </div>
+        <div class="ds-shadow-card ds-shadow-card--md">
+          <div class="box"></div>
+          <div class="key">--iuasr-shadow-md</div>
+          <div class="val">rgba(32, 21, 71,0.15) 0 4px 20px</div>
+        </div>
+        <div class="ds-shadow-card ds-shadow-card--lg">
+          <div class="box"></div>
+          <div class="key">shadow-lg (modal)</div>
+          <div class="val">rgba(32, 21, 71,0.22) 0 16px 48px -8px</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         06. COMPONENTEN
+         ========================================================= -->
+    <section id="components" class="ds-section" data-screen-label="06 Components">
+      <header class="ds-section__head">
+        <span class="ds-section__num">06 · Componenten</span>
+        <h2 class="ds-section__title">De bouwstenen van het portaal.</h2>
+        <p class="ds-section__lede">
+          Knoppen, formulieren, kaarten, navigatie, tabellen en dashboardwidgets. Allemaal gebouwd op
+          dezelfde tokens — dezelfde radius, hetzelfde ritme, dezelfde focus-ring.
+        </p>
+      </header>
+
+      <!-- Buttons -->
+      <div class="ds-block">
+        <header class="ds-block__head"><h4>Knoppen</h4><span class="tag">.btn · 41 px · 4 px radius · 2 px border</span></header>
+
+        <div class="ds-block__rowlabel">Varianten · standaardgrootte</div>
+        <div class="ds-block__row">
+          <button class="btn btn--primary">Aanmelden</button>
+          <button class="btn btn--secondary">Meer info</button>
+          <button class="btn btn--tertiary">Naar dashboard</button>
+          <button class="btn btn--quiet">Annuleren</button>
+          <button class="btn btn--link">Wachtwoord vergeten?</button>
+        </div>
+
+        <div class="ds-block__rowlabel">Met icon</div>
+        <div class="ds-block__row">
+          <button class="btn btn--primary">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Indienen
+          </button>
+          <button class="btn btn--secondary">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download brochure
+          </button>
+          <button class="btn btn--tertiary">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            Verder
+          </button>
+        </div>
+
+        <div class="ds-block__rowlabel">Maten</div>
+        <div class="ds-block__row">
+          <button class="btn btn--primary btn--sm">Klein</button>
+          <button class="btn btn--primary">Standaard</button>
+          <button class="btn btn--primary btn--lg">Groot</button>
+        </div>
+
+        <div class="ds-block__rowlabel">Statussen</div>
+        <div class="ds-block__row">
+          <button class="btn btn--primary">Normaal</button>
+          <button class="btn btn--primary" style="background:#9A0C24;">Hover</button>
+          <button class="btn btn--primary" style="box-shadow: var(--iuasr-focus-ring); outline: none;">Focus</button>
+          <button class="btn btn--primary" disabled>Disabled</button>
+          <button class="btn btn--primary" disabled>
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-opacity="0.25"/><path d="M21 12a9 9 0 0 0-9-9" /></svg>
+            Bezig…
+          </button>
+        </div>
+      </div>
+
+      <!-- Inputs -->
+      <div class="ds-block">
+        <header class="ds-block__head"><h4>Formuliervelden</h4><span class="tag">.fld · 41 px · 4 px radius · 1 px border</span></header>
+        <div class="ds-form-grid">
+          <div class="fld">
+            <label>Voornaam <span>*</span></label>
+            <input type="text" placeholder="Bijv. Aïsha">
+            <span class="help">Zoals op je legitimatiebewijs staat.</span>
+          </div>
+          <div class="fld">
+            <label>Achternaam <span>*</span></label>
+            <input type="text" value="El Bouzidi">
+          </div>
+          <div class="fld fld--ok">
+            <label>E-mailadres <span>*</span></label>
+            <input type="email" value="a.elbouzidi@iuasr.nl">
+            <span class="help" style="color:#156A42; font-weight:500;">Beschikbaar.</span>
+          </div>
+          <div class="fld">
+            <label>E-mailadres met fout</label>
+            <input type="email" class="err" value="niet-geldig">
+            <span class="errmsg">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Vul een geldig e-mailadres in.
+            </span>
+          </div>
+          <div class="fld">
+            <label>Vooropleiding</label>
+            <select>
+              <option>Kies een optie…</option>
+              <option>HAVO</option>
+              <option>VWO</option>
+              <option>MBO 4</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>Telefoon (uitgeschakeld)</label>
+            <input type="tel" value="+31 6 12 34 56 78" disabled>
+            <span class="help">Wordt automatisch gevuld vanuit je profiel.</span>
+          </div>
+          <div class="fld" style="grid-column: 1 / -1;">
+            <label>Motivatie (max 500 tekens)</label>
+            <textarea placeholder="Vertel kort waarom je voor IUASR kiest…"></textarea>
+          </div>
+        </div>
+
+        <div class="ds-block__rowlabel" style="margin-top:24px;">Keuzes &amp; toggles</div>
+        <div class="ds-block__row">
+          <label class="choice">
+            <input type="checkbox" checked>
+            <span class="box"></span>
+            <span>Ik ga akkoord met de privacyverklaring.</span>
+          </label>
+        </div>
+        <div class="ds-block__row">
+          <label class="choice"><input type="checkbox"><span class="box"></span><span>Stuur mij de digitale studiegids.</span></label>
+        </div>
+        <div class="ds-block__row">
+          <label class="choice choice--radio"><input type="radio" name="d" checked><span class="box"></span><span>Bachelor</span></label>
+          <label class="choice choice--radio"><input type="radio" name="d"><span class="box"></span><span>Master</span></label>
+          <label class="choice choice--radio"><input type="radio" name="d"><span class="box"></span><span>Cursus</span></label>
+        </div>
+        <div class="ds-block__row">
+          <label class="toggle">
+            <input type="checkbox" checked>
+            <span class="track"></span>
+            <span>Notificaties per e-mail</span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox">
+            <span class="track"></span>
+            <span>SMS-herinneringen</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Badges / status -->
+      <div class="ds-block">
+        <header class="ds-block__head"><h4>Badges &amp; status</h4><span class="tag">.badge · .status</span></header>
+
+        <div class="ds-block__rowlabel">Lifecycle aanmelding</div>
+        <div class="ds-block__row">
+          <span class="status s-draft">Concept</span>
+          <span class="status s-submitted">Ingediend</span>
+          <span class="status s-incomplete">Onvolledig</span>
+          <span class="status s-docs">Wacht op documenten</span>
+          <span class="status s-pay">Wacht op betaling</span>
+          <span class="status s-approved">Goedgekeurd</span>
+          <span class="status s-rejected">Afgewezen</span>
+        </div>
+
+        <div class="ds-block__rowlabel">Inline badges</div>
+        <div class="ds-block__row">
+          <span class="badge">Nieuw</span>
+          <span class="badge badge--crimson">Deadline 14 juni</span>
+          <span class="badge badge--peach">Open Dag</span>
+          <span class="badge badge--outline">Bachelor</span>
+        </div>
+      </div>
+
+      <!-- Card + Callout -->
+      <div class="ds-block">
+        <header class="ds-block__head"><h4>Kaart &amp; callout</h4><span class="tag">.card-demo · .callout</span></header>
+        <div class="ds-block__row" style="align-items: stretch;">
+          <div class="card-demo">
+            <p class="eye">Bachelor · 3 jaar</p>
+            <h5>Islamitisch Recht</h5>
+            <p>Een hoofdrichting voor wie zich wil verdiepen in klassieke fiqh én in toepassing binnen de Nederlandse context.</p>
+            <div class="foot">
+              <button class="btn btn--primary btn--sm">Meer info</button>
+              <button class="btn btn--link" style="font-size: 13px;">Vergelijk</button>
+            </div>
+          </div>
+          <div class="callout" style="max-width: 400px;">
+            <small>Belangrijke deadline</small>
+            <h5>Aanmeldperiode 2026/2027 sluit 14 juni.</h5>
+            <p>Vergeet niet je gewaarmerkte diplomakopie en motivatiebrief tijdig te uploaden. Aanmeldingen na deze datum worden in de wachtlijst geplaatst.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alerts -->
+      <div class="ds-block">
+        <header class="ds-block__head"><h4>Alerts</h4><span class="tag">.alert</span></header>
+        <div class="alert alert--info" style="margin-bottom:10px;">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span><b>Tip.</b> Je kunt je aanmelding op elk moment tussentijds opslaan en later afmaken.</span>
+        </div>
+        <div class="alert alert--success" style="margin-bottom:10px;">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+          <span><b>Bevestigd.</b> Je documenten zijn ontvangen — we beoordelen ze binnen vijf werkdagen.</span>
+        </div>
+        <div class="alert alert--warn" style="margin-bottom:10px;">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span><b>Let op.</b> Je intakegesprek staat over 48 uur. Bevestig of verzet via je dashboard.</span>
+        </div>
+        <div class="alert alert--error">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          <span><b>Aanmelding afgewezen.</b> Je vooropleiding voldoet niet aan de toelatingseisen. Bekijk alternatieven in je dashboard.</span>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="ds-block">
+        <header class="ds-block__head"><h4>Navigatie</h4><span class="tag">.nav-demo · breadcrumbs · tabs</span></header>
+        <div class="nav-demo" style="margin-bottom: 18px;">
+          <div class="nav-demo__top">
+            <img src="assets/logo/dark-default-latin.png" alt="">
+            <nav class="menu">
+              <a href="#" class="is-active">Dashboard</a>
+              <a href="#">Documenten</a>
+              <a href="#">Berichten</a>
+              <a href="#">Profiel</a>
+            </nav>
+            <span class="spacer"></span>
+            <div class="user">
+              <span>Aïsha El Bouzidi</span>
+              <span class="avatar">AE</span>
+            </div>
+          </div>
+          <div class="nav-demo__sub">
+            <a href="#" class="is-active">Overzicht</a>
+            <a href="#">Tijdlijn</a>
+            <a href="#">Acties</a>
+            <a href="#">Geschiedenis</a>
+          </div>
+          <div class="breadcrumbs">
+            <a href="#">Dashboard</a><span class="sep">/</span>
+            <a href="#">Mijn aanmeldingen</a><span class="sep">/</span>
+            <span class="cur">Bachelor Islamitisch Recht 2026/2027</span>
+          </div>
+        </div>
+
+        <div class="ds-block__rowlabel">Tabs</div>
+        <div class="tabs" data-tabs style="margin-bottom:8px;">
+          <button class="tab is-active">Persoonsgegevens</button>
+          <button class="tab">Vooropleiding</button>
+          <button class="tab">Documenten</button>
+          <button class="tab">Bevestiging</button>
+        </div>
+
+        <div class="ds-block__rowlabel" style="margin-top: 18px;">Paginering</div>
+        <div class="pager">
+          <button class="pg" aria-label="Vorige">‹</button>
+          <button class="pg">1</button>
+          <button class="pg is-current">2</button>
+          <button class="pg">3</button>
+          <button class="pg">4</button>
+          <span class="pg is-ellipsis">…</span>
+          <button class="pg">12</button>
+          <button class="pg" aria-label="Volgende">›</button>
+        </div>
+      </div>
+
+      <!-- Tabel -->
+      <div class="ds-block">
+        <header class="ds-block__head"><h4>Tabel</h4><span class="tag">.tbl · gestreepte hover, sticky header in app</span></header>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Aanmelding</th>
+                <th>Opleiding</th>
+                <th>Status</th>
+                <th>Ingediend</th>
+                <th style="text-align: right;">Acties</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>#A-2026-0142</td>
+                <td>Bachelor Islamitisch Recht</td>
+                <td><span class="status s-docs">Wacht op documenten</span></td>
+                <td>14 mei 2026</td>
+                <td style="text-align: right;"><button class="btn btn--link" style="font-size:13px;">Openen</button></td>
+              </tr>
+              <tr>
+                <td>#A-2026-0138</td>
+                <td>Bachelor Theologie</td>
+                <td><span class="status s-approved">Goedgekeurd</span></td>
+                <td>09 mei 2026</td>
+                <td style="text-align: right;"><button class="btn btn--link" style="font-size:13px;">Openen</button></td>
+              </tr>
+              <tr>
+                <td>#A-2026-0121</td>
+                <td>Bachelor Pedagogiek</td>
+                <td><span class="status s-submitted">Ingediend</span></td>
+                <td>02 mei 2026</td>
+                <td style="text-align: right;"><button class="btn btn--link" style="font-size:13px;">Openen</button></td>
+              </tr>
+              <tr>
+                <td>#A-2026-0098</td>
+                <td>Master Theologie</td>
+                <td><span class="status s-rejected">Afgewezen</span></td>
+                <td>18 april 2026</td>
+                <td style="text-align: right;"><button class="btn btn--link" style="font-size:13px;">Openen</button></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="5">4 van 17 aanmeldingen getoond</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <div class="ds-block">
+        <header class="ds-block__head"><h4>Modal</h4><span class="tag">.modal-demo · indigo overlay · 32% opacity</span></header>
+        <div class="modal-demo">
+          <div class="modal-demo__sheet">
+            <button class="modal-demo__close" aria-label="Sluiten">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <h5>Aanmelding intrekken?</h5>
+            <p>Je aanmelding voor de Bachelor Islamitisch Recht 2026/2027 wordt definitief verwijderd. Reeds ingediende documenten blijven 90 dagen bewaard.</p>
+            <div class="foot">
+              <button class="btn btn--quiet">Annuleren</button>
+              <button class="btn btn--primary">Ja, intrekken</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard widgets -->
+      <div class="ds-block">
+        <header class="ds-block__head"><h4>Dashboard widgets</h4><span class="tag">.widget · .progress · .timeline</span></header>
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
+          <div class="widget">
+            <div class="widget__hd"><h5>Openstaande acties</h5><span class="meta">2 / 5</span></div>
+            <div class="widget__metric">3<small>te doen</small></div>
+            <div class="widget__delta">−1 sinds gisteren</div>
+          </div>
+          <div class="widget">
+            <div class="widget__hd"><h5>Voortgang aanmelding</h5><span class="meta">stap 3 / 5</span></div>
+            <div class="widget__metric" style="font-size: 32px;">Documenten</div>
+            <div class="progress" data-motion="progress"><i></i></div>
+          </div>
+          <div class="widget">
+            <div class="widget__hd"><h5>Nieuwe berichten</h5><span class="meta">deze week</span></div>
+            <div class="widget__metric">2</div>
+            <div class="widget__delta widget__delta--down">+2 sinds vrijdag</div>
+          </div>
+        </div>
+
+        <div class="ds-block__rowlabel" style="margin-top: 22px;">Tijdlijn — aanmeldproces</div>
+        <div style="background:#fff; border:1px solid var(--borderSubtleColor); border-radius:8px; padding: 22px 24px;">
+          <div class="timeline">
+            <div class="timeline__step done"><span class="timeline__dot">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span><span class="lbl">Ingediend</span></div>
+            <div class="timeline__step done"><span class="timeline__dot">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span><span class="lbl">Ontvangst-bevestiging</span></div>
+            <div class="timeline__step current"><span class="timeline__dot">●</span><span class="lbl">Documenten controle</span></div>
+            <div class="timeline__step"><span class="timeline__dot">4</span><span class="lbl">Intakegesprek</span></div>
+            <div class="timeline__step"><span class="timeline__dot">5</span><span class="lbl">Toelating</span></div>
+            <div class="timeline__step"><span class="timeline__dot">6</span><span class="lbl">Inschrijving</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         07. ICONOGRAFIE
+         ========================================================= -->
+    <section id="iconography" class="ds-section" data-screen-label="07 Iconography">
+      <header class="ds-section__head">
+        <span class="ds-section__num">07 · Iconografie</span>
+        <h2 class="ds-section__title">Lijniconen, rustig en herkenbaar.</h2>
+        <p class="ds-section__lede">
+          Onze iconen zijn lijntekeningen op een 24-px grid: 1,5 px lijndikte, ronde lijneinden,
+          ronde hoeken (radius 2 px op de stroke). Geen kleur, geen vulling — kleur komt van de tekst eromheen.
+        </p>
+      </header>
+
+      <div class="ds-icon-specs">
+        <div class="ds-icon-spec">
+          <h5>Grid &amp; stroke</h5>
+          <p>24 × 24 viewBox. Stroke 1,5 px. Lijneinden en hoeken rond. Padding minimaal 2 px aan elke zijde voor optische balans.</p>
+        </div>
+        <div class="ds-icon-spec">
+          <h5>Kleur &amp; thema</h5>
+          <p>Iconen erven <code style="font-family:ui-monospace,monospace; font-size:11.5px">currentColor</code>. Geen accentkleur in iconen zelf — de plaatsing bepaalt de toon. Crimson alleen op kritieke iconen.</p>
+        </div>
+        <div class="ds-icon-spec">
+          <h5>Sterk vs licht</h5>
+          <p>Eén familie. Geen "filled / outline" duo. Voor nadruk wordt de stroke naar 2 px verhoogd; nooit zwaarder dan 2,2 px.</p>
+        </div>
+      </div>
+
+      <div class="ds-sub"><h3>Voorbeeldset</h3><p>Een kerncollectie voor het portaal — uitgewerkt in dezelfde stijl voor het volledige systeem.</p></div>
+      <div class="ds-icon-grid">
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><path d="M3 12 12 3l9 9"/><path d="M5 10v10h14V10"/></svg><span>home</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg><span>profiel</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>document</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-9 8.38 8.5 8.5 0 0 1-3.5-.74L3 21l1.85-5.55A8.5 8.5 0 1 1 21 11.5z"/></svg><span>bericht</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>agenda</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>tijd</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>goedgekeurd</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>info</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>let op</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><span>fout</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>download</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>upload</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>zoeken</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg><span>filter</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06A2 2 0 1 1 4.27 17l.06-.06A1.65 1.65 0 0 0 4.66 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06A2 2 0 1 1 7 4.27l.06.06A1.65 1.65 0 0 0 9 4.66a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06A2 2 0 1 1 19.73 7l-.06.06A1.65 1.65 0 0 0 19.34 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>instellingen</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><path d="M9 11V7a3 3 0 0 1 6 0v4"/><rect x="5" y="11" width="14" height="10" rx="2"/></svg><span>beveiliging</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>team</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>contact</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>locatie</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg><span>volgende</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg><span>vorige</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span>sluiten</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>toevoegen</span></div>
+        <div class="ds-icon"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span>verwijderen</span></div>
+      </div>
+
+      <div class="ds-sub"><h3>Illustratiestijl</h3><p>Voor figuratief beeld kiezen we voor fotografie van de Bergsingel-locatie en docenten, niet voor stockillustraties of cartoony spot illustraties. Beelden zijn rustig, natuurlijk belicht en altijd in context.</p></div>
+      <div style="background:#fff; border:1px solid var(--borderSubtleColor); border-radius:8px; padding: 22px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px; align-items: center;">
+        <div>
+          <p style="font-family:var(--serif-font); font-size:20px; line-height:1.25; margin:0 0 8px;">Foto’s vertellen het verhaal van onze plek.</p>
+          <p style="font-size:14px; line-height:1.6; color:var(--blackAltText); font-weight:300; margin:0 0 8px;">
+            Documenteer echte momenten: een docent in gesprek, een student in de bibliotheek, een rondleiding op de Bergsingel.
+            Geen geënsceneerde lifestyle-fotografie, geen mensen met stockglimlach.
+          </p>
+          <p style="font-size:13px; line-height:1.6; color:var(--blackAltText); font-weight:300; margin:0;">
+            Tonen: natuurlijk daglicht, gedempte kleuren, ruimte om iemand heen. Vermijden: extreem grading, lensflare,
+            zwaar bewerkte uitsneden.
+          </p>
+        </div>
+        <div style="background: var(--priColor103); border-radius: 8px; aspect-ratio: 4/3; overflow: hidden; display: flex; align-items: center; justify-content: center; color: var(--blackAltText); font-size: 12px;">
+          <img src="assets/img/docent-paneel.jpg" alt="Docentenpaneel Bergsingel" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'; this.parentNode.innerHTML='[foto · docentpaneel Bergsingel]';">
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         08. STATES
+         ========================================================= -->
+    <section id="states" class="ds-section" data-screen-label="08 States">
+      <header class="ds-section__head">
+        <span class="ds-section__num">08 · Statussen</span>
+        <h2 class="ds-section__title">Interactiestatussen, voorspelbaar voor elk component.</h2>
+        <p class="ds-section__lede">
+          Knoppen, links, formulieren en kaarten gebruiken dezelfde set statussen.
+          De crimson-focusring verschijnt overal waar de gebruiker is — toegankelijkheid is geen extra laag.
+        </p>
+      </header>
+
+      <div class="ds-state-table">
+        <div class="row">
+          <div class="cell lbl"></div>
+          <div class="cell head">Default</div>
+          <div class="cell head">Hover</div>
+          <div class="cell head">Focus</div>
+          <div class="cell head">Active</div>
+          <div class="cell head">Disabled</div>
+        </div>
+
+        <div class="row">
+          <div class="cell lbl">Primary</div>
+          <div class="cell"><button class="btn btn--primary btn--sm">Aanmelden</button></div>
+          <div class="cell"><button class="btn btn--primary btn--sm" style="background:#9A0C24;">Aanmelden</button></div>
+          <div class="cell"><button class="btn btn--primary btn--sm" style="box-shadow: var(--iuasr-focus-ring); outline: none;">Aanmelden</button></div>
+          <div class="cell"><button class="btn btn--primary btn--sm" style="background:#9A0C24; transform: translateY(1px);">Aanmelden</button></div>
+          <div class="cell"><button class="btn btn--primary btn--sm" disabled>Aanmelden</button></div>
+        </div>
+
+        <div class="row">
+          <div class="cell lbl">Secondary</div>
+          <div class="cell"><button class="btn btn--secondary btn--sm">Meer info</button></div>
+          <div class="cell"><button class="btn btn--secondary btn--sm" style="background:rgba(200,16,46,0.06);">Meer info</button></div>
+          <div class="cell"><button class="btn btn--secondary btn--sm" style="box-shadow: var(--iuasr-focus-ring); outline: none;">Meer info</button></div>
+          <div class="cell"><button class="btn btn--secondary btn--sm" style="background:rgba(200,16,46,0.10); transform: translateY(1px);">Meer info</button></div>
+          <div class="cell"><button class="btn btn--secondary btn--sm" disabled>Meer info</button></div>
+        </div>
+
+        <div class="row">
+          <div class="cell lbl">Input</div>
+          <div class="cell"><input style="width:100%; padding:6px 10px; border:1px solid var(--borderColor); border-radius:4px; font:inherit; font-size:13px;" value="abc"></div>
+          <div class="cell"><input style="width:100%; padding:6px 10px; border:1px solid var(--priColor100); border-radius:4px; font:inherit; font-size:13px;" value="abc"></div>
+          <div class="cell"><input style="width:100%; padding:6px 10px; border:1px solid var(--secColor100); border-radius:4px; box-shadow:0 0 0 3px rgba(200,16,46,0.2); font:inherit; font-size:13px; outline:none;" value="abc"></div>
+          <div class="cell"><input style="width:100%; padding:6px 10px; border:1px solid var(--secColor100); border-radius:4px; box-shadow:0 0 0 3px rgba(200,16,46,0.2); background:#FBE9EB; font:inherit; font-size:13px; outline:none;" value="fout"></div>
+          <div class="cell"><input style="width:100%; padding:6px 10px; border:1px solid var(--borderColor); border-radius:4px; background:rgba(32, 21, 71,0.03); color:#6F6F6F; font:inherit; font-size:13px;" value="—" disabled></div>
+        </div>
+
+        <div class="row">
+          <div class="cell lbl">Link</div>
+          <div class="cell"><a href="#" style="color:var(--secColor100); text-decoration: none;">Wachtwoord vergeten?</a></div>
+          <div class="cell"><a href="#" style="color:#9A0C24; text-decoration: underline;">Wachtwoord vergeten?</a></div>
+          <div class="cell"><a href="#" style="color:var(--secColor100); text-decoration: none; box-shadow:0 0 0 3px rgba(200,16,46,0.2); border-radius:2px;">Wachtwoord vergeten?</a></div>
+          <div class="cell"><a href="#" style="color:#9A0C24; text-decoration: underline;">Wachtwoord vergeten?</a></div>
+          <div class="cell"><a href="#" style="color:#6F6F6F; text-decoration: none; pointer-events:none;">Wachtwoord vergeten?</a></div>
+        </div>
+      </div>
+
+      <div class="ds-sub"><h3>Toegankelijkheid</h3><p>Drie regels die in elke staat gelden — niet alleen op afspraak.</p></div>
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
+        <div style="background:#fff; border:1px solid var(--borderSubtleColor); border-radius:8px; padding: 20px 22px;">
+          <p style="font-family:var(--serif-font); font-size:18px; margin: 0 0 6px;">Focusring is verplicht</p>
+          <p style="font-size:13.5px; line-height:1.55; color:var(--blackAltText); font-weight:300; margin:0;">Crimson glow van 3 px op alle interactieve elementen. Nooit weggeretoucheerd — ook niet in custom componenten.</p>
+        </div>
+        <div style="background:#fff; border:1px solid var(--borderSubtleColor); border-radius:8px; padding: 20px 22px;">
+          <p style="font-family:var(--serif-font); font-size:18px; margin: 0 0 6px;">Kleur is nooit alleen</p>
+          <p style="font-size:13.5px; line-height:1.55; color:var(--blackAltText); font-weight:300; margin:0;">Status, fouten en succes worden ook door tekst of icon gecommuniceerd — niet alleen rood of groen.</p>
+        </div>
+        <div style="background:#fff; border:1px solid var(--borderSubtleColor); border-radius:8px; padding: 20px 22px;">
+          <p style="font-family:var(--serif-font); font-size:18px; margin: 0 0 6px;">Contrast ≥ 4,5:1</p>
+          <p style="font-size:13.5px; line-height:1.55; color:var(--blackAltText); font-weight:300; margin:0;">Indigo op #F2F1F4 zit op 14:1. Crimson op wit op 6:1. Alle hoofd-combo's voldoen aan WCAG AA.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         09. MOTION
+         ========================================================= -->
+    <section id="motion" class="ds-section" data-screen-label="09 Motion">
+      <header class="ds-section__head">
+        <span class="ds-section__num">09 · Animaties &amp; motion</span>
+        <h2 class="ds-section__title">Beweging die rust ondersteunt, niet onderbreekt.</h2>
+        <p class="ds-section__lede">
+          Onze animaties zijn kort, gericht en functioneel. Ze geven feedback op een actie of begeleiden
+          een element op zijn plek — nooit decoratief en nooit afleidend.
+        </p>
+      </header>
+
+      <div class="ds-sub"><h3>Duur</h3><p>Vier vaste duraties. Alles korter dan 120 ms is onbewust; alles langer dan 500 ms voelt traag.</p></div>
+      <div class="ds-duration">
+        <div><div class="num">120<small style="font-size:14px;font-family:var(--sans-serif-font);"> ms</small></div><div class="key">--iuasr-duration-fast</div><div class="val">Hover, focus, subtiele kleurwissels.</div></div>
+        <div><div class="num">200<small style="font-size:14px;font-family:var(--sans-serif-font);"> ms</small></div><div class="key">--iuasr-duration-normal</div><div class="val">Buttons, inputs, tabs, expanderen.</div></div>
+        <div><div class="num">320<small style="font-size:14px;font-family:var(--sans-serif-font);"> ms</small></div><div class="key">duration-slow</div><div class="val">Modals, drawers, paneel-transities.</div></div>
+        <div><div class="num">520<small style="font-size:14px;font-family:var(--sans-serif-font);"> ms</small></div><div class="key">duration-entry</div><div class="val">Eerste binnenkomst van een pagina.</div></div>
+      </div>
+
+      <div class="ds-sub"><h3>Easing</h3><p>Eén standaardcurve. Geen bouncy springs in productie-UI — alleen in opt-in micro-momenten.</p></div>
+      <div class="ds-easings">
+        <div class="row">
+          <span class="lbl">--ease-standard</span>
+          <div class="track"><span class="ball s"></span></div>
+          <span class="val">cubic-bezier(0.2, 0, 0, 1)</span>
+        </div>
+        <div class="row">
+          <span class="lbl">ease-out</span>
+          <div class="track"><span class="ball e"></span></div>
+          <span class="val">cubic-bezier(0, 0, 0.2, 1)</span>
+        </div>
+        <div class="row">
+          <span class="lbl">spring (opt-in)</span>
+          <div class="track"><span class="ball b"></span></div>
+          <span class="val">cubic-bezier(0.5,1.7,0.4,1)</span>
+        </div>
+        <div class="row">
+          <span class="lbl">linear</span>
+          <div class="track"><span class="ball l"></span></div>
+          <span class="val">linear · alleen voor progress</span>
+        </div>
+      </div>
+
+      <div class="ds-sub"><h3>Patronen</h3><p>Klik op een stage om de animatie te triggeren. Alle animaties respecteren <code style="font-family:ui-monospace,monospace; font-size:12px">prefers-reduced-motion</code>.</p></div>
+
+      <div class="ds-motion-grid">
+        <div class="ds-motion">
+          <div class="ds-motion__stage motion-trigger" data-motion="rise">
+            <div class="motion-card">
+              <div class="lbl">Aanmelding</div>
+              <div class="num">#A-2026-0142</div>
+            </div>
+            <span class="ds-motion__hint">klik om te spelen</span>
+          </div>
+          <div class="ds-motion__foot">
+            <h5>Card reveal</h5>
+            <p>16 px vertaal omhoog, fade-in. 420 ms, ease-standard. Voor kaarten en lijst-items.</p>
+          </div>
+        </div>
+
+        <div class="ds-motion">
+          <div class="ds-motion__stage motion-trigger" data-motion="pulse">
+            <button class="btn btn--primary">Indienen</button>
+            <span class="ds-motion__hint">klik om te spelen</span>
+          </div>
+          <div class="ds-motion__foot">
+            <h5>Button feedback</h5>
+            <p>Pulse 240 ms naar 0.97×. Bevestigt een klik zonder geluid of trilling.</p>
+          </div>
+        </div>
+
+        <div class="ds-motion">
+          <div class="ds-motion__stage" data-motion="reveal" style="flex-direction: column; gap: 8px; padding: 24px;">
+            <div class="reveal-item" style="height: 12px; width: 80%; background: var(--priColor102); border-radius: 999px;"></div>
+            <div class="reveal-item" style="height: 12px; width: 60%; background: var(--priColor102); border-radius: 999px;"></div>
+            <div class="reveal-item" style="height: 12px; width: 70%; background: var(--priColor102); border-radius: 999px;"></div>
+            <span class="ds-motion__hint">klik om te spelen</span>
+          </div>
+          <div class="ds-motion__foot">
+            <h5>Staggered list</h5>
+            <p>Cascade van 80 ms tussen items. Voor binnenkomende lijsten of search-resultaten.</p>
+          </div>
+        </div>
+
+        <div class="ds-motion">
+          <div class="ds-motion__stage" data-motion="progress" style="flex-direction:column; gap: 14px; padding: 28px;">
+            <div class="progress" style="width: 80%;"><i></i></div>
+            <div style="font-size:12px; color: var(--blackAltText); font-family: ui-monospace, monospace;">stap 3 van 5</div>
+            <span class="ds-motion__hint">klik om te spelen</span>
+          </div>
+          <div class="ds-motion__foot">
+            <h5>Progress</h5>
+            <p>Linear easing, 600 ms. Lengte communiceert waarde — niet de timing.</p>
+          </div>
+        </div>
+
+        <div class="ds-motion">
+          <div class="ds-motion__stage" style="padding: 28px;">
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <span class="ds-motion__hint">loopt continu</span>
+          </div>
+          <div class="ds-motion__foot">
+            <h5>Loading state</h5>
+            <p>Shimmer 1400 ms, ease-in-out. Voor data die laadt — niet voor formulieren.</p>
+          </div>
+        </div>
+
+        <div class="ds-motion">
+          <div class="ds-motion__stage" data-motion="page">
+            <div class="page-mock">
+              <div class="h">Nieuw bericht</div>
+              <div class="l"></div><div class="l"></div><div class="l"></div>
+            </div>
+            <span class="ds-motion__hint">klik om te spelen</span>
+          </div>
+          <div class="ds-motion__foot">
+            <h5>Page transition</h5>
+            <p>Subtiel: 20 px omhoog + fade. 520 ms entry. Geen horizontale slides, geen 3D.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-sub"><h3>Principes voor motion</h3><p>Drie regels die elk animatievoorstel toetsen.</p></div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
+        <div style="background:#fff; border:1px solid var(--borderSubtleColor); border-radius:8px; padding: 22px 24px;">
+          <p style="font-family:var(--serif-font); font-size:18px; margin: 0 0 6px;">Communicatief</p>
+          <p style="font-size:13.5px; line-height:1.55; color:var(--blackAltText); font-weight:300; margin:0;">Elke animatie communiceert een staat (verschijnen, klaar, foutief). Decoratie zonder reden hoort hier niet thuis.</p>
+        </div>
+        <div style="background:#fff; border:1px solid var(--borderSubtleColor); border-radius:8px; padding: 22px 24px;">
+          <p style="font-family:var(--serif-font); font-size:18px; margin: 0 0 6px;">Kort &amp; helder</p>
+          <p style="font-size:13.5px; line-height:1.55; color:var(--blackAltText); font-weight:300; margin:0;">Tussen 120 en 520 ms. Begin- en eindpositie zijn duidelijk; we vermijden continue loopende beweging.</p>
+        </div>
+        <div style="background:#fff; border:1px solid var(--borderSubtleColor); border-radius:8px; padding: 22px 24px;">
+          <p style="font-family:var(--serif-font); font-size:18px; margin: 0 0 6px;">Respect voor de gebruiker</p>
+          <p style="font-size:13.5px; line-height:1.55; color:var(--blackAltText); font-weight:300; margin:0;"><code style="font-family:ui-monospace,monospace; font-size:11.5px;">prefers-reduced-motion: reduce</code> schakelt alle niet-noodzakelijke animaties uit. Standaardgedrag, geen optie.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         10. VOORBEELDEN
+         ========================================================= -->
+    <section id="examples" class="ds-section" data-screen-label="10 Examples">
+      <header class="ds-section__head">
+        <span class="ds-section__num">10 · Voorbeelden</span>
+        <h2 class="ds-section__title">Het systeem in toepassing.</h2>
+        <p class="ds-section__lede">
+          Vier voorbeelden van hoe deze fundamenten samenkomen — een marketinghero, een portaalpagina,
+          een transactionele e-mail en een marketing-sectieblok. Allemaal opgebouwd uit dezelfde tokens.
+        </p>
+      </header>
+
+      <div class="ex-grid">
+        <!-- Hero -->
+        <div class="ex-card">
+          <div class="ex-card__head"><h5>Marketing hero</h5><span class="tag">iuasr.nl / Bachelor</span></div>
+          <div class="ex-card__body">
+            <div class="ex-hero">
+              <p class="ds-eyebrow">Open Dag · 23 mei 2026</p>
+              <h2>Studeren waar <em>traditie</em><br>op toepassing aansluit.</h2>
+              <p>Bezoek onze open dag op de Bergsingel-locatie. Maak kennis met docenten, loop een college mee en stel je vragen aan studieadviseurs.</p>
+              <div class="ctas">
+                <button class="btn btn--primary">Aanmelden</button>
+                <button class="btn btn--secondary">Bekijk programma</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="ex-card">
+          <div class="ex-card__head"><h5>Studentdashboard</h5><span class="tag">/mijn-iuasr</span></div>
+          <div class="ex-card__body">
+            <div class="ex-dash">
+              <div class="ex-dash__hd"><h6>Welkom terug, Aïsha</h6><small>woensdag 27 mei</small></div>
+              <div class="ex-dash__top">
+                <div class="widget"><div class="widget__hd"><h5>Status</h5></div><span class="status s-docs">Wacht op documenten</span></div>
+                <div class="widget"><div class="widget__hd"><h5>Stap</h5></div><div class="widget__metric" style="font-size:22px;">3 / 5</div></div>
+                <div class="widget"><div class="widget__hd"><h5>Berichten</h5></div><div class="widget__metric">2</div></div>
+              </div>
+              <div class="ex-dash__hero">
+                <p class="ds-eyebrow" style="margin-bottom:10px;">Bachelor Islamitisch Recht · 2026/2027</p>
+                <div class="timeline">
+                  <div class="timeline__step done"><span class="timeline__dot">✓</span><span class="lbl">Ingediend</span></div>
+                  <div class="timeline__step done"><span class="timeline__dot">✓</span><span class="lbl">Ontvangst</span></div>
+                  <div class="timeline__step current"><span class="timeline__dot">●</span><span class="lbl">Documenten</span></div>
+                  <div class="timeline__step"><span class="timeline__dot">4</span><span class="lbl">Intake</span></div>
+                  <div class="timeline__step"><span class="timeline__dot">5</span><span class="lbl">Toelating</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="ex-card">
+          <div class="ex-card__head"><h5>Transactionele e-mail</h5><span class="tag">aanmelding ontvangen</span></div>
+          <div class="ex-card__body">
+            <div class="ex-email">
+              <div class="ex-email__logo"><img src="assets/logo/light-default-latin.png" alt="IUASR"></div>
+              <p class="ds-eyebrow">Bevestiging aanmelding</p>
+              <h2>Je aanmelding is in goede orde ontvangen.</h2>
+              <p>Beste Aïsha,</p>
+              <p>Hartelijk dank voor je aanmelding voor de Bachelor Islamitisch Recht. We controleren je documenten binnen vijf werkdagen en sturen daarna een uitnodiging voor een intakegesprek.</p>
+              <p>Je kunt de voortgang van je aanmelding op elk moment volgen in je dashboard.</p>
+              <div style="margin: 18px 0;">
+                <button class="btn btn--primary">Open mijn dashboard</button>
+              </div>
+              <p class="signoff">Met vriendelijke groet,<br>Studentenzaken IUASR</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section -->
+        <div class="ex-card">
+          <div class="ex-card__head"><h5>Marketing-sectie</h5><span class="tag">Over ons</span></div>
+          <div class="ex-card__body">
+            <div class="ex-section">
+              <p class="eye">Onze plek</p>
+              <h3>Een rustige campus in het hart van Rotterdam.</h3>
+              <p style="font-size:14.5px; color:var(--blackAltText); font-weight:300; line-height:1.55; margin:0;">Aan de Bergsingel — een groen, klassiek hoekje van Rotterdam-Noord — vinden onze colleges, ontmoetingen en bibliotheek-uren plaats. Op loopafstand van metrolijn E.</p>
+              <div class="cols">
+                <div class="col">
+                  <h5>Bergsingel 71</h5>
+                  <p>3037 GD Rotterdam · op werkdagen open van 09:00 tot 17:00</p>
+                </div>
+                <div class="col">
+                  <h5>Studentenzaken</h5>
+                  <p>studentenzaken@iuasr.nl · 010 – 760 14 22</p>
+                </div>
+              </div>
+              <div style="margin-top:18px; display:flex; gap: 10px;">
+                <button class="btn btn--secondary btn--sm">Plan een bezoek</button>
+                <button class="btn btn--link" style="font-size:13px;">Routebeschrijving</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         COLOPHON
+         ========================================================= -->
+    <footer class="ds-colophon">
+      <div>
+        <b>IUASR Design System · v1.0</b><br>
+        Mei 2026 · Brand &amp; Product
+      </div>
+      <div>
+        Tokens: <code style="font-family:ui-monospace,monospace; font-size:12px;">iuasr-portal-tokens.css</code><br>
+        Fonts: <a href="https://fonts.google.com/specimen/DM+Serif+Display">DM Serif Display</a> · <a href="https://fonts.google.com/specimen/Fira+Sans">Fira Sans</a> · <a href="https://fonts.google.com/specimen/Reem+Kufi">Reem Kufi</a> · <a href="https://fonts.google.com/specimen/Cairo">Cairo</a>
+      </div>
+      <div>
+        Vragen of voorstellen?<br>
+        <a href="mailto:design@iuasr.nl">design@iuasr.nl</a>
+      </div>
+    </footer>
+
+  </main>
+</div>
+
+<script src="assets/js/design-system.js"></script>
+</body>
+</html>

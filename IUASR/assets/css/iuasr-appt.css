@@ -1,0 +1,655 @@
+/* =============================================================
+   IUASR Afsprakenplugin — eigen prefix om CSS-botsing te
+   voorkomen met de bestaande portaal-classes (.week-nav, .slot,
+   .intake-confirm, …). Visueel identiek aan stap 4A maar
+   geïsoleerd.
+
+   Tokens worden hergebruikt uit :root van de drager-pagina:
+   --priColor100, --secColor100, --secColor300, --priColor102,
+   --priColor103, --borderSubtleColor, --borderColor,
+   --blackAltText, --serif-font, --sans-serif-font.
+   ============================================================= */
+
+/* ---------- ROOT CONTAINER ---------- */
+.iuasr-appt {
+  font-family: var(--sans-serif-font);
+  color: var(--priColor100);
+}
+
+/* ---------- CARD ---------- */
+.iuasr-appt-card {
+  background: #FFFFFF;
+  border: 1px solid var(--borderSubtleColor);
+  border-radius: 8px;
+  box-shadow: var(--shadow-card);
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 32px 32px 28px;
+}
+.iuasr-appt-card__title {
+  font-family: var(--serif-font); font-weight: 400;
+  font-size: 28px; line-height: 34px; margin: 0 0 6px;
+  color: var(--priColor100); letter-spacing: -0.005em;
+}
+.iuasr-appt-card__sub {
+  font-size: 14px; line-height: 21px; color: var(--blackAltText);
+  font-weight: 300; margin: 0 0 6px; max-width: 56ch;
+}
+.iuasr-appt-card__note {
+  font-size: 12px; color: var(--blackAltText); font-weight: 300;
+  margin: 12px 0 22px;
+  padding-top: 14px; border-top: 1px solid var(--borderSubtleColor);
+}
+
+/* ---------- WEEK NAV ---------- */
+.iuasr-appt-week {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 14px; background: var(--priColor102); border-radius: 6px;
+  margin-bottom: 16px;
+}
+.iuasr-appt-week__btn {
+  background: transparent; border: 0; cursor: pointer;
+  color: var(--priColor100); font-size: 13px; font-weight: 500;
+  font-family: var(--sans-serif-font);
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px; border-radius: 4px;
+  transition: background 150ms;
+}
+.iuasr-appt-week__btn:hover { background: rgba(30, 20, 70, 0.10); }
+.iuasr-appt-week__btn:disabled,
+.iuasr-appt-week__btn[aria-disabled="true"] { opacity: 0.35; cursor: not-allowed; }
+.iuasr-appt-week__btn:focus-visible {
+  outline: none; box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.30);
+}
+.iuasr-appt-week__label {
+  flex: 1; min-width: 140px;
+  font-family: var(--serif-font); font-weight: 400; font-size: 16px;
+  color: var(--priColor100); text-align: center;
+}
+.iuasr-appt-week__label small {
+  font-family: var(--sans-serif-font); font-weight: 400; font-size: 11px;
+  color: var(--blackAltText); display: block; letter-spacing: 0.04em;
+  text-transform: uppercase; margin-bottom: 2px;
+}
+
+/* ---------- DAY LABEL ---------- */
+.iuasr-appt-daylabel {
+  font-size: 13px; color: var(--blackAltText); font-weight: 400;
+  margin: 0 0 10px;
+}
+.iuasr-appt-daylabel b { font-weight: 500; color: var(--priColor100); }
+.iuasr-appt-daylabel--loading {
+  color: var(--blackAltText);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.iuasr-appt-daylabel--loading::before {
+  content: ""; width: 12px; height: 12px;
+  border: 1.5px solid var(--borderColor);
+  border-top-color: var(--priColor100);
+  border-radius: 50%;
+  animation: iuasrApptSpin 700ms linear infinite;
+}
+@keyframes iuasrApptSpin { to { transform: rotate(360deg); } }
+
+/* ---------- SLOTS ---------- */
+.iuasr-appt-slots {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+}
+.iuasr-appt-slot {
+  background: #FFFFFF; border: 1.5px solid var(--priColor100); color: var(--priColor100);
+  border-radius: 6px; padding: 14px 8px; text-align: center;
+  font-family: var(--sans-serif-font); font-weight: 500; font-size: 16px;
+  cursor: pointer;
+  transition: background 150ms, color 150ms, border-color 150ms;
+}
+.iuasr-appt-slot small {
+  display: block; font-size: 11px; font-weight: 400; color: var(--blackAltText);
+  letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px;
+}
+.iuasr-appt-slot:hover { background: var(--priColor100); color: var(--priColor103); }
+.iuasr-appt-slot:hover small { color: var(--secColor300); }
+.iuasr-appt-slot:focus-visible {
+  outline: none; box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.30);
+}
+
+/* --selected — indigo gevuld */
+.iuasr-appt-slot--selected,
+.iuasr-appt-slot--selected:hover {
+  background: var(--priColor100); color: var(--priColor103);
+}
+.iuasr-appt-slot--selected small,
+.iuasr-appt-slot--selected:hover small { color: var(--secColor300); }
+
+/* --busy — vol/disabled */
+.iuasr-appt-slot--busy {
+  background: var(--priColor102); border-color: transparent;
+  color: var(--blackAltText); cursor: not-allowed;
+}
+.iuasr-appt-slot--busy:hover {
+  background: var(--priColor102); color: var(--blackAltText);
+}
+.iuasr-appt-slot--busy small,
+.iuasr-appt-slot--busy:hover small { color: var(--blackAltText); }
+
+/* --skeleton — loading state */
+.iuasr-appt-slot--skel {
+  pointer-events: none; cursor: default;
+  background: var(--priColor102); border-color: transparent;
+  color: transparent;
+  position: relative; overflow: hidden;
+  min-height: 64px;
+}
+.iuasr-appt-slot--skel small { color: transparent; }
+.iuasr-appt-slot--skel::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,0.55) 50%,
+    transparent 100%);
+  animation: iuasrApptShimmer 1400ms linear infinite;
+}
+@keyframes iuasrApptShimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ---------- CONFIRMATION CARD (success / groen) ---------- */
+.iuasr-appt-confirm {
+  margin-top: 18px;
+  background: #F1FAF5; border: 1px solid #C6E3D2; border-radius: 6px;
+  padding: 14px 16px;
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.iuasr-appt-confirm__icon {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #156A42; color: #FFFFFF;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: none;
+}
+.iuasr-appt-confirm__body {
+  font-size: 13.5px; line-height: 1.5; color: var(--priColor100);
+}
+.iuasr-appt-confirm__body b {
+  display: block; font-size: 15px; font-weight: 500; margin-bottom: 2px; color: #0F4B2E;
+}
+.iuasr-appt-confirm__where {
+  color: var(--blackAltText); margin-top: 4px; font-size: 12.5px;
+}
+
+/* ---------- HOLD / EXPIRING MICROCOPY ---------- */
+.iuasr-appt-hold {
+  margin-top: 8px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--blackAltText); font-weight: 300;
+  line-height: 1.45;
+  padding: 0 2px;
+}
+.iuasr-appt-hold__icon {
+  width: 14px; height: 14px; flex: none; color: var(--priColor100); opacity: 0.6;
+}
+.iuasr-appt-hold__timer {
+  color: var(--priColor100); font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  margin-left: auto;
+  background: var(--priColor102);
+  padding: 2px 8px; border-radius: 999px;
+  font-size: 11.5px;
+}
+
+/* ---------- EMPTY / INFO ---------- */
+.iuasr-appt-empty {
+  background: #FDF4E3; border: 1px solid #F2D88F; border-radius: 6px;
+  padding: 14px 16px;
+  display: flex; align-items: flex-start; gap: 12px;
+  margin-bottom: 0;
+}
+.iuasr-appt-empty__icon {
+  width: 32px; height: 32px; border-radius: 6px;
+  background: rgba(141, 89, 5, 0.12); color: #8D5905;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: none;
+}
+.iuasr-appt-empty__body { font-size: 13.5px; line-height: 1.5; color: #8D5905; }
+.iuasr-appt-empty__body b {
+  display: block; font-size: 14px; font-weight: 500;
+  color: #6B4304; margin-bottom: 2px;
+}
+
+/* ---------- ERROR ---------- */
+.iuasr-appt-error {
+  background: #FBE9EB; border: 1px solid #F2BFC6; border-radius: 6px;
+  padding: 12px 14px; margin-bottom: 12px;
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13px; color: #7A0A1F; line-height: 1.45;
+}
+.iuasr-appt-error__icon {
+  width: 18px; height: 18px; flex: none; color: #9A0C24; margin-top: 1px;
+}
+.iuasr-appt-error b { font-weight: 500; color: #9A0C24; }
+
+/* ---------- ACTION ROW ---------- */
+.iuasr-appt-actions {
+  display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--borderSubtleColor);
+}
+.iuasr-appt-btn {
+  box-sizing: border-box;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 140px; min-height: 41px;
+  padding: 8px 16px; border: 2px solid transparent; border-radius: 4px;
+  font-size: 15px; font-weight: 500; font-family: var(--sans-serif-font);
+  text-decoration: none; cursor: pointer; gap: 8px;
+  transition: background 150ms, color 150ms, border-color 150ms, box-shadow 150ms;
+}
+.iuasr-appt-btn:focus-visible {
+  outline: none; box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.30);
+}
+.iuasr-appt-btn--primary {
+  background: var(--secColor100); color: #F2F1F4; border-color: var(--secColor100);
+}
+.iuasr-appt-btn--primary:hover {
+  background: var(--secColor100-hover); border-color: var(--secColor100-hover);
+}
+.iuasr-appt-btn--primary[aria-disabled="true"],
+.iuasr-appt-btn--primary:disabled {
+  background: var(--priColor102); color: var(--blackAltText);
+  border-color: transparent; cursor: not-allowed;
+}
+.iuasr-appt-btn--ghost {
+  background: transparent; color: var(--priColor100); border-color: var(--borderColor);
+}
+.iuasr-appt-btn--ghost:hover {
+  border-color: var(--priColor100); background: var(--priColor102);
+}
+.iuasr-appt-btn .iuasr-appt-arrow {
+  display: inline-block; transition: transform 200ms cubic-bezier(0.2,0,0,1);
+}
+.iuasr-appt-btn:hover .iuasr-appt-arrow { transform: translateX(3px); }
+.iuasr-appt-btn--back .iuasr-appt-arrow { transform: rotate(180deg); }
+.iuasr-appt-btn--back:hover .iuasr-appt-arrow {
+  transform: rotate(180deg) translateX(3px);
+}
+
+/* ---------- MOBILE ---------- */
+@media (max-width: 640px) {
+  .iuasr-appt-card { padding: 22px 18px 20px; }
+  .iuasr-appt-card__title { font-size: 22px; line-height: 28px; }
+
+  .iuasr-appt-week {
+    flex-wrap: wrap; gap: 8px;
+    padding: 10px 10px;
+  }
+  .iuasr-appt-week__label {
+    flex: 0 1 100%; min-width: 0;
+    order: -1; width: 100%; padding: 2px 0 4px;
+    border-bottom: 1px solid rgba(30,20,70,0.08); margin-bottom: 4px;
+  }
+  .iuasr-appt-week__btn {
+    flex: 1; justify-content: center;
+    padding: 8px 8px;
+  }
+
+  .iuasr-appt-slots { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .iuasr-appt-slot { padding: 12px 6px; font-size: 15px; }
+
+  .iuasr-appt-actions { flex-direction: column-reverse; align-items: stretch; }
+  .iuasr-appt-actions .iuasr-appt-btn { width: 100%; min-width: 0; }
+}
+
+/* =============================================================
+   ADMIN — beheer / overzicht / regels / uitzonderingen
+   ============================================================= */
+
+.iuasr-appt-admin-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 16px; margin-bottom: 18px; flex-wrap: wrap;
+}
+.iuasr-appt-admin-head h1 {
+  font-family: var(--serif-font); font-weight: 400;
+  font-size: 26px; line-height: 32px; margin: 0;
+  color: var(--priColor100);
+}
+.iuasr-appt-admin-head .summary {
+  font-size: 13px; color: var(--blackAltText); margin-top: 4px; font-weight: 300;
+}
+.iuasr-appt-admin-head .summary b { color: var(--priColor100); font-weight: 500; }
+.iuasr-appt-admin-head__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* Tab strip — subnav binnen "IUASR Afspraken" */
+.iuasr-appt-admin-tabs {
+  display: flex; gap: 2px; margin-bottom: 16px;
+  border-bottom: 1px solid var(--borderSubtleColor);
+}
+.iuasr-appt-admin-tabs a {
+  padding: 10px 14px;
+  font-size: 13.5px; font-weight: 500; color: var(--blackAltText);
+  text-decoration: none; border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 120ms, border-color 120ms;
+}
+.iuasr-appt-admin-tabs a:hover {
+  color: var(--priColor100); text-decoration: none;
+}
+.iuasr-appt-admin-tabs a.is-active {
+  color: var(--priColor100); border-bottom-color: var(--secColor100);
+}
+.iuasr-appt-admin-tabs a .badge {
+  display: inline-block; background: var(--priColor102);
+  color: var(--blackAltText); font-size: 11px; font-weight: 500;
+  padding: 1px 7px; border-radius: 999px; margin-left: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.iuasr-appt-admin-tabs a.is-active .badge {
+  background: var(--secColor300); color: var(--priColor100);
+}
+
+/* Filterbar */
+.iuasr-appt-admin-filters {
+  background: #FFFFFF; border: 1px solid var(--borderSubtleColor);
+  border-radius: 8px; padding: 12px 14px; margin-bottom: 16px;
+  display: grid; grid-template-columns: 1.2fr 1fr 1fr 1.2fr 1.4fr; gap: 10px;
+}
+.iuasr-appt-admin-filters .field {
+  display: flex; flex-direction: column; gap: 4px; min-width: 0;
+}
+.iuasr-appt-admin-filters label {
+  font-size: 10.5px; font-weight: 500; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--blackAltText);
+}
+.iuasr-appt-admin-filters select,
+.iuasr-appt-admin-filters input {
+  height: 36px; padding: 6px 10px;
+  font-family: inherit; font-size: 13.5px; color: var(--priColor100);
+  background: #FFFFFF;
+  border: 1px solid var(--borderColor); border-radius: 4px;
+  width: 100%;
+}
+.iuasr-appt-admin-filters select {
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231E1446' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+.iuasr-appt-admin-filters select:focus,
+.iuasr-appt-admin-filters input:focus {
+  outline: none; border-color: var(--secColor100);
+  box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.18);
+}
+.iuasr-appt-admin-filters .field--range { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+/* Table */
+.iuasr-appt-admin-tbl-card {
+  background: #FFFFFF; border: 1px solid var(--borderSubtleColor);
+  border-radius: 8px; overflow: hidden;
+}
+.iuasr-appt-admin-tbl {
+  width: 100%; border-collapse: collapse;
+  font-size: 13.5px;
+}
+.iuasr-appt-admin-tbl thead th {
+  background: var(--priColor102);
+  text-align: left; font-weight: 500;
+  color: var(--blackAltText); font-size: 11.5px;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--borderSubtleColor);
+  white-space: nowrap;
+}
+.iuasr-appt-admin-tbl tbody tr {
+  border-bottom: 1px solid var(--borderSubtleColor);
+  transition: background 120ms;
+}
+.iuasr-appt-admin-tbl tbody tr:last-child { border-bottom: 0; }
+.iuasr-appt-admin-tbl tbody tr:hover { background: rgba(30, 20, 70, 0.03); }
+.iuasr-appt-admin-tbl tbody td {
+  padding: 12px 14px;
+  color: var(--priColor100); vertical-align: middle;
+}
+.iuasr-appt-admin-tbl .dt { font-variant-numeric: tabular-nums; }
+.iuasr-appt-admin-tbl .dt b {
+  display: block; font-weight: 500; color: var(--priColor100);
+}
+.iuasr-appt-admin-tbl .dt small {
+  display: block; font-size: 11.5px; color: var(--blackAltText);
+  letter-spacing: 0.02em; margin-top: 1px;
+}
+.iuasr-appt-admin-tbl .nm { font-weight: 500; }
+.iuasr-appt-admin-tbl .nm small {
+  display: block; font-weight: 300; color: var(--blackAltText);
+  font-size: 12px; margin-top: 1px;
+}
+.iuasr-appt-admin-tbl .pg small {
+  display: block; font-size: 11px; color: var(--blackAltText);
+  text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 1px;
+}
+.iuasr-appt-admin-tbl .loc small {
+  display: block; font-size: 11.5px; color: var(--blackAltText);
+}
+.iuasr-appt-admin-tbl .gf {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12.5px; color: var(--blackAltText);
+}
+.iuasr-appt-admin-tbl .gf a {
+  color: var(--secColor100); font-weight: 500;
+  text-decoration: none;
+}
+.iuasr-appt-admin-tbl .gf a:hover { text-decoration: underline; }
+
+/* Acties cel */
+.iuasr-appt-admin-tbl td.acts {
+  text-align: right; white-space: nowrap;
+}
+.iuasr-appt-admin-tbl td.acts .iuasr-appt-admin-btn + .iuasr-appt-admin-btn {
+  margin-left: 6px;
+}
+
+/* Status pills (held / confirmed / cancelled / expired) */
+.iuasr-appt-status {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 999px;
+  font-size: 12px; font-weight: 500; white-space: nowrap;
+}
+.iuasr-appt-status::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor;
+}
+.iuasr-appt-status--held {
+  background: rgba(30,20,70,0.06); color: #1E1446;
+}
+.iuasr-appt-status--confirmed {
+  background: #E7F5EE; color: #156A42;
+}
+.iuasr-appt-status--cancelled {
+  background: #FBE9EB; color: #9A0C24;
+}
+.iuasr-appt-status--expired {
+  background: #F4F4F4; color: #6F6F6F;
+}
+
+/* Admin buttons (compact) */
+.iuasr-appt-admin-btn {
+  box-sizing: border-box;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 30px; padding: 4px 10px;
+  border: 1px solid var(--borderColor); background: #FFFFFF;
+  color: var(--priColor100); font-family: inherit;
+  font-size: 12.5px; font-weight: 500; border-radius: 4px;
+  cursor: pointer; gap: 6px; text-decoration: none;
+  transition: background 120ms, border-color 120ms, color 120ms;
+}
+.iuasr-appt-admin-btn:hover {
+  background: var(--priColor102); border-color: var(--priColor100);
+  text-decoration: none; color: var(--priColor100);
+}
+.iuasr-appt-admin-btn--danger {
+  color: var(--secColor100); border-color: rgba(200,16,46,0.4);
+}
+.iuasr-appt-admin-btn--danger:hover {
+  color: #F2F1F4; background: var(--secColor100); border-color: var(--secColor100);
+}
+.iuasr-appt-admin-btn--primary {
+  background: var(--secColor100); color: #F2F1F4; border-color: var(--secColor100);
+  min-height: 38px; padding: 7px 14px; font-size: 13.5px;
+}
+.iuasr-appt-admin-btn--primary:hover {
+  background: var(--secColor100-hover); border-color: var(--secColor100-hover); color: #F2F1F4;
+}
+.iuasr-appt-admin-btn--ghost {
+  background: transparent;
+}
+
+/* ---------- ADMIN FORM ---------- */
+.iuasr-appt-admin-form-card {
+  background: #FFFFFF; border: 1px solid var(--borderSubtleColor);
+  border-radius: 8px; padding: 22px 24px; margin-bottom: 16px;
+}
+.iuasr-appt-admin-form-card h3 {
+  font-family: var(--serif-font); font-weight: 400; font-size: 18px;
+  margin: 0 0 4px; color: var(--priColor100);
+}
+.iuasr-appt-admin-form-card .sub {
+  font-size: 12.5px; color: var(--blackAltText); font-weight: 300;
+  margin: 0 0 18px;
+}
+.iuasr-appt-admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 12px 14px;
+}
+.iuasr-appt-admin-form-grid .fld { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.iuasr-appt-admin-form-grid .fld label {
+  font-size: 11.5px; font-weight: 500; color: var(--priColor100);
+}
+.iuasr-appt-admin-form-grid .fld label .req { color: var(--secColor100); margin-left: 2px; }
+.iuasr-appt-admin-form-grid .fld input,
+.iuasr-appt-admin-form-grid .fld select,
+.iuasr-appt-admin-form-grid .fld textarea {
+  height: 36px; padding: 6px 10px;
+  font-family: inherit; font-size: 13.5px; color: var(--priColor100);
+  background: #FFFFFF;
+  border: 1px solid var(--borderColor); border-radius: 4px;
+  width: 100%;
+}
+.iuasr-appt-admin-form-grid .fld textarea {
+  height: auto; min-height: 72px; padding: 8px 10px; line-height: 1.45;
+  resize: vertical;
+}
+.iuasr-appt-admin-form-grid .fld select {
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231E1446' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+.iuasr-appt-admin-form-grid .fld input:focus,
+.iuasr-appt-admin-form-grid .fld select:focus,
+.iuasr-appt-admin-form-grid .fld textarea:focus {
+  outline: none; border-color: var(--secColor100);
+  box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.18);
+}
+.iuasr-appt-admin-form-grid .fld small.hint {
+  font-size: 11.5px; color: var(--blackAltText); font-weight: 300; line-height: 1.4;
+}
+
+/* Column spans */
+.iuasr-appt-admin-form-grid .col-3  { grid-column: span 3; }
+.iuasr-appt-admin-form-grid .col-4  { grid-column: span 4; }
+.iuasr-appt-admin-form-grid .col-5  { grid-column: span 5; }
+.iuasr-appt-admin-form-grid .col-6  { grid-column: span 6; }
+.iuasr-appt-admin-form-grid .col-7  { grid-column: span 7; }
+.iuasr-appt-admin-form-grid .col-8  { grid-column: span 8; }
+.iuasr-appt-admin-form-grid .col-12 { grid-column: span 12; }
+
+/* Toggle (actief ja/nee) */
+.iuasr-appt-toggle {
+  display: inline-flex; align-items: center; gap: 10px; cursor: pointer;
+  height: 36px;
+}
+.iuasr-appt-toggle input {
+  appearance: none; -webkit-appearance: none; margin: 0; position: relative;
+  width: 36px; height: 20px; border-radius: 999px;
+  background: var(--borderColor); cursor: pointer;
+  transition: background 150ms;
+}
+.iuasr-appt-toggle input::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #FFFFFF; transition: transform 150ms;
+}
+.iuasr-appt-toggle input:checked { background: #156A42; }
+.iuasr-appt-toggle input:checked::after { transform: translateX(16px); }
+.iuasr-appt-toggle input:focus-visible {
+  outline: none; box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.25);
+}
+.iuasr-appt-toggle__lbl { font-size: 13px; color: var(--priColor100); font-weight: 500; }
+.iuasr-appt-toggle__lbl small {
+  display: block; font-size: 11.5px; color: var(--blackAltText); font-weight: 400;
+}
+
+/* Form footer */
+.iuasr-appt-admin-form-actions {
+  margin-top: 18px; padding-top: 16px;
+  border-top: 1px solid var(--borderSubtleColor);
+  display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;
+}
+
+/* Sectiekop boven bestaande regels lijst */
+.iuasr-appt-admin-subhead {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; margin: 24px 0 12px;
+}
+.iuasr-appt-admin-subhead h2 {
+  font-family: var(--serif-font); font-weight: 400; font-size: 20px;
+  margin: 0; color: var(--priColor100);
+}
+.iuasr-appt-admin-subhead .meta {
+  font-size: 12.5px; color: var(--blackAltText); font-weight: 300;
+}
+
+/* Inline day chip groep (weekdag) */
+.iuasr-appt-day-chips {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.iuasr-appt-day-chips label {
+  position: relative; cursor: pointer;
+}
+.iuasr-appt-day-chips input {
+  position: absolute; opacity: 0; pointer-events: none;
+}
+.iuasr-appt-day-chips span {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 36px; height: 32px; padding: 0 10px;
+  border: 1px solid var(--borderColor); border-radius: 4px;
+  font-size: 12.5px; font-weight: 500; color: var(--priColor100);
+  background: #FFFFFF;
+  transition: background 120ms, border-color 120ms, color 120ms;
+}
+.iuasr-appt-day-chips label:hover span {
+  border-color: var(--priColor100); background: var(--priColor102);
+}
+.iuasr-appt-day-chips input:checked + span {
+  background: var(--priColor100); color: var(--priColor103); border-color: var(--priColor100);
+}
+.iuasr-appt-day-chips input:focus-visible + span {
+  box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.25);
+}
+
+/* Exceptions banner */
+.iuasr-appt-admin-cta {
+  background: var(--priColor102); border: 1px dashed var(--borderColor);
+  border-radius: 8px; padding: 16px 18px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+}
+.iuasr-appt-admin-cta__body { flex: 1; min-width: 220px; font-size: 13px; color: var(--blackAltText); }
+.iuasr-appt-admin-cta__body b { color: var(--priColor100); font-weight: 500; }
+
+@media (max-width: 880px) {
+  .iuasr-appt-admin-filters { grid-template-columns: 1fr 1fr; }
+  .iuasr-appt-admin-form-grid .col-3,
+  .iuasr-appt-admin-form-grid .col-4,
+  .iuasr-appt-admin-form-grid .col-5,
+  .iuasr-appt-admin-form-grid .col-6,
+  .iuasr-appt-admin-form-grid .col-7,
+  .iuasr-appt-admin-form-grid .col-8 { grid-column: span 12; }
+}

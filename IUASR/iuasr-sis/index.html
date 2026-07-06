@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IUASR SIS — Schermenoverzicht</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sis.css">
+<link rel="stylesheet" href="assets/iuasr-plugin-dash.css">
+<style>
+  .idx { max-width: 1000px; margin: 0 auto; padding: 40px 24px 80px; }
+  .idx__hero { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 28px; flex-wrap: wrap; }
+  .idx__hero img { height: 54px; }
+  .idx__hero h1 { font-family: var(--serif-font); font-weight: 400; font-size: 34px; margin: 0 0 6px; color: var(--priColor100); letter-spacing: -0.01em; }
+  .idx__hero p { margin: 0; color: var(--blackAltText); font-size: 14px; max-width: 62ch; line-height: 1.6; }
+  .idx__cluster { margin-top: 30px; }
+  .idx__cluster h2 { font-family: var(--serif-font); font-weight: 400; font-size: 18px; color: var(--priColor100); margin: 0 0 4px; display: flex; align-items: baseline; gap: 10px; }
+  .idx__cluster h2 .k { font-size: 12px; color: var(--secColor100); font-weight: 600; letter-spacing: 0.06em; font-family: var(--sans-serif-font); }
+  .idx__cluster .lead { font-size: 12.5px; color: var(--blackAltText); margin: 0 0 14px; }
+  .idx__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+  .idx__card { display: flex; flex-direction: column; gap: 4px; background: #FFFFFF; border: 1px solid var(--borderSubtleColor); border-radius: 8px; padding: 14px 16px; text-decoration: none; transition: border-color 120ms, box-shadow 120ms, transform 120ms; }
+  .idx__card:hover { border-color: var(--borderColor); box-shadow: var(--shadow-card); transform: translateY(-1px); text-decoration: none; }
+  .idx__card b { color: var(--priColor100); font-size: 14px; font-weight: 500; }
+  .idx__card span { color: var(--blackAltText); font-size: 12px; line-height: 1.45; }
+  .idx__card .roles { margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap; }
+</style>
+</head>
+<body style="background:var(--priColor103);">
+
+<div class="idx">
+  <div class="idx__hero">
+    <img src="assets/logo-dark.png" alt="IUASR">
+    <div>
+      <h1>Studentbeheersysteem (SIS)</h1>
+      <p>Interne web-opvolger van het oude Access-systeem voor Studentenzaken. Eén shell met een <b>rolwisselaar</b> (rechtsboven) — de interface, navigatie en zichtbaarheid van cijfers en persoonsgegevens veranderen per rol. Fictieve nepdata; geen echte persoonsgegevens.</p>
+    </div>
+  </div>
+
+  <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="login.html" style="min-height:44px;">Start bij het inlogscherm →</a>
+
+  <div class="idx__cluster">
+    <h2><span class="k">A</span> Toegang &amp; shell</h2>
+    <p class="lead">SSO-login en de applicatie-shell met rolwisselaar.</p>
+    <div class="idx__grid">
+      <a class="idx__card" href="login.html"><b>Inloggen (SSO)</b><span>Alleen “Inloggen met IUASR-account”</span></a>
+      <a class="idx__card" href="dashboard.html"><b>Dashboard</b><span>Rol-afhankelijk overzicht + rolwisselaar</span></a>
+    </div>
+  </div>
+
+  <div class="idx__cluster">
+    <h2><span class="k">C</span> Studenten <span class="sis-rolebadge r-studentenzaken" style="font-size:10.5px;">Studentenzaken</span></h2>
+    <p class="lead">Zoeken op studentnummer, dossier met afgeschermd tabblad Cijfers, in- en uitschrijven.</p>
+    <div class="idx__grid">
+      <a class="idx__card" href="studenten.html"><b>Studentenlijst</b><span>Zoek op studentnummer · statusbadges</span></a>
+      <a class="idx__card" href="student-detail.html"><b>Studentdetail</b><span>Tabblad Cijfers afgeschermd voor Studentenzaken</span></a>
+      <a class="idx__card" href="inschrijven.html"><b>Student inschrijven</b><span>Auto-studentnummer · BSN gemaskeerd</span></a>
+      <a class="idx__card" href="herinschrijven.html"><b>Herinschrijven</b><span>Vereenvoudigd · nieuwe periode</span></a>
+      <a class="idx__card" href="uitschrijven.html"><b>Uitschrijven</b><span>Statuswijziging · berekende datum</span></a>
+    </div>
+  </div>
+
+  <div class="idx__cluster">
+    <h2><span class="k">D</span> Onderwijs &amp; cijfers <span class="sis-rolebadge r-docent" style="font-size:10.5px;">Docent</span> <span class="sis-rolebadge r-examencommissie" style="font-size:10.5px;">Examencie.</span></h2>
+    <p class="lead">Docent voert cijfers in voor eigen vakken; examencommissie/directie zien het overzicht (afgeschermd voor Studentenzaken).</p>
+    <div class="idx__grid">
+      <a class="idx__card" href="mijn-vakken.html"><b>Mijn vakken</b><span>Docent · eigen vakken per periode</span></a>
+      <a class="idx__card" href="cijferinvoer.html"><b>Cijferinvoer</b><span>Toetsonderdelen · weging · poging · vrijstelling</span></a>
+      <a class="idx__card" href="cijferoverzicht.html"><b>Cijferoverzicht</b><span>Leesweergave · niet voor Studentenzaken</span></a>
+    </div>
+  </div>
+
+  <div class="idx__cluster">
+    <h2><span class="k">E</span> Rapporten &amp; documenten</h2>
+    <p class="lead">De web-opvolger van de Access-rapporten: nette, printbare A4-uitvoer.</p>
+    <div class="idx__grid">
+      <a class="idx__card" href="rapporten.html"><b>Rapporten-overzicht</b><span>Tentamenlijst · EC · cijfer · klassenlijst</span></a>
+      <a class="idx__card" href="rapport-voorbeeld.html"><b>Rapport-voorbeeld (A4)</b><span>Printbare tentamenlijst</span></a>
+      <a class="idx__card" href="verklaringen.html"><b>Verklaring genereren</b><span>Studentbewijs · vertraging · afstudeerfase</span></a>
+    </div>
+  </div>
+
+  <div class="idx__cluster">
+    <h2><span class="k">F</span> Beheer <span class="sis-rolebadge r-beheerder" style="font-size:10.5px;">Beheerder</span></h2>
+    <p class="lead">Gebruikers &amp; rollen (maakt de rolscheiding leesbaar), referentiedata en de audit-log.</p>
+    <div class="idx__grid">
+      <a class="idx__card" href="gebruikers.html"><b>Gebruikers &amp; rollen</b><span>Toegangsmatrix per rol</span></a>
+      <a class="idx__card" href="opzoektabellen.html"><b>Opzoektabellen</b><span>Opleidingen · vakken · perioden · klassen · docenten</span></a>
+      <a class="idx__card" href="audit-log.html"><b>Audit-log</b><span>Wie zag/wijzigde welk cijfer of BSN</span></a>
+    </div>
+  </div>
+
+  <p class="sis-tblnote" style="margin-top:30px;">Tip: gebruik de <b>rolwisselaar</b> rechtsboven op elk scherm. Open bijvoorbeeld een studentdetail als <b>Studentenzaken</b> (tabblad Cijfers vergrendeld) en wissel dan naar <b>Examencommissie</b> om te zien dat de cijfers zichtbaar worden.</p>
+</div>
+
+<script>
+// Zorg dat er een rol gekozen is voor navigatie vanaf het overzicht
+if (!localStorage.getItem('sis_role')) localStorage.setItem('sis_role', 'studentenzaken');
+</script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uitschrijven — IUASR SIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sis.css">
+<link rel="stylesheet" href="assets/iuasr-plugin-dash.css">
+</head>
+<body>
+
+<div id="sis-header"></div>
+
+<div class="iuasr-dash-app">
+  <nav class="iuasr-dash-sidebar" id="sis-sidebar" aria-label="Hoofdmenu"></nav>
+
+  <main class="iuasr-dash-main">
+    <div class="sis-crumb"><a href="dashboard.html">Dashboard</a><span class="sep">›</span><a href="studenten.html">Studenten</a><span class="sep">›</span><b>Uitschrijven</b></div>
+
+    <div class="iuasr-dash-vhead">
+      <div>
+        <h1>Uitschrijven</h1>
+        <div class="summary">Statuswijziging · berekende uitschrijfdatum</div>
+      </div>
+    </div>
+
+    <div class="sis-grid-2">
+      <div>
+        <div class="sis-card" style="margin-bottom:16px;">
+          <div class="iuasr-dash-candidate__hd" style="margin:0;padding:0;border:0;">
+            <span class="iuasr-dash-candidate__avatar" style="width:44px;height:44px;font-size:18px;" aria-hidden="true">R</span>
+            <div class="iuasr-dash-candidate__body">
+              <div style="font-family:var(--serif-font);font-size:19px;">Rachid Belhaj</div>
+              <div class="iuasr-dash-candidate__meta"><span>258871</span><span class="dot"></span><span>Bachelor Islamitische Theologie</span><span class="dot"></span><span>Cohort 2024</span></div>
+            </div>
+            <span class="iuasr-dash-status s-approved" style="align-self:flex-start;">Actief</span>
+          </div>
+        </div>
+
+        <form class="sis-card sis-form" onsubmit="return false;">
+          <fieldset class="sis-fieldset">
+            <legend>Uitschrijving</legend>
+            <div class="sis-fld">
+              <label>Reden uitschrijving <span class="req">*</span></label>
+              <select id="reden">
+                <option>Op eigen verzoek</option>
+                <option>Afgestudeerd</option>
+                <option>Negatief bindend studieadvies (BSA)</option>
+                <option>Overstap andere instelling</option>
+                <option>Financieel / niet voldaan</option>
+              </select>
+            </div>
+            <div class="sis-fld">
+              <label>Peildatum verzoek <span class="req">*</span></label>
+              <input type="text" id="peildatum" value="06-07-2026" placeholder="dd-mm-jjjj">
+              <div class="help">Uitschrijfdatum wordt berekend op basis van de wettelijke regel: einde van de lopende maand.</div>
+            </div>
+            <div class="sis-fld">
+              <label>Toelichting (interne notitie)</label>
+              <textarea placeholder="Optioneel — reden, afspraken, doorverwijzing…"></textarea>
+            </div>
+            <div class="sis-fld">
+              <label class="sis-check-inline"><input type="checkbox" checked> Student per e-mail informeren en uitschrijfbevestiging (A4) genereren</label>
+            </div>
+          </fieldset>
+
+          <div class="sis-form__actions">
+            <a class="iuasr-dash-btn" href="student-detail.html">Annuleren</a>
+            <a class="iuasr-dash-btn iuasr-dash-btn--danger" href="#" onclick="return false;">Uitschrijven bevestigen</a>
+          </div>
+        </form>
+      </div>
+
+      <div>
+        <div class="sis-card">
+          <div class="sis-card__hd"><h3>Gevolgen</h3></div>
+          <dl class="sis-dl">
+            <dt>Nieuwe status</dt><dd><span class="iuasr-dash-status s-draft">Uitgeschreven</span></dd>
+            <dt>Berekende datum</dt><dd><b id="calc-date">31 juli 2026</b></dd>
+            <dt>Klasplaatsing</dt><dd>Vervalt per uitschrijfdatum</dd>
+            <dt>IUASR-account</dt><dd>Wordt gedeactiveerd (+30 dagen)</dd>
+            <dt>Behaalde EC</dt><dd>Blijven geregistreerd</dd>
+          </dl>
+        </div>
+        <div class="iuasr-dash-alert iuasr-dash-alert--warn" style="margin-top:16px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Uitschrijven is <b>onomkeerbaar</b> in dit scherm. Een uitgeschreven student kan later opnieuw worden ingeschreven via een nieuwe aanmelding.</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/sis-shell.js"></script>
+<script>
+SIS.render({ active: 'uitschrijven' });
+// Bereken einde lopende maand op basis van peildatum
+(function () {
+  var months = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+  var inp = document.getElementById('peildatum');
+  var out = document.getElementById('calc-date');
+  function recalc() {
+    var m = inp.value.match(/(\d{2})-(\d{2})-(\d{4})/);
+    if (!m) return;
+    var d = new Date(+m[3], +m[2], 0); // laatste dag lopende maand
+    out.textContent = d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+  inp.addEventListener('input', recalc);
+  recalc();
+})();
+</script>
+</body>
+</html>

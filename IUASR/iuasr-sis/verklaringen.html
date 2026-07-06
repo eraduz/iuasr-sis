@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verklaring genereren — IUASR SIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sis.css">
+<link rel="stylesheet" href="assets/iuasr-plugin-dash.css">
+<style>
+  .verk-layout { display: grid; grid-template-columns: 300px 1fr; gap: 18px; align-items: start; }
+  @media (max-width: 980px) { .verk-layout { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div id="sis-header"></div>
+
+<div class="iuasr-dash-app">
+  <nav class="iuasr-dash-sidebar" id="sis-sidebar" aria-label="Hoofdmenu"></nav>
+
+  <main class="iuasr-dash-main">
+    <div class="sis-crumb"><a href="dashboard.html">Dashboard</a><span class="sep">›</span><b>Verklaringen</b></div>
+
+    <div class="iuasr-dash-vhead">
+      <div>
+        <h1>Verklaring genereren</h1>
+        <div class="summary">Officiële verklaring op IUASR-briefpapier · A4</div>
+      </div>
+      <div class="iuasr-dash-vhead__actions">
+        <button class="iuasr-dash-btn iuasr-dash-btn--sm" type="button" onclick="window.print()">Printen</button>
+        <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="button" onclick="window.print()">Download PDF</button>
+      </div>
+    </div>
+
+    <div class="verk-layout">
+      <div>
+        <div class="sis-card" style="margin-bottom:16px;">
+          <div class="sis-card__hd"><h3>Student</h3></div>
+          <div class="sis-fld" style="margin-bottom:0;"><input type="text" value="264192 — Yasmin Demir" aria-label="Student"></div>
+        </div>
+        <div class="sis-card">
+          <div class="sis-card__hd"><h3>Type verklaring</h3></div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button class="sis-choice is-selected" data-type="studentbewijs" style="padding:12px 14px;">
+              <h4 style="margin:0 0 3px;font-size:14px;">Studentbewijs</h4>
+              <p>Bevestiging van inschrijving voor dit studiejaar.</p>
+            </button>
+            <button class="sis-choice" data-type="vertraging" style="padding:12px 14px;">
+              <h4 style="margin:0 0 3px;font-size:14px;">Studievertraging</h4>
+              <p>Verklaring t.b.v. DUO / gemeente bij vertraging.</p>
+            </button>
+            <button class="sis-choice" data-type="afstudeerfase" style="padding:12px 14px;">
+              <h4 style="margin:0 0 3px;font-size:14px;">Afstudeerfase</h4>
+              <p>Bevestiging dat de student in de afstudeerfase zit.</p>
+            </button>
+          </div>
+        </div>
+        <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-top:16px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Verklaringen bevatten <b>geen cijfers</b> en geen BSN. Uitgifte wordt gelogd.</span>
+        </div>
+      </div>
+
+      <div class="sis-paper-stage" style="padding:24px;">
+        <div class="sis-a4" style="min-height:auto;">
+          <div class="sis-a4__head">
+            <img src="assets/logo-dark.png" alt="IUASR">
+            <div class="org">
+              <b>Islamic University of Applied Sciences Rotterdam</b>
+              Bureau Studentenzaken<br>
+              Postbus 12345 · 3000 AB Rotterdam<br>
+              studentenzaken@iuasr.nl
+            </div>
+          </div>
+
+          <h1 id="v-title">Studentbewijs</h1>
+          <p class="doc-sub" id="v-sub">Bewijs van inschrijving · studiejaar 2026 / 2027</p>
+
+          <p>Hierbij verklaart Bureau Studentenzaken van de Islamic University of Applied Sciences Rotterdam dat:</p>
+
+          <dl class="kv" style="margin:14px 0 18px;">
+            <dt>Naam</dt><dd>Yasmin Demir</dd>
+            <dt>Studentnummer</dt><dd>264192</dd>
+            <dt>Geboortedatum</dt><dd>14 maart 2004</dd>
+            <dt>Opleiding</dt><dd>Bachelor Islamitische Theologie</dd>
+          </dl>
+
+          <p id="v-body">staat ingeschreven als voltijdstudent aan bovengenoemde opleiding voor het studiejaar 2026 / 2027. De inschrijving is geldig van 1 september 2026 tot en met 31 augustus 2027.</p>
+          <p id="v-body2">Deze verklaring is op verzoek van de student afgegeven en bevat geen resultaatgegevens.</p>
+
+          <div class="sis-a4__sig">
+            <div class="line">Namens Bureau Studentenzaken<br><b style="color:var(--priColor100);">F. Yıldız</b> · medewerker Studentenzaken</div>
+            <div class="line" style="text-align:right;border-top:0;padding-top:0;">
+              <span class="sis-a4__stamp"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg> Gewaarmerkt IUASR</span>
+            </div>
+          </div>
+
+          <div class="sis-a4__foot">
+            <span id="v-ref">Referentie: VERKL-2026-264192-SB · Rotterdam, 6 juli 2026</span>
+            <span class="sis-a4__watermark">Officieel document</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/sis-shell.js"></script>
+<script>
+SIS.render({ active: 'verklaringen' });
+
+var DATA = {
+  studentbewijs: {
+    title: 'Studentbewijs', sub: 'Bewijs van inschrijving · studiejaar 2026 / 2027',
+    body: 'staat ingeschreven als voltijdstudent aan bovengenoemde opleiding voor het studiejaar 2026 / 2027. De inschrijving is geldig van 1 september 2026 tot en met 31 augustus 2027.',
+    body2: 'Deze verklaring is op verzoek van de student afgegeven en bevat geen resultaatgegevens.',
+    ref: 'Referentie: VERKL-2026-264192-SB · Rotterdam, 6 juli 2026'
+  },
+  vertraging: {
+    title: 'Verklaring studievertraging', sub: 'Ten behoeve van DUO / gemeente',
+    body: 'als voltijdstudent studievertraging heeft opgelopen door persoonlijke omstandigheden die zijn erkend door de instelling. De vertraging bedraagt naar schatting één semester ten opzichte van het reguliere studieprogramma.',
+    body2: 'Deze verklaring dient ter ondersteuning van een aanvraag bij DUO of de gemeente en bevat geen resultaatgegevens.',
+    ref: 'Referentie: VERKL-2026-264192-SV · Rotterdam, 6 juli 2026'
+  },
+  afstudeerfase: {
+    title: 'Verklaring afstudeerfase', sub: 'Bevestiging afstudeerfase',
+    body: 'zich bevindt in de afstudeerfase van bovengenoemde opleiding. De student volgt het afstudeertraject en wordt naar verwachting in het studiejaar 2026 / 2027 gediplomeerd.',
+    body2: 'Deze verklaring is op verzoek van de student afgegeven en bevat geen resultaatgegevens.',
+    ref: 'Referentie: VERKL-2026-264192-AF · Rotterdam, 6 juli 2026'
+  }
+};
+
+document.querySelectorAll('.sis-choice[data-type]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    document.querySelectorAll('.sis-choice[data-type]').forEach(function (x){ x.classList.remove('is-selected'); });
+    b.classList.add('is-selected');
+    var d = DATA[b.getAttribute('data-type')];
+    document.getElementById('v-title').textContent = d.title;
+    document.getElementById('v-sub').textContent = d.sub;
+    document.getElementById('v-body').textContent = d.body;
+    document.getElementById('v-body2').textContent = d.body2;
+    document.getElementById('v-ref').textContent = d.ref;
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+/*
+ * Vite-ingang voor toekomstige, gebundelde stijlen.
+ *
+ * Het leidende design system (IUASR/iuasr-sis) wordt in deze fase rechtstreeks
+ * vanuit public/assets/css geladen (sis.css → iuasr-plugin-dash.css), zodat de
+ * designs 1-op-1 behouden blijven. Aanvullende, app-specifieke stijlen kunnen
+ * hier worden toegevoegd zodra de frontend-buildstap wordt ingericht.
+ */

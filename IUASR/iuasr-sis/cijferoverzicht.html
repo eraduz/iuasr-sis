@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cijferoverzicht — IUASR SIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sis.css">
+<link rel="stylesheet" href="assets/iuasr-plugin-dash.css">
+</head>
+<body>
+
+<div id="sis-header"></div>
+
+<div class="iuasr-dash-app">
+  <nav class="iuasr-dash-sidebar" id="sis-sidebar" aria-label="Hoofdmenu"></nav>
+
+  <main class="iuasr-dash-main">
+    <div class="sis-crumb"><a href="dashboard.html">Dashboard</a><span class="sep">›</span><b>Cijferoverzicht</b></div>
+
+    <!-- Afgeschermd (Studentenzaken / Docent) -->
+    <div id="ov-locked" hidden>
+      <div class="iuasr-dash-vhead"><div><h1>Cijferoverzicht</h1></div></div>
+      <div class="sis-locked-panel">
+        <span class="sis-locked-panel__ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+        <h3>Geen toegang tot het cijferoverzicht</h3>
+        <p>Cijferinzage op studentniveau is voorbehouden aan de examencommissie en de directie. Uw huidige rol heeft hiervoor geen rechten.</p>
+        <span class="who"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Toegang via rol <b>Examencommissie</b> of <b>Directie</b></span>
+      </div>
+    </div>
+
+    <!-- Zichtbaar -->
+    <div id="ov-visible" hidden>
+      <div class="iuasr-dash-vhead">
+        <div>
+          <h1>Cijferoverzicht</h1>
+          <div class="summary">Leesweergave · <span data-role-only="examencommissie">vaststelling mogelijk</span><span data-role-only="directie">alleen-lezen</span></div>
+        </div>
+        <div class="iuasr-dash-vhead__actions">
+          <span class="sis-role-note"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg> Leesweergave</span>
+          <a class="iuasr-dash-btn" href="rapport-voorbeeld.html">Cijferrapport (PDF)</a>
+        </div>
+      </div>
+
+      <div class="iuasr-dash-filters" style="grid-template-columns:2fr 1fr 1fr;">
+        <div class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="search" value="264192 — Yasmin Demir" aria-label="Student"></div>
+        <select><option>Bachelor Islamitische Theologie</option></select>
+        <select><option>Cohort 2026</option></select>
+      </div>
+
+      <div class="sis-card">
+        <div class="iuasr-dash-candidate__hd" style="margin:0 0 14px;">
+          <span class="iuasr-dash-candidate__avatar" style="width:44px;height:44px;font-size:18px;" aria-hidden="true">Y</span>
+          <div class="iuasr-dash-candidate__body">
+            <div style="font-family:var(--serif-font);font-size:20px;">Yasmin Demir</div>
+            <div class="iuasr-dash-candidate__meta"><span>264192</span><span class="dot"></span><span>Bachelor Islamitische Theologie</span><span class="dot"></span><span>Cohort 2026</span></div>
+          </div>
+        </div>
+        <div class="iuasr-dash-tbl-card" style="border:0;">
+          <table class="iuasr-dash-tbl">
+            <thead><tr><th>Vak</th><th>Code</th><th>EC</th><th>Poging</th><th>Cijfer</th><th>Vastgesteld</th></tr></thead>
+            <tbody>
+              <tr><td class="nm">Arabische grammatica I</td><td class="tnum">ARA-101</td><td class="tnum">6</td><td>Tentamen</td><td><b class="tnum">7,5</b></td><td class="dt">31 jan 2026</td></tr>
+              <tr><td class="nm">Inleiding Koranwetenschappen</td><td class="tnum">KRN-110</td><td class="tnum">6</td><td>Tentamen</td><td><b class="tnum">8,0</b></td><td class="dt">28 jan 2026</td></tr>
+              <tr><td class="nm">Islamitisch recht I</td><td class="tnum">FIQ-110</td><td class="tnum">6</td><td>Herkansing</td><td><b class="tnum">6,0</b></td><td class="dt">14 apr 2026</td></tr>
+              <tr><td class="nm">Geschiedenis van de Islam</td><td class="tnum">HIS-120</td><td class="tnum">5</td><td>Vrijstelling</td><td><span class="sis-pill-soft">VR</span></td><td class="dt">—</td></tr>
+              <tr><td class="nm">Arabische grammatica II</td><td class="tnum">ARA-201</td><td class="tnum">6</td><td>Tentamen</td><td><span class="iuasr-dash-status s-submitted" style="padding:2px 8px;">Ter vaststelling</span></td><td class="dt">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <dl class="sis-dl" style="margin-top:16px;grid-template-columns:160px 1fr 160px 1fr;">
+          <dt>Gewogen gemiddelde</dt><dd><b class="tnum" style="font-size:16px;">7,4</b></dd>
+          <dt>EC behaald</dt><dd class="tnum">28 / 60</dd>
+          <dt>Studievoortgang</dt><dd><span class="iuasr-dash-status s-approved">Op koers</span></dd>
+          <dt>Cum laude-kans</dt><dd>Indicatief ja</dd>
+        </dl>
+
+        <!-- Vaststelling (alleen examencommissie) -->
+        <div data-role-only="examencommissie" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--borderSubtleColor);display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <span class="sis-muted" style="font-size:12.5px;flex:1;min-width:200px;">1 cijfer wacht op vaststelling door de examencommissie.</span>
+          <button class="iuasr-dash-btn iuasr-dash-btn--sm" type="button">Terug naar docent</button>
+          <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="button">Vaststellen</button>
+        </div>
+      </div>
+
+      <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-top:16px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span>Elke inzage van dit overzicht wordt vastgelegd in de <a href="audit-log.html">audit-log</a> met gebruiker, rol en tijdstip.</span>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="assets/sis-shell.js"></script>
+<script>
+SIS.render({
+  active: 'cijferoverzicht',
+  roleStay: true,
+  onRole: function (role) {
+    var allowed = (role === 'examencommissie' || role === 'directie');
+    document.getElementById('ov-visible').hidden = !allowed;
+    document.getElementById('ov-locked').hidden = allowed;
+  }
+});
+</script>
+</body>
+</html>

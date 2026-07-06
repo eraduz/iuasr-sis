@@ -1,0 +1,217 @@
+/* ============================================================
+   IUASR Studentportaal — Design Tokens
+   v1.0 — IUASR Corporate Identity v1.0.1 (2024-09)
+   + scrape-aanpassingen van iuasr.nl
+   ------------------------------------------------------------
+   Twee lagen:
+     LAAG 1 — Brand-tokens, exact zoals op iuasr.nl. Niet aanpassen.
+     LAAG 2 — Semantische portaal-tokens. Refereren altijd aan
+              laag 1. Pas hier aan voor portaal-specifieke UX.
+   ============================================================ */
+
+:root {
+
+  /* ============================================================
+     LAAG 1 — IUASR BRAND TOKENS (1:1 met de site)
+     ============================================================ */
+
+  /* Primair — indigo (Pantone 2765 C · #201547) */
+  --priColor100: rgba(32, 21, 71, 1);       /* #201547 — kern */
+  --priColor101: rgba(32, 21, 71, 0.03);    /* zeer subtiele tint */
+  --priColor102: rgba(32, 21, 71, 0.06);    /* lichte tint */
+  --priColor103: rgb(242, 241, 244);        /* #F2F1F4 — pagina-bg */
+  --priColor104: rgba(242, 241, 244, 0.75);
+  --priColor105: rgba(250, 250, 250, 0.75);
+  --priColor106: rgba(242, 241, 244, 0.5);
+
+  /* Secundair — crimson (186 C), grijs, peach */
+  --secColor100: rgba(200, 16, 46, 1);      /* #C8102E — crimson */
+  --secColor200: rgba(222, 222, 222, 1);    /* #DEDEDE */
+  --secColor201: #F4F4F4;
+  --secColor300: rgba(255, 210, 176, 1);    /* #FFD2B0 — peach */
+  --secColor301: rgba(255, 210, 176, 0.3);
+  --secColor302: rgba(255, 210, 176, 0.6);
+  --secColor303: rgba(255, 210, 176, 0.8);
+
+  /* Officiële merkkleuren — uit Corporate Identity v1.0.1 */
+  --priColor200: #285C4D;                   /* Pantone 626 C — heritage groen */
+  --priColor201: rgba(40, 92, 77, 0.06);
+  --priColor202: rgba(40, 92, 77, 0.10);
+  --priColor300: #D69A2D;                   /* Pantone 7563 C — goud */
+  --priColor301: rgba(214, 154, 45, 0.10);
+  --priColor302: rgba(214, 154, 45, 0.18);
+
+  /* Borders & overlays */
+  --borderSubtleColor: rgba(32, 21, 71, 0.09);
+  --borderColor:       rgba(32, 21, 71, 0.2);
+  --white070:          rgba(255, 255, 255, 0.7);
+  --black085:          rgba(0, 0, 0, 0.85);
+  --blackAltText:      #6F6F6F;
+
+  /* Fonts (exact zoals geladen op iuasr.nl) */
+  --sans-serif-font: "Fira Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                     Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  --serif-font:      "DM Serif Display", serif;
+
+  /* Layout-tokens (exact uit de scrape) */
+  --unit: 1em;
+  --spacing: 1em;
+  --unitSize: 4px;
+  --button-border-radius: 4px;
+  --menu-header-height: 80px;
+  --menu-header-spacer-width: 1em;
+  --headlines-height: 18em;
+
+  /* Spacing-schaal */
+  --space-xs: 10px;
+  --space-sm: 18px;
+  --space-md: 32px;
+  --space-lg: 44px;
+  --space-xl: 64px;
+
+  /* ============================================================
+     LAAG 2 — SEMANTISCHE PORTAAL-TOKENS
+     Aliassen naar laag 1 met portaal-context.
+     ============================================================ */
+
+  /* ---- Kleur-rollen ---- */
+  --iuasr-bg-page:        var(--priColor103);            /* #F2F1F4 — niet wit */
+  --iuasr-bg-card:        #FFFFFF;
+  --iuasr-bg-surface-alt: var(--priColor102);
+  --iuasr-bg-emphasis:    var(--priColor101);
+  --iuasr-bg-callout:     var(--secColor301);            /* peach 30% */
+  --iuasr-bg-callout-strong: var(--secColor300);         /* peach 100% */
+  --iuasr-bg-footer:      var(--priColor100);
+
+  --iuasr-text-default:   var(--priColor100);            /* #201547 als hoofdtekst */
+  --iuasr-text-muted:     var(--blackAltText);           /* #6F6F6F */
+  --iuasr-text-inverse:   var(--priColor103);            /* #F2F1F4 op donker */
+  --iuasr-text-brand:     var(--priColor100);
+  --iuasr-text-link:      var(--secColor100);            /* crimson links */
+  --iuasr-text-link-hover:#9A0C24;
+
+  --iuasr-border-subtle:  var(--borderSubtleColor);
+  --iuasr-border-default: var(--borderColor);
+  --iuasr-border-focus:   var(--secColor100);
+
+
+  /* Officiële secundaire merkkleuren — voor publicaties, covers, sub-merken */
+  --iuasr-brand-green:  var(--priColor200);              /* IUASR Press green cover */
+  --iuasr-brand-gold:   var(--priColor300);              /* sub-brand accent */
+  --iuasr-brand-green-soft: var(--priColor201);
+  --iuasr-brand-gold-soft:  var(--priColor301);
+
+  /* ---- Knoppen ---- */
+  --iuasr-btn-primary-bg:    var(--secColor100);         /* crimson */
+  --iuasr-btn-primary-fg:    var(--priColor103);
+  --iuasr-btn-primary-hover: #9A0C24;
+  --iuasr-btn-secondary-fg:     var(--secColor100);
+  --iuasr-btn-secondary-border: var(--secColor100);
+  --iuasr-btn-link-fg:       var(--priColor100);         /* indigo voor inline links */
+
+  /* ---- Typografie ---- */
+  --iuasr-font-display: var(--serif-font);
+  --iuasr-font-body:    var(--sans-serif-font);
+
+  /* Schaal — exact uit de scrape, met portaal-aanvullingen */
+  --iuasr-text-xs:      0.75rem;     /* 12px */
+  --iuasr-text-sm:      0.875rem;    /* 14px */
+  --iuasr-text-base:    1rem;        /* 16px — site p */
+  --iuasr-text-lg:      1.125rem;    /* 18px — site h4 */
+  --iuasr-text-xl:      1.2rem;      /* 19.2px — site h3 */
+  --iuasr-text-2xl:     1.5rem;      /* 24px — site h2 */
+  --iuasr-text-3xl:     2.4rem;      /* 38.4px — site h1 */
+
+  --iuasr-lh-xs:        16px;
+  --iuasr-lh-sm:        20px;
+  --iuasr-lh-base:      24px;
+  --iuasr-lh-lg:        22px;        /* exact uit scrape h4 */
+  --iuasr-lh-xl:        23px;        /* exact uit scrape h3 */
+  --iuasr-lh-2xl:       29px;        /* exact uit scrape h2 */
+  --iuasr-lh-3xl:       46px;        /* exact uit scrape h1 */
+
+  /* Body weight: site = 200, portaal = 400 voor leesbaarheid bij UI/formulieren.
+     Schakel deze om naar 200 als je marketing-pagina's matcht. */
+  --iuasr-weight-body:    400;
+  --iuasr-weight-body-light: 200;    /* match-site mode */
+  --iuasr-weight-medium:  500;
+  --iuasr-weight-semi:    600;
+  --iuasr-weight-bold:    700;
+
+  /* ---- Radii ---- */
+  --iuasr-radius-sm:   4px;             /* exact site-knop */
+  --iuasr-radius-md:   8px;             /* exact site-kaart */
+  --iuasr-radius-lg:   12px;
+  --iuasr-radius-full: 9999px;
+
+  /* ---- Shadows — getint met indigo, zoals de site ---- */
+  --iuasr-shadow-sm: rgba(32, 21, 71, 0.08) 0px 2px 8px 0px;
+  --iuasr-shadow-md: rgba(32, 21, 71, 1) 0px 4px 20px 0px;   /* exact zoals scrape */
+  --iuasr-shadow-md-soft: rgba(32, 21, 71, 0.15) 0px 4px 20px 0px;
+
+  /* ---- Focus ---- */
+  --iuasr-focus-ring:     0 0 0 3px rgba(200, 16, 46, 0.30);    /* crimson glow */
+  --iuasr-focus-ring-alt: 0 0 0 3px rgba(32, 21, 71, 0.25);     /* indigo glow */
+
+  /* ---- Motion ---- */
+  --iuasr-duration-fast:   120ms;
+  --iuasr-duration-normal: 200ms;
+  --iuasr-ease-standard:   cubic-bezier(0.2, 0, 0, 1);
+
+  /* ============================================================
+     LIFECYCLE-STATUS (portaal-specifiek)
+     ============================================================ */
+  --st-draft-bg:        var(--secColor201);             /* #F4F4F4 */
+  --st-draft-fg:        var(--blackAltText);
+  --st-submitted-bg:    var(--secColor301);             /* peach 30% */
+  --st-submitted-fg:    #8C4513;
+  --st-incomplete-bg:   #FDF4E3;
+  --st-incomplete-fg:   #8D5905;
+  --st-awaitdocs-bg:    var(--secColor302);             /* peach 60% */
+  --st-awaitdocs-fg:    #6B330A;
+  --st-awaitpay-bg:     var(--priColor102);             /* indigo 6% */
+  --st-awaitpay-fg:     var(--priColor100);
+  --st-approved-bg:     #E7F5EE;
+  --st-approved-fg:     #156A42;
+  --st-rejected-bg:     #FBE9EB;
+  --st-rejected-fg:     #9A0C24;
+
+  /* ============================================================
+     SEMANTISCHE KLEUREN (success/warning/error/info)
+     Bewust niet uit het brand book — IUASR heeft hier geen
+     definitie voor. Gekozen om naast de huisstijl te werken
+     zonder ermee te concurreren.
+     ============================================================ */
+  --iuasr-success-bg:  #E7F5EE;
+  --iuasr-success-fg:  #156A42;
+  --iuasr-warning-bg:  #FDF4E3;
+  --iuasr-warning-fg:  #8D5905;
+  --iuasr-error-bg:    #FBE9EB;
+  --iuasr-error-fg:    #9A0C24;        /* iets donkerder dan crimson om te onderscheiden */
+  --iuasr-info-bg:     var(--secColor301);
+  --iuasr-info-fg:     var(--priColor100);
+}
+
+/* ============================================================
+   GEBRUIKSAANTEKENINGEN
+   ------------------------------------------------------------
+   1. Pagina-achtergrond is NIET wit. Het is #F2F1F4. Witte
+      vlakken (kaarten, modals) leveren daardoor automatisch
+      een subtiel hoogte-verschil.
+
+   2. Body-tekst op de marketing-site is weight 200. In het
+      portaal raad ik 400 aan voor formulieren en kleinere UI;
+      bewaar 200 voor lange leestekst en marketing-blokken.
+      Wissel met --iuasr-weight-body.
+
+   3. Knoppen zijn 41px hoog met 8px 16px padding en 2px
+      borders. Houd dit aan — het matcht 1:1 de site-knoppen
+      ("Aanmelden", "PAYPAL", "AANMELDEN" in nieuwsbrief).
+
+   4. Kaartschaduw is GETINT met de indigo merkkleur, geen
+      neutraal grijs. Dat geeft de site z'n karakteristieke
+      "warme" diepte. Gebruik --iuasr-shadow-md.
+
+   5. Links zijn crimson (#C8102E), tekst is indigo (#201547).
+      Dit is omgekeerd t.o.v. veel portalen — respecteer het.
+   ============================================================ */

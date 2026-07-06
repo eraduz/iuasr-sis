@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audit-log — IUASR SIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sis.css">
+<link rel="stylesheet" href="assets/iuasr-plugin-dash.css">
+</head>
+<body>
+
+<div id="sis-header"></div>
+
+<div class="iuasr-dash-app">
+  <nav class="iuasr-dash-sidebar" id="sis-sidebar" aria-label="Hoofdmenu"></nav>
+
+  <main class="iuasr-dash-main">
+    <div class="sis-crumb"><a href="dashboard.html">Dashboard</a><span class="sep">›</span><b>Audit-log</b></div>
+
+    <div class="iuasr-dash-vhead">
+      <div>
+        <h1>Audit-log</h1>
+        <div class="summary">Gevoelige acties — wie zag of wijzigde welk cijfer of BSN</div>
+      </div>
+      <div class="iuasr-dash-vhead__actions">
+        <button class="iuasr-dash-btn" type="button">Export (gelogd)</button>
+      </div>
+    </div>
+
+    <div class="iuasr-dash-filters" style="grid-template-columns:2fr 1fr 1fr 1fr;">
+      <div class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="search" placeholder="Zoek op gebruiker, studentnr. of actie…"></div>
+      <select><option>Alle acties</option><option>BSN getoond</option><option>Cijfer gewijzigd</option><option>Cijfer ingezien</option><option>Export</option></select>
+      <select><option>Alle rollen</option><option>Studentenzaken</option><option>Docent</option><option>Examencommissie</option><option>Directie</option><option>Beheerder</option></select>
+      <input type="text" value="06-07-2026" aria-label="Datum">
+    </div>
+
+    <div class="iuasr-dash-tbl-card">
+      <table class="iuasr-dash-tbl">
+        <thead><tr><th style="width:150px;">Tijdstip</th><th>Gebruiker</th><th>Rol</th><th>Actie</th><th>Object</th><th>IP</th></tr></thead>
+        <tbody>
+          <tr><td class="dt">06-07 · 09:41:12</td><td class="nm">prof. K. Nassar</td><td><span class="sis-rolebadge r-examencommissie">Examencie.</span></td><td><b>Cijfer vastgesteld</b> · 7,5</td><td>264192 · ARA-201</td><td class="dt">10.2.4.11</td></tr>
+          <tr><td class="dt">06-07 · 09:12:03</td><td class="nm">prof. K. Nassar</td><td><span class="sis-rolebadge r-examencommissie">Examencie.</span></td><td>Cijferoverzicht ingezien</td><td>264192</td><td class="dt">10.2.4.11</td></tr>
+          <tr><td class="dt">06-07 · 08:47:55</td><td class="nm">Fatima Yıldız</td><td><span class="sis-rolebadge r-studentenzaken">Studentenzaken</span></td><td><b style="color:var(--st-incomplete-fg);">BSN getoond</b></td><td>264192</td><td class="dt">10.2.1.4</td></tr>
+          <tr><td class="dt">06-07 · 08:44:20</td><td class="nm">Fatima Yıldız</td><td><span class="sis-rolebadge r-studentenzaken">Studentenzaken</span></td><td>Verklaring uitgegeven · studentbewijs</td><td>264192</td><td class="dt">10.2.1.4</td></tr>
+          <tr><td class="dt">05-07 · 16:22:41</td><td class="nm">dr. Y. Aydın</td><td><span class="sis-rolebadge r-docent">Docent</span></td><td><b>Cijfer gewijzigd</b> · 6,0 → 6,5</td><td>264188 · ARA-201</td><td class="dt">10.2.3.8</td></tr>
+          <tr><td class="dt">05-07 · 16:18:09</td><td class="nm">dr. Y. Aydın</td><td><span class="sis-rolebadge r-docent">Docent</span></td><td>Cijferlijst ingediend</td><td>ARA-201 · P2</td><td class="dt">10.2.3.8</td></tr>
+          <tr><td class="dt">05-07 · 14:03:30</td><td class="nm">drs. B. de Wit</td><td><span class="sis-rolebadge r-directie">Directie</span></td><td>EC-rapport gegenereerd</td><td>ISLTH · cohort 2026</td><td class="dt">10.2.5.2</td></tr>
+          <tr><td class="dt">05-07 · 11:51:14</td><td class="nm">Fatima Yıldız</td><td><span class="sis-rolebadge r-studentenzaken">Studentenzaken</span></td><td><b style="color:var(--st-rejected-fg);">Toegang geweigerd</b> · cijferoverzicht</td><td>264192</td><td class="dt">10.2.1.4</td></tr>
+          <tr><td class="dt">05-07 · 09:30:02</td><td class="nm">Ismail Kaya</td><td><span class="sis-rolebadge r-beheerder">Beheerder</span></td><td>Rol gewijzigd · L. Ziani → inactief</td><td>gebruiker #18</td><td class="dt">10.2.9.1</td></tr>
+        </tbody>
+      </table>
+      <div class="iuasr-dash-pagination">
+        <div class="iuasr-dash-pagination__range">Toont <b>1–9</b> van <b>218</b> events (24u)</div>
+        <div class="iuasr-dash-pagination__nav">
+          <button disabled>‹</button><button class="is-current">1</button><button>2</button><button>3</button><button>›</button>
+        </div>
+      </div>
+    </div>
+    <p class="sis-tblnote">De audit-log is <b>alleen-lezen</b> en kan niet worden gewijzigd of verwijderd. Elke inzage van een BSN, elke cijfermutatie en elke geweigerde toegangspoging wordt vastgelegd met gebruiker, rol, tijdstip en IP.</p>
+  </main>
+</div>
+
+<script src="assets/sis-shell.js"></script>
+<script>SIS.render({ active: 'audit-log' });</script>
+</body>
+</html>

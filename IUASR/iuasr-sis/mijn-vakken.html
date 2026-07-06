@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mijn vakken — IUASR SIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sis.css">
+<link rel="stylesheet" href="assets/iuasr-plugin-dash.css">
+</head>
+<body>
+
+<div id="sis-header"></div>
+
+<div class="iuasr-dash-app">
+  <nav class="iuasr-dash-sidebar" id="sis-sidebar" aria-label="Hoofdmenu"></nav>
+
+  <main class="iuasr-dash-main">
+    <div class="sis-crumb"><a href="dashboard.html">Dashboard</a><span class="sep">›</span><b>Mijn vakken</b></div>
+
+    <div class="iuasr-dash-vhead">
+      <div>
+        <h1>Mijn vakken</h1>
+        <div class="summary">dr. Yusuf Aydın · periode <b>2</b> · <b>4</b> vakken</div>
+      </div>
+      <div class="iuasr-dash-vhead__actions">
+        <select class="iuasr-dash-btn" style="border-color:var(--borderColor);" aria-label="Periode">
+          <option>Periode 2 · 2026/2027</option><option>Periode 1 · 2026/2027</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-bottom:16px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <span>U ziet uitsluitend <b>uw eigen vakken</b>. Cijfers van andere docenten en studentdossiers buiten uw vak zijn niet toegankelijk voor de rol Docent.</span>
+    </div>
+
+    <div class="iuasr-dash-tbl-card">
+      <table class="iuasr-dash-tbl">
+        <thead>
+          <tr><th>Vak</th><th>Code</th><th>Opleiding</th><th>EC</th><th>Studenten</th><th>Toetsonderdelen</th><th>Cijferstatus</th><th class="row-act"></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="nm">Arabische grammatica II</td><td class="tnum">ARA-201</td>
+            <td class="pg">Bachelor Islamitische Theologie</td><td class="tnum">6</td><td class="tnum">28</td>
+            <td class="tnum">3</td>
+            <td><span class="iuasr-dash-status s-incomplete">18/28 ingevoerd</span></td>
+            <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" href="cijferinvoer.html">Cijfers invoeren</a></td>
+          </tr>
+          <tr>
+            <td class="nm">Usul al-Fiqh</td><td class="tnum">FIQ-210</td>
+            <td class="pg">Bachelor Islamitische Theologie</td><td class="tnum">6</td><td class="tnum">31</td>
+            <td class="tnum">2</td>
+            <td><span class="iuasr-dash-status s-draft">Nog niet gestart</span></td>
+            <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" href="cijferinvoer.html">Cijfers invoeren</a></td>
+          </tr>
+          <tr>
+            <td class="nm">Koranrecitatie (Tajwīd)</td><td class="tnum">TAJ-102</td>
+            <td class="pg">Cursus Koran &amp; Hifz</td><td class="tnum">4</td><td class="tnum">15</td>
+            <td class="tnum">2</td>
+            <td><span class="iuasr-dash-status s-approved">Ingediend</span></td>
+            <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="cijferinvoer.html">Bekijken</a></td>
+          </tr>
+          <tr>
+            <td class="nm">Islamitische ethiek</td><td class="tnum">ETH-305</td>
+            <td class="pg">Master Isl. Geestelijke Verzorging</td><td class="tnum">5</td><td class="tnum">12</td>
+            <td class="tnum">3</td>
+            <td><span class="iuasr-dash-status s-approved">Ingediend</span></td>
+            <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="cijferinvoer.html">Bekijken</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sis-tblnote">Een vak dat is <b>ingediend</b> is vergrendeld voor invoer en gaat ter vaststelling naar de examencommissie. Wijzigingen daarna verlopen via een correctieverzoek.</p>
+  </main>
+</div>
+
+<script src="assets/sis-shell.js"></script>
+<script>SIS.render({ active: 'mijn-vakken' });</script>
+</body>
+</html>

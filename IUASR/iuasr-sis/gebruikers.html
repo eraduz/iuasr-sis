@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gebruikers &amp; rollen — IUASR SIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sis.css">
+<link rel="stylesheet" href="assets/iuasr-plugin-dash.css">
+</head>
+<body>
+
+<div id="sis-header"></div>
+
+<div class="iuasr-dash-app">
+  <nav class="iuasr-dash-sidebar" id="sis-sidebar" aria-label="Hoofdmenu"></nav>
+
+  <main class="iuasr-dash-main">
+    <div class="sis-crumb"><a href="dashboard.html">Dashboard</a><span class="sep">›</span><b>Gebruikers &amp; rollen</b></div>
+
+    <div class="iuasr-dash-vhead">
+      <div>
+        <h1>Gebruikers &amp; rollen</h1>
+        <div class="summary"><b>29</b> gebruikers · <b>5</b> rollen · toegang via IUASR SSO</div>
+      </div>
+      <div class="iuasr-dash-vhead__actions">
+        <a class="iuasr-dash-btn" href="audit-log.html">Audit-log</a>
+        <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="button">Gebruiker toevoegen</button>
+      </div>
+    </div>
+
+    <!-- Toegangsmatrix -->
+    <div class="sis-card" style="margin-bottom:18px;">
+      <div class="sis-card__hd"><h3>Toegangsmatrix</h3><span class="hint">Wat elke rol mag — dit stuurt de zichtbaarheid van cijfers en persoonsgegevens</span></div>
+      <div class="iuasr-dash-tbl-card" style="border:0;overflow-x:auto;">
+        <table class="iuasr-dash-tbl" style="min-width:720px;">
+          <thead>
+            <tr>
+              <th>Recht</th>
+              <th style="text-align:center;">Studentenzaken</th>
+              <th style="text-align:center;">Docent</th>
+              <th style="text-align:center;">Examencie.</th>
+              <th style="text-align:center;">Directie</th>
+              <th style="text-align:center;">Beheerder</th>
+            </tr>
+          </thead>
+          <tbody id="matrix"></tbody>
+        </table>
+      </div>
+      <p class="sis-tblnote">Cijfers zijn bewust <b>niet</b> zichtbaar voor Studentenzaken. Docenten zien alleen hun eigen vak. Directie en examencommissie hebben inzage; alleen de examencommissie stelt vast.</p>
+    </div>
+
+    <!-- Gebruikerslijst -->
+    <div class="sis-card">
+      <div class="sis-card__hd"><h3>Gebruikers</h3></div>
+      <div class="iuasr-dash-tbl-card" style="border:0;">
+        <table class="iuasr-dash-tbl">
+          <thead><tr><th>Naam</th><th>E-mail</th><th>Rol</th><th>Laatste login</th><th>Status</th><th class="row-act"></th></tr></thead>
+          <tbody>
+            <tr><td class="nm">Fatima Yıldız</td><td class="dt">f.yildiz@iuasr.nl</td><td><span class="sis-rolebadge r-studentenzaken">Studentenzaken</span></td><td class="dt">vandaag · 08:42</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+            <tr><td class="nm">dr. Yusuf Aydın</td><td class="dt">y.aydin@iuasr.nl</td><td><span class="sis-rolebadge r-docent">Docent</span></td><td class="dt">gisteren · 16:20</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+            <tr><td class="nm">dr. Samira Boujat</td><td class="dt">s.boujat@iuasr.nl</td><td><span class="sis-rolebadge r-docent">Docent</span></td><td class="dt">2 dgn geleden</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+            <tr><td class="nm">prof. Karima Nassar</td><td class="dt">k.nassar@iuasr.nl</td><td><span class="sis-rolebadge r-examencommissie">Examencommissie</span></td><td class="dt">vandaag · 09:15</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+            <tr><td class="nm">drs. Bram de Wit</td><td class="dt">b.dewit@iuasr.nl</td><td><span class="sis-rolebadge r-directie">Directie</span></td><td class="dt">3 dgn geleden</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+            <tr><td class="nm">Ismail Kaya</td><td class="dt">i.kaya@iuasr.nl</td><td><span class="sis-rolebadge r-beheerder">Beheerder</span></td><td class="dt">vandaag · 07:58</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+            <tr><td class="nm">Latifa Ziani</td><td class="dt">l.ziani@iuasr.nl</td><td><span class="sis-rolebadge r-studentenzaken">Studentenzaken</span></td><td class="dt">gisteren · 11:04</td><td><span class="iuasr-dash-status s-draft">Inactief</span></td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/sis-shell.js"></script>
+<script>
+SIS.render({ active: 'gebruikers' });
+
+// Toegangsmatrix — Y = mag, N = niet, R = alleen-lezen, E = eigen
+var YES = '<span class="sis-access sis-access--yes"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>';
+var NO  = '<span class="sis-access sis-access--no"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>';
+function tag(t){ return '<span class="sis-pill-soft" style="font-size:10.5px;">'+t+'</span>'; }
+
+var rows = [
+  ['Studenten inzien',            [YES, NO, YES, tag('beperkt'), NO]],
+  ['Persoonsgegevens / BSN',      [YES, NO, NO, NO, YES]],
+  ['In-/uitschrijven',            [YES, NO, NO, NO, NO]],
+  ['Cijfers invoeren',            [NO, tag('eigen vak'), NO, NO, NO]],
+  ['Cijfers inzien',              [NO, tag('eigen vak'), YES, YES, NO]],
+  ['Cijfers vaststellen',         [NO, NO, YES, NO, NO]],
+  ['Rapporten genereren',         [tag('zonder cijfer'), NO, YES, YES, NO]],
+  ['Verklaringen uitgeven',       [YES, NO, NO, NO, NO]],
+  ['Gebruikers &amp; rollen',     [NO, NO, NO, NO, YES]],
+  ['Opzoektabellen beheren',      [NO, NO, NO, NO, YES]]
+];
+document.getElementById('matrix').innerHTML = rows.map(function (r) {
+  return '<tr><td class="nm">'+r[0]+'</td>' + r[1].map(function (c) {
+    return '<td style="text-align:center;">'+c+'</td>';
+  }).join('') + '</tr>';
+}).join('');
+</script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yasmin Demir · 264192 — IUASR SIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sis.css">
+<link rel="stylesheet" href="assets/iuasr-plugin-dash.css">
+</head>
+<body>
+
+<div id="sis-header"></div>
+
+<div class="iuasr-dash-app">
+  <nav class="iuasr-dash-sidebar" id="sis-sidebar" aria-label="Hoofdmenu"></nav>
+
+  <main class="iuasr-dash-main">
+    <div class="sis-crumb"><a href="dashboard.html">Dashboard</a><span class="sep">›</span><a href="studenten.html">Studenten</a><span class="sep">›</span><b>264192 — Yasmin Demir</b></div>
+
+    <!-- Kandidaatkop -->
+    <div class="iuasr-dash-candidate">
+      <div class="iuasr-dash-candidate__hd" style="margin-bottom:0;border-bottom:0;padding-bottom:0;">
+        <span class="iuasr-dash-candidate__avatar" aria-hidden="true">Y</span>
+        <div class="iuasr-dash-candidate__body">
+          <h2 class="iuasr-dash-candidate__name">Yasmin Demir</h2>
+          <div class="iuasr-dash-candidate__meta">
+            <span>Studentnr. <b>264192</b></span><span class="dot"></span>
+            <span>Bachelor Islamitische Theologie</span><span class="dot"></span>
+            <span>Klas <b>IT-1</b></span><span class="dot"></span>
+            <span>Cohort <b>2026</b></span>
+          </div>
+        </div>
+        <span class="iuasr-dash-status s-approved" style="align-self:flex-start;">Actief</span>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="sis-tabs" role="tablist">
+      <button class="sis-tab is-active" data-tab="persoon" role="tab">Persoonsgegevens</button>
+      <button class="sis-tab" data-tab="inschrijving" role="tab">Inschrijving &amp; klas</button>
+      <button class="sis-tab" data-tab="cijfers" role="tab" id="tab-cijfers">
+        Cijfers
+        <span class="lock" id="cijfers-lock" hidden><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+      </button>
+    </div>
+
+    <!-- PANEL: Persoonsgegevens -->
+    <section class="sis-tabpanel is-active" data-panel="persoon">
+      <div class="sis-grid-2">
+        <div>
+          <div class="sis-card">
+            <div class="sis-card__hd"><h3>Persoonsgegevens</h3><span class="hint">Bron: inschrijving</span></div>
+            <dl class="sis-dl">
+              <dt>Volledige naam</dt><dd><b>Yasmin Demir</b></dd>
+              <dt>Roepnaam</dt><dd>Yasmin</dd>
+              <dt>Geboortedatum</dt><dd>14 maart 2004</dd>
+              <dt>Geboorteplaats</dt><dd>Rotterdam</dd>
+              <dt>Nationaliteit</dt><dd>Nederlandse</dd>
+              <dt>Geslacht</dt><dd>Vrouw</dd>
+              <dt>BSN</dt><dd>
+                <span class="sis-masked" id="bsn-field">
+                  <span id="bsn-value">••••••••</span>
+                  <button class="reveal" type="button" id="bsn-toggle" data-role-only="studentenzaken beheerder">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                    Tonen
+                  </button>
+                  <span class="sis-shield" data-role-hide="studentenzaken beheerder"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> afgeschermd</span>
+                </span>
+              </dd>
+            </dl>
+            <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-top:14px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <span>Het BSN is <b>versleuteld opgeslagen</b> en wordt gemaskeerd getoond. Tonen wordt gelogd in de audit-log. Het BSN wordt nooit geëxporteerd.</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="sis-card">
+            <div class="sis-card__hd"><h3>Contact</h3></div>
+            <dl class="sis-dl">
+              <dt>E-mail (IUASR)</dt><dd>y.demir@student.iuasr.nl</dd>
+              <dt>E-mail privé</dt><dd>y.demir@outlook.com</dd>
+              <dt>Telefoon</dt><dd>06 •• •• •• 42</dd>
+              <dt>Adres</dt><dd>Voorbeeldstraat 12<br>3011 AB Rotterdam</dd>
+            </dl>
+          </div>
+          <div class="sis-card">
+            <div class="sis-card__hd"><h3>Vooropleiding</h3></div>
+            <dl class="sis-dl">
+              <dt>Diploma</dt><dd>VWO — Cum laude</dd>
+              <dt>NT2</dt><dd>Programma II · behaald</dd>
+              <dt>Toelating</dt><dd>Regulier</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL: Inschrijving & klas -->
+    <section class="sis-tabpanel" data-panel="inschrijving">
+      <div class="sis-grid-2">
+        <div>
+          <div class="sis-card">
+            <div class="sis-card__hd"><h3>Huidige inschrijving</h3><span class="hint">Studiejaar 2026 / 2027</span></div>
+            <dl class="sis-dl">
+              <dt>Opleiding</dt><dd><b>Bachelor Islamitische Theologie</b></dd>
+              <dt>Variant</dt><dd>Voltijd · regulier</dd>
+              <dt>Klas</dt><dd>IT-1</dd>
+              <dt>Cohort</dt><dd>2026</dd>
+              <dt>Studiejaar</dt><dd>1e jaar</dd>
+              <dt>Inschrijfdatum</dt><dd>1 september 2026</dd>
+              <dt>Studentnummer</dt><dd class="tnum">264192</dd>
+            </dl>
+          </div>
+          <div class="sis-card">
+            <div class="sis-card__hd"><h3>Inschrijfhistorie</h3></div>
+            <ul class="iuasr-dash-log">
+              <li><b>Ingeschreven — cohort 2026</b><time>1 sep 2026 · Studentenzaken (F. Yıldız)</time></li>
+              <li><b>Aanmelding goedgekeurd</b><time>28 jun 2026 · Examencommissie</time></li>
+              <li><b>Intake afgerond</b><time>12 jun 2026 · IUASR-2026-IT-0079</time></li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <div class="sis-card">
+            <div class="sis-card__hd"><h3>Studievoortgang</h3><span class="hint">EC</span></div>
+            <div class="iuasr-dash-progress" style="margin-bottom:6px;"><span style="font-size:13px;">Behaald</span><span class="iuasr-dash-progress__bar" style="width:140px;"><span style="width:47%;"></span></span><small>28 / 60 EC</small></div>
+            <dl class="sis-dl" style="margin-top:12px;">
+              <dt>EC dit jaar</dt><dd>28 van 60</dd>
+              <dt>Gem. (indicatief)</dt><dd><span class="sis-lockchip" data-role-only="studentenzaken"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>afgeschermd</span><b data-role-hide="studentenzaken">7,4</b></dd>
+              <dt>BSA-status</dt><dd><span class="iuasr-dash-status s-approved">Op koers</span></dd>
+            </dl>
+          </div>
+          <div class="sis-card">
+            <div class="sis-card__hd"><h3>Acties</h3></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <a class="iuasr-dash-btn iuasr-dash-btn--sm" data-role-only="studentenzaken" href="herinschrijven.html">Herinschrijven</a>
+              <a class="iuasr-dash-btn iuasr-dash-btn--sm" data-role-only="studentenzaken" href="uitschrijven.html">Uitschrijven</a>
+              <a class="iuasr-dash-btn iuasr-dash-btn--sm" data-role-only="studentenzaken" href="verklaringen.html">Verklaring</a>
+              <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="rapport-voorbeeld.html">Cijferrapport (PDF)</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL: Cijfers -->
+    <section class="sis-tabpanel" data-panel="cijfers">
+      <!-- Afgeschermd (Studentenzaken) -->
+      <div id="cijfers-locked" hidden>
+        <div class="sis-locked-panel">
+          <span class="sis-locked-panel__ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+          <h3>Cijfers zijn afgeschermd voor Studentenzaken</h3>
+          <p>Deze rol beheert inschrijvingen en persoonsgegevens, maar heeft geen inzage in behaalde cijfers of resultaten. Cijferinzage is voorbehouden aan docenten (eigen vak), de examencommissie en de directie.</p>
+          <span class="who"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Toegang via rol <b>Examencommissie</b> of <b>Directie</b></span>
+        </div>
+      </div>
+
+      <!-- Zichtbaar (Examencommissie / Directie / Docent) -->
+      <div id="cijfers-visible" hidden>
+        <div class="sis-card">
+          <div class="sis-card__hd"><h3>Cijferoverzicht — Bachelor Islamitische Theologie</h3><span class="hint">Cohort 2026 · leesweergave</span></div>
+          <div class="iuasr-dash-tbl-card" style="border:0;">
+            <table class="iuasr-dash-tbl">
+              <thead><tr><th>Vak</th><th>Code</th><th>EC</th><th>Poging</th><th>Cijfer</th><th>Datum</th></tr></thead>
+              <tbody>
+                <tr><td class="nm">Arabische grammatica I</td><td class="tnum">ARA-101</td><td class="tnum">6</td><td>Tentamen</td><td><b class="tnum">7,5</b></td><td class="dt">31 jan 2026</td></tr>
+                <tr><td class="nm">Inleiding Koranwetenschappen</td><td class="tnum">KRN-110</td><td class="tnum">6</td><td>Tentamen</td><td><b class="tnum">8,0</b></td><td class="dt">28 jan 2026</td></tr>
+                <tr><td class="nm">Islamitisch recht I</td><td class="tnum">FIQ-110</td><td class="tnum">6</td><td>Herkansing</td><td><b class="tnum">6,0</b></td><td class="dt">14 apr 2026</td></tr>
+                <tr><td class="nm">Geschiedenis van de Islam</td><td class="tnum">HIS-120</td><td class="tnum">5</td><td>Vrijstelling</td><td><span class="sis-pill-soft">VR</span></td><td class="dt">—</td></tr>
+                <tr><td class="nm">Arabische grammatica II</td><td class="tnum">ARA-201</td><td class="tnum">6</td><td>Tentamen</td><td><span class="iuasr-dash-status s-submitted" style="padding:2px 8px;">In beoordeling</span></td><td class="dt">—</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <dl class="sis-dl" style="margin-top:14px;grid-template-columns:150px 1fr 150px 1fr;">
+            <dt>Gewogen gemiddelde</dt><dd><b class="tnum">7,4</b></dd>
+            <dt>EC behaald</dt><dd class="tnum">28 / 60</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="assets/sis-shell.js"></script>
+<script>
+SIS.render({
+  active: 'studenten',
+  roleStay: true,
+  onRole: function (role) {
+    var szLocked = (role === 'studentenzaken');
+    document.getElementById('cijfers-lock').hidden = !szLocked;
+    document.getElementById('tab-cijfers').classList.toggle('is-locked', szLocked);
+    document.getElementById('cijfers-locked').hidden = !szLocked;
+    document.getElementById('cijfers-visible').hidden = szLocked;
+  }
+});
+
+// Tabs
+document.querySelectorAll('.sis-tab').forEach(function (t) {
+  t.addEventListener('click', function () {
+    var key = t.getAttribute('data-tab');
+    document.querySelectorAll('.sis-tab').forEach(function (x){ x.classList.remove('is-active'); });
+    t.classList.add('is-active');
+    document.querySelectorAll('.sis-tabpanel').forEach(function (p){
+      p.classList.toggle('is-active', p.getAttribute('data-panel') === key);
+    });
+  });
+});
+
+// BSN tonen
+(function () {
+  var btn = document.getElementById('bsn-toggle');
+  var val = document.getElementById('bsn-value');
+  var shown = false;
+  if (btn) btn.addEventListener('click', function () {
+    shown = !shown;
+    val.textContent = shown ? '••• •• 4•2' : '••••••••';
+    btn.lastChild.textContent = shown ? ' Verbergen' : ' Tonen';
+  });
+})();
+</script>
+</body>
+</html>

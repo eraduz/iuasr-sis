@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studenten — IUASR SIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sis.css">
+<link rel="stylesheet" href="assets/iuasr-plugin-dash.css">
+</head>
+<body>
+
+<div id="sis-header"></div>
+
+<div class="iuasr-dash-app">
+  <nav class="iuasr-dash-sidebar" id="sis-sidebar" aria-label="Hoofdmenu"></nav>
+
+  <main class="iuasr-dash-main">
+    <div class="sis-crumb"><a href="dashboard.html">Dashboard</a><span class="sep">›</span><b>Studenten</b></div>
+
+    <div class="iuasr-dash-vhead">
+      <div>
+        <h1>Studenten</h1>
+        <div class="summary"><b>342</b> actieve studenten · zoek op <b>studentnummer</b></div>
+      </div>
+      <div class="iuasr-dash-vhead__actions">
+        <span class="sis-role-note" data-role-only="directie examencommissie"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg> Alleen-lezen</span>
+        <a class="iuasr-dash-btn" data-role-only="studentenzaken" href="rapporten.html">Klassenlijst</a>
+        <a class="iuasr-dash-btn iuasr-dash-btn--primary" data-role-only="studentenzaken" href="inschrijven.html">Student inschrijven</a>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="iuasr-dash-filters">
+      <div class="search" style="grid-column:1 / -1;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" placeholder="Zoek op studentnummer (bijv. 264192)…" value="">
+      </div>
+    </div>
+    <div class="iuasr-dash-filters" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+      <select aria-label="Opleiding">
+        <option>Alle opleidingen</option>
+        <option>PABO — Leraar Basisonderwijs</option>
+        <option>Bachelor Islamitische Theologie</option>
+        <option>Master Isl. Geestelijke Verzorging</option>
+        <option>Cursus Koran &amp; Hifz</option>
+      </select>
+      <select aria-label="Periode / cohort">
+        <option>Alle cohorten</option>
+        <option>Cohort 2026</option>
+        <option>Cohort 2025</option>
+        <option>Cohort 2024</option>
+      </select>
+      <select aria-label="Status">
+        <option>Alle statussen</option>
+        <option>Actief</option>
+        <option>Uitgeschreven</option>
+        <option>Afgestudeerd</option>
+        <option>Onderbroken</option>
+      </select>
+      <select aria-label="Klas">
+        <option>Alle klassen</option>
+        <option>PB-1A · voltijd</option>
+        <option>IT-1 · voltijd</option>
+        <option>MGV-D · deeltijd</option>
+      </select>
+    </div>
+
+    <!-- Tabel -->
+    <div class="iuasr-dash-tbl-card">
+      <table class="iuasr-dash-tbl">
+        <thead>
+          <tr>
+            <th class="sortable sorted asc" style="width:110px;">Studentnr. <span class="sort">▲</span></th>
+            <th>Naam</th>
+            <th>Opleiding</th>
+            <th>Klas</th>
+            <th>Cohort</th>
+            <th>Status</th>
+            <th class="row-act"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="tnum">264192</td><td class="nm">Yasmin Demir<small>y.demir@student.iuasr.nl</small></td><td class="pg">Bachelor Islamitische Theologie</td><td>IT-1</td><td class="tnum">2026</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="student-detail.html">Openen</a></td></tr>
+          <tr><td class="tnum">264188</td><td class="nm">Aïsha El Bouzidi<small>a.elbouzidi@student.iuasr.nl</small></td><td class="pg">PABO — Leraar Basisonderwijs</td><td>PB-1A</td><td class="tnum">2026</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="student-detail.html">Openen</a></td></tr>
+          <tr><td class="tnum">263044</td><td class="nm">Mehmet Akın<small>m.akin@student.iuasr.nl</small></td><td class="pg">Master Isl. Geestelijke Verzorging</td><td>MGV-D</td><td class="tnum">2025</td><td><span class="iuasr-dash-status s-incomplete">Onderbroken</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="student-detail.html">Openen</a></td></tr>
+          <tr><td class="tnum">262910</td><td class="nm">Khalid Ouahbi<small>k.ouahbi@student.iuasr.nl</small></td><td class="pg">Cursus Koran &amp; Hifz</td><td>KH-2</td><td class="tnum">2025</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="student-detail.html">Openen</a></td></tr>
+          <tr><td class="tnum">261557</td><td class="nm">Sara El Idrissi<small>s.elidrissi@student.iuasr.nl</small></td><td class="pg">PABO — Leraar Basisonderwijs</td><td>PB-2B</td><td class="tnum">2025</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="student-detail.html">Openen</a></td></tr>
+          <tr><td class="tnum">259823</td><td class="nm">Fatima Zahra Bennani<small>f.bennani@student.iuasr.nl</small></td><td class="pg">Bachelor Islamitische Theologie</td><td>IT-3</td><td class="tnum">2024</td><td><span class="iuasr-dash-status s-pay">Afgestudeerd</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="student-detail.html">Openen</a></td></tr>
+          <tr><td class="tnum">258871</td><td class="nm">Rachid Belhaj<small>r.belhaj@student.iuasr.nl</small></td><td class="pg">Bachelor Islamitische Theologie</td><td>—</td><td class="tnum">2024</td><td><span class="iuasr-dash-status s-draft">Uitgeschreven</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="student-detail.html">Openen</a></td></tr>
+          <tr><td class="tnum">257402</td><td class="nm">Amal Ahmadi<small>a.ahmadi@student.iuasr.nl</small></td><td class="pg">Cursus Koran &amp; Hifz</td><td>KH-1</td><td class="tnum">2026</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="student-detail.html">Openen</a></td></tr>
+          <tr><td class="tnum">256119</td><td class="nm">Bilal Yıldırım<small>b.yildirim@student.iuasr.nl</small></td><td class="pg">Master Isl. Geestelijke Verzorging</td><td>MGV-V</td><td class="tnum">2025</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="student-detail.html">Openen</a></td></tr>
+          <tr><td class="tnum">254730</td><td class="nm">Nora Haddadi<small>n.haddadi@student.iuasr.nl</small></td><td class="pg">PABO — Leraar Basisonderwijs</td><td>PB-3A</td><td class="tnum">2024</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="student-detail.html">Openen</a></td></tr>
+        </tbody>
+      </table>
+      <div class="iuasr-dash-pagination">
+        <div class="iuasr-dash-pagination__range">Toont <b>1–10</b> van <b>342</b> studenten</div>
+        <div class="iuasr-dash-pagination__nav">
+          <button disabled>‹</button>
+          <button class="is-current">1</button>
+          <button>2</button>
+          <button>3</button>
+          <button>…</button>
+          <button>35</button>
+          <button>›</button>
+        </div>
+      </div>
+    </div>
+    <p class="sis-tblnote">Statussen: <b>Actief</b> · <b>Onderbroken</b> · <b>Uitgeschreven</b> · <b>Afgestudeerd</b>. Zoeken gebeurt op studentnummer, niet op achternaam — dat voorkomt verwarring bij gelijke namen (les uit het oude Access-systeem).</p>
+  </main>
+</div>
+
+<script src="assets/sis-shell.js"></script>
+<script>SIS.render({ active: 'studenten' });</script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opzoektabellen — IUASR SIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sis.css">
+<link rel="stylesheet" href="assets/iuasr-plugin-dash.css">
+</head>
+<body>
+
+<div id="sis-header"></div>
+
+<div class="iuasr-dash-app">
+  <nav class="iuasr-dash-sidebar" id="sis-sidebar" aria-label="Hoofdmenu"></nav>
+
+  <main class="iuasr-dash-main">
+    <div class="sis-crumb"><a href="dashboard.html">Dashboard</a><span class="sep">›</span><b>Opzoektabellen</b></div>
+
+    <div class="iuasr-dash-vhead">
+      <div>
+        <h1>Opzoektabellen</h1>
+        <div class="summary">Referentiedata — vroeger losse Access-tabellen, nu centraal en gekoppeld</div>
+      </div>
+      <div class="iuasr-dash-vhead__actions">
+        <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="button" id="add-btn">Rij toevoegen</button>
+      </div>
+    </div>
+
+    <div class="sis-subtabs" role="tablist">
+      <button class="sis-subtab is-active" data-t="opleidingen">Opleidingen<span class="n">7</span></button>
+      <button class="sis-subtab" data-t="vakken">Vakken<span class="n">142</span></button>
+      <button class="sis-subtab" data-t="perioden">Perioden<span class="n">4</span></button>
+      <button class="sis-subtab" data-t="klassen">Klassen<span class="n">23</span></button>
+      <button class="sis-subtab" data-t="docenten">Docenten<span class="n">14</span></button>
+    </div>
+
+    <!-- Opleidingen -->
+    <div class="iuasr-dash-tbl-card sis-refpanel" data-panel="opleidingen">
+      <table class="iuasr-dash-tbl">
+        <thead><tr><th>Code</th><th>Opleiding</th><th>Niveau</th><th>Varianten</th><th>EC totaal</th><th>Status</th><th class="row-act"></th></tr></thead>
+        <tbody>
+          <tr><td class="tnum">PABO</td><td class="nm">Leraar Basisonderwijs</td><td>Bachelor</td><td>Voltijd</td><td class="tnum">240</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          <tr><td class="tnum">ISLTH</td><td class="nm">Islamitische Theologie</td><td>Bachelor</td><td>Voltijd · Deeltijd</td><td class="tnum">180</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          <tr><td class="tnum">MGV</td><td class="nm">Islamitische Geestelijke Verzorging</td><td>Master</td><td>Voltijd · Deeltijd</td><td class="tnum">120</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          <tr><td class="tnum">KRN</td><td class="nm">Cursus Koran &amp; Hifz</td><td>Cursus</td><td>Deeltijd</td><td class="tnum">—</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          <tr><td class="tnum">CD</td><td class="nm">Colloquium Doctum</td><td>Toelating</td><td>—</td><td class="tnum">—</td><td><span class="iuasr-dash-status s-draft">Op aanvraag</span></td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Vakken -->
+    <div class="iuasr-dash-tbl-card sis-refpanel" data-panel="vakken" hidden>
+      <table class="iuasr-dash-tbl">
+        <thead><tr><th>Code</th><th>Vak</th><th>Opleiding</th><th>EC</th><th>Docent</th><th>Periode</th><th class="row-act"></th></tr></thead>
+        <tbody>
+          <tr><td class="tnum">ARA-201</td><td class="nm">Arabische grammatica II</td><td>ISLTH</td><td class="tnum">6</td><td>dr. Y. Aydın</td><td>P2</td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          <tr><td class="tnum">FIQ-210</td><td class="nm">Usul al-Fiqh</td><td>ISLTH</td><td class="tnum">6</td><td>dr. Y. Aydın</td><td>P2</td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          <tr><td class="tnum">KRN-110</td><td class="nm">Inleiding Koranwetenschappen</td><td>ISLTH</td><td class="tnum">6</td><td>dr. S. Boujat</td><td>P1</td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          <tr><td class="tnum">ETH-305</td><td class="nm">Islamitische ethiek</td><td>MGV</td><td class="tnum">5</td><td>dr. Y. Aydın</td><td>P2</td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          <tr><td class="tnum">TAJ-102</td><td class="nm">Koranrecitatie (Tajwīd)</td><td>KRN</td><td class="tnum">4</td><td>dr. Y. Aydın</td><td>P2</td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Perioden -->
+    <div class="iuasr-dash-tbl-card sis-refpanel" data-panel="perioden" hidden>
+      <table class="iuasr-dash-tbl">
+        <thead><tr><th>Periode</th><th>Studiejaar</th><th>Start</th><th>Einde</th><th>Toetsweek</th><th class="row-act"></th></tr></thead>
+        <tbody>
+          <tr><td class="nm">Periode 1</td><td>2026 / 2027</td><td class="dt">1 sep 2026</td><td class="dt">6 nov 2026</td><td class="dt">wk 45</td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          <tr><td class="nm">Periode 2</td><td>2026 / 2027</td><td class="dt">9 nov 2026</td><td class="dt">5 feb 2027</td><td class="dt">wk 6</td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          <tr><td class="nm">Periode 3</td><td>2026 / 2027</td><td class="dt">8 feb 2027</td><td class="dt">16 apr 2027</td><td class="dt">wk 15</td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          <tr><td class="nm">Periode 4</td><td>2026 / 2027</td><td class="dt">19 apr 2027</td><td class="dt">2 jul 2027</td><td class="dt">wk 26</td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Klassen -->
+    <div class="iuasr-dash-tbl-card sis-refpanel" data-panel="klassen" hidden>
+      <table class="iuasr-dash-tbl">
+        <thead><tr><th>Klas</th><th>Opleiding</th><th>Cohort</th><th>Variant</th><th>Studenten</th><th>Mentor</th><th class="row-act"></th></tr></thead>
+        <tbody>
+          <tr><td class="nm">PB-1A</td><td>PABO</td><td class="tnum">2026</td><td>Voltijd</td><td class="tnum">26</td><td>N. Haddadi</td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          <tr><td class="nm">IT-1</td><td>ISLTH</td><td class="tnum">2026</td><td>Voltijd</td><td class="tnum">28</td><td>dr. S. Boujat</td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          <tr><td class="nm">MGV-D</td><td>MGV</td><td class="tnum">2025</td><td>Deeltijd</td><td class="tnum">12</td><td>prof. K. Nassar</td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          <tr><td class="nm">KH-2</td><td>KRN</td><td class="tnum">2025</td><td>Deeltijd</td><td class="tnum">15</td><td>dr. Y. Aydın</td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Docenten -->
+    <div class="iuasr-dash-tbl-card sis-refpanel" data-panel="docenten" hidden>
+      <table class="iuasr-dash-tbl">
+        <thead><tr><th>Naam</th><th>E-mail</th><th>Vakken</th><th>Opleiding(en)</th><th>Status</th><th class="row-act"></th></tr></thead>
+        <tbody>
+          <tr><td class="nm">dr. Yusuf Aydın</td><td class="dt">y.aydin@iuasr.nl</td><td class="tnum">4</td><td>ISLTH · MGV · KRN</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          <tr><td class="nm">dr. Samira Boujat</td><td class="dt">s.boujat@iuasr.nl</td><td class="tnum">3</td><td>ISLTH</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+          <tr><td class="nm">prof. Karima Nassar</td><td class="dt">k.nassar@iuasr.nl</td><td class="tnum">2</td><td>MGV</td><td><span class="iuasr-dash-status s-approved">Actief</span></td><td class="row-act"><button class="iuasr-dash-btn iuasr-dash-btn--sm">Bewerken</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="sis-tblnote">Alle koppelingen verlopen via <b>codes</b> (opleiding, vak, periode), niet via losse tekst zoals in het oude Access-systeem. Zo blijven studenten, cijfers en rapporten consistent gekoppeld.</p>
+  </main>
+</div>
+
+<script src="assets/sis-shell.js"></script>
+<script>
+SIS.render({ active: 'opzoektabellen' });
+document.querySelectorAll('.sis-subtab').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var t = b.getAttribute('data-t');
+    document.querySelectorAll('.sis-subtab').forEach(function (x){ x.classList.remove('is-active'); });
+    b.classList.add('is-active');
+    document.querySelectorAll('.sis-refpanel').forEach(function (p){
+      p.hidden = p.getAttribute('data-panel') !== t;
+    });
+  });
+});
+</script>
+</body>
+</html>

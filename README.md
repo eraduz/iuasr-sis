@@ -13,9 +13,28 @@ strikt gescheiden van het publieke aanmeldportaal.
 
 ## Status
 
-In opbouw — **Fase 0 (fundament)**. Zie **[PROGRESS.md](PROGRESS.md)** voor de
-fasering, beslissingen en openstaande parameters, en **[CLAUDE.md](CLAUDE.md)**
-voor de niet-onderhandelbare principes en AVG-grenzen.
+In opbouw — **Fase 2-aanzet (technische opzet)**: Laravel-projectskelet met
+genormaliseerd datamodel, rolscheiding en het leidende design system. Zie
+**[PROGRESS.md](PROGRESS.md)** voor de fasering, beslissingen en openstaande
+parameters, en **[CLAUDE.md](CLAUDE.md)** voor de niet-onderhandelbare
+principes en AVG-grenzen.
+
+## Lokaal opzetten (ontwikkeling)
+
+> PHP en Composer moeten geïnstalleerd zijn (PHP ^8.2). Node/npm zijn aanwezig.
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+# Zet DB-gegevens in .env (uitsluitend een lege ontwikkeldatabase).
+php artisan migrate --seed   # laadt UITSLUITEND synthetische data
+npm install && npm run dev
+php artisan serve
+```
+
+Rol wisselen in de demo-shell kan via de rolwisselaar rechtsboven; de
+rolscheiding zelf wordt server-side afgedwongen (Gates + `rol`-middleware).
 
 ## Belangrijke regels
 
@@ -26,6 +45,11 @@ voor de niet-onderhandelbare principes en AVG-grenzen.
 
 ## Mappenstructuur
 
+- `app/` — modellen, rollen (`Enums/Rol`), autorisatie (`Providers`, `Http/Middleware`), EC-logica (`Support`).
+- `database/migrations/` — genormaliseerd InnoDB-schema met surrogaatsleutels en echte foreign keys.
+- `database/seeders/` — uitsluitend synthetische seed-data.
+- `resources/views/` — Blade-views gekoppeld aan het leidende design system.
+- `public/assets/` — het overgenomen design system (`sis.css`, `iuasr-plugin-dash.css`, `sis-shell.js`).
 - `docs/` — ontwerp- en projectdocumentatie (FO, TO, datamodel, AVG/DPIA).
 - `synthetische-data/` — synthetische seed-datasets (nooit echte data).
-- Laravel-projectstructuur (`app/`, `database/`, `routes/`, …) volgt in Fase 1/2.
+- `IUASR/` — bronmateriaal en designs; **`IUASR/iuasr-sis/` is leidend** voor de SIS-schermen.

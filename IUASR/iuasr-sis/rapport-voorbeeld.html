@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rapport-voorbeeld — IUASR SIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sis.css">
+<link rel="stylesheet" href="assets/iuasr-plugin-dash.css">
+</head>
+<body>
+
+<div id="sis-header"></div>
+
+<div class="iuasr-dash-app">
+  <nav class="iuasr-dash-sidebar" id="sis-sidebar" aria-label="Hoofdmenu"></nav>
+
+  <main class="iuasr-dash-main">
+    <div class="sis-crumb"><a href="dashboard.html">Dashboard</a><span class="sep">›</span><a href="rapporten.html">Rapporten</a><span class="sep">›</span><b>Voorbeeld — Tentamenlijst</b></div>
+
+    <div class="sis-toolbar">
+      <span class="meta"><b>Tentamenlijst</b> · ARA-201 · Arabische grammatica II · periode 2</span>
+      <span class="grow"></span>
+      <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="rapporten.html">Terug</a>
+      <button class="iuasr-dash-btn iuasr-dash-btn--sm" type="button" onclick="window.print()">Printen</button>
+      <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="button" onclick="window.print()">Download PDF</button>
+    </div>
+
+    <div class="sis-paper-stage">
+      <div class="sis-a4">
+        <div class="sis-a4__head">
+          <img src="assets/logo-dark.png" alt="IUASR">
+          <div class="org">
+            <b>Islamic University of Applied Sciences Rotterdam</b>
+            Bureau Studentenzaken<br>
+            Postbus 12345 · 3000 AB Rotterdam<br>
+            studentenzaken@iuasr.nl
+          </div>
+        </div>
+
+        <h1>Tentamenlijst</h1>
+        <p class="doc-sub">Arabische grammatica II · ARA-201 · Bachelor Islamitische Theologie</p>
+
+        <dl class="kv">
+          <dt>Vak / code</dt><dd>Arabische grammatica II — ARA-201</dd>
+          <dt>Studiepunten</dt><dd>6 EC</dd>
+          <dt>Docent</dt><dd>dr. Y. Aydın</dd>
+          <dt>Toetsmoment</dt><dd>Periode 2 · eerste kans · 3 juni 2026</dd>
+          <dt>Cesuur</dt><dd>5,5</dd>
+          <dt>Aantal deelnemers</dt><dd>8 van 28 (uittreksel)</dd>
+        </dl>
+
+        <h2>Resultaten</h2>
+        <table class="sis-a4-tbl">
+          <thead>
+            <tr><th style="width:26px;">#</th><th>Studentnr.</th><th>Naam</th><th>Poging</th><th class="num">Cijfer</th><th>Resultaat</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>264192</td><td>Yasmin Demir</td><td>Tentamen</td><td class="num">7,5</td><td>Voldaan</td></tr>
+            <tr><td>2</td><td>264188</td><td>Aïsha El Bouzidi</td><td>Tentamen</td><td class="num">6,5</td><td>Voldaan</td></tr>
+            <tr><td>3</td><td>262910</td><td>Khalid Ouahbi</td><td>Herkansing</td><td class="num">5,5</td><td>Voldaan</td></tr>
+            <tr><td>4</td><td>261557</td><td>Sara El Idrissi</td><td>Tentamen</td><td class="num">8,5</td><td>Voldaan</td></tr>
+            <tr><td>5</td><td>257402</td><td>Amal Ahmadi</td><td>Vrijstelling</td><td class="num">VR</td><td>Vrijgesteld</td></tr>
+            <tr><td>6</td><td>256119</td><td>Bilal Yıldırım</td><td>Tentamen</td><td class="num">5,5</td><td>Voldaan</td></tr>
+            <tr><td>7</td><td>254730</td><td>Nora Haddadi</td><td>Tentamen</td><td class="num">7,0</td><td>Voldaan</td></tr>
+            <tr><td>8</td><td>259823</td><td>Ismail Bakkali</td><td>Herkansing</td><td class="num">4,0</td><td>Niet voldaan</td></tr>
+          </tbody>
+          <tfoot>
+            <tr><td colspan="4">Gemiddeld cijfer · geslaagd</td><td class="num">6,3</td><td>7 van 8</td></tr>
+          </tfoot>
+        </table>
+
+        <div class="sis-a4__sig">
+          <div class="line">Vastgesteld door examencommissie<br><b style="color:var(--priColor100);">prof. K. Nassar</b> · voorzitter</div>
+          <div class="line">Datum<br><b style="color:var(--priColor100);">6 juli 2026</b> · Rotterdam</div>
+        </div>
+
+        <div class="sis-a4__foot">
+          <span>Referentie: EXL-2026-ARA201-P2 · gegenereerd via IUASR SIS op 06-07-2026</span>
+          <span class="sis-a4__watermark">Officieel document</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/sis-shell.js"></script>
+<script>SIS.render({ active: 'rapporten', roleStay: true });</script>
+</body>
+</html>

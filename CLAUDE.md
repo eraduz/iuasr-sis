@@ -12,6 +12,19 @@ strikt gescheiden van het publieke aanmeldportaal. Zie
 - Auth via **Microsoft Entra ID (SSO/OIDC)** — bouw NOOIT een eigen login
 - Draait intern, IP-beperkt
 
+## Design system (leidend)
+- De SIS-schermen volgen het design system uit **`IUASR/iuasr-sis/`** — dit is
+  LEIDEND. De genummerde HTML-schermen daar en het design system zijn het
+  referentiepunt voor elke UI. De overige mappen onder `IUASR/` (homepage,
+  aanmeldportaal, `pages/`) horen bij een andere/publieke site en zijn NIET
+  leidend voor het interne SIS.
+- Het design system is overgenomen naar `public/assets/` (`css/sis.css`,
+  `css/iuasr-plugin-dash.css`, `js/sis-shell.js`) en gekoppeld in
+  `resources/views/layouts/app.blade.php`. Wijzig de merk-tokens/kleuren niet
+  ad hoc; bouw nieuwe schermen met de bestaande `iuasr-dash-*` en `sis-*` klassen.
+- Fonts: DM Serif Display (koppen) + Fira Sans (tekst). Kleuren o.a.
+  `--priColor100` #1E1446, `--secColor100` #C8102E, heritage-groen #285C4D, goud #D69A2D.
+
 ## Niet-onderhandelbare principes
 1. **Surrogaatsleutels overal.** Elke entiteit heeft een betekenisloze,
    systeem-gegenereerde PK. Het leesbare studentnummer is een uniek VELD,

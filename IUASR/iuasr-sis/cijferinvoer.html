@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cijferinvoer · ARA-201 — IUASR SIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sis.css">
+<link rel="stylesheet" href="assets/iuasr-plugin-dash.css">
+</head>
+<body>
+
+<div id="sis-header"></div>
+
+<div class="iuasr-dash-app">
+  <nav class="iuasr-dash-sidebar" id="sis-sidebar" aria-label="Hoofdmenu"></nav>
+
+  <main class="iuasr-dash-main">
+    <div class="sis-crumb"><a href="dashboard.html">Dashboard</a><span class="sep">›</span><a href="mijn-vakken.html">Mijn vakken</a><span class="sep">›</span><b>ARA-201 · Cijferinvoer</b></div>
+
+    <div class="iuasr-dash-vhead">
+      <div>
+        <h1>Arabische grammatica II</h1>
+        <div class="summary"><b>ARA-201</b> · Bachelor Islamitische Theologie · 6 EC · periode 2 · <b>28</b> studenten</div>
+      </div>
+      <div class="iuasr-dash-vhead__actions">
+        <span class="iuasr-dash-status s-incomplete">Concept · 18/28 ingevoerd</span>
+      </div>
+    </div>
+
+    <!-- Toetsopbouw -->
+    <div class="sis-card" style="margin-bottom:16px;">
+      <div class="sis-card__hd"><h3>Toetsopbouw</h3><span class="hint">Weging telt op tot 100%</span></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <span class="sis-pill-soft" style="font-size:12px;padding:5px 12px;">Deeltoets schriftelijk · <b style="color:var(--priColor100);">40%</b></span>
+        <span class="sis-pill-soft" style="font-size:12px;padding:5px 12px;">Mondeling (recitatie) · <b style="color:var(--priColor100);">25%</b></span>
+        <span class="sis-pill-soft" style="font-size:12px;padding:5px 12px;">Eindtentamen · <b style="color:var(--priColor100);">35%</b></span>
+        <span class="sis-pill-soft" style="font-size:12px;padding:5px 12px;">Cesuur · <b style="color:var(--priColor100);">5,5</b></span>
+      </div>
+    </div>
+
+    <div class="iuasr-dash-tbl-card">
+      <table class="iuasr-dash-tbl" id="grade-tbl">
+        <thead>
+          <tr>
+            <th style="width:190px;">Student</th>
+            <th style="text-align:center;">Schriftelijk<br><span class="sis-weegcell">40%</span></th>
+            <th style="text-align:center;">Mondeling<br><span class="sis-weegcell">25%</span></th>
+            <th style="text-align:center;">Tentamen<br><span class="sis-weegcell">35%</span></th>
+            <th style="text-align:center;">Poging</th>
+            <th style="text-align:center;">Vrijstelling</th>
+            <th style="text-align:right;">Eindcijfer</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- rows injected -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sis-savebar">
+      <span class="status"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Laatst opgeslagen <b>zojuist</b> · concept</span>
+      <span class="grow"></span>
+      <button class="iuasr-dash-btn" type="button">Concept opslaan</button>
+      <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="button" onclick="alert('Cijfers gaan definitief naar de examencommissie ter vaststelling. (mockup)')">Indienen bij examencommissie</button>
+    </div>
+
+    <p class="sis-tblnote">Eindcijfer = gewogen gemiddelde van de deelresultaten (afgerond op 1 decimaal). Bij <b>Herkansing</b> geldt het hoogst behaalde cijfer. Een <b>Vrijstelling</b> laat de deelvelden vervallen en registreert “VR”.</p>
+  </main>
+</div>
+
+<script src="assets/sis-shell.js"></script>
+<script>
+SIS.render({ active: 'cijferinvoer' });
+
+var students = [
+  ['264192','Yasmin Demir', 7.5, 8.0, 7.0, 'T', false],
+  ['264188','Aïsha El Bouzidi', 6.0, 7.0, 6.5, 'T', false],
+  ['262910','Khalid Ouahbi', 4.5, 5.0, 5.5, 'H', false],
+  ['261557','Sara El Idrissi', 8.5, 9.0, 8.0, 'T', false],
+  ['257402','Amal Ahmadi', null, null, null, 'T', true],
+  ['256119','Bilal Yıldırım', 5.5, 6.0, 5.0, 'T', false],
+  ['254730','Nora Haddadi', 7.0, 6.5, 7.5, 'T', false],
+  ['259823','Ismail Bakkali', 3.5, 4.0, 4.5, 'H', false]
+];
+var W = [0.40, 0.25, 0.35];
+
+function initials(name){ return name.split(' ').map(function(p){return p[0];}).slice(0,2).join(''); }
+
+function calcRow(tr) {
+  var vr = tr.querySelector('.vr-check').checked;
+  var inputs = tr.querySelectorAll('.sis-grade-input');
+  var finalCell = tr.querySelector('.final');
+  inputs.forEach(function(i){ i.disabled = vr; i.classList.remove('is-pass','is-fail'); });
+  if (vr) { finalCell.innerHTML = '<span class="sis-pill-soft">VR</span>'; return; }
+  var sum = 0, any = false, complete = true;
+  inputs.forEach(function(i, idx){
+    var v = parseFloat(i.value.replace(',', '.'));
+    if (!isNaN(v)) { sum += v * W[idx]; any = true; i.classList.add(v >= 5.5 ? 'is-pass' : 'is-fail'); }
+    else complete = false;
+  });
+  if (!any) { finalCell.innerHTML = '<span class="sis-muted">—</span>'; return; }
+  if (!complete) { finalCell.innerHTML = '<span class="sis-muted" style="font-size:12px;">onvolledig</span>'; return; }
+  var f = Math.round(sum * 10) / 10;
+  finalCell.innerHTML = '<span class="sis-grade-final'+(f < 5.5 ? ' is-fail' : '')+'">'+f.toFixed(1).replace('.', ',')+'</span>';
+}
+
+var tbody = document.querySelector('#grade-tbl tbody');
+students.forEach(function (s) {
+  var tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td class="nm">'+s[1]+'<small>'+s[0]+'</small></td>' +
+    ['<td style="text-align:center;"><input class="sis-grade-input" inputmode="decimal" value="'+(s[2]!=null?String(s[2]).replace('.',','):'')+'"></td>',
+     '<td style="text-align:center;"><input class="sis-grade-input" inputmode="decimal" value="'+(s[3]!=null?String(s[3]).replace('.',','):'')+'"></td>',
+     '<td style="text-align:center;"><input class="sis-grade-input" inputmode="decimal" value="'+(s[4]!=null?String(s[4]).replace('.',','):'')+'"></td>'].join('') +
+    '<td style="text-align:center;"><span class="sis-attempt"><button type="button" data-p="T" class="'+(s[5]==='T'?'is-on':'')+'">Tent.</button><button type="button" data-p="H" class="'+(s[5]==='H'?'is-on':'')+'">Herk.</button></span></td>' +
+    '<td style="text-align:center;"><label class="sis-check-inline" style="justify-content:center;"><input type="checkbox" class="vr-check"'+(s[6]?' checked':'')+'></label></td>' +
+    '<td style="text-align:right;" class="final"></td>';
+  tbody.appendChild(tr);
+
+  tr.querySelectorAll('.sis-grade-input').forEach(function(i){ i.addEventListener('input', function(){ calcRow(tr); }); });
+  tr.querySelector('.vr-check').addEventListener('change', function(){ calcRow(tr); });
+  tr.querySelectorAll('.sis-attempt button').forEach(function(b){
+    b.addEventListener('click', function(){
+      tr.querySelectorAll('.sis-attempt button').forEach(function(x){ x.classList.remove('is-on'); });
+      b.classList.add('is-on');
+    });
+  });
+  calcRow(tr);
+});
+</script>
+</body>
+</html>

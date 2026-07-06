@@ -7,10 +7,9 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
 
 ## Projectstatus
 
-- **Huidige fase:** Fase 0 — fundament & AVG-nulmeting
+- **Huidige fase:** Fase 2-aanzet — technische opzet (Laravel-projectskelet)
 - **Laatst bijgewerkt:** 2026-07-06
-- **Repo:** git@github.com:eraduz/iuasr-sis.git (nog niet gepusht — eerste push in
-  overleg met de opdrachtgever)
+- **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 
 ---
 
@@ -22,10 +21,18 @@ opleverpunt aantoonbaar klaar is.
 - [ ] **Fase 0 — Fundament & AVG-nulmeting** (in uitvoering)
   - Git-repo, remote, AVG-veilige `.gitignore`, PROGRESS.md, leeg mappenskelet.
   - Nog te doen: DPIA-opzet en synthetische seed-dataset (latere sessie).
-- [ ] **Fase 1 — Functioneel Ontwerp (FO) + datamodel**
+- [~] **Fase 1 — Functioneel Ontwerp (FO) + datamodel** (grotendeels belegd in code)
   - Genormaliseerd datamodel met surrogaatsleutels, rolmodel, gevoelige-data-plan.
-- [ ] **Fase 2 — Technisch Ontwerp (TO)**
+  - Gedaan: migraties (student, inschrijving, vak, toetsonderdeel, resultaat,
+    opzoektabellen, audit-log), Eloquent-modellen, `Rol`-enum, EC-logica.
+  - Nog te doen: FO-document in `docs/`, datamodel-diagram, formele vaststelling.
+- [~] **Fase 2 — Technisch Ontwerp (TO)** (aanzet gebouwd)
   - Laravel-projectopzet, Entra ID/OIDC-auth, InnoDB-schema, migratiestrategie.
+  - Gedaan: Laravel 12-skelet, config (`sis.php`, `database.php`), rolscheiding
+    (Gates + `rol`-middleware), Blade-layout gekoppeld aan het leidende design
+    system, synthetische seeders, unit-test rolscheiding.
+  - Nog te doen: Entra ID/OIDC-integratie, TO-document, `composer install` +
+    `php artisan migrate --seed` daadwerkelijk draaien (PHP/Composer ontbreken nog).
 - [ ] **Fase 3 — Kern-CRUD**
   - Student/inschrijving/opleiding-beheer door SZ (identiteit, geen cijfers).
 - [ ] **Fase 4 — Cijfers + rolscheiding**
@@ -74,6 +81,11 @@ Deze zijn nog niet vastgesteld. Vraag de opdrachtgever; verzin geen waarden.
 | 2026-07-06 | Cijfers genormaliseerd (resultaatregels + toetsonderdelen + weging); nooit blok-kolommen. |
 | 2026-07-06 | Git-repo geinitialiseerd, remote origin gezet; eerste push in overleg. |
 | 2026-07-06 | AVG-veilige `.gitignore`: alle DB-/dumpformaten, secrets en gevoelige-data-mappen uitgesloten. |
+| 2026-07-06 | Laravel 12-skelet opgezet (hand-scaffold; PHP/Composer nog niet geïnstalleerd). |
+| 2026-07-06 | Datamodel in migraties: surrogaatsleutels, echte FK's, genormaliseerde resultaatregels, versleuteld BSN + audit-log. |
+| 2026-07-06 | Rolscheiding server-side: `Rol`-enum, Gates (`AutorisatieServiceProvider`) en `rol`-middleware. |
+| 2026-07-06 | Leidend design system: `IUASR/iuasr-sis` overgenomen naar `public/assets` en gekoppeld aan Blade-layout. |
+| 2026-07-06 | Openstaande parameters bewust `null` in `config/sis.php` en op `opleidingen` (voldoende_grens, ec_overgang_drempel, studentnummerlengte) — niet zelf ingevuld. |
 
 ---
 
@@ -93,9 +105,20 @@ Deze zijn nog niet vastgesteld. Vraag de opdrachtgever; verzin geen waarden.
 
 ## Aandachtspunten voor volgende sessie
 
-- **Composer ontbreekt** op de ontwikkelmachine — installeren vóór Fase 1
-  (Laravel-scaffolding). PHP 8.5, Node 24, npm 11 en mysql-client 9.6 zijn aanwezig.
-- **Oude Access-database `IUTSTD-met oudestudenten9-9.mdb` (129 MB)** staat nog in
-  de repo-map. Bevat vermoedelijk echte persoonsgegevens. Overweeg dit bestand
-  buiten de repo-map te verplaatsen, onder toezicht FG. Nu al door `.gitignore` gedekt.
-- **Nog te doen in Fase 0:** DPIA-opzet en generatie synthetische seed-dataset.
+- **PHP en Composer ontbreken** op de ontwikkelmachine. Het Laravel-skelet is
+  met de hand gescaffold en is klaar voor `composer install`. Installeer PHP ^8.2
+  en Composer, draai daarna `composer install`, `php artisan key:generate` en
+  `php artisan migrate --seed`. Pas dán kan `php -l`/tests groen worden bevestigd.
+  Node 24 en npm 11 zijn aanwezig.
+- **Design system is leidend uit `IUASR/iuasr-sis`.** De overige mappen onder
+  `IUASR/` (homepage, aanmeldportaal, pages) horen bij een andere/ publieke site
+  en zijn NIET leidend voor het interne SIS. De 23 genummerde schermen in
+  `IUASR/iuasr-sis/*.html` zijn het referentiepunt voor Fase 3/4.
+- **Openstaande parameters blokkeren nog schermen:** studentnummerlengte (5 of 6),
+  voldoende-grens en EC-drempel per opleiding. Deze staan als `null` in code
+  (config + kolommen) en moeten met de opdrachtgever worden bevestigd vóór
+  cijfer-/EC-schermen (Fase 4).
+- **Oude Access-database `IUTSTD-*.mdb`** — indien aanwezig in de map: bevat
+  vermoedelijk echte persoonsgegevens; buiten de repo houden (al door `.gitignore`
+  gedekt), onder toezicht FG.
+- **Nog te doen in Fase 0/1:** DPIA-opzet en FO-document + datamodel-diagram in `docs/`.

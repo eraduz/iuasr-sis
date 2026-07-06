@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Herinschrijven — IUASR SIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sis.css">
+<link rel="stylesheet" href="assets/iuasr-plugin-dash.css">
+</head>
+<body>
+
+<div id="sis-header"></div>
+
+<div class="iuasr-dash-app">
+  <nav class="iuasr-dash-sidebar" id="sis-sidebar" aria-label="Hoofdmenu"></nav>
+
+  <main class="iuasr-dash-main">
+    <div class="sis-crumb"><a href="dashboard.html">Dashboard</a><span class="sep">›</span><a href="studenten.html">Studenten</a><span class="sep">›</span><b>Herinschrijven</b></div>
+
+    <div class="iuasr-dash-vhead">
+      <div>
+        <h1>Herinschrijven</h1>
+        <div class="summary">Bestaande student · nieuwe periode</div>
+      </div>
+    </div>
+
+    <div class="sis-grid-2">
+      <div>
+        <div class="sis-card" style="margin-bottom:16px;">
+          <div class="iuasr-dash-candidate__hd" style="margin:0;padding:0;border:0;">
+            <span class="iuasr-dash-candidate__avatar" style="width:44px;height:44px;font-size:18px;" aria-hidden="true">Y</span>
+            <div class="iuasr-dash-candidate__body">
+              <div style="font-family:var(--serif-font);font-size:19px;">Yasmin Demir</div>
+              <div class="iuasr-dash-candidate__meta"><span>264192</span><span class="dot"></span><span>Bachelor Islamitische Theologie</span><span class="dot"></span><span>Klas IT-1</span></div>
+            </div>
+            <span class="iuasr-dash-status s-approved" style="align-self:flex-start;">Actief</span>
+          </div>
+        </div>
+
+        <form class="sis-card sis-form" onsubmit="return false;">
+          <fieldset class="sis-fieldset">
+            <legend>Nieuwe inschrijfperiode</legend>
+            <div class="sis-fld-row sis-fld-row--2">
+              <div class="sis-fld"><label>Studiejaar <span class="req">*</span></label><select><option>2027 / 2028</option></select></div>
+              <div class="sis-fld"><label>Studiejaar-fase</label><select><option>2e jaar</option><option>3e jaar</option></select></div>
+            </div>
+            <div class="sis-fld-row sis-fld-row--2">
+              <div class="sis-fld"><label>Klas</label><select><option>IT-2</option><option>IT-2 (deeltijd)</option></select></div>
+              <div class="sis-fld"><label>Variant</label><select><option>Voltijd · ongewijzigd</option><option>Deeltijd</option></select></div>
+            </div>
+            <div class="sis-fld">
+              <label class="sis-check-inline"><input type="checkbox" checked> Gegevens en machtiging collegegeld overnemen uit vorige inschrijving</label>
+            </div>
+          </fieldset>
+
+          <div class="sis-form__actions">
+            <a class="iuasr-dash-btn" href="student-detail.html">Annuleren</a>
+            <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="#" onclick="return false;">Herinschrijving vastleggen</a>
+          </div>
+        </form>
+      </div>
+
+      <div>
+        <div class="sis-card">
+          <div class="sis-card__hd"><h3>Ongewijzigd overgenomen</h3></div>
+          <dl class="sis-dl">
+            <dt>Studentnummer</dt><dd class="tnum">264192 <span class="sis-pill-soft">blijft gelijk</span></dd>
+            <dt>Opleiding</dt><dd>Bachelor Islamitische Theologie</dd>
+            <dt>Persoonsgegevens</dt><dd>Ongewijzigd</dd>
+            <dt>EC behaald</dt><dd>28 EC (loopt door)</dd>
+          </dl>
+        </div>
+        <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-top:16px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Herinschrijven is een <b>vereenvoudigd formulier</b>: alleen de nieuwe periode en klas hoeven te worden bevestigd. Behaalde EC blijven behouden.</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/sis-shell.js"></script>
+<script>SIS.render({ active: 'herinschrijven' });</script>
+</body>
+</html>
