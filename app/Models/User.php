@@ -58,4 +58,32 @@ class User extends Authenticatable
     {
         return $this->rol === $rol;
     }
+
+    /** Vergelijk op rolsleutel (handig in Blade): $user->rolIs('docent'). */
+    public function rolIs(string ...$rollen): bool
+    {
+        return in_array($this->rol->value, $rollen, true);
+    }
+
+    // Doorverwijzingen naar de rol-regels, zodat views en policies hetzelfde
+    // vocabulaire delen als de UI (design system).
+    public function magCijfersInzien(): bool
+    {
+        return $this->rol->magCijfersInzien();
+    }
+
+    public function magCijfersInvoeren(): bool
+    {
+        return $this->rol->magCijfersInvoeren();
+    }
+
+    public function magInschrijvingBeheren(): bool
+    {
+        return $this->rol->magInschrijvingBeheren();
+    }
+
+    public function magBsnInzien(): bool
+    {
+        return $this->rol->magBsnInzien();
+    }
 }

@@ -14,7 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AuditLog extends Model
 {
-    public const UPDATED_AT = null; // append-only: geen updated_at
+    // Append-only: geen created_at/updated_at; de timestamp is `gelogd_op`.
+    public $timestamps = false;
 
     protected $table = 'audit_logs';
 

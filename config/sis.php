@@ -29,11 +29,10 @@ return [
     | koppelsleutel. Interne relaties lopen via de surrogaatsleutel (id).
     */
     'studentnummer' => [
+        // BEVESTIGD (opdrachtgever, 2026-07-06): jaarprefix van 2 cijfers + een
+        // volgnummer, totaal 6 tekens. Voorbeeld: 261234 (26 = 2026, 1234 = volgnr).
         'jaarprefix_lengte' => 2,
-        // TE BEVESTIGEN: 5 of 6. Leeg/afwezig => null (geen aanname), niet 0.
-        'cijfers_na_prefix' => filled(env('SIS_STUDENTNUMMER_CIJFERS'))
-            ? (int) env('SIS_STUDENTNUMMER_CIJFERS')
-            : null,
+        'volgnummer_lengte' => (int) env('SIS_STUDENTNUMMER_VOLGNUMMER_LENGTE', 4),
         // Nummerbeleid bij heringstroom: behoudt of nieuw nummer? TE BEVESTIGEN.
         'behoud_bij_heringstroom' => null,
     ],

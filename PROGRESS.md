@@ -7,7 +7,7 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
 
 ## Projectstatus
 
-- **Huidige fase:** Fase 2-aanzet — technische opzet (Laravel-projectskelet)
+- **Huidige fase:** Fase 3 — Kern-CRUD (increment 1 opgeleverd)
 - **Laatst bijgewerkt:** 2026-07-06
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 
@@ -36,8 +36,15 @@ opleverpunt aantoonbaar klaar is.
     `php artisan migrate --seed` en de testsuite draaien groen; de app boot op
     `http://127.0.0.1:8000` (dashboard + SSO-login geven HTTP 200).
   - Nog te doen: Entra ID/OIDC-integratie, TO-document.
-- [ ] **Fase 3 — Kern-CRUD**
+- [~] **Fase 3 — Kern-CRUD** (increment 1 opgeleverd)
   - Student/inschrijving/opleiding-beheer door SZ (identiteit, geen cijfers).
+  - Gedaan: dev-login (tijdelijk, vervangt Entra later), server-side rolscheiding
+    op alle routes; server-gerenderde shell (header/sidebar per rol); studentenlijst
+    (zoek op studentnummer), studentdetail (BSN gemaskeerd + gelogde inzage; cijfer-
+    tabblad afgeschermd voor SZ), inschrijven met automatische nummergeneratie;
+    audit-logging op aanmaak en BSN-inzage. 12 tests groen; live geverifieerd.
+  - Nog te doen: herinschrijven, uitschrijven, verklaringen (A4), student muteren,
+    opzoektabellen-beheer, rijkere synthetische dataset.
 - [ ] **Fase 4 — Cijfers + rolscheiding**
   - Genormaliseerde resultaatregels, docent-invoer eigen vak, server-side autorisatie.
 - [ ] **Fase 5 — Rapporten + documenten**
@@ -67,7 +74,8 @@ Niet bouwen tenzij expliciet gevraagd:
 
 Deze zijn nog niet vastgesteld. Vraag de opdrachtgever; verzin geen waarden.
 
-- [ ] **Studentnummerformaat** — bron noemt zowel 5 als 6 cijfers. Moet eenduidig.
+- [x] **Studentnummerformaat** — BEVESTIGD 2026-07-06: jaarprefix (2) + volgnummer,
+  totaal 6 tekens (voorbeeld 261234). Vastgelegd in `config/sis.php`.
 - [ ] **Nummerbeleid bij heringstroom** — behoudt student oud nummer of nieuw nummer?
 - [ ] **Voldoende-grens per opleiding** — welke cijfergrens telt als voldoende?
 - [ ] **EC-drempels per opleiding** — normen voor voortgang/BSA per opleiding.
@@ -91,6 +99,9 @@ Deze zijn nog niet vastgesteld. Vraag de opdrachtgever; verzin geen waarden.
 | 2026-07-06 | Openstaande parameters bewust `null` in `config/sis.php` en op `opleidingen` (voldoende_grens, ec_overgang_drempel, studentnummerlengte) — niet zelf ingevuld. |
 | 2026-07-06 | Lokale toolchain: PHP 8.3.32 + Composer 2.10 + portable MariaDB 11.4.9 (poort 3307, user-profiel, geen service/admin). |
 | 2026-07-06 | Database NIET in Git: schema via migraties, data via synthetische seeders; `.env` per omgeving (lokaal↔intranet). Zie docs/ONTWIKKELOMGEVING.md. |
+| 2026-07-06 | Studentnummer BEVESTIGD: jaarprefix (2) + volgnummer, totaal 6 tekens (voorbeeld 261234). |
+| 2026-07-06 | Tijdelijke dev-login (alleen lokaal) om rolscheiding te bouwen/testen; vervangen door Entra ID SSO in latere fase. |
+| 2026-07-06 | App-shell (header/sidebar) server-side gerenderd op basis van de ingelogde rol; `sis-shell.js` (localStorage-demo) niet meer leidend in de app. |
 
 ---
 

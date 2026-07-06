@@ -8,27 +8,34 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
-{{-- Leidend design system: overgenomen uit IUASR/iuasr-sis. Laadvolgorde: sis.css → plugin-dash.css --}}
+{{-- Leidend design system (IUASR/iuasr-sis). Laadvolgorde: sis.css → plugin-dash.css --}}
 <link rel="stylesheet" href="{{ asset('assets/css/sis.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/css/iuasr-plugin-dash.css') }}">
 @stack('head')
 </head>
-<body>
+<body data-role="{{ auth()->user()?->rol?->value }}">
 
-<div id="sis-header"></div>
+{{-- Header + sidebar worden server-side gerenderd op basis van de ingelogde rol
+     (rolscheiding), niet vanuit de browser. --}}
+@include('partials.header')
 
 <div class="iuasr-dash-app">
-  <nav class="iuasr-dash-sidebar" id="sis-sidebar" aria-label="Hoofdmenu"></nav>
+  <nav class="iuasr-dash-sidebar" aria-label="Hoofdmenu">
+    @include('partials.sidebar')
+  </nav>
 
   <main class="iuasr-dash-main">
+    @if (session('status'))
+      <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-bottom:16px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span>{{ session('status') }}</span>
+      </div>
+    @endif
+
     @yield('inhoud')
   </main>
 </div>
 
-{{-- Rolbewuste shell (header + sidebar + rolwisselaar). In Fase 3 volgt de
-     rol uit de Entra-sessie i.p.v. localStorage; nu blijft de demo-wisselaar. --}}
-<script src="{{ asset('assets/js/sis-shell.js') }}"></script>
-<script>SIS.render({ active: '@yield('actief', 'dashboard')' });</script>
 @stack('scripts')
 </body>
 </html>
