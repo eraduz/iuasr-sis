@@ -33,6 +33,17 @@ npm install && npm run dev
 php artisan serve
 ```
 
+Draait de omgeving al (PHP + Composer + MariaDB geïnstalleerd)? Start dan alles
+in één keer met:
+
+```powershell
+.\scripts\dev.ps1   # PHP/Composer op pad, MariaDB (poort 3307) + php artisan serve
+```
+
+Zie **[docs/ONTWIKKELOMGEVING.md](docs/ONTWIKKELOMGEVING.md)** voor de volledige
+opzet, de poortkeuze (geen conflicten) en hoe lokaal zich verhoudt tot de latere
+**intranetserver**.
+
 Rol wisselen in de demo-shell kan via de rolwisselaar rechtsboven; de
 rolscheiding zelf wordt server-side afgedwongen (Gates + `rol`-middleware).
 

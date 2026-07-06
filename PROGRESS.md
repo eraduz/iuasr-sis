@@ -31,8 +31,11 @@ opleverpunt aantoonbaar klaar is.
   - Gedaan: Laravel 12-skelet, config (`sis.php`, `database.php`), rolscheiding
     (Gates + `rol`-middleware), Blade-layout gekoppeld aan het leidende design
     system, synthetische seeders, unit-test rolscheiding.
-  - Nog te doen: Entra ID/OIDC-integratie, TO-document, `composer install` +
-    `php artisan migrate --seed` daadwerkelijk draaien (PHP/Composer ontbreken nog).
+  - Gedaan (deze sessie): PHP 8.3.32 + Composer 2.10 + portable MariaDB 11.4.9
+    geïnstalleerd (user-profiel, geen admin); `composer install`,
+    `php artisan migrate --seed` en de testsuite draaien groen; de app boot op
+    `http://127.0.0.1:8000` (dashboard + SSO-login geven HTTP 200).
+  - Nog te doen: Entra ID/OIDC-integratie, TO-document.
 - [ ] **Fase 3 — Kern-CRUD**
   - Student/inschrijving/opleiding-beheer door SZ (identiteit, geen cijfers).
 - [ ] **Fase 4 — Cijfers + rolscheiding**
@@ -86,6 +89,8 @@ Deze zijn nog niet vastgesteld. Vraag de opdrachtgever; verzin geen waarden.
 | 2026-07-06 | Rolscheiding server-side: `Rol`-enum, Gates (`AutorisatieServiceProvider`) en `rol`-middleware. |
 | 2026-07-06 | Leidend design system: `IUASR/iuasr-sis` overgenomen naar `public/assets` en gekoppeld aan Blade-layout. |
 | 2026-07-06 | Openstaande parameters bewust `null` in `config/sis.php` en op `opleidingen` (voldoende_grens, ec_overgang_drempel, studentnummerlengte) — niet zelf ingevuld. |
+| 2026-07-06 | Lokale toolchain: PHP 8.3.32 + Composer 2.10 + portable MariaDB 11.4.9 (poort 3307, user-profiel, geen service/admin). |
+| 2026-07-06 | Database NIET in Git: schema via migraties, data via synthetische seeders; `.env` per omgeving (lokaal↔intranet). Zie docs/ONTWIKKELOMGEVING.md. |
 
 ---
 
@@ -105,11 +110,14 @@ Deze zijn nog niet vastgesteld. Vraag de opdrachtgever; verzin geen waarden.
 
 ## Aandachtspunten voor volgende sessie
 
-- **PHP en Composer ontbreken** op de ontwikkelmachine. Het Laravel-skelet is
-  met de hand gescaffold en is klaar voor `composer install`. Installeer PHP ^8.2
-  en Composer, draai daarna `composer install`, `php artisan key:generate` en
-  `php artisan migrate --seed`. Pas dán kan `php -l`/tests groen worden bevestigd.
-  Node 24 en npm 11 zijn aanwezig.
+- **Toolchain staat en draait.** PHP 8.3.32 (`%USERPROFILE%\php\8.3`), Composer
+  (`%USERPROFILE%\bin`) en portable MariaDB 11.4.9 (poort 3307) zijn geïnstalleerd
+  en op het user-PATH. Start alles met `.\scripts\dev.ps1`. Volledige uitleg en
+  het lokaal↔intranet-verhaal staan in **docs/ONTWIKKELOMGEVING.md**.
+- **OneDrive-quirk:** de repo staat in OneDrive; PHP's `is_writable()` ziet mappen
+  daar ten onrechte als niet-schrijfbaar (ReadOnly-attribuut). `scripts\dev.ps1`
+  haalt dat bit weg. Advies: projectmap naar een pad buiten OneDrive verplaatsen
+  (bijv. `C:\dev\iuasr-sis`) voor stabiel ontwikkelen.
 - **Design system is leidend uit `IUASR/iuasr-sis`.** De overige mappen onder
   `IUASR/` (homepage, aanmeldportaal, pages) horen bij een andere/ publieke site
   en zijn NIET leidend voor het interne SIS. De 23 genummerde schermen in
