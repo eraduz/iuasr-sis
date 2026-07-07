@@ -36,6 +36,13 @@
   </div>
 </div>
 
+@if ($vak->toetsonderdelen->isEmpty())
+  <div class="iuasr-dash-alert iuasr-dash-alert--warn" style="margin-bottom:16px;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    <span>Dit vak heeft nog <b>geen toetsonderdelen</b>. Cijfers kunnen pas worden ingevoerd zodra de toetsopbouw is vastgelegd.</span>
+  </div>
+@endif
+
 <form id="cijfergrid" method="POST" action="{{ route('vakken.cijfers.opslaan', $vak) }}">
   @csrf
   <div class="iuasr-dash-tbl-card">

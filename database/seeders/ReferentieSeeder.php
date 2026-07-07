@@ -124,11 +124,13 @@ class ReferentieSeeder extends Seeder
             ['ISLTH-TAF-220', 'Tafsīr I', 6, 2, 3, $boujat],
         ];
         foreach ($curriculum as [$code, $naam, $ec, $leerjaar, $blok, $docent]) {
-            Vak::create([
+            $v = Vak::create([
                 'opleiding_id' => $theologie->id, 'docent_id' => $docent?->id,
                 'code' => $code, 'naam' => $naam, 'ec' => $ec,
                 'leerjaar' => $leerjaar, 'blok' => $blok, 'actief' => true,
             ]);
+            // Standaard toetsopbouw zodat het vak direct beoordeelbaar is.
+            Toetsonderdeel::create(['vak_id' => $v->id, 'code' => 'TEN', 'naam' => 'Tentamen', 'type' => 'tentamen', 'weging' => 1.00, 'telt_mee' => true, 'volgorde' => 1]);
         }
     }
 }

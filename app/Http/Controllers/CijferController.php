@@ -41,7 +41,9 @@ class CijferController extends Controller
 
         $rijen = $vakken->map(function (Vak $vak) use ($lijsten) {
             $deelnemers = $vak->deelnemers()->get();
+            // Alleen resultaten van DIT vak tellen (via de eigen toetsonderdelen).
             $ingevoerd = Resultaat::whereIn('inschrijving_id', $deelnemers->pluck('id'))
+                ->whereIn('toetsonderdeel_id', $vak->toetsonderdelen->pluck('id'))
                 ->distinct()->pluck('inschrijving_id')->count();
 
             return [

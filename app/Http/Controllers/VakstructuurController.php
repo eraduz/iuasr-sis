@@ -46,7 +46,13 @@ class VakstructuurController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->valideer($request);
-        Vak::create($data + ['actief' => true]);
+        $vak = Vak::create($data + ['actief' => true]);
+
+        // Standaard toetsopbouw zodat het vak direct beoordeelbaar is (later te verfijnen).
+        $vak->toetsonderdelen()->create([
+            'code' => 'TEN', 'naam' => 'Tentamen', 'type' => 'tentamen',
+            'weging' => 1.00, 'telt_mee' => true, 'volgorde' => 1,
+        ]);
 
         return redirect()->to(route('vakstructuur', ['opleiding' => $data['opleiding_id']]).'#lj'.$data['leerjaar'])
             ->with('status', 'Vak toegevoegd aan de vakstructuur.');
