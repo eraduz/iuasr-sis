@@ -69,6 +69,11 @@ class ReferentieSeeder extends Seeder
             'soort' => 'cursus', 'nominale_jaren' => 1, 'ec_totaal' => null,
             'voldoende_grens' => null, 'ec_overgang_drempel' => null, 'actief' => true,
         ]);
+        Opleiding::create([
+            'faculteit_id' => $fiw->id, 'code' => 'ARAB', 'naam' => 'Cursus Arabisch',
+            'soort' => 'cursus', 'nominale_jaren' => 1, 'ec_totaal' => null,
+            'voldoende_grens' => null, 'ec_overgang_drempel' => null, 'actief' => true,
+        ]);
 
         // Klassen (opleiding + leerjaar).
         for ($jaar = 1; $jaar <= 4; $jaar++) {
