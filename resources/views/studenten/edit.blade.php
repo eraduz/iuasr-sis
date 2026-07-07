@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('titel', 'Gegevens muteren')
+@section('titel', 'Wijzig gegevens')
 
 @section('inhoud')
-<div class="sis-crumb"><a href="{{ route('dashboard') }}">Dashboard</a><span class="sep">›</span><a href="{{ route('studenten.index') }}">Studenten</a><span class="sep">›</span><a href="{{ route('studenten.show', $student) }}">{{ $student->studentnummer }}</a><span class="sep">›</span><b>Muteren</b></div>
+<div class="sis-crumb"><a href="{{ route('dashboard') }}">Dashboard</a><span class="sep">›</span><a href="{{ route('studenten.index') }}">Studenten</a><span class="sep">›</span><a href="{{ route('studenten.show', $student) }}">{{ $student->studentnummer }}</a><span class="sep">›</span><b>Wijzigen</b></div>
 
 <div class="iuasr-dash-vhead">
   <div>
-    <h1>Gegevens muteren</h1>
+    <h1>Wijzig gegevens</h1>
     <div class="summary">{{ $student->volledigeNaam() }} · <b>{{ $student->studentnummer }}</b></div>
   </div>
 </div>

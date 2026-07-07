@@ -133,6 +133,37 @@
       @endif
     </div>
   </div>
+
+  {{-- Acties — direct beschikbaar bij de persoonsgegevens --}}
+  @if (auth()->user()->magInschrijvingBeheren())
+    <div class="sis-card" style="margin-top:16px;">
+      <div class="sis-card__hd"><h3>Acties</h3></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('studenten.edit', $student) }}">Wijzig gegevens</a>
+        @if ($financieel['achterstand'])
+          <span class="iuasr-dash-btn iuasr-dash-btn--sm" aria-disabled="true" title="Geblokkeerd wegens betalingsachterstand" style="opacity:.5;cursor:not-allowed;">Herinschrijven (geblokkeerd)</span>
+          <span class="iuasr-dash-btn iuasr-dash-btn--sm" aria-disabled="true" title="Geblokkeerd wegens betalingsachterstand" style="opacity:.5;cursor:not-allowed;">Verklaring (geblokkeerd)</span>
+        @else
+          <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('herinschrijven.form', $student) }}">Herinschrijven</a>
+          <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('verklaringen', ['student' => $student->id]) }}">Verklaring</a>
+        @endif
+        @if ($huidige)
+          {{-- Schorsen / opheffen met één klik --}}
+          <form method="POST" action="{{ route('studenten.schors', $student) }}" style="display:inline;">
+            @csrf
+            @if ($huidige->status === App\Enums\InschrijvingStatus::Geschorst)
+              <button type="submit" class="iuasr-dash-btn iuasr-dash-btn--sm">Schorsing opheffen</button>
+            @else
+              <button type="submit" class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger">Schorsen</button>
+            @endif
+          </form>
+          @if ($huidige->status !== App\Enums\InschrijvingStatus::Uitgeschreven)
+            <a class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" href="{{ route('uitschrijven.form', $student) }}">Uitschrijven</a>
+          @endif
+        @endif
+      </div>
+    </div>
+  @endif
 </section>
 
 {{-- PANEEL: Inschrijving --}}
@@ -168,36 +199,6 @@
           @endforelse
         </ul>
       </div>
-
-      @if (auth()->user()->magInschrijvingBeheren())
-        <div class="sis-card">
-          <div class="sis-card__hd"><h3>Acties</h3></div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('studenten.edit', $student) }}">Gegevens muteren</a>
-            @if ($financieel['achterstand'])
-              <span class="iuasr-dash-btn iuasr-dash-btn--sm" aria-disabled="true" title="Geblokkeerd wegens betalingsachterstand" style="opacity:.5;cursor:not-allowed;">Herinschrijven (geblokkeerd)</span>
-              <span class="iuasr-dash-btn iuasr-dash-btn--sm" aria-disabled="true" title="Geblokkeerd wegens betalingsachterstand" style="opacity:.5;cursor:not-allowed;">Verklaring (geblokkeerd)</span>
-            @else
-              <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('herinschrijven.form', $student) }}">Herinschrijven</a>
-              <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('verklaringen', ['student' => $student->id]) }}">Verklaring</a>
-            @endif
-            @if ($huidige)
-              {{-- Schorsen / opheffen met één klik --}}
-              <form method="POST" action="{{ route('studenten.schors', $student) }}" style="display:inline;">
-                @csrf
-                @if ($huidige->status === App\Enums\InschrijvingStatus::Geschorst)
-                  <button type="submit" class="iuasr-dash-btn iuasr-dash-btn--sm">Schorsing opheffen</button>
-                @else
-                  <button type="submit" class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger">Schorsen</button>
-                @endif
-              </form>
-              @if ($huidige->status !== App\Enums\InschrijvingStatus::Uitgeschreven)
-                <a class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" href="{{ route('uitschrijven.form', $student) }}">Uitschrijven</a>
-              @endif
-            @endif
-          </div>
-        </div>
-      @endif
     </div>
   </div>
 
