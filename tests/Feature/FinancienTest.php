@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\Enums\Rol;
+use App\Models\Betaling;
 use App\Models\CollegegeldTarief;
 use App\Models\Periode;
 use App\Models\Student;
 use App\Models\User;
 use App\Support\Collegegeldstatus;
+use Illuminate\Http\UploadedFile;
 use Database\Seeders\GebruikerSeeder;
 use Database\Seeders\ReferentieSeeder;
 use Database\Seeders\SynthetischeStudentSeeder;
@@ -139,6 +141,38 @@ class FinancienTest extends TestCase
         $this->actingAs($this->sz)->get(route('financien'))->assertForbidden();
         $student = Student::first();
         $this->actingAs($this->sz)->post(route('financien.betaling', $student), [])->assertForbidden();
+    }
+
+    public function test_betalingen_bulk_import_uit_csv(): void
+    {
+        $csv = "studentnummer;bedrag;datum;betaalwijze;opmerking\r\n"
+            ."261013;1000,00;15-09-2025;overboeking;jaarbetaling\r\n"
+            ."261014;500,00;15-09-2025;termijn;\r\n"
+            ."999999;100,00;15-09-2025;;\r\n"; // onbekend studentnummer -> overslaan
+
+        $file = UploadedFile::fake()->createWithContent('betalingen.csv', $csv);
+        $this->actingAs($this->fin)->post(route('financien.import'), ['bestand' => $file])
+            ->assertRedirect(route('financien'))
+            ->assertSessionHas('import_resultaat');
+
+        // Alleen de twee bestaande studenten zijn geïmporteerd.
+        $this->assertSame(2, Betaling::count());
+        $this->assertEqualsWithDelta(1000.00, (float) Student::where('studentnummer', '261013')->first()->betalingen()->sum('bedrag'), 0.01);
+        $this->assertCount(1, session('import_resultaat')['fouten']);
+    }
+
+    public function test_import_weigert_niet_csv_bestand(): void
+    {
+        $file = UploadedFile::fake()->create('betalingen.xlsx', 10);
+        $this->actingAs($this->fin)->post(route('financien.import'), ['bestand' => $file])
+            ->assertSessionHasErrors('bestand');
+        $this->assertSame(0, Betaling::count());
+    }
+
+    public function test_studentenzaken_mag_niet_importeren(): void
+    {
+        $this->actingAs($this->sz)->get(route('financien.import.sjabloon'))->assertForbidden();
+        $this->actingAs($this->sz)->post(route('financien.import'), [])->assertForbidden();
     }
 
     public function test_verklaring_wordt_geblokkeerd_bij_achterstand(): void

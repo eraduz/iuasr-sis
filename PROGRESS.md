@@ -82,6 +82,12 @@ opleverpunt aantoonbaar klaar is.
     actieve studiejaar is verzet naar 2025-2026 zodat "vandaag" binnen het
     lopende jaar valt. 54 tests groen (o.a. pro rata uitschrijven en
     terugbetaling).
+  - Increment 4: bulk-import van betalingen via CSV (Financiële Administratie).
+    Upload op het Financiën-scherm met downloadbaar sjabloon; detecteert `;`/`,`
+    als scheidingsteken en Nederlandse bedragnotatie, koppelt per studentnummer
+    aan de meest recente inschrijving, en toont een samenvatting (geïmporteerd /
+    overgeslagen met reden per regel). Geen externe dependency (fgetcsv). 61
+    tests groen.
   - Nog te doen: leerjaar-herbeoordeling op EC-drempel (zodra per opleiding
     ingevuld), herkansing als aparte poging (nu één rij per onderdeel).
 - [ ] **Fase 5 — Rapporten + documenten**
