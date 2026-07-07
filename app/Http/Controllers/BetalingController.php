@@ -21,11 +21,19 @@ class BetalingController extends Controller
     {
         $zoek = trim((string) $request->query('q', ''));
 
+        $alle = Student::with(['inschrijvingen.periode', 'betalingen'])->get()
+            ->map(fn (Student $s) => ['student' => $s, 'status' => Collegegeldstatus::voor($s)]);
+
         // Studenten met een openstaande schuld.
-        $achterstanden = Student::with(['inschrijvingen', 'betalingen'])->get()
-            ->map(fn (Student $s) => ['student' => $s, 'status' => Collegegeldstatus::voor($s)])
-            ->filter(fn ($r) => $r['status']['achterstand'])
+        $achterstanden = $alle
+            ->filter(fn ($r) => $r['status']['openstaand'] > 0)
             ->sortByDesc(fn ($r) => $r['status']['openstaand'])
+            ->values();
+
+        // Studenten die teveel hebben betaald (terugbetaling).
+        $terugbetalingen = $alle
+            ->filter(fn ($r) => $r['status']['terugbetaling'] > 0)
+            ->sortByDesc(fn ($r) => $r['status']['terugbetaling'])
             ->values();
 
         $resultaten = $zoek !== ''
@@ -35,7 +43,7 @@ class BetalingController extends Controller
                 ->orderBy('studentnummer')->limit(20)->get()
             : collect();
 
-        return view('financien.index', compact('achterstanden', 'resultaten', 'zoek'));
+        return view('financien.index', compact('achterstanden', 'terugbetalingen', 'resultaten', 'zoek'));
     }
 
     public function student(Student $student): View
@@ -43,10 +51,12 @@ class BetalingController extends Controller
         $student->load(['inschrijvingen.opleiding', 'inschrijvingen.periode', 'betalingen.geregistreerdDoor']);
         $status = Collegegeldstatus::voor($student);
 
-        // Per inschrijving het verschuldigde tarief tonen.
+        // Per inschrijving het (pro rata) verschuldigde bedrag tonen.
         $regels = $student->inschrijvingen->sortByDesc('inschrijfdatum')->map(fn ($i) => [
             'inschrijving' => $i,
             'tarief' => Collegegeldstatus::tarief($i),
+            'maanden' => Collegegeldstatus::maanden($i),
+            'verschuldigd' => Collegegeldstatus::verschuldigd($i),
         ]);
 
         return view('financien.student', compact('student', 'status', 'regels'));

@@ -35,13 +35,19 @@ class ReferentieSeeder extends Seeder
             Nationaliteit::create(['naam' => $n]);
         }
 
-        Periode::create([
-            'code' => '2026-2027', 'naam' => 'Studiejaar 2026 / 2027',
-            'startdatum' => '2026-09-01', 'einddatum' => '2027-08-31', 'actief' => true,
-        ]);
+        // Studiejaar loopt van 1 september t/m 31 juli. Het huidige studiejaar
+        // (2025-2026) is actief; 2026-2027 is het komende jaar.
         Periode::create([
             'code' => '2025-2026', 'naam' => 'Studiejaar 2025 / 2026',
-            'startdatum' => '2025-09-01', 'einddatum' => '2026-08-31', 'actief' => false,
+            'startdatum' => '2025-09-01', 'einddatum' => '2026-07-31', 'actief' => true,
+        ]);
+        Periode::create([
+            'code' => '2026-2027', 'naam' => 'Studiejaar 2026 / 2027',
+            'startdatum' => '2026-09-01', 'einddatum' => '2027-07-31', 'actief' => false,
+        ]);
+        Periode::create([
+            'code' => '2024-2025', 'naam' => 'Studiejaar 2024 / 2025',
+            'startdatum' => '2024-09-01', 'einddatum' => '2025-07-31', 'actief' => false,
         ]);
 
         // Docenten (synthetisch — komen overeen met de mockups).

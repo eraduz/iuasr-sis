@@ -62,7 +62,7 @@ class LifecycleTest extends TestCase
 
     public function test_herinschrijven_behoudt_studentnummer_en_maakt_nieuwe_inschrijving(): void
     {
-        $nieuwe = Periode::where('code', '2025-2026')->first();
+        $nieuwe = Periode::where('code', '2026-2027')->first();
 
         $this->actingAs($this->sz)->post(route('herinschrijven.store', $this->student), [
             'periode_id' => $nieuwe->id,

@@ -69,9 +69,10 @@ class SynthetischeStudentSeeder extends Seeder
                 'periode_id' => $periode->id,
                 'leerjaar' => $leerjaar,
                 'status' => $status,
-                'inschrijfdatum' => '2026-09-01',
-                'invoerdatum' => '2026-08-20',
-                'uitschrijfdatum' => $status === InschrijvingStatus::Uitgeschreven ? '2026-10-31' : null,
+                'inschrijfdatum' => '2025-09-01',
+                'invoerdatum' => '2025-08-20',
+                // Uitgeschreven per einde uitschrijfmaand (december) -> 4 maanden ingeschreven.
+                'uitschrijfdatum' => $status === InschrijvingStatus::Uitgeschreven ? '2025-12-31' : null,
             ]);
         }
     }

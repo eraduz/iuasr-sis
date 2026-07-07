@@ -94,6 +94,40 @@
         </dl>
       </div>
 
+      {{-- Collegegeld — pro rata o.b.v. inschrijvingsduur, altijd actueel --}}
+      @if (auth()->user()->magFinancieelInzien())
+        <div class="sis-card" style="margin-top:16px;">
+          <div class="sis-card__hd"><h3>Collegegeld</h3><span class="hint">pro rata · studiejaar 1 sep – 31 jul</span></div>
+          @if ($financieel['jaarbedrag'] === null)
+            <p class="sis-muted" style="font-size:13px;margin:0;">Geen collegegeldtarief ingesteld voor dit studiejaar.</p>
+          @else
+            <dl class="sis-dl">
+              <dt>Jaarcollegegeld</dt><dd>€ {{ number_format($financieel['jaarbedrag'], 2, ',', '.') }}</dd>
+              <dt>Maandbedrag</dt><dd>€ {{ number_format($financieel['maandbedrag'], 2, ',', '.') }} <span class="sis-muted" style="font-size:11px;">· ÷ 12</span></dd>
+              <dt>Ingeschreven</dt><dd>{{ $financieel['maanden'] }} {{ $financieel['maanden'] === 1 ? 'maand' : 'maanden' }}</dd>
+              <dt>Verschuldigd</dt><dd><b>€ {{ number_format($financieel['verschuldigd'], 2, ',', '.') }}</b> <span class="sis-muted" style="font-size:11px;">o.b.v. huidige maand</span></dd>
+              <dt>Betaald</dt><dd>€ {{ number_format($financieel['betaald'], 2, ',', '.') }}</dd>
+            </dl>
+            @if ($financieel['openstaand'] > 0)
+              <div class="iuasr-dash-alert iuasr-dash-alert--danger" style="margin-top:12px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <span>Nog te betalen: <b>€ {{ number_format($financieel['openstaand'], 2, ',', '.') }}</b></span>
+              </div>
+            @elseif ($financieel['terugbetaling'] > 0)
+              <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-top:12px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                <span>Terug te betalen aan student: <b>€ {{ number_format($financieel['terugbetaling'], 2, ',', '.') }}</b></span>
+              </div>
+            @else
+              <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-top:12px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                <span>Collegegeld volledig voldaan.</span>
+              </div>
+            @endif
+          @endif
+        </div>
+      @endif
+
       {{-- Interne notities — direct onder Contact, altijd zichtbaar (Studentenzaken/Beheer) --}}
       @if (auth()->user()->magInschrijvingBeheren())
         <div class="sis-card" id="notities" style="margin-top:16px;">

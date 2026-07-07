@@ -58,7 +58,17 @@ class InschrijvingActiesController extends Controller
         $huidige = $this->huidige($student);
         abort_if($huidige === null, 404, 'Geen inschrijving om uit te schrijven.');
 
-        return view('inschrijven.uitschrijven', compact('student', 'huidige'));
+        // Financieel gevolg (pro rata) — voor live-berekening op het formulier.
+        $jaarbedrag = \App\Support\Collegegeldstatus::tarief($huidige);
+        $fin = [
+            'jaarbedrag' => $jaarbedrag,
+            'maandbedrag' => $jaarbedrag !== null ? round($jaarbedrag / 12, 2) : null,
+            'startjaar' => $huidige->periode?->startdatum?->year
+                ?? (int) substr((string) $huidige->periode?->code, 0, 4),
+            'betaald' => (float) $student->betalingen()->sum('bedrag'),
+        ];
+
+        return view('inschrijven.uitschrijven', compact('student', 'huidige', 'fin'));
     }
 
     public function uitschrijven(Request $request, Student $student): RedirectResponse

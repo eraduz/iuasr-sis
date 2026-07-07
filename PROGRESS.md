@@ -72,6 +72,16 @@ opleverpunt aantoonbaar klaar is.
     vastgestelde lijst corrigeren (gelogd). Resultaten worden bij vaststellen
     definitief. Status zichtbaar in mijn-vakken, cijferoverzicht en op het
     examencommissie-dashboard ("ter vaststelling"). 52 tests groen.
+  - Increment 3: pro rata collegegeld. `Collegegeldstatus` berekent verschuldigd =
+    jaartarief ÷ 12 × maanden ingeschreven (studiejaar 1 sep – 31 jul;
+    uitschrijfdatum t/m einde uitschrijfmaand; lopende inschrijving telt t/m de
+    huidige maand). Studentpagina en Financiën tonen jaarbedrag, maandbedrag,
+    maanden, verschuldigd, betaald en het saldo (openstaand óf terugbetaling).
+    Financiën-overzicht heeft aparte lijsten voor achterstanden en
+    terugbetalingen; het uitschrijfformulier berekent het gevolg live. Het
+    actieve studiejaar is verzet naar 2025-2026 zodat "vandaag" binnen het
+    lopende jaar valt. 54 tests groen (o.a. pro rata uitschrijven en
+    terugbetaling).
   - Nog te doen: leerjaar-herbeoordeling op EC-drempel (zodra per opleiding
     ingevuld), herkansing als aparte poging (nu één rij per onderdeel).
 - [ ] **Fase 5 — Rapporten + documenten**

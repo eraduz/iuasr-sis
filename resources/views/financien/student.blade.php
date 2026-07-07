@@ -12,8 +12,10 @@
       <h2 class="iuasr-dash-candidate__name">{{ $student->volledigeNaam() }}</h2>
       <div class="iuasr-dash-candidate__meta"><span>Studentnr. <b>{{ $student->studentnummer }}</b></span></div>
     </div>
-    @if ($status['achterstand'])
-      <span class="iuasr-dash-status s-rejected" style="align-self:flex-start;">Achterstand € {{ number_format($status['openstaand'], 2, ',', '.') }}</span>
+    @if ($status['openstaand'] > 0)
+      <span class="iuasr-dash-status s-rejected" style="align-self:flex-start;">Nog te betalen € {{ number_format($status['openstaand'], 2, ',', '.') }}</span>
+    @elseif ($status['terugbetaling'] > 0)
+      <span class="iuasr-dash-status s-submitted" style="align-self:flex-start;">Terugbetaling € {{ number_format($status['terugbetaling'], 2, ',', '.') }}</span>
     @else
       <span class="iuasr-dash-status s-approved" style="align-self:flex-start;">Voldaan</span>
     @endif
@@ -21,27 +23,33 @@
 </div>
 
 <div class="iuasr-dash-stats" style="grid-template-columns:repeat(3,1fr);">
-  <div class="iuasr-dash-stat"><span class="lbl">Verschuldigd</span><span class="val" style="font-size:22px;">€ {{ number_format($status['verschuldigd'], 2, ',', '.') }}</span></div>
+  <div class="iuasr-dash-stat"><span class="lbl">Verschuldigd (pro rata)</span><span class="val" style="font-size:22px;">€ {{ number_format($status['verschuldigd'], 2, ',', '.') }}</span><span class="delta">{{ $status['maanden'] }} {{ $status['maanden'] === 1 ? 'maand' : 'maanden' }} ingeschreven</span></div>
   <div class="iuasr-dash-stat"><span class="lbl">Betaald</span><span class="val" style="font-size:22px;">€ {{ number_format($status['betaald'], 2, ',', '.') }}</span></div>
-  <div class="iuasr-dash-stat {{ $status['achterstand'] ? 'iuasr-dash-stat--alert' : 'iuasr-dash-stat--ok' }}"><span class="lbl">Openstaand</span><span class="val" style="font-size:22px;">€ {{ number_format($status['openstaand'], 2, ',', '.') }}</span></div>
+  @if ($status['terugbetaling'] > 0)
+    <div class="iuasr-dash-stat iuasr-dash-stat--alert"><span class="lbl">Terug te betalen</span><span class="val" style="font-size:22px;">€ {{ number_format($status['terugbetaling'], 2, ',', '.') }}</span><span class="delta">teveel betaald</span></div>
+  @else
+    <div class="iuasr-dash-stat {{ $status['achterstand'] ? 'iuasr-dash-stat--alert' : 'iuasr-dash-stat--ok' }}"><span class="lbl">Openstaand</span><span class="val" style="font-size:22px;">€ {{ number_format($status['openstaand'], 2, ',', '.') }}</span><span class="delta">saldo</span></div>
+  @endif
 </div>
 
 <div class="sis-grid-2">
   <div>
     <div class="sis-card">
-      <div class="sis-card__hd"><h3>Verschuldigd per studiejaar</h3></div>
+      <div class="sis-card__hd"><h3>Verschuldigd per studiejaar</h3><span class="hint">pro rata · jaartarief ÷ 12 × maanden</span></div>
       <div class="iuasr-dash-tbl-card" style="border:0;">
         <table class="iuasr-dash-tbl">
-          <thead><tr><th>Studiejaar</th><th>Opleiding</th><th>Tarief</th></tr></thead>
+          <thead><tr><th>Studiejaar</th><th>Opleiding</th><th style="text-align:right;">Jaartarief</th><th style="text-align:center;">Maanden</th><th style="text-align:right;">Verschuldigd</th></tr></thead>
           <tbody>
             @forelse ($regels as $r)
               <tr>
-                <td class="nm">{{ $r['inschrijving']->periode?->naam ?? '—' }}</td>
+                <td class="nm">{{ $r['inschrijving']->periode?->naam ?? '—' }}<small>{{ $r['inschrijving']->status->label() }}</small></td>
                 <td>{{ $r['inschrijving']->opleiding?->code ?? '—' }}</td>
-                <td class="tnum">{{ $r['tarief'] !== null ? '€ '.number_format($r['tarief'], 2, ',', '.') : 'geen tarief' }}</td>
+                <td class="tnum" style="text-align:right;">{{ $r['tarief'] !== null ? '€ '.number_format($r['tarief'], 2, ',', '.') : 'geen tarief' }}</td>
+                <td class="tnum" style="text-align:center;">{{ $r['maanden'] }}</td>
+                <td class="tnum" style="text-align:right;"><b>€ {{ number_format($r['verschuldigd'], 2, ',', '.') }}</b></td>
               </tr>
             @empty
-              <tr><td colspan="3" style="color:var(--blackAltText);padding:14px;">Geen inschrijvingen.</td></tr>
+              <tr><td colspan="5" style="color:var(--blackAltText);padding:14px;">Geen inschrijvingen.</td></tr>
             @endforelse
           </tbody>
         </table>
