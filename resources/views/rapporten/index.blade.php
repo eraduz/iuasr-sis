@@ -15,12 +15,20 @@
 <div class="sis-card" style="margin-bottom:18px;">
   <div class="sis-card__hd"><h3>1 · Kies rapporttype</h3></div>
   <div class="sis-choicegrid">
-    <div class="sis-choice is-selected">
+    <a class="sis-choice is-selected" href="{{ route('rapporten.alumni') }}">
+      <span class="sis-choice__ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2 3 6 3s6-2 6-3v-5"/></svg></span>
+      <h4>Alumni</h4>
+      <p>Afgestudeerde studenten met contactgegevens: naam, telefoon en e-mail.</p>
+      <span class="tag">Studentenzaken &amp; Directie</span>
+    </a>
+    @if (auth()->user()->magInschrijvingBeheren())
+    <div class="sis-choice">
       <span class="sis-choice__ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
       <h4>Klassenlijst</h4>
       <p>Alle studenten per klas met studentnummer en status. Voor presentie en administratie.</p>
       <span class="tag">geen cijfers · beschikbaar</span>
     </div>
+    @endif
     <div class="sis-choice" style="opacity:.55;">
       <span class="sis-choice__ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
       <h4>Examen-/tentamenlijst</h4>
@@ -42,6 +50,7 @@
   </div>
 </div>
 
+@if (auth()->user()->magInschrijvingBeheren())
 <form method="GET" action="{{ route('rapporten.klassenlijst') }}" class="sis-grid-2--even">
   <div class="sis-card sis-form">
     <div class="sis-card__hd"><h3>2 · Selectie</h3></div>
@@ -72,4 +81,5 @@
     <p class="sis-tblnote" style="margin-top:12px;">De klassenlijst bevat <b>geen cijfers</b> en is beschikbaar voor Studentenzaken.</p>
   </div>
 </form>
+@endif
 @endsection

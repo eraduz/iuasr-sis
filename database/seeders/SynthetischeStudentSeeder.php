@@ -51,6 +51,7 @@ class SynthetischeStudentSeeder extends Seeder
                 'geboorteplaats' => $plaats,
                 'nationaliteit_id' => $nlId,
                 'email' => strtolower(substr($voornaam, 0, 1)).'.'.strtolower(str_replace([' ', 'ï', 'İ'], ['', 'i', 'i'], $achternaam)).'@student.iuasr.nl',
+                'telefoon' => '06 '.implode(' ', str_split(substr($nr, -6), 2)), // synthetisch
             ]);
 
             Inschrijving::create([

@@ -50,4 +50,23 @@ class RapportController extends Controller
 
         return view('rapporten.klassenlijst', compact('inschrijvingen', 'opleiding', 'periode', 'klas'));
     }
+
+    /**
+     * Alumni-rapport: afgestudeerde studenten met contactgegevens (naam,
+     * telefoon, e-mail). Zichtbaar voor Studentenzaken en Directie. Bevat geen
+     * cijfers of BSN.
+     */
+    public function alumni(): View
+    {
+        // Alleen studenten waarvan de MEEST RECENTE inschrijving 'afgestudeerd' is.
+        $alumni = Inschrijving::query()
+            ->with(['student', 'opleiding'])
+            ->where('status', 'afgestudeerd')
+            ->whereRaw('inschrijvingen.inschrijfdatum = (select max(i2.inschrijfdatum) from inschrijvingen i2 where i2.student_id = inschrijvingen.student_id)')
+            ->get()
+            ->sortBy(fn ($i) => $i->student->achternaam)
+            ->values();
+
+        return view('rapporten.alumni', compact('alumni'));
+    }
 }

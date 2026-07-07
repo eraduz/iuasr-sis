@@ -90,6 +90,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/rapporten-inzage', [RapportController::class, 'index'])->name('rapporten.inzage');
     });
 
+    // --- Alumni-rapport — Studentenzaken & Directie ---
+    Route::middleware('rol:studentenzaken,directie')->group(function () {
+        Route::get('/rapporten/alumni', [RapportController::class, 'alumni'])->name('rapporten.alumni');
+    });
+
     // --- Beheer — Beheerder ---
     Route::middleware('rol:beheerder')->group(function () {
         Route::get('/gebruikers', [GebruikerController::class, 'index'])->name('gebruikers');
