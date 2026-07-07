@@ -68,20 +68,20 @@ class ReferentieController extends Controller
                 ],
             ],
             'perioden' => [
-                'model' => Periode::class, 'enkel' => 'Periode', 'meer' => 'Perioden',
+                'model' => Periode::class, 'enkel' => 'Studiejaar', 'meer' => 'Studiejaren',
                 'kolommen' => [
                     'Code' => fn ($m) => $m->code,
                     'Naam' => fn ($m) => $m->naam,
                     'Start' => fn ($m) => $m->startdatum?->format('d-m-Y') ?? '—',
                     'Einde' => fn ($m) => $m->einddatum?->format('d-m-Y') ?? '—',
-                    'Actief' => fn ($m) => $m->actief ? 'Ja' : 'Nee',
+                    'Huidig' => fn ($m) => $m->actief ? 'Ja' : 'Nee',
                 ],
                 'velden' => [
                     'code' => ['label' => 'Code', 'type' => 'text', 'rules' => 'required|string|max:20', 'hint' => 'bv. 2026-2027'],
-                    'naam' => ['label' => 'Naam', 'type' => 'text', 'rules' => 'required|string|max:255'],
-                    'startdatum' => ['label' => 'Startdatum', 'type' => 'date', 'rules' => 'nullable|date'],
-                    'einddatum' => ['label' => 'Einddatum', 'type' => 'date', 'rules' => 'nullable|date|after_or_equal:startdatum'],
-                    'actief' => ['label' => 'Actief (huidig studiejaar)', 'type' => 'checkbox'],
+                    'naam' => ['label' => 'Naam', 'type' => 'text', 'rules' => 'required|string|max:255', 'hint' => 'bv. Studiejaar 2026 / 2027'],
+                    'startdatum' => ['label' => 'Startdatum', 'type' => 'date', 'rules' => 'nullable|date', 'hint' => '1 september'],
+                    'einddatum' => ['label' => 'Einddatum', 'type' => 'date', 'rules' => 'nullable|date|after_or_equal:startdatum', 'hint' => '31 juli'],
+                    'actief' => ['label' => 'Huidig studiejaar', 'type' => 'checkbox', 'hint' => 'Aanvinken activeert dit jaar en deactiveert automatisch het vorige.'],
                 ],
             ],
             'klassen' => [
