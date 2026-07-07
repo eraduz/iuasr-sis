@@ -29,7 +29,7 @@ class SynthetischeStudentSeeder extends Seeder
         // [studentnummer, voornaam, achternaam, geslacht, geb.datum, plaats, opleidingcode, klascode, leerjaar, status]
         $set = [
             ['261001', 'Yasmin', 'Demir', 'V', '2004-03-14', 'Rotterdam', 'ISLTH', 'IT-1', 1, InschrijvingStatus::Actief],
-            ['261002', 'Mehmet', 'Akın', 'M', '2003-11-02', 'Den Haag', 'MGV', 'MGV-D', 1, InschrijvingStatus::Onderbroken],
+            ['261002', 'Mehmet', 'Akın', 'M', '2003-11-02', 'Den Haag', 'MGV', 'MGV-D', 1, InschrijvingStatus::Actief],
             ['261003', 'Aïsha', 'El Bouzidi', 'V', '2005-06-21', 'Utrecht', 'PABO', 'PB-1A', 1, InschrijvingStatus::Actief],
             ['261004', 'Rachid', 'Belhaj', 'M', '2002-09-30', 'Amsterdam', 'ISLTH', null, 3, InschrijvingStatus::Uitgeschreven],
             ['261005', 'Sara', 'El Idrissi', 'V', '2004-01-18', 'Rotterdam', 'PABO', 'PB-2B', 2, InschrijvingStatus::Actief],

@@ -11,7 +11,6 @@ enum InschrijvingStatus: string
     case Aangemeld = 'aangemeld';
     case Actief = 'actief';
     case Geschorst = 'geschorst';
-    case Onderbroken = 'onderbroken';
     case Uitgeschreven = 'uitgeschreven';
     case Afgestudeerd = 'afgestudeerd';
 
@@ -21,7 +20,6 @@ enum InschrijvingStatus: string
             self::Aangemeld => 'Aangemeld',
             self::Actief => 'Actief',
             self::Geschorst => 'Geschorst',
-            self::Onderbroken => 'Onderbroken',
             self::Uitgeschreven => 'Uitgeschreven',
             self::Afgestudeerd => 'Afgestudeerd',
         };
@@ -34,7 +32,6 @@ enum InschrijvingStatus: string
             self::Aangemeld => 's-requested',
             self::Actief => 's-approved',
             self::Geschorst => 's-rejected',
-            self::Onderbroken => 's-incomplete',
             self::Uitgeschreven => 's-draft',
             self::Afgestudeerd => 's-pay',
         };
