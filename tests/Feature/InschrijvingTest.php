@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\Rol;
+use App\Enums\TaalNiveau;
 use App\Models\AuditLog;
 use App\Models\Opleiding;
 use App\Models\Periode;
@@ -47,6 +48,29 @@ class InschrijvingTest extends TestCase
         $this->assertDatabaseHas('audit_logs', ['onderwerp_type' => 'Student', 'actie' => 'aanmaak']);
         // BSN is niet vastgelegd in deze fase.
         $this->assertNull($student->getRawOriginal('bsn'));
+    }
+
+    public function test_inschrijven_slaat_taalbeheersing_op(): void
+    {
+        $this->seed(ReferentieSeeder::class);
+        $opleiding = Opleiding::where('code', 'ISLTH')->first();
+        $periode = Periode::where('actief', true)->first();
+
+        $this->actingAs($this->studentenzaken())->post('/inschrijven', [
+            'voornaam' => 'Taal',
+            'achternaam' => 'Beheersing',
+            'opleiding_id' => $opleiding->id,
+            'periode_id' => $periode->id,
+            'inschrijfdatum' => '2026-09-01',
+            'taal_nederlands' => 'onvoldoende',
+            'taal_arabisch' => 'goed',
+            'nt2_examen_vereist' => '1',
+        ]);
+
+        $student = Student::where('achternaam', 'Beheersing')->first();
+        $this->assertSame(TaalNiveau::Onvoldoende, $student->taal_nederlands);
+        $this->assertSame(TaalNiveau::Goed, $student->taal_arabisch);
+        $this->assertTrue($student->nt2_examen_vereist);
     }
 
     public function test_bsn_inzage_wordt_gelogd(): void

@@ -89,7 +89,10 @@ class StudentController extends Controller
             'adres' => ['nullable', 'string', 'max:255'],
             'postcode' => ['nullable', 'string', 'max:20'],
             'woonplaats' => ['nullable', 'string', 'max:255'],
+            'taal_nederlands' => ['nullable', \Illuminate\Validation\Rule::enum(\App\Enums\TaalNiveau::class)],
+            'taal_arabisch' => ['nullable', \Illuminate\Validation\Rule::enum(\App\Enums\TaalNiveau::class)],
         ]);
+        $data['nt2_examen_vereist'] = $request->boolean('nt2_examen_vereist');
 
         $gewijzigd = array_keys(array_diff_assoc($data, $student->only(array_keys($data))));
         $student->update($data);

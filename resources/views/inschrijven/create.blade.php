@@ -56,6 +56,35 @@
         </fieldset>
 
         <fieldset class="sis-fieldset" style="margin-top:8px;">
+          <legend>Taalbeheersing</legend>
+          <div class="sis-fld-row sis-fld-row--2">
+            <div class="sis-fld">
+              <label>Nederlandse taal</label>
+              <select name="taal_nederlands">
+                <option value="">— niet bekend —</option>
+                @foreach (App\Enums\TaalNiveau::cases() as $n)
+                  <option value="{{ $n->value }}" @selected(old('taal_nederlands') === $n->value)>{{ $n->label() }}</option>
+                @endforeach
+              </select>
+              <div class="help">Belangrijk voor toelating en begeleiding.</div>
+            </div>
+            <div class="sis-fld">
+              <label>Arabische taal</label>
+              <select name="taal_arabisch">
+                <option value="">— niet bekend —</option>
+                @foreach (App\Enums\TaalNiveau::cases() as $n)
+                  <option value="{{ $n->value }}" @selected(old('taal_arabisch') === $n->value)>{{ $n->label() }}</option>
+                @endforeach
+              </select>
+              <div class="help">Alleen ter informatie.</div>
+            </div>
+          </div>
+          <div class="sis-fld">
+            <label class="sis-check-inline"><input type="checkbox" name="nt2_examen_vereist" value="1" @checked(old('nt2_examen_vereist'))> Student moet nog een NT2-examen afleggen</label>
+          </div>
+        </fieldset>
+
+        <fieldset class="sis-fieldset" style="margin-top:8px;">
           <legend>Inschrijving</legend>
           <div class="sis-fld">
             <label>Opleiding <span class="req">*</span></label>

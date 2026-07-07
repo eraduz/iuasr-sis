@@ -44,6 +44,8 @@ class InschrijvingController extends Controller
             'postcode' => ['nullable', 'string', 'max:20'],
             'woonplaats' => ['nullable', 'string', 'max:255'],
             'telefoon' => ['nullable', 'string', 'max:40'],
+            'taal_nederlands' => ['nullable', Rule::enum(\App\Enums\TaalNiveau::class)],
+            'taal_arabisch' => ['nullable', Rule::enum(\App\Enums\TaalNiveau::class)],
             'opleiding_id' => ['required', Rule::exists('opleidingen', 'id')],
             'klas_id' => ['nullable', Rule::exists('klassen', 'id')],
             'periode_id' => ['required', Rule::exists('perioden', 'id')],
@@ -51,6 +53,7 @@ class InschrijvingController extends Controller
             'inschrijfdatum' => ['required', 'date'],
             'betaalwijze' => ['nullable', 'string', 'max:40'],
         ]);
+        $data['nt2_examen_vereist'] = $request->boolean('nt2_examen_vereist');
 
         $student = DB::transaction(function () use ($data) {
             $jaar = (int) date('Y', strtotime($data['inschrijfdatum']));
@@ -73,6 +76,9 @@ class InschrijvingController extends Controller
                         'postcode' => $data['postcode'] ?? null,
                         'woonplaats' => $data['woonplaats'] ?? null,
                         'telefoon' => $data['telefoon'] ?? null,
+                        'taal_nederlands' => $data['taal_nederlands'] ?? null,
+                        'taal_arabisch' => $data['taal_arabisch'] ?? null,
+                        'nt2_examen_vereist' => $data['nt2_examen_vereist'],
                         // BSN wordt hier bewust NIET vastgelegd (pas na akkoord FG).
                     ]);
                     break;

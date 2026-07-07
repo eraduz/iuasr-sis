@@ -40,6 +40,9 @@ class Student extends Model
         'email_prive',
         'vooropleiding',
         'diploma',
+        'taal_nederlands',
+        'taal_arabisch',
+        'nt2_examen_vereist',
         'bsn',
         'bsn_hash',
         'rekeningnummer',
@@ -50,6 +53,9 @@ class Student extends Model
     {
         return [
             'geboortedatum' => 'date',
+            'taal_nederlands' => \App\Enums\TaalNiveau::class,
+            'taal_arabisch' => \App\Enums\TaalNiveau::class,
+            'nt2_examen_vereist' => 'boolean',
             // Gevoelige velden: versleuteld opgeslagen (AVG).
             'bsn' => VersleuteldGevoeligVeld::class,
             'rekeningnummer' => VersleuteldGevoeligVeld::class,

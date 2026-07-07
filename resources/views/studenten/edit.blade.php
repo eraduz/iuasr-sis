@@ -37,6 +37,28 @@
         </div>
         <div class="sis-fld"><label>Geboorteplaats</label><input type="text" name="geboorteplaats" value="{{ old('geboorteplaats', $student->geboorteplaats) }}"></div>
       </fieldset>
+      <fieldset class="sis-fieldset" style="margin-top:8px;">
+        <legend>Taalbeheersing</legend>
+        <div class="sis-fld-row sis-fld-row--2">
+          <div class="sis-fld"><label>Nederlandse taal</label>
+            <select name="taal_nederlands">
+              <option value="">— niet bekend —</option>
+              @foreach (App\Enums\TaalNiveau::cases() as $n)
+                <option value="{{ $n->value }}" @selected(old('taal_nederlands', $student->taal_nederlands?->value) === $n->value)>{{ $n->label() }}</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="sis-fld"><label>Arabische taal <span class="sis-muted" style="font-weight:400;">(info)</span></label>
+            <select name="taal_arabisch">
+              <option value="">— niet bekend —</option>
+              @foreach (App\Enums\TaalNiveau::cases() as $n)
+                <option value="{{ $n->value }}" @selected(old('taal_arabisch', $student->taal_arabisch?->value) === $n->value)>{{ $n->label() }}</option>
+              @endforeach
+            </select>
+          </div>
+        </div>
+        <div class="sis-fld"><label class="sis-check-inline"><input type="checkbox" name="nt2_examen_vereist" value="1" @checked(old('nt2_examen_vereist', $student->nt2_examen_vereist))> Student moet nog een NT2-examen afleggen</label></div>
+      </fieldset>
     </div>
     <div class="sis-card sis-form">
       <fieldset class="sis-fieldset">

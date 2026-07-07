@@ -52,6 +52,9 @@ class SynthetischeStudentSeeder extends Seeder
                 'nationaliteit_id' => $nlId,
                 'email' => strtolower(substr($voornaam, 0, 1)).'.'.strtolower(str_replace([' ', 'ï', 'İ'], ['', 'i', 'i'], $achternaam)).'@student.iuasr.nl',
                 'telefoon' => '06 '.implode(' ', str_split(substr($nr, -6), 2)), // synthetisch
+                'taal_nederlands' => $status === InschrijvingStatus::Aangemeld ? 'onvoldoende' : 'voldoende',
+                'taal_arabisch' => 'goed',
+                'nt2_examen_vereist' => $status === InschrijvingStatus::Aangemeld,
             ]);
 
             Inschrijving::create([

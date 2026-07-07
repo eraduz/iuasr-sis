@@ -78,6 +78,15 @@
         </dl>
       </div>
 
+      <div class="sis-card" style="margin-top:16px;">
+        <div class="sis-card__hd"><h3>Taalbeheersing</h3></div>
+        <dl class="sis-dl">
+          <dt>Nederlandse taal</dt><dd>{{ $student->taal_nederlands?->label() ?? '—' }}</dd>
+          <dt>Arabische taal</dt><dd>{{ $student->taal_arabisch?->label() ?? '—' }} <span class="sis-muted" style="font-size:11px;">· info</span></dd>
+          <dt>NT2-examen</dt><dd>@if($student->nt2_examen_vereist)<span class="iuasr-dash-status s-incomplete">Moet nog afgelegd</span>@else<span class="sis-muted">Niet vereist</span>@endif</dd>
+        </dl>
+      </div>
+
       {{-- Interne notities — direct onder Contact, altijd zichtbaar (Studentenzaken/Beheer) --}}
       @if (auth()->user()->magInschrijvingBeheren())
         <div class="sis-card" id="notities" style="margin-top:16px;">
