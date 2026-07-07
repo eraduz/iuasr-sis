@@ -104,6 +104,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/financien', [BetalingController::class, 'index'])->name('financien');
         // Bulk-import van betalingen (vóór de {student}-route i.v.m. matching).
         Route::get('/financien/import/sjabloon', [BetalingController::class, 'importSjabloon'])->name('financien.import.sjabloon');
+        Route::post('/financien/import/controle', [BetalingController::class, 'importControle'])->name('financien.import.controle');
         Route::post('/financien/import', [BetalingController::class, 'import'])->name('financien.import');
         Route::get('/financien/{student}', [BetalingController::class, 'student'])->name('financien.student');
         Route::post('/financien/{student}/betaling', [BetalingController::class, 'registreer'])->name('financien.betaling');

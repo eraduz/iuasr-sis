@@ -143,7 +143,7 @@ class FinancienTest extends TestCase
         $this->actingAs($this->sz)->post(route('financien.betaling', $student), [])->assertForbidden();
     }
 
-    public function test_betalingen_bulk_import_uit_csv(): void
+    public function test_bulk_import_controleert_voor_definitief_opslaan(): void
     {
         $csv = "studentnummer;bedrag;datum;betaalwijze;opmerking\r\n"
             ."261013;1000,00;15-09-2025;overboeking;jaarbetaling\r\n"
@@ -151,20 +151,36 @@ class FinancienTest extends TestCase
             ."999999;100,00;15-09-2025;;\r\n"; // onbekend studentnummer -> overslaan
 
         $file = UploadedFile::fake()->createWithContent('betalingen.csv', $csv);
-        $this->actingAs($this->fin)->post(route('financien.import'), ['bestand' => $file])
+
+        // Stap 1: controle — toont het overzicht, slaat nog NIETS op.
+        $this->actingAs($this->fin)->post(route('financien.import.controle'), ['bestand' => $file])
+            ->assertOk()
+            ->assertSee('261013')
+            ->assertSessionHas('import_preview');
+        $this->assertSame(0, Betaling::count());
+
+        // Stap 2: bevestigen — slaat de gecontroleerde regels definitief op.
+        $this->actingAs($this->fin)->post(route('financien.import'))
             ->assertRedirect(route('financien'))
             ->assertSessionHas('import_resultaat');
 
-        // Alleen de twee bestaande studenten zijn geïmporteerd.
         $this->assertSame(2, Betaling::count());
         $this->assertEqualsWithDelta(1000.00, (float) Student::where('studentnummer', '261013')->first()->betalingen()->sum('bedrag'), 0.01);
         $this->assertCount(1, session('import_resultaat')['fouten']);
     }
 
+    public function test_bevestigen_zonder_controle_slaat_niets_op(): void
+    {
+        $this->actingAs($this->fin)->post(route('financien.import'))
+            ->assertRedirect(route('financien'))
+            ->assertSessionHasErrors('bestand');
+        $this->assertSame(0, Betaling::count());
+    }
+
     public function test_import_weigert_niet_csv_bestand(): void
     {
         $file = UploadedFile::fake()->create('betalingen.xlsx', 10);
-        $this->actingAs($this->fin)->post(route('financien.import'), ['bestand' => $file])
+        $this->actingAs($this->fin)->post(route('financien.import.controle'), ['bestand' => $file])
             ->assertSessionHasErrors('bestand');
         $this->assertSame(0, Betaling::count());
     }
@@ -172,6 +188,7 @@ class FinancienTest extends TestCase
     public function test_studentenzaken_mag_niet_importeren(): void
     {
         $this->actingAs($this->sz)->get(route('financien.import.sjabloon'))->assertForbidden();
+        $this->actingAs($this->sz)->post(route('financien.import.controle'), [])->assertForbidden();
         $this->actingAs($this->sz)->post(route('financien.import'), [])->assertForbidden();
     }
 

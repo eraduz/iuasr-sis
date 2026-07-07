@@ -36,13 +36,13 @@
   @if ($errors->has('bestand'))
     <div class="iuasr-dash-alert iuasr-dash-alert--danger" style="margin-bottom:12px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/></svg><span>{{ $errors->first('bestand') }}</span></div>
   @endif
-  <form method="POST" action="{{ route('financien.import') }}" enctype="multipart/form-data" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+  <form method="POST" action="{{ route('financien.import.controle') }}" enctype="multipart/form-data" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
     @csrf
     <input type="file" name="bestand" accept=".csv,.txt" required style="flex:1;min-width:220px;">
-    <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit">Importeren</button>
+    <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit">Controleren</button>
     <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('financien.import.sjabloon') }}">Sjabloon downloaden</a>
   </form>
-  <p class="sis-tblnote" style="margin-top:10px;">Kolommen: <b>studentnummer; bedrag; datum; betaalwijze; opmerking</b>. Datum bijv. 15-09-2025, bedrag bijv. 4000,00. Elke betaling wordt gekoppeld aan de meest recente inschrijving van de student.</p>
+  <p class="sis-tblnote" style="margin-top:10px;">Kolommen: <b>studentnummer; bedrag; datum; betaalwijze; opmerking</b>. Datum bijv. 15-09-2025, bedrag bijv. 4000,00. Na <b>Controleren</b> ziet u eerst een overzicht; daarna kunt u definitief importeren.</p>
 </div>
 
 <form method="GET" action="{{ route('financien') }}" class="iuasr-dash-filters">

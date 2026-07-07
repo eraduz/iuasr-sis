@@ -81,8 +81,12 @@ class BetalingController extends Controller
         }, 'betalingen-sjabloon.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
-    /** Bulk-import van betalingen uit een CSV-bestand (Excel -> Opslaan als CSV). */
-    public function import(Request $request): RedirectResponse
+    /**
+     * Stap 1 — Controle: lees en valideer het CSV-bestand en toon wat er wordt
+     * geïmporteerd (en wat wordt overgeslagen). Er wordt nog NIETS opgeslagen;
+     * de te importeren regels worden in de sessie bewaard voor de bevestiging.
+     */
+    public function importControle(Request $request): View|RedirectResponse
     {
         $request->validate([
             'bestand' => ['required', 'file', 'max:5120'],
@@ -101,7 +105,7 @@ class BetalingController extends Controller
             return back()->withErrors(['bestand' => 'Het bestand bevat geen gegevens.']);
         }
 
-        $aantal = 0;
+        $geldig = [];
         $fouten = [];
 
         foreach ($regels as $index => $kolommen) {
@@ -139,16 +143,57 @@ class BetalingController extends Controller
                 continue;
             }
 
-            $student->betalingen()->create([
+            $geldig[] = [
+                'student_id' => $student->id,
                 'inschrijving_id' => $insch->id,
+                'studentnummer' => $student->studentnummer,
+                'naam' => $student->volledigeNaam(),
                 'bedrag' => $bedrag,
                 'datum' => $datum,
                 'betaalwijze' => trim((string) ($kolommen[3] ?? '')) ?: null,
                 'opmerking' => trim((string) ($kolommen[4] ?? '')) ?: null,
+            ];
+        }
+
+        session()->put('import_preview', $geldig);
+        session()->put('import_fouten', $fouten);
+
+        return view('financien.import-controle', [
+            'geldig' => $geldig,
+            'fouten' => $fouten,
+            'bestandsnaam' => $bestand->getClientOriginalName(),
+        ]);
+    }
+
+    /**
+     * Stap 2 — Bevestigen: sla de eerder gecontroleerde regels definitief op.
+     * Leest uit de sessie (gevuld door importControle), zodat exact wordt
+     * opgeslagen wat de gebruiker heeft gezien.
+     */
+    public function import(Request $request): RedirectResponse
+    {
+        $rijen = session('import_preview', []);
+        if (empty($rijen)) {
+            return redirect()->route('financien')
+                ->withErrors(['bestand' => 'Er is geen gecontroleerde import. Upload eerst een CSV.']);
+        }
+
+        $aantal = 0;
+        foreach ($rijen as $r) {
+            Betaling::create([
+                'student_id' => $r['student_id'],
+                'inschrijving_id' => $r['inschrijving_id'],
+                'bedrag' => $r['bedrag'],
+                'datum' => $r['datum'],
+                'betaalwijze' => $r['betaalwijze'],
+                'opmerking' => $r['opmerking'],
                 'geregistreerd_door_id' => auth()->id(),
             ]);
             $aantal++;
         }
+
+        $fouten = session('import_fouten', []);
+        session()->forget(['import_preview', 'import_fouten']);
 
         return redirect()->route('financien')->with('import_resultaat', [
             'aantal' => $aantal,
