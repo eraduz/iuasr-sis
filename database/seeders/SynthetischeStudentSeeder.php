@@ -75,5 +75,23 @@ class SynthetischeStudentSeeder extends Seeder
                 'uitschrijfdatum' => $status === InschrijvingStatus::Uitgeschreven ? '2025-12-31' : null,
             ]);
         }
+
+        // NT2-bewaking (synthetisch): plichtige studenten met verschillende
+        // deadlines (1 jaar na inschrijfdatum) en resultaten, voor het
+        // dashboardvenster van Studentenzaken.
+        $nt2 = [
+            '261010' => ['inschrijf' => '2025-09-01', 'behaald' => null],        // open, ruim op tijd
+            '261008' => ['inschrijf' => '2025-07-20', 'behaald' => null],        // binnen 30 dagen
+            '261002' => ['inschrijf' => '2025-05-01', 'behaald' => null],        // termijn verstreken
+            '261003' => ['inschrijf' => '2025-09-01', 'behaald' => '2026-01-20'], // op tijd behaald
+        ];
+        foreach ($nt2 as $nr => $cfg) {
+            $student = Student::where('studentnummer', $nr)->first();
+            if (! $student) {
+                continue;
+            }
+            $student->update(['nt2_examen_vereist' => true, 'nt2_behaald_op' => $cfg['behaald']]);
+            $student->inschrijvingen()->update(['inschrijfdatum' => $cfg['inschrijf']]);
+        }
     }
 }

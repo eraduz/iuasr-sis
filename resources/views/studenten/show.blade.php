@@ -90,7 +90,14 @@
         <dl class="sis-dl">
           <dt>Nederlandse taal</dt><dd>{{ $student->taal_nederlands?->label() ?? '—' }}</dd>
           <dt>Arabische taal</dt><dd>{{ $student->taal_arabisch?->label() ?? '—' }} <span class="sis-muted" style="font-size:11px;">· info</span></dd>
-          <dt>NT2-examen</dt><dd>@if($student->nt2_examen_vereist)<span class="iuasr-dash-status s-incomplete">Moet nog afgelegd</span>@else<span class="sis-muted">Niet vereist</span>@endif</dd>
+          <dt>NT2-examen</dt><dd>
+            @switch($student->nt2Status())
+              @case('behaald')<span class="iuasr-dash-status s-approved">Behaald op {{ $student->nt2_behaald_op->format('d-m-Y') }}</span>@break
+              @case('verlopen')<span class="iuasr-dash-status s-rejected">Termijn verstreken · deadline {{ $student->nt2Deadline()?->format('d-m-Y') }}</span>@break
+              @case('open')<span class="iuasr-dash-status s-incomplete">Deadline {{ $student->nt2Deadline()?->format('d-m-Y') }} · nog {{ $student->nt2DagenResterend() }} dagen</span>@break
+              @default<span class="sis-muted">Niet vereist</span>
+            @endswitch
+          </dd>
         </dl>
       </div>
 

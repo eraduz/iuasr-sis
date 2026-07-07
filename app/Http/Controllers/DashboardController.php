@@ -29,6 +29,24 @@ class DashboardController extends Controller
                 ->where('periode_id', $actievePeriodeId)->count(),
         ];
 
-        return view('dashboard.index', compact('kpi'));
+        // NT2-bewaking: studenten die het NT2-examen nog moeten halen, op
+        // deadline (1 jaar vanaf inschrijfdatum) gesorteerd — meest urgent eerst.
+        $nt2 = collect();
+        if (auth()->user()->rol === \App\Enums\Rol::Studentenzaken) {
+            $nt2 = Student::where('nt2_examen_vereist', true)
+                ->whereNull('nt2_behaald_op')
+                ->with('inschrijvingen')
+                ->get()
+                ->map(fn (Student $s) => [
+                    'student' => $s,
+                    'deadline' => $s->nt2Deadline(),
+                    'dagen' => $s->nt2DagenResterend(),
+                    'status' => $s->nt2Status(),
+                ])
+                ->sortBy(fn ($r) => $r['dagen'] ?? PHP_INT_MAX)
+                ->values();
+        }
+
+        return view('dashboard.index', compact('kpi', 'nt2'));
     }
 }

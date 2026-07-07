@@ -57,7 +57,13 @@
             </select>
           </div>
         </div>
-        <div class="sis-fld"><label class="sis-check-inline"><input type="checkbox" name="nt2_examen_vereist" value="1" @checked(old('nt2_examen_vereist', $student->nt2_examen_vereist))> Student moet nog een NT2-examen afleggen</label></div>
+        <div class="sis-fld-row sis-fld-row--2">
+          <div class="sis-fld"><label class="sis-check-inline" style="margin-top:26px;"><input type="checkbox" name="nt2_examen_vereist" value="1" @checked(old('nt2_examen_vereist', $student->nt2_examen_vereist))> NT2-examen vereist</label></div>
+          <div class="sis-fld"><label>NT2 behaald op</label>
+            <input type="date" name="nt2_behaald_op" value="{{ old('nt2_behaald_op', $student->nt2_behaald_op?->format('Y-m-d')) }}">
+            <div class="help">Leeg laten zolang het examen nog niet is gehaald. De deadline is 1 jaar na de inschrijfdatum.</div>
+          </div>
+        </div>
       </fieldset>
     </div>
     <div class="sis-card sis-form">

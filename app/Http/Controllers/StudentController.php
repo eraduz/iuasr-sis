@@ -126,6 +126,7 @@ class StudentController extends Controller
             'woonplaats' => ['nullable', 'string', 'max:255'],
             'taal_nederlands' => ['nullable', \Illuminate\Validation\Rule::enum(\App\Enums\TaalNiveau::class)],
             'taal_arabisch' => ['nullable', \Illuminate\Validation\Rule::enum(\App\Enums\TaalNiveau::class)],
+            'nt2_behaald_op' => ['nullable', 'date'],
         ]);
         $data['nt2_examen_vereist'] = $request->boolean('nt2_examen_vereist');
 

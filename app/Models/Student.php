@@ -43,6 +43,7 @@ class Student extends Model
         'taal_nederlands',
         'taal_arabisch',
         'nt2_examen_vereist',
+        'nt2_behaald_op',
         'bsn',
         'bsn_hash',
         'rekeningnummer',
@@ -56,6 +57,7 @@ class Student extends Model
             'taal_nederlands' => \App\Enums\TaalNiveau::class,
             'taal_arabisch' => \App\Enums\TaalNiveau::class,
             'nt2_examen_vereist' => 'boolean',
+            'nt2_behaald_op' => 'date',
             // Gevoelige velden: versleuteld opgeslagen (AVG).
             'bsn' => VersleuteldGevoeligVeld::class,
             'rekeningnummer' => VersleuteldGevoeligVeld::class,
@@ -99,6 +101,52 @@ class Student extends Model
     public function betalingen(): HasMany
     {
         return $this->hasMany(Betaling::class);
+    }
+
+    /**
+     * NT2-deadline: de student heeft 1 jaar vanaf de (eerste) inschrijfdatum om
+     * het NT2-examen succesvol af te ronden. Null als NT2 niet vereist is of er
+     * geen inschrijfdatum bekend is.
+     */
+    public function nt2Deadline(): ?\Carbon\Carbon
+    {
+        if (! $this->nt2_examen_vereist) {
+            return null;
+        }
+        $eerste = $this->inschrijvingen->min('inschrijfdatum');
+        if (! $eerste) {
+            return null;
+        }
+
+        return \Carbon\Carbon::parse($eerste)->addYear()->startOfDay();
+    }
+
+    /** niet_vereist | behaald | open | verlopen */
+    public function nt2Status(): string
+    {
+        if (! $this->nt2_examen_vereist) {
+            return 'niet_vereist';
+        }
+        if ($this->nt2_behaald_op) {
+            return 'behaald';
+        }
+        $deadline = $this->nt2Deadline();
+        if (! $deadline) {
+            return 'open';
+        }
+
+        return now()->startOfDay()->gt($deadline) ? 'verlopen' : 'open';
+    }
+
+    /** Aantal dagen tot de NT2-deadline (negatief = termijn verstreken). */
+    public function nt2DagenResterend(): ?int
+    {
+        $deadline = $this->nt2Deadline();
+        if (! $deadline) {
+            return null;
+        }
+
+        return (int) now()->startOfDay()->diffInDays($deadline, false);
     }
 
     public function volledigeNaam(): string

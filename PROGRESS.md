@@ -56,6 +56,10 @@ opleverpunt aantoonbaar klaar is.
     heet "Alle studenten".
   - 27 tests groen (rolscheiding, lifecycle, mutatie, verklaring, beheer, notities,
     studentenlijst-filter); alle schermen live geverifieerd.
+  - NT2-bewaking: NT2-plichtige studenten hebben 1 jaar vanaf de inschrijfdatum
+    om het examen te halen. Deadline wordt afgeleid; `nt2_behaald_op` vastlegbaar
+    via het wijzigscherm. Dashboardvenster bij Studentenzaken toont de openstaande
+    gevallen (verstreken / binnen 30 dagen / open) op urgentie gesorteerd.
   - Nog te doen: cijferrapport/tentamenlijst (na Fase 4), student toevoegen los
     van aanmelding is al mogelijk via inschrijven.
 - [~] **Fase 4 — Cijfers + rolscheiding** (increment 1 opgeleverd)
