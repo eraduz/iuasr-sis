@@ -49,10 +49,13 @@ opleverpunt aantoonbaar klaar is.
     opleidingen, vakken, perioden, klassen, docenten, landen, nationaliteiten);
     gebruikers & rollen (toegangsmatrix + rol wijzigen, gelogd); audit-log
     (alleen-lezen); klassenlijst-rapport (A4). Rijkere synthetische dataset.
-  - Interne notities per student (datum + auteur), tabblad op het studentdetail;
-    alleen zichtbaar/te bewerken voor Studentenzaken & Beheer.
-  - 24 tests groen (rolscheiding, lifecycle, mutatie, verklaring, beheer, notities);
-    alle schermen live geverifieerd.
+  - Interne notities per student (datum + auteur), direct onder de Contact-kaart
+    op het studentdetail; alleen zichtbaar/te bewerken voor Studentenzaken & Beheer.
+  - Studentenlijst met filterbalk (status + opleiding); standaard alleen ACTIEVE
+    studenten (uitgeschrevenen niet in beeld tenzij expliciet gekozen). Menu-item
+    heet "Alle studenten".
+  - 27 tests groen (rolscheiding, lifecycle, mutatie, verklaring, beheer, notities,
+    studentenlijst-filter); alle schermen live geverifieerd.
   - Nog te doen: cijferrapport/tentamenlijst (na Fase 4), student toevoegen los
     van aanmelding is al mogelijk via inschrijven.
 - [ ] **Fase 4 — Cijfers + rolscheiding**

@@ -18,19 +18,37 @@ class StudentController extends Controller
     public function index(Request $request): View
     {
         $zoek = trim((string) $request->query('q', ''));
+        // Standaard tonen we alleen ACTIEVE studenten (geen uitgeschrevenen).
+        $status = (string) $request->query('status', 'actief');
+        $opleidingId = $request->query('opleiding');
+
+        // Correlated subquery: filter op de MEEST RECENTE inschrijving van de student,
+        // zodat de huidige status/opleiding telt (niet een oude inschrijving).
+        $laatste = fn ($iq) => $iq->whereRaw(
+            'inschrijvingen.inschrijfdatum = (select max(i2.inschrijfdatum) from inschrijvingen i2 where i2.student_id = inschrijvingen.student_id)'
+        );
 
         $studenten = Student::query()
             ->with(['inschrijvingen' => fn ($q) => $q->latest('inschrijfdatum')->with(['opleiding', 'klas', 'periode'])])
             ->when($zoek !== '', function ($q) use ($zoek) {
-                $q->where('studentnummer', 'like', $zoek.'%')
-                    ->orWhere('achternaam', 'like', '%'.$zoek.'%')
-                    ->orWhere('voornaam', 'like', '%'.$zoek.'%');
+                $q->where(function ($sub) use ($zoek) {
+                    $sub->where('studentnummer', 'like', $zoek.'%')
+                        ->orWhere('achternaam', 'like', '%'.$zoek.'%')
+                        ->orWhere('voornaam', 'like', '%'.$zoek.'%');
+                });
             })
+            ->when($status !== 'alle', fn ($q) => $q->whereHas('inschrijvingen',
+                fn ($iq) => $laatste($iq)->where('status', $status)))
+            ->when($opleidingId, fn ($q) => $q->whereHas('inschrijvingen',
+                fn ($iq) => $laatste($iq)->where('opleiding_id', $opleidingId)))
             ->orderBy('studentnummer')
             ->paginate(15)
             ->withQueryString();
 
-        return view('studenten.index', compact('studenten', 'zoek'));
+        $opleidingen = \App\Models\Opleiding::orderBy('naam')->get(['id', 'naam']);
+        $statussen = \App\Enums\InschrijvingStatus::cases();
+
+        return view('studenten.index', compact('studenten', 'zoek', 'status', 'opleidingId', 'opleidingen', 'statussen'));
     }
 
     /**

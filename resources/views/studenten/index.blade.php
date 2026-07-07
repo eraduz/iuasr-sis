@@ -9,8 +9,8 @@
 
 <div class="iuasr-dash-vhead">
   <div>
-    <h1>Studenten</h1>
-    <div class="summary"><b>{{ $studenten->total() }}</b> studenten · zoek op <b>studentnummer</b></div>
+    <h1>Alle studenten</h1>
+    <div class="summary"><b>{{ $studenten->total() }}</b> {{ $status === 'alle' ? 'studenten' : \App\Enums\InschrijvingStatus::tryFrom($status)?->label().' — studenten' }}{{ $zoek !== '' ? ' · zoekterm “'.$zoek.'”' : '' }}</div>
   </div>
   <div class="iuasr-dash-vhead__actions">
     @unless ($magInschrijven)
@@ -22,10 +22,29 @@
   </div>
 </div>
 
-<form method="GET" action="{{ route('studenten.index') }}" class="iuasr-dash-filters">
-  <div class="search" style="grid-column:1 / -1;">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="search" name="q" value="{{ $zoek }}" placeholder="Zoek op studentnummer (bijv. 261001) of naam…">
+<form method="GET" action="{{ route('studenten.index') }}">
+  <div class="iuasr-dash-filters">
+    <div class="search" style="grid-column:1 / -1;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="search" name="q" value="{{ $zoek }}" placeholder="Zoek op studentnummer (bijv. 261001) of naam…">
+    </div>
+  </div>
+  <div class="iuasr-dash-filters" style="grid-template-columns:1fr 1fr;">
+    <select name="status" aria-label="Status" onchange="this.form.submit()">
+      <option value="actief" @selected($status==='actief')>Actieve studenten</option>
+      <option value="alle" @selected($status==='alle')>Alle statussen</option>
+      @foreach ($statussen as $st)
+        @if ($st->value !== 'actief')
+          <option value="{{ $st->value }}" @selected($status===$st->value)>{{ $st->label() }}</option>
+        @endif
+      @endforeach
+    </select>
+    <select name="opleiding" aria-label="Opleiding" onchange="this.form.submit()">
+      <option value="">Alle opleidingen</option>
+      @foreach ($opleidingen as $o)
+        <option value="{{ $o->id }}" @selected((string) $opleidingId === (string) $o->id)>{{ $o->naam }}</option>
+      @endforeach
+    </select>
   </div>
 </form>
 

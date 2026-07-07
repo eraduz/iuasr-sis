@@ -28,7 +28,7 @@
         Rol::Studentenzaken->value => [
             'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
             'Studenten' => [
-                ['Studenten', 'studenten.index', 'students', 'studenten.*'],
+                ['Alle studenten', 'studenten.index', 'students', 'studenten.*'],
                 ['Student inschrijven', 'inschrijven', 'plus', 'inschrijven'],
                 ['Herinschrijven', 'herinschrijven', 'refresh', 'herinschrijven'],
                 ['Uitschrijven', 'uitschrijven', 'userx', 'uitschrijven'],
@@ -47,7 +47,7 @@
         ],
         Rol::Examencommissie->value => [
             'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
-            'Studenten' => [['Studenten', 'studenten.index', 'students', 'studenten.*']],
+            'Studenten' => [['Alle studenten', 'studenten.index', 'students', 'studenten.*']],
             'Cijfers' => [['Cijferoverzicht', 'cijferoverzicht', 'grade', 'cijferoverzicht']],
             'Rapporten' => [['Rapporten', 'rapporten.inzage', 'report', 'rapporten.inzage']],
         ],
