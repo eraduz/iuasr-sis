@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             GebruikerSeeder::class,
             SynthetischeStudentSeeder::class,
             ResultatenSeeder::class,
+            CollegegeldSeeder::class,
         ]);
     }
 }

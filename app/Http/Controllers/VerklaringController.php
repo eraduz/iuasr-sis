@@ -40,13 +40,17 @@ class VerklaringController extends Controller
         }
 
         $verklaring = null;
+        $financieel = null;
         if ($student) {
-            $verklaring = $this->bouw($student, $type);
-            // Uitgifte van een verklaring wordt gelogd.
-            AuditLogger::log(AuditLogger::UITGIFTE, $student, veld: 'verklaring', context: ['type' => $type]);
+            $financieel = \App\Support\Collegegeldstatus::voor($student);
+            // Blokkade: geen officiële documenten bij een betalingsachterstand.
+            if (! $financieel['achterstand']) {
+                $verklaring = $this->bouw($student, $type);
+                AuditLogger::log(AuditLogger::UITGIFTE, $student, veld: 'verklaring', context: ['type' => $type]);
+            }
         }
 
-        return view('verklaringen.index', compact('student', 'type', 'verklaring', 'zoek', 'resultaten'));
+        return view('verklaringen.index', compact('student', 'type', 'verklaring', 'zoek', 'resultaten', 'financieel'));
     }
 
     /** Bouwt de tekstblokken voor het gekozen verklaringstype. */

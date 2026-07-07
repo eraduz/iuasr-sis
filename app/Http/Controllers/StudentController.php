@@ -48,7 +48,12 @@ class StudentController extends Controller
         $opleidingen = \App\Models\Opleiding::orderBy('naam')->get(['id', 'naam']);
         $statussen = \App\Enums\InschrijvingStatus::cases();
 
-        return view('studenten.index', compact('studenten', 'zoek', 'status', 'opleidingId', 'opleidingen', 'statussen'));
+        // Markeer welke getoonde studenten een betalingsachterstand hebben.
+        $schuldIds = $studenten->getCollection()
+            ->filter(fn ($s) => \App\Support\Collegegeldstatus::heeftAchterstand($s))
+            ->pluck('id')->all();
+
+        return view('studenten.index', compact('studenten', 'zoek', 'status', 'opleidingId', 'opleidingen', 'statussen', 'schuldIds'));
     }
 
     /**
@@ -83,7 +88,10 @@ class StudentController extends Controller
             }
         }
 
-        return view('studenten.show', compact('student', 'huidige', 'magCijfers', 'cijferVakken'));
+        // Financiële status (betalingsachterstand) — stuurt de waarschuwing en blokkades.
+        $financieel = \App\Support\Collegegeldstatus::voor($student);
+
+        return view('studenten.show', compact('student', 'huidige', 'magCijfers', 'cijferVakken', 'financieel'));
     }
 
     /** Muteren van persoonsgegevens (Studentenzaken/Beheerder). */

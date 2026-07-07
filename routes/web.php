@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\DevLoginController;
+use App\Http\Controllers\BetalingController;
 use App\Http\Controllers\CijferController;
+use App\Http\Controllers\CollegegeldController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GebruikerController;
 use App\Http\Controllers\InschrijvingActiesController;
@@ -77,6 +79,18 @@ Route::middleware('auth')->group(function () {
         // Rapporten (SZ: geen cijferkolom)
         Route::get('/rapporten', [RapportController::class, 'index'])->name('rapporten');
         Route::get('/rapporten/klassenlijst', [RapportController::class, 'klassenlijst'])->name('rapporten.klassenlijst');
+
+        // Collegegeld instellen (jaarlijks) — Studentenadministratie
+        Route::get('/collegegeld', [CollegegeldController::class, 'index'])->name('collegegeld');
+        Route::post('/collegegeld', [CollegegeldController::class, 'store'])->name('collegegeld.store');
+        Route::delete('/collegegeld/{tarief}', [CollegegeldController::class, 'destroy'])->name('collegegeld.destroy');
+    });
+
+    // --- Financiële Administratie: betalingen & achterstanden ---
+    Route::middleware('rol:financien,beheerder')->group(function () {
+        Route::get('/financien', [BetalingController::class, 'index'])->name('financien');
+        Route::get('/financien/{student}', [BetalingController::class, 'student'])->name('financien.student');
+        Route::post('/financien/{student}/betaling', [BetalingController::class, 'registreer'])->name('financien.betaling');
     });
 
     // --- Docent — eigen vak ---

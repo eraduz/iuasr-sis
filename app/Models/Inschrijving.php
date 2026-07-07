@@ -70,4 +70,9 @@ class Inschrijving extends Model
     {
         return $this->hasMany(Resultaat::class);
     }
+
+    public function betalingen(): HasMany
+    {
+        return $this->hasMany(Betaling::class);
+    }
 }

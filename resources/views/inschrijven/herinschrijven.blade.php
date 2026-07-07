@@ -16,6 +16,13 @@
   <div class="iuasr-dash-alert iuasr-dash-alert--danger" style="margin-bottom:16px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/></svg><span>Controleer de invoer: {{ $errors->first() }}</span></div>
 @endif
 
+@if ($financieel['achterstand'])
+  <div class="iuasr-dash-alert iuasr-dash-alert--danger" style="margin-bottom:16px;">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <span><b>Herinschrijven geblokkeerd.</b> Openstaande betalingsachterstand van € {{ number_format($financieel['openstaand'], 2, ',', '.') }}. De studievoortgang is geblokkeerd tot de schuld is voldaan.</span>
+  </div>
+@endif
+
 <div class="sis-grid-2">
   <div>
     <div class="sis-card" style="margin-bottom:16px;">
@@ -55,7 +62,7 @@
       </fieldset>
       <div class="sis-form__actions">
         <a class="iuasr-dash-btn" href="{{ route('studenten.show', $student) }}">Annuleren</a>
-        <div class="right"><button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit">Herinschrijving vastleggen</button></div>
+        <div class="right"><button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit" {{ $financieel['achterstand'] ? 'disabled' : '' }}>Herinschrijving vastleggen</button></div>
       </div>
     </form>
   </div>

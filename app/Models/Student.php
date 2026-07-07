@@ -96,6 +96,11 @@ class Student extends Model
         return $this->hasMany(Resultaat::class);
     }
 
+    public function betalingen(): HasMany
+    {
+        return $this->hasMany(Betaling::class);
+    }
+
     public function volledigeNaam(): string
     {
         return trim(implode(' ', array_filter([

@@ -101,6 +101,12 @@
         <h3>Kies een student</h3>
         <p>Selecteer links een student en het type verklaring; het document verschijnt hier.</p>
       </div>
+    @elseif ($financieel && $financieel['achterstand'])
+      <div class="iuasr-dash-empty" style="border:0;background:#fff;width:100%;">
+        <span class="iuasr-dash-empty__icon" style="background:var(--st-rejected-bg);color:var(--st-rejected-fg);"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+        <h3>Verklaring geblokkeerd</h3>
+        <p>Deze student heeft een openstaande betalingsachterstand van <b>€ {{ number_format($financieel['openstaand'], 2, ',', '.') }}</b>. Het afgeven van officiële documenten en verklaringen is geblokkeerd tot de schuld is voldaan.</p>
+      </div>
     @else
       <div class="sis-a4" style="min-height:auto;">
         <div class="sis-a4__head">

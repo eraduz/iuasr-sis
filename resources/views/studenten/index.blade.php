@@ -66,7 +66,7 @@
         @php $insch = $student->inschrijvingen->first(); @endphp
         <tr>
           <td class="tnum">{{ $student->studentnummer }}</td>
-          <td class="nm">{{ $student->volledigeNaam() }}<small>{{ $student->email ?? '—' }}</small></td>
+          <td class="nm">{{ $student->volledigeNaam() }}@if(in_array($student->id, $schuldIds))<span class="sis-pill-soft" style="color:var(--secColor100);background:rgba(200,16,46,0.09);margin-left:6px;" title="Openstaande betalingsachterstand">schuld</span>@endif<small>{{ $student->email ?? '—' }}</small></td>
           <td class="pg">{{ $insch?->opleiding?->naam ?? '—' }}</td>
           <td>{{ $insch?->klas?->code ?? '—' }}</td>
           <td class="tnum">{{ $insch?->inschrijfdatum?->format('Y') ?? '—' }}</td>

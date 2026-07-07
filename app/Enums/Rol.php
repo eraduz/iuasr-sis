@@ -20,6 +20,7 @@ namespace App\Enums;
 enum Rol: string
 {
     case Studentenzaken = 'studentenzaken';
+    case Financien = 'financien';
     case Docent = 'docent';
     case Examencommissie = 'examencommissie';
     case Directie = 'directie';
@@ -30,10 +31,38 @@ enum Rol: string
     {
         return match ($this) {
             self::Studentenzaken => 'Studentenzaken',
+            self::Financien => 'Financiële Administratie',
             self::Docent => 'Docent',
             self::Examencommissie => 'Examencommissie',
             self::Directie => 'Directie',
             self::Beheerder => 'Beheerder',
+        };
+    }
+
+    /** Mag deze rol collegegeldtarieven instellen? (Studentenadministratie, Beheer.) */
+    public function magCollegegeldBeheren(): bool
+    {
+        return match ($this) {
+            self::Studentenzaken, self::Beheerder => true,
+            default => false,
+        };
+    }
+
+    /** Mag deze rol betalingen registreren? (Financiële Administratie, Beheer.) */
+    public function magBetalingenRegistreren(): bool
+    {
+        return match ($this) {
+            self::Financien, self::Beheerder => true,
+            default => false,
+        };
+    }
+
+    /** Mag deze rol de financiële status (betaalachterstand) inzien? */
+    public function magFinancieelInzien(): bool
+    {
+        return match ($this) {
+            self::Studentenzaken, self::Financien, self::Directie, self::Beheerder => true,
+            default => false,
         };
     }
 

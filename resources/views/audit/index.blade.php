@@ -4,7 +4,7 @@
 
 @php
   $badge = [
-    'studentenzaken' => 'r-studentenzaken', 'docent' => 'r-docent',
+    'studentenzaken' => 'r-studentenzaken', 'financien' => 'r-financien', 'docent' => 'r-docent',
     'examencommissie' => 'r-examencommissie', 'directie' => 'r-directie', 'beheerder' => 'r-beheerder',
   ];
 @endphp

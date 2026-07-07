@@ -128,14 +128,21 @@ class InschrijvingActiesController extends Controller
         $huidige = $this->huidige($student);
         $perioden = Periode::orderByDesc('code')->get();
         $klassen = Klas::with('opleiding')->orderBy('code')->get();
+        $financieel = \App\Support\Collegegeldstatus::voor($student);
 
-        return view('inschrijven.herinschrijven', compact('student', 'huidige', 'perioden', 'klassen'));
+        return view('inschrijven.herinschrijven', compact('student', 'huidige', 'perioden', 'klassen', 'financieel'));
     }
 
     public function herinschrijven(Request $request, Student $student): RedirectResponse
     {
         $huidige = $this->huidige($student);
         abort_if($huidige === null, 404, 'Geen bestaande inschrijving om op voort te bouwen.');
+
+        // Blokkade studievoortgang bij betalingsachterstand.
+        if (\App\Support\Collegegeldstatus::heeftAchterstand($student)) {
+            return redirect()->route('studenten.show', $student)
+                ->with('status', 'Herinschrijven geblokkeerd: de student heeft een openstaande betalingsachterstand.');
+        }
 
         $data = $request->validate([
             'periode_id' => ['required', Rule::exists('perioden', 'id')],

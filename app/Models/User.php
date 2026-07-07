@@ -86,4 +86,19 @@ class User extends Authenticatable
     {
         return $this->rol->magBsnInzien();
     }
+
+    public function magFinancieelInzien(): bool
+    {
+        return $this->rol->magFinancieelInzien();
+    }
+
+    public function magCollegegeldBeheren(): bool
+    {
+        return $this->rol->magCollegegeldBeheren();
+    }
+
+    public function magBetalingenRegistreren(): bool
+    {
+        return $this->rol->magBetalingenRegistreren();
+    }
 }

@@ -10,6 +10,13 @@
 @section('inhoud')
 <div class="sis-crumb"><a href="{{ route('dashboard') }}">Dashboard</a><span class="sep">›</span><a href="{{ route('studenten.index') }}">Studenten</a><span class="sep">›</span><b>{{ $student->studentnummer }} — {{ $student->volledigeNaam() }}</b></div>
 
+@if (auth()->user()->magFinancieelInzien() && $financieel['achterstand'])
+  <div class="iuasr-dash-alert iuasr-dash-alert--danger" style="margin-bottom:16px;">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span><b>Betalingsachterstand: € {{ number_format($financieel['openstaand'], 2, ',', '.') }} openstaand.</b> Studievoortgang (herinschrijven) en het afgeven van documenten/verklaringen zijn voor deze student <b>geblokkeerd</b> tot de schuld is voldaan.</span>
+  </div>
+@endif
+
 <div class="iuasr-dash-candidate">
   <div class="iuasr-dash-candidate__hd" style="margin-bottom:0;border-bottom:0;padding-bottom:0;">
     <span class="iuasr-dash-candidate__avatar" aria-hidden="true">{{ mb_substr($student->voornaam, 0, 1) }}</span>
@@ -167,8 +174,13 @@
           <div class="sis-card__hd"><h3>Acties</h3></div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
             <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('studenten.edit', $student) }}">Gegevens muteren</a>
-            <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('herinschrijven.form', $student) }}">Herinschrijven</a>
-            <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('verklaringen', ['student' => $student->id]) }}">Verklaring</a>
+            @if ($financieel['achterstand'])
+              <span class="iuasr-dash-btn iuasr-dash-btn--sm" aria-disabled="true" title="Geblokkeerd wegens betalingsachterstand" style="opacity:.5;cursor:not-allowed;">Herinschrijven (geblokkeerd)</span>
+              <span class="iuasr-dash-btn iuasr-dash-btn--sm" aria-disabled="true" title="Geblokkeerd wegens betalingsachterstand" style="opacity:.5;cursor:not-allowed;">Verklaring (geblokkeerd)</span>
+            @else
+              <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('herinschrijven.form', $student) }}">Herinschrijven</a>
+              <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('verklaringen', ['student' => $student->id]) }}">Verklaring</a>
+            @endif
             @if ($huidige)
               {{-- Schorsen / opheffen met één klik --}}
               <form method="POST" action="{{ route('studenten.schors', $student) }}" style="display:inline;">

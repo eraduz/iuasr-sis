@@ -13,6 +13,7 @@
       <div class="summary">Identiteit &amp; inschrijving · <b>geen</b> cijferinzage voor deze rol</div>
     </div>
     <div class="iuasr-dash-vhead__actions">
+      <a class="iuasr-dash-btn" href="{{ route('collegegeld') }}">Collegegeld</a>
       <a class="iuasr-dash-btn" href="{{ route('verklaringen') }}">Verklaring opstellen</a>
       <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('inschrijven') }}">Student inschrijven</a>
     </div>
@@ -28,6 +29,21 @@
   <div class="iuasr-dash-alert iuasr-dash-alert--info">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
     <span>Als Studentenzaken heeft u <b>geen inzage in cijfers</b>. Dit wordt server-side afgedwongen (rolscheiding), niet alleen in de interface.</span>
+  </div>
+
+@elseif ($rol === App\Enums\Rol::Financien)
+  <div class="iuasr-dash-vhead">
+    <div>
+      <h1>Financiële Administratie</h1>
+      <div class="summary">Collegegeldbetalingen registreren en betalingsachterstanden bewaken</div>
+    </div>
+    <div class="iuasr-dash-vhead__actions">
+      <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('financien') }}">Betalingen &amp; achterstand</a>
+    </div>
+  </div>
+  <div class="iuasr-dash-alert iuasr-dash-alert--info">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+    <span>U registreert betalingen per student. Het systeem bepaalt automatisch de achterstand; studenten met een schuld worden gesignaleerd bij Studentenzaken.</span>
   </div>
 
 @elseif ($rol === App\Enums\Rol::Docent)

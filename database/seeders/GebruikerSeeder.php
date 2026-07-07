@@ -16,6 +16,7 @@ class GebruikerSeeder extends Seeder
     public function run(): void
     {
         User::create(['naam' => 'Fatima Yıldız', 'email' => 'f.yildiz@iuasr.nl', 'rol' => Rol::Studentenzaken]);
+        User::create(['naam' => 'Sanne Visser', 'email' => 's.visser@iuasr.nl', 'rol' => Rol::Financien]);
 
         $aydin = Docent::where('code', 'DOC-001')->first();
         User::create(['naam' => 'dr. Yusuf Aydın', 'email' => 'y.aydin@iuasr.nl', 'rol' => Rol::Docent, 'docent_id' => $aydin?->id]);

@@ -36,6 +36,7 @@
   border: 1px solid currentColor;
 }
 .role--studentenzaken { color: var(--secColor100); }
+.role--financien      { color: #0F766E; }
 .role--docent         { color: var(--priColor200); }
 .role--examencommissie{ color: #6B4FB0; }
 .role--directie       { color: var(--priColor300); }
@@ -548,6 +549,7 @@
   white-space: nowrap; border: 1px solid;
 }
 .sis-rolebadge.r-studentenzaken { background: rgba(200,16,46,0.06); color: var(--secColor100); border-color: rgba(200,16,46,0.25); }
+.sis-rolebadge.r-financien { background: rgba(15,118,110,0.08); color: #0F766E; border-color: rgba(15,118,110,0.25); }
 .sis-rolebadge.r-docent { background: rgba(40,92,77,0.08); color: var(--priColor200); border-color: rgba(40,92,77,0.25); }
 .sis-rolebadge.r-examencommissie { background: rgba(107,79,176,0.08); color: #6B4FB0; border-color: rgba(107,79,176,0.25); }
 .sis-rolebadge.r-directie { background: rgba(214,154,45,0.12); color: #8A5A0B; border-color: rgba(214,154,45,0.3); }

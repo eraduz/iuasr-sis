@@ -6,14 +6,18 @@
   $J = '<span class="sis-access sis-access--yes"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>';
   $N = '<span class="sis-access sis-access--no"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>';
   $tag = fn($t) => '<span class="sis-pill-soft" style="font-size:10.5px;">'.$t.'</span>';
+  // Celvolgorde = rolvolgorde: Studentenzaken, Financiën, Docent, Examencie, Directie, Beheerder.
   $matrix = [
-    ['Studenten inzien',       [$J, $N, $J, $tag('beperkt'), $N]],
-    ['Persoonsgegevens / BSN', [$J, $N, $N, $N, $J]],
-    ['In-/uitschrijven',       [$J, $N, $N, $N, $N]],
-    ['Cijfers invoeren',       [$N, $tag('eigen vak'), $N, $N, $N]],
-    ['Cijfers inzien',         [$N, $tag('eigen vak'), $J, $J, $N]],
-    ['Verklaringen uitgeven',  [$J, $N, $N, $N, $N]],
-    ['Opzoektabellen beheren', [$N, $N, $N, $N, $J]],
+    ['Studenten inzien',        [$J, $N, $N, $J, $tag('beperkt'), $N]],
+    ['Persoonsgegevens / BSN',  [$J, $N, $N, $N, $N, $J]],
+    ['In-/uitschrijven',        [$J, $N, $N, $N, $N, $N]],
+    ['Cijfers invoeren',        [$N, $N, $tag('eigen vak'), $N, $N, $N]],
+    ['Cijfers inzien',          [$N, $N, $tag('eigen vak'), $J, $J, $N]],
+    ['Verklaringen uitgeven',   [$J, $N, $N, $N, $N, $N]],
+    ['Collegegeld instellen',   [$J, $N, $N, $N, $N, $J]],
+    ['Betalingen registreren',  [$N, $J, $N, $N, $N, $J]],
+    ['Betaalachterstand inzien',[$J, $J, $N, $N, $J, $J]],
+    ['Opzoektabellen beheren',  [$N, $N, $N, $N, $N, $J]],
   ];
 @endphp
 

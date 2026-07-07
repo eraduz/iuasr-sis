@@ -84,7 +84,9 @@ opleverpunt aantoonbaar klaar is.
 Niet bouwen tenzij expliciet gevraagd:
 
 - **DUO/BRON-koppeling** — blijft handmatig, apart regime.
-- **Betalingsmodule** — latere fase.
+- **Betalingsmodule** — GEBOUWD op expliciet verzoek (2026-07-07): collegegeld per
+  studiejaar, betalingsregistratie door Financiële Administratie, automatische
+  achterstandsbepaling en blokkades. Zie beslissingenlogboek.
 - **Moodle-provisioning** — latere fase.
 - **E-mailautomatisering** — latere fase.
 - **Migratie van echte data** — pas Fase 7, onder toezicht FG.
@@ -134,6 +136,9 @@ Deze zijn nog niet vastgesteld. Vraag de opdrachtgever; verzin geen waarden.
 | 2026-07-07 | Cesuur (voldoende-grens) bevestigd op 5,5 voor alle opleidingen; per opleiding overschrijfbaar. |
 | 2026-07-07 | EC-overgangsdrempel per opleiding (veld klaar, door Beheer in te vullen). |
 | 2026-07-07 | Reguliere cijferinvoer alleen door de docent (eigen vak); examencie/directie hebben inzage. Vaststelling/correctie door examencie volgt in Fase 4 increment 2. |
+| 2026-07-07 | Nieuwe rol **Financiële Administratie** (registreert betalingen; geen cijfers/BSN). |
+| 2026-07-07 | Collegegeldmodule (Studentenadministratie): tarief per studiejaar, optioneel per opleiding, jaarlijks bij te werken. |
+| 2026-07-07 | Betalingsachterstand automatisch bepaald (verschuldigd − betaald). Bij achterstand: waarschuwing op dossier, en blokkade van herinschrijven (studievoortgang) en verklaringen (documenten). |
 
 ---
 
