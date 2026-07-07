@@ -35,6 +35,9 @@
                 ['Herinschrijven', 'herinschrijven', 'refresh', 'herinschrijven'],
                 ['Uitschrijven', 'uitschrijven', 'userx', 'uitschrijven'],
             ],
+            'Onderwijs' => [
+                ['Vakstructuur', 'vakstructuur', 'book', 'vakstructuur*'],
+            ],
             'Documenten' => [
                 ['Rapporten', 'rapporten', 'report', 'rapporten'],
                 ['Verklaringen', 'verklaringen', 'cert', 'verklaringen'],

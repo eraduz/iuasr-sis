@@ -64,9 +64,18 @@ class StudentController extends Controller
     {
         $student->load([
             'inschrijvingen.opleiding', 'inschrijvingen.klas', 'inschrijvingen.periode',
+            'inschrijvingen.vaktoewijzingen.vak',
             'nationaliteit', 'land', 'notities.gebruiker',
         ]);
         $huidige = $student->inschrijvingen->sortByDesc('inschrijfdatum')->first();
+
+        // Vakhistorie: per studiejaar (inschrijving) de toegewezen vakken, gegroepeerd
+        // per periode (blok). Blijft ook jaren later volledig raadpleegbaar.
+        $vakHistorie = $student->inschrijvingen->sortBy('inschrijfdatum')->values()->map(fn ($insch) => [
+            'inschrijving' => $insch,
+            'perBlok' => $insch->vaktoewijzingen->map->vak->filter()
+                ->sortBy('code')->groupBy(fn ($v) => $v->blok ?? 0)->sortKeys(),
+        ]);
 
         $magCijfers = auth()->user()->magCijfersInzien();
 
@@ -91,7 +100,7 @@ class StudentController extends Controller
         // Financiële status (betalingsachterstand) — stuurt de waarschuwing en blokkades.
         $financieel = \App\Support\Collegegeldstatus::voor($student);
 
-        return view('studenten.show', compact('student', 'huidige', 'magCijfers', 'cijferVakken', 'financieel'));
+        return view('studenten.show', compact('student', 'huidige', 'magCijfers', 'cijferVakken', 'financieel', 'vakHistorie'));
     }
 
     /** Muteren van persoonsgegevens (Studentenzaken/Beheerder). */

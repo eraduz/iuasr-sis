@@ -89,7 +89,7 @@ class InschrijvingController extends Controller
 
             abort_if($student === null, 500, 'Kon geen uniek studentnummer toekennen.');
 
-            Inschrijving::create([
+            $inschrijving = Inschrijving::create([
                 'student_id' => $student->id,
                 'opleiding_id' => $data['opleiding_id'],
                 'klas_id' => $data['klas_id'] ?? null,
@@ -100,6 +100,9 @@ class InschrijvingController extends Controller
                 'invoerdatum' => now()->toDateString(),
                 'betaalwijze' => $data['betaalwijze'] ?? null,
             ]);
+
+            // Vakken van dit studiejaar automatisch toewijzen.
+            \App\Support\Vaktoewijzer::wijsToe($inschrijving);
 
             AuditLogger::log(AuditLogger::AANMAAK, $student, veld: 'inschrijving', context: [
                 'studentnummer' => $student->studentnummer,

@@ -12,6 +12,8 @@ use App\Http\Controllers\InschrijvingController;
 use App\Http\Controllers\RapportController;
 use App\Http\Controllers\ReferentieController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\VakstructuurController;
+use App\Http\Controllers\VaktoewijzingController;
 use App\Http\Controllers\VerklaringController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -84,6 +86,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/collegegeld', [CollegegeldController::class, 'index'])->name('collegegeld');
         Route::post('/collegegeld', [CollegegeldController::class, 'store'])->name('collegegeld.store');
         Route::delete('/collegegeld/{tarief}', [CollegegeldController::class, 'destroy'])->name('collegegeld.destroy');
+
+        // Vakstructuur (curriculum) — per studiejaar/periode vakken beheren
+        Route::get('/vakstructuur', [VakstructuurController::class, 'index'])->name('vakstructuur');
+        Route::post('/vakstructuur', [VakstructuurController::class, 'store'])->name('vakstructuur.store');
+        Route::get('/vakstructuur/{vak}/bewerken', [VakstructuurController::class, 'edit'])->name('vakstructuur.edit');
+        Route::put('/vakstructuur/{vak}', [VakstructuurController::class, 'update'])->name('vakstructuur.update');
+        Route::delete('/vakstructuur/{vak}', [VakstructuurController::class, 'destroy'])->name('vakstructuur.destroy');
+
+        // Vaktoewijzing per student aanpassen
+        Route::get('/inschrijvingen/{inschrijving}/vakken', [VaktoewijzingController::class, 'edit'])->name('inschrijving.vakken');
+        Route::put('/inschrijvingen/{inschrijving}/vakken', [VaktoewijzingController::class, 'update'])->name('inschrijving.vakken.update');
     });
 
     // --- Financiële Administratie: betalingen & achterstanden ---

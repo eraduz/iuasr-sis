@@ -75,4 +75,9 @@ class Inschrijving extends Model
     {
         return $this->hasMany(Betaling::class);
     }
+
+    public function vaktoewijzingen(): HasMany
+    {
+        return $this->hasMany(Vaktoewijzing::class);
+    }
 }

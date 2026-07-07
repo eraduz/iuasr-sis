@@ -110,5 +110,25 @@ class ReferentieSeeder extends Seeder
         Toetsonderdeel::create(['vak_id' => $vak1->id, 'code' => 'SCH', 'naam' => 'Deeltoets schriftelijk', 'type' => 'tentamen', 'weging' => 0.40, 'telt_mee' => true, 'volgorde' => 1]);
         Toetsonderdeel::create(['vak_id' => $vak1->id, 'code' => 'MON', 'naam' => 'Mondeling (recitatie)', 'type' => 'mondeling', 'weging' => 0.25, 'telt_mee' => true, 'volgorde' => 2]);
         Toetsonderdeel::create(['vak_id' => $vak1->id, 'code' => 'TEN', 'naam' => 'Eindtentamen', 'type' => 'tentamen', 'weging' => 0.35, 'telt_mee' => true, 'volgorde' => 3]);
+
+        // Curriculum ISLTH — vakken per leerjaar (studiejaar) en blok (periode).
+        $boujat = Docent::where('code', 'DOC-002')->first();
+        $curriculum = [
+            // [code, naam, ec, leerjaar, blok, docent]
+            ['ISLTH-KRN-110', 'Inleiding Koranwetenschappen', 6, 1, 1, $boujat],
+            ['ISLTH-FIQ-110', 'Islamitisch recht I', 6, 1, 2, $boujat],
+            ['ISLTH-HIS-120', 'Geschiedenis van de Islam', 5, 1, 2, $aydin],
+            ['ISLTH-ARA-102', 'Arabische grammatica I-b', 6, 1, 3, $aydin],
+            ['ISLTH-SIR-140', 'Sīra (biografie van de Profeet)', 5, 1, 4, $boujat],
+            ['ISLTH-FIQ-210', 'Usul al-Fiqh', 6, 2, 2, $aydin],
+            ['ISLTH-TAF-220', 'Tafsīr I', 6, 2, 3, $boujat],
+        ];
+        foreach ($curriculum as [$code, $naam, $ec, $leerjaar, $blok, $docent]) {
+            Vak::create([
+                'opleiding_id' => $theologie->id, 'docent_id' => $docent?->id,
+                'code' => $code, 'naam' => $naam, 'ec' => $ec,
+                'leerjaar' => $leerjaar, 'blok' => $blok, 'actief' => true,
+            ]);
+        }
     }
 }

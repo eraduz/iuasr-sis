@@ -200,7 +200,78 @@
       @endif
     </div>
   </div>
+
+  {{-- Toegewezen vakken — volledige studiehistorie per studiejaar en periode --}}
+  <div class="sis-card" style="margin-top:16px;">
+    <div class="sis-card__hd"><h3>Toegewezen vakken</h3><span class="hint">studiehistorie per studiejaar en periode (blok)</span></div>
+    @if ($vakHistorie->isEmpty())
+      <p class="sis-muted" style="font-size:13px;margin:0;">Nog geen vakken toegewezen.</p>
+    @else
+      <div class="sis-subtabs" role="tablist">
+        @foreach ($vakHistorie as $i => $h)
+          <button class="sis-subtab {{ $i===0 ? 'is-active' : '' }}" data-vh="vh{{ $i }}">{{ $h['inschrijving']->periode?->naam ?? 'Studiejaar' }} · jaar {{ $h['inschrijving']->leerjaar }}</button>
+        @endforeach
+      </div>
+
+      @foreach ($vakHistorie as $i => $h)
+        <div class="vh-panel" data-vhpanel="vh{{ $i }}" @if($i!==0) hidden @endif>
+          @if (auth()->user()->magInschrijvingBeheren())
+            <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+              <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('inschrijving.vakken', $h['inschrijving']) }}">Vakken aanpassen</a>
+            </div>
+          @endif
+          @php $blokken = $h['perBlok']; @endphp
+          @if ($blokken->isEmpty())
+            <p class="sis-muted" style="font-size:13px;">Geen vakken in dit studiejaar.</p>
+          @else
+            <div class="sis-subtabs" role="tablist">
+              @foreach ($blokken as $blok => $vakken)
+                <button class="sis-subtab vh-blok-btn {{ $loop->first ? 'is-active' : '' }}" data-vhb="vh{{ $i }}b{{ $blok }}" data-group="vh{{ $i }}">Blok {{ $blok ?: '—' }}<span class="n">{{ $vakken->count() }}</span></button>
+              @endforeach
+            </div>
+            @foreach ($blokken as $blok => $vakken)
+              <div class="vh-blok" data-vhbpanel="vh{{ $i }}b{{ $blok }}" @if(!$loop->first) hidden @endif>
+                <div class="iuasr-dash-tbl-card" style="border:0;">
+                  <table class="iuasr-dash-tbl">
+                    <thead><tr><th>Code</th><th>Vak</th><th>EC</th><th>Docent</th></tr></thead>
+                    <tbody>
+                      @foreach ($vakken as $vak)
+                        <tr><td class="tnum">{{ $vak->code }}</td><td class="nm">{{ $vak->naam }}</td><td class="tnum">{{ $vak->ec }}</td><td>{{ $vak->docent?->achternaam ?? '—' }}</td></tr>
+                      @endforeach
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            @endforeach
+          @endif
+        </div>
+      @endforeach
+    @endif
+  </div>
 </section>
+
+@push('scripts')
+<script>
+  document.querySelectorAll('.sis-subtab[data-vh]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('.sis-subtab[data-vh]').forEach(function (x){ x.classList.remove('is-active'); });
+      b.classList.add('is-active');
+      var t = b.getAttribute('data-vh');
+      document.querySelectorAll('.vh-panel').forEach(function (p){ p.hidden = p.getAttribute('data-vhpanel') !== t; });
+    });
+  });
+  document.querySelectorAll('.vh-blok-btn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var group = b.getAttribute('data-group');
+      document.querySelectorAll('.vh-blok-btn[data-group="' + group + '"]').forEach(function (x){ x.classList.remove('is-active'); });
+      b.classList.add('is-active');
+      var t = b.getAttribute('data-vhb');
+      var panel = document.querySelector('.vh-panel[data-vhpanel="' + group + '"]');
+      if (panel) panel.querySelectorAll('.vh-blok').forEach(function (p){ p.hidden = p.getAttribute('data-vhbpanel') !== t; });
+    });
+  });
+</script>
+@endpush
 
 {{-- PANEEL: Cijfers --}}
 <section class="sis-tabpanel" data-panel="cijfers">

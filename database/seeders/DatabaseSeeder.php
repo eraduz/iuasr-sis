@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             ReferentieSeeder::class,
             GebruikerSeeder::class,
             SynthetischeStudentSeeder::class,
+            VaktoewijzingSeeder::class,
             ResultatenSeeder::class,
             CollegegeldSeeder::class,
         ]);

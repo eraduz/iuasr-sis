@@ -164,6 +164,9 @@ class InschrijvingActiesController extends Controller
             'invoerdatum' => now()->toDateString(),
         ]);
 
+        // Vakken van het nieuwe studiejaar automatisch toewijzen.
+        \App\Support\Vaktoewijzer::wijsToe($nieuw);
+
         AuditLogger::log(AuditLogger::AANMAAK, $student, veld: 'herinschrijving', context: [
             'periode_id' => $data['periode_id'],
             'inschrijving_id' => $nieuw->id,
