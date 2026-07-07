@@ -68,6 +68,12 @@ class Student extends Model
         return $this->hasMany(Inschrijving::class);
     }
 
+    /** Interne notities (Studentenzaken), nieuwste eerst. */
+    public function notities(): HasMany
+    {
+        return $this->hasMany(StudentNotitie::class)->latest();
+    }
+
     public function nationaliteit(): BelongsTo
     {
         return $this->belongsTo(Nationaliteit::class);

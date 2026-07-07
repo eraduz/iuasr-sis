@@ -36,6 +36,9 @@
       <span class="lock"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
     @endunless
   </button>
+  @if (auth()->user()->magInschrijvingBeheren())
+    <button class="sis-tab" data-tab="notities" role="tab">Notities <span class="sis-pill-soft" style="margin-left:2px;">{{ $student->notities->count() }}</span></button>
+  @endif
 </div>
 
 {{-- PANEEL: Persoonsgegevens --}}
@@ -161,8 +164,56 @@
   @endunless
 </section>
 
+{{-- PANEL: Notities (Studentenzaken / Beheer) --}}
+@if (auth()->user()->magInschrijvingBeheren())
+<section class="sis-tabpanel" data-panel="notities" id="notities">
+  <div class="sis-card">
+    <div class="sis-card__hd"><h3>Interne notities</h3><span class="hint">Alleen zichtbaar voor Studentenzaken &amp; Beheer · geen cijfers of BSN</span></div>
+
+    <form method="POST" action="{{ route('studenten.notities.store', $student) }}" class="iuasr-dash-note-form" style="margin-bottom:14px;">
+      @csrf
+      <div class="iuasr-dash-note-form__hd">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        Nieuwe notitie · {{ now()->format('d-m-Y') }}
+      </div>
+      <textarea name="tekst" required maxlength="2000" placeholder="Bijv. telefonisch contact, gemaakte afspraak, ontbrekend document…">{{ old('tekst') }}</textarea>
+      <div style="display:flex;justify-content:flex-end;">
+        <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Notitie opslaan</button>
+      </div>
+    </form>
+
+    <div class="iuasr-dash-note-list">
+      @forelse ($student->notities as $n)
+        <div class="iuasr-dash-note">
+          <small>{{ $n->created_at->format('d-m-Y · H:i') }} · {{ $n->gebruiker?->naam ?? 'onbekend' }}</small>
+          <div style="display:flex;gap:12px;align-items:flex-start;justify-content:space-between;">
+            <span style="white-space:pre-wrap;">{{ $n->tekst }}</span>
+            <form method="POST" action="{{ route('studenten.notities.destroy', [$student, $n]) }}" onsubmit="return confirm('Deze notitie verwijderen?');" style="flex:none;">
+              @csrf @method('DELETE')
+              <button type="submit" title="Verwijderen" style="background:none;border:0;cursor:pointer;color:var(--blackAltText);padding:2px;line-height:0;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </form>
+          </div>
+        </div>
+      @empty
+        <p class="sis-muted" style="font-size:13px;margin:4px 2px;">Nog geen notities voor deze student.</p>
+      @endforelse
+    </div>
+  </div>
+</section>
+@endif
+
 @push('scripts')
 <script>
+  // Activeer een tab op basis van de #hash (bv. na het opslaan van een notitie).
+  document.addEventListener('DOMContentLoaded', function () {
+    if (location.hash === '#notities') {
+      var t = document.querySelector('.sis-tab[data-tab="notities"]');
+      if (t) t.click();
+    }
+  });
+
   // Tabs
   document.querySelectorAll('.sis-tab').forEach(function (t) {
     t.addEventListener('click', function () {

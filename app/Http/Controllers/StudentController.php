@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Models\StudentNotitie;
 use App\Support\AuditLogger;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -38,7 +39,10 @@ class StudentController extends Controller
      */
     public function show(Student $student): View
     {
-        $student->load(['inschrijvingen.opleiding', 'inschrijvingen.klas', 'inschrijvingen.periode', 'nationaliteit', 'land']);
+        $student->load([
+            'inschrijvingen.opleiding', 'inschrijvingen.klas', 'inschrijvingen.periode',
+            'nationaliteit', 'land', 'notities.gebruiker',
+        ]);
         $huidige = $student->inschrijvingen->sortByDesc('inschrijfdatum')->first();
 
         $magCijfers = auth()->user()->magCijfersInzien();
@@ -79,6 +83,34 @@ class StudentController extends Controller
         return redirect()
             ->route('studenten.show', $student)
             ->with('status', 'Persoonsgegevens bijgewerkt.');
+    }
+
+    /** Interne notitie toevoegen bij een student (Studentenzaken/Beheerder). */
+    public function notitieStore(Request $request, Student $student): RedirectResponse
+    {
+        $data = $request->validate([
+            'tekst' => ['required', 'string', 'max:2000'],
+        ]);
+
+        $student->notities()->create([
+            'gebruiker_id' => auth()->id(),
+            'tekst' => $data['tekst'],
+        ]);
+
+        return redirect()
+            ->to(route('studenten.show', $student).'#notities')
+            ->with('status', 'Notitie toegevoegd.');
+    }
+
+    /** Interne notitie verwijderen. */
+    public function notitieDestroy(Student $student, StudentNotitie $notitie): RedirectResponse
+    {
+        abort_unless($notitie->student_id === $student->id, 404);
+        $notitie->delete();
+
+        return redirect()
+            ->to(route('studenten.show', $student).'#notities')
+            ->with('status', 'Notitie verwijderd.');
     }
 
     /**
