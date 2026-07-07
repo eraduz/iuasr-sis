@@ -72,10 +72,10 @@
     </div>
   </div>
   <div class="iuasr-dash-stats">
+    <div class="iuasr-dash-stat {{ $kpi['ter_vaststelling'] > 0 ? 'iuasr-dash-stat--alert' : '' }}"><span class="lbl">Ter vaststelling</span><span class="val">{{ $kpi['ter_vaststelling'] }}</span><span class="delta">ingediende cijferlijsten</span></div>
     <div class="iuasr-dash-stat"><span class="lbl">Studenten</span><span class="val">{{ $kpi['studenten'] }}</span><span class="delta">in het systeem</span></div>
     <div class="iuasr-dash-stat"><span class="lbl">Vakken</span><span class="val">{{ $kpi['vakken'] }}</span><span class="delta">referentiedata</span></div>
     <div class="iuasr-dash-stat"><span class="lbl">Actieve inschrijvingen</span><span class="val">{{ $kpi['inschrijvingen'] }}</span><span class="delta">huidige periode</span></div>
-    <div class="iuasr-dash-stat iuasr-dash-stat--ok"><span class="lbl">Databron</span><span class="val" style="font-size:15px;line-height:2;">Synthetisch</span><span class="delta">AVG-veilig</span></div>
   </div>
 
 @elseif ($rol === App\Enums\Rol::Beheerder)

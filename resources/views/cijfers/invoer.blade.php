@@ -2,7 +2,15 @@
 
 @section('titel', 'Cijferinvoer · '.$vak->code)
 
-@php $terug = auth()->user()->rolIs('docent') ? route('mijn-vakken') : route('cijferoverzicht'); @endphp
+@php
+  use App\Enums\CijferlijstStatus;
+  $u = auth()->user();
+  $isDocent = $u->rolIs('docent');
+  $isExamen = $u->rolIs('examencommissie');
+  $terug = $isDocent ? route('mijn-vakken') : route('cijferoverzicht');
+  $status = $lijst->status;
+  $correctieMode = $isExamen && $status === CijferlijstStatus::Vastgesteld;
+@endphp
 
 @section('inhoud')
 <div class="sis-crumb"><a href="{{ route('dashboard') }}">Dashboard</a><span class="sep">›</span><a href="{{ $terug }}">{{ auth()->user()->rolIs('docent') ? 'Mijn vakken' : 'Cijferoverzicht' }}</a><span class="sep">›</span><b>{{ $vak->code }}</b></div>
@@ -13,7 +21,8 @@
     <div class="summary"><b>{{ $vak->code }}</b> · {{ $vak->opleiding?->naam }} · {{ $vak->ec }} EC · {{ $rijen->count() }} studenten</div>
   </div>
   <div class="iuasr-dash-vhead__actions">
-    @unless ($magInvoeren)<span class="sis-role-note"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg> Inzage — alleen-lezen</span>@endunless
+    <span class="iuasr-dash-status {{ $status->badge() }}">{{ $status->label() }}</span>
+    @unless ($magInvoeren)<span class="sis-role-note"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg> Alleen-lezen</span>@endunless
   </div>
 </div>
 
@@ -27,7 +36,7 @@
   </div>
 </div>
 
-<form method="POST" action="{{ route('vakken.cijfers.opslaan', $vak) }}">
+<form id="cijfergrid" method="POST" action="{{ route('vakken.cijfers.opslaan', $vak) }}">
   @csrf
   <div class="iuasr-dash-tbl-card">
     <table class="iuasr-dash-tbl" id="grade-tbl">
@@ -77,14 +86,54 @@
     </table>
   </div>
 
-  @if ($magInvoeren && $rijen->isNotEmpty())
-    <div class="sis-savebar">
-      <span class="status"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Eindcijfer wordt live berekend; wijzigingen worden gelogd.</span>
-      <span class="grow"></span>
-      <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit">Cijfers opslaan</button>
-    </div>
-  @endif
 </form>
+
+@if ($lijst->opmerking && $status === CijferlijstStatus::Concept)
+  <div class="iuasr-dash-alert iuasr-dash-alert--warn" style="margin:12px 0;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span><b>Teruggestuurd door de examencommissie:</b> {{ $lijst->opmerking }}</span>
+  </div>
+@endif
+
+{{-- Workflow-formulieren buiten het grid-formulier (form-attribuut koppelt de knoppen) --}}
+@if ($isDocent && $status === CijferlijstStatus::Concept)
+  <form id="indienenForm" method="POST" action="{{ route('vakken.cijfers.indienen', $vak) }}" hidden>@csrf</form>
+@endif
+@if ($isExamen && $status === CijferlijstStatus::Ingediend)
+  <form id="vaststellenForm" method="POST" action="{{ route('vakken.cijfers.vaststellen', $vak) }}" hidden>@csrf</form>
+@endif
+
+@if ($rijen->isNotEmpty())
+  <div class="sis-savebar">
+    <span class="status">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      @if ($magInvoeren)
+        {{ $correctieMode ? 'Correctie op een vastgestelde lijst wordt gelogd.' : 'Eindcijfer wordt live berekend; wijzigingen worden gelogd.' }}
+      @else
+        Vergrendeld — status {{ $status->label() }}.
+      @endif
+    </span>
+    <span class="grow"></span>
+    @if ($magInvoeren)
+      <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit" form="cijfergrid">{{ $correctieMode ? 'Correctie opslaan' : 'Cijfers opslaan' }}</button>
+      @if ($isDocent && $status === CijferlijstStatus::Concept)
+        <button class="iuasr-dash-btn" type="submit" form="indienenForm">Indienen bij examencommissie</button>
+      @endif
+      @if ($isExamen && $status === CijferlijstStatus::Ingediend)
+        <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit" form="vaststellenForm">Vaststellen</button>
+      @endif
+    @endif
+  </div>
+
+  @if ($isExamen && $status === CijferlijstStatus::Ingediend)
+    <form method="POST" action="{{ route('vakken.cijfers.terugsturen', $vak) }}" class="sis-card sis-form" style="margin-top:12px;">
+      @csrf
+      <div class="sis-card__hd"><h3>Terugsturen naar docent</h3></div>
+      <div class="sis-fld"><textarea name="opmerking" placeholder="Reden / opmerking voor de docent (optioneel)"></textarea></div>
+      <div style="display:flex;justify-content:flex-end;"><button class="iuasr-dash-btn iuasr-dash-btn--danger" type="submit">Terugsturen naar docent</button></div>
+    </form>
+  @endif
+@endif
 
 <p class="sis-tblnote">Eindcijfer = gewogen gemiddelde van de deelresultaten (1 decimaal). Bij <b>Vrijstelling</b> vervallen de deelvelden en geldt “VR”. EC worden toegekend als álle meetellende onderdelen voldoende zijn.</p>
 

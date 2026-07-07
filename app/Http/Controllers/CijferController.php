@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CijferlijstStatus;
 use App\Enums\Rol;
+use App\Models\Cijferlijst;
+use App\Models\Periode;
 use App\Models\Resultaat;
 use App\Models\Vak;
 use App\Support\AuditLogger;
@@ -10,38 +13,47 @@ use App\Support\Cijferberekening;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 
 /**
- * Cijferregistratie (Fase 4). Docenten voeren cijfers in voor hun EIGEN vak;
- * examencommissie en directie hebben inzage. Studentenzaken heeft geen toegang.
- * Elke invoer/wijziging en elke inzage wordt gelogd.
+ * Cijferregistratie met vaststellingsworkflow (Fase 4).
+ *
+ * Concept (docent voert in) → Ingediend (bij examencommissie) → Vastgesteld
+ * (definitief door examencommissie). Wie wanneer mag bewerken:
+ *  - Docent: eigen vak, alleen zolang de lijst 'concept' is.
+ *  - Examencommissie: bij 'ingediend' (vaststellen/terugsturen) en 'vastgesteld'
+ *    (gelogde correctie).
+ *  - Studentenzaken: geen enkele toegang tot cijfers.
  */
 class CijferController extends Controller
 {
-    /** Docent: overzicht van de eigen vakken met cijferstatus. */
+    /** Docent: overzicht van de eigen vakken met cijfer-/vaststellingsstatus. */
     public function mijnVakken(): View
     {
         $docentId = auth()->user()->docent_id;
+        $periode = Periode::where('actief', true)->first();
 
         $vakken = Vak::where('docent_id', $docentId)->where('actief', true)
-            ->with(['opleiding', 'toetsonderdelen'])
-            ->orderBy('code')
-            ->get()
-            ->map(function (Vak $vak) {
-                $deelnemers = $vak->deelnemers()->get();
-                $metResultaat = Resultaat::whereIn('inschrijving_id', $deelnemers->pluck('id'))
-                    ->distinct()->pluck('inschrijving_id')->count();
+            ->with(['opleiding', 'toetsonderdelen'])->orderBy('code')->get();
 
-                return [
-                    'vak' => $vak,
-                    'aantal' => $deelnemers->count(),
-                    'ingevoerd' => $metResultaat,
-                    'onderdelen' => $vak->toetsonderdelen->count(),
-                ];
-            });
+        $lijsten = $periode
+            ? Cijferlijst::where('periode_id', $periode->id)->whereIn('vak_id', $vakken->pluck('id'))->get()->keyBy('vak_id')
+            : collect();
 
-        return view('cijfers.mijn-vakken', compact('vakken'));
+        $rijen = $vakken->map(function (Vak $vak) use ($lijsten) {
+            $deelnemers = $vak->deelnemers()->get();
+            $ingevoerd = Resultaat::whereIn('inschrijving_id', $deelnemers->pluck('id'))
+                ->distinct()->pluck('inschrijving_id')->count();
+
+            return [
+                'vak' => $vak,
+                'aantal' => $deelnemers->count(),
+                'ingevoerd' => $ingevoerd,
+                'onderdelen' => $vak->toetsonderdelen->count(),
+                'status' => $lijsten[$vak->id]?->status ?? CijferlijstStatus::Concept,
+            ];
+        });
+
+        return view('cijfers.mijn-vakken', ['vakken' => $rijen]);
     }
 
     /** Cijferinvoer-/inzagescherm voor één vak. */
@@ -50,17 +62,17 @@ class CijferController extends Controller
         $this->autoriseerInzage($vak);
         $vak->load(['opleiding', 'toetsonderdelen', 'docent']);
 
-        $magInvoeren = Gate::allows('cijfers-invoeren', $vak);
+        $periode = $this->actievePeriode();
+        $lijst = Cijferlijst::voor($vak, $periode);
+        $magInvoeren = $this->magBewerken($vak, $lijst);
 
-        // Inzage door examencommissie/directie wordt gelogd.
         if (! $magInvoeren && auth()->user()->magCijfersInzien()) {
             AuditLogger::log(AuditLogger::INZAGE, $vak, veld: 'cijfers', context: ['vak' => $vak->code]);
         }
 
         $deelnemers = $vak->deelnemers()->get();
         $resultaten = Resultaat::whereIn('toetsonderdeel_id', $vak->toetsonderdelen->pluck('id'))
-            ->whereIn('inschrijving_id', $deelnemers->pluck('id'))
-            ->get();
+            ->whereIn('inschrijving_id', $deelnemers->pluck('id'))->get();
 
         $grens = Cijferberekening::voldoendeGrens($vak);
 
@@ -70,28 +82,28 @@ class CijferController extends Controller
             foreach ($vak->toetsonderdelen as $od) {
                 $perOnderdeel[$od->id] = Cijferberekening::beste($eigen, $od->id);
             }
-            $eersteMetPoging = $eigen->first();
 
             return [
                 'inschrijving' => $insch,
                 'student' => $insch->student,
                 'resultaten' => $perOnderdeel,
-                'poging' => $eersteMetPoging?->poging ?? 'tentamen',
+                'poging' => $eigen->first()?->poging ?? 'tentamen',
                 'vrijstelling' => (bool) $eigen->firstWhere('vrijstelling', true),
                 'eind' => Cijferberekening::eindcijfer($vak, $eigen),
                 'ec' => Cijferberekening::ec($vak, $eigen),
             ];
         });
 
-        return view('cijfers.invoer', compact('vak', 'rijen', 'magInvoeren', 'grens'));
+        return view('cijfers.invoer', compact('vak', 'rijen', 'magInvoeren', 'grens', 'lijst'));
     }
 
-    /** Cijfers opslaan (docent eigen vak, of examencommissie). */
+    /** Cijfers opslaan (docent bij concept, of examencommissie bij ingediend/vastgesteld). */
     public function opslaan(Request $request, Vak $vak): RedirectResponse
     {
-        abort_unless(Gate::allows('cijfers-invoeren', $vak), 403, 'Geen recht om cijfers voor dit vak in te voeren.');
+        $periode = $this->actievePeriode();
+        $lijst = Cijferlijst::voor($vak, $periode);
+        abort_unless($this->magBewerken($vak, $lijst), 403, 'Deze cijferlijst mag u nu niet bewerken.');
 
-        // Nederlandse komma-decimalen normaliseren naar punt vóór validatie.
         $cijfers = $request->input('cijfer', []);
         array_walk_recursive($cijfers, function (&$v) {
             if (is_string($v)) {
@@ -108,10 +120,10 @@ class CijferController extends Controller
         $vak->load('toetsonderdelen');
         $grens = Cijferberekening::voldoendeGrens($vak);
         $deelnemers = $vak->deelnemers()->get();
+        $correctie = auth()->user()->rol === Rol::Examencommissie && $lijst->status === CijferlijstStatus::Vastgesteld;
 
         $bestaand = Resultaat::whereIn('toetsonderdeel_id', $vak->toetsonderdelen->pluck('id'))
-            ->whereIn('inschrijving_id', $deelnemers->pluck('id'))
-            ->get()
+            ->whereIn('inschrijving_id', $deelnemers->pluck('id'))->get()
             ->keyBy(fn ($r) => $r->inschrijving_id.'-'.$r->toetsonderdeel_id);
 
         foreach ($deelnemers as $insch) {
@@ -121,14 +133,14 @@ class CijferController extends Controller
 
             foreach ($vak->toetsonderdelen as $od) {
                 $raw = data_get($request->input('cijfer'), $insch->id.'.'.$od->id);
-                $cijfer = ($raw === null || $raw === '') ? null : (float) str_replace(',', '.', (string) $raw);
+                $cijfer = ($raw === null || $raw === '') ? null : (float) $raw;
                 if ($vrij) {
                     $cijfer = null;
                 }
 
                 $res = $bestaand->get($insch->id.'-'.$od->id);
                 if ($res === null && ! $vrij && $cijfer === null) {
-                    continue; // niets in te voeren voor deze cel
+                    continue;
                 }
 
                 $res ??= new Resultaat([
@@ -144,6 +156,7 @@ class CijferController extends Controller
                     'voldoende' => $vrij ? true : ($cijfer !== null ? $cijfer >= $grens : null),
                     'ingevoerd_door_id' => auth()->id(),
                     'toetsdatum' => $res->toetsdatum ?? now()->toDateString(),
+                    'definitief' => $lijst->status === CijferlijstStatus::Vastgesteld,
                 ]);
 
                 if ($res->isDirty()) {
@@ -153,45 +166,138 @@ class CijferController extends Controller
             }
 
             if ($gewijzigd) {
-                AuditLogger::log(AuditLogger::WIJZIGING, $insch->student, veld: 'cijfer', context: ['vak' => $vak->code]);
+                AuditLogger::log(AuditLogger::WIJZIGING, $insch->student, veld: 'cijfer',
+                    context: ['vak' => $vak->code, 'correctie' => $correctie]);
             }
         }
 
-        return redirect()->route('vakken.cijfers', $vak)->with('status', 'Cijfers opgeslagen.');
+        return redirect()->route('vakken.cijfers', $vak)
+            ->with('status', $correctie ? 'Correctie opgeslagen en gelogd.' : 'Cijfers opgeslagen.');
     }
 
-    /** Examencommissie/Directie: overzicht van alle vakken met gemiddelde en geslaagd. */
+    /** Docent dient de cijferlijst in bij de examencommissie. */
+    public function indienen(Vak $vak): RedirectResponse
+    {
+        $lijst = Cijferlijst::voor($vak, $this->actievePeriode());
+        $u = auth()->user();
+        abort_unless($u->rol === Rol::Docent && $u->docent_id === $vak->docent_id
+            && $lijst->status === CijferlijstStatus::Concept, 403);
+
+        $lijst->update([
+            'status' => CijferlijstStatus::Ingediend,
+            'ingediend_op' => now(),
+            'ingediend_door_id' => $u->id,
+            'opmerking' => null,
+        ]);
+        AuditLogger::log(AuditLogger::WIJZIGING, $vak, veld: 'cijferlijst', context: ['status' => 'ingediend']);
+
+        return redirect()->route('vakken.cijfers', $vak)->with('status', 'Cijferlijst ingediend bij de examencommissie.');
+    }
+
+    /** Examencommissie stelt de cijferlijst definitief vast. */
+    public function vaststellen(Vak $vak): RedirectResponse
+    {
+        abort_unless(auth()->user()->rol === Rol::Examencommissie, 403);
+        $lijst = Cijferlijst::voor($vak, $this->actievePeriode());
+        abort_unless($lijst->status === CijferlijstStatus::Ingediend, 403, 'Alleen een ingediende lijst kan worden vastgesteld.');
+
+        $lijst->update([
+            'status' => CijferlijstStatus::Vastgesteld,
+            'vastgesteld_op' => now(),
+            'vastgesteld_door_id' => auth()->id(),
+        ]);
+
+        // Resultaten markeren als definitief.
+        $vak->load('toetsonderdelen');
+        $deelnemers = $vak->deelnemers()->get();
+        Resultaat::whereIn('toetsonderdeel_id', $vak->toetsonderdelen->pluck('id'))
+            ->whereIn('inschrijving_id', $deelnemers->pluck('id'))
+            ->update(['definitief' => true]);
+
+        AuditLogger::log(AuditLogger::WIJZIGING, $vak, veld: 'cijferlijst', context: ['status' => 'vastgesteld']);
+
+        return redirect()->route('vakken.cijfers', $vak)->with('status', 'Cijferlijst vastgesteld.');
+    }
+
+    /** Examencommissie stuurt een ingediende lijst terug naar de docent. */
+    public function terugsturen(Request $request, Vak $vak): RedirectResponse
+    {
+        abort_unless(auth()->user()->rol === Rol::Examencommissie, 403);
+        $lijst = Cijferlijst::voor($vak, $this->actievePeriode());
+        abort_unless($lijst->status === CijferlijstStatus::Ingediend, 403);
+
+        $data = $request->validate(['opmerking' => ['nullable', 'string', 'max:500']]);
+        $lijst->update([
+            'status' => CijferlijstStatus::Concept,
+            'ingediend_op' => null,
+            'ingediend_door_id' => null,
+            'opmerking' => $data['opmerking'] ?? null,
+        ]);
+        AuditLogger::log(AuditLogger::WIJZIGING, $vak, veld: 'cijferlijst', context: ['status' => 'teruggestuurd']);
+
+        return redirect()->route('vakken.cijfers', $vak)->with('status', 'Cijferlijst teruggestuurd naar de docent.');
+    }
+
+    /** Examencommissie/Directie: overzicht van alle vakken met status en gemiddelde. */
     public function overzicht(): View
     {
-        $vakken = Vak::where('actief', true)->with(['opleiding', 'docent', 'toetsonderdelen'])
-            ->orderBy('code')->get()
-            ->map(function (Vak $vak) {
-                $deelnemers = $vak->deelnemers()->get();
-                $resultaten = Resultaat::whereIn('toetsonderdeel_id', $vak->toetsonderdelen->pluck('id'))
-                    ->whereIn('inschrijving_id', $deelnemers->pluck('id'))->get();
+        $periode = Periode::where('actief', true)->first();
+        $vakken = Vak::where('actief', true)->with(['opleiding', 'docent', 'toetsonderdelen'])->orderBy('code')->get();
+        $lijsten = $periode
+            ? Cijferlijst::where('periode_id', $periode->id)->whereIn('vak_id', $vakken->pluck('id'))->get()->keyBy('vak_id')
+            : collect();
 
-                $cijfers = [];
-                $geslaagd = 0;
-                foreach ($deelnemers as $insch) {
-                    $eigen = $resultaten->where('inschrijving_id', $insch->id);
-                    $eind = Cijferberekening::eindcijfer($vak, $eigen);
-                    if ($eind['status'] === 'cijfer') {
-                        $cijfers[] = $eind['cijfer'];
-                    }
-                    if ((Cijferberekening::ec($vak, $eigen) ?? 0) > 0) {
-                        $geslaagd++;
-                    }
+        $rijen = $vakken->map(function (Vak $vak) use ($lijsten) {
+            $deelnemers = $vak->deelnemers()->get();
+            $resultaten = Resultaat::whereIn('toetsonderdeel_id', $vak->toetsonderdelen->pluck('id'))
+                ->whereIn('inschrijving_id', $deelnemers->pluck('id'))->get();
+
+            $cijfers = [];
+            $geslaagd = 0;
+            foreach ($deelnemers as $insch) {
+                $eigen = $resultaten->where('inschrijving_id', $insch->id);
+                $eind = Cijferberekening::eindcijfer($vak, $eigen);
+                if ($eind['status'] === 'cijfer') {
+                    $cijfers[] = $eind['cijfer'];
                 }
+                if ((Cijferberekening::ec($vak, $eigen) ?? 0) > 0) {
+                    $geslaagd++;
+                }
+            }
 
-                return [
-                    'vak' => $vak,
-                    'aantal' => $deelnemers->count(),
-                    'gemiddeld' => $cijfers ? round(array_sum($cijfers) / count($cijfers), 1) : null,
-                    'geslaagd' => $geslaagd,
-                ];
-            });
+            return [
+                'vak' => $vak,
+                'aantal' => $deelnemers->count(),
+                'gemiddeld' => $cijfers ? round(array_sum($cijfers) / count($cijfers), 1) : null,
+                'geslaagd' => $geslaagd,
+                'status' => $lijsten[$vak->id]?->status ?? CijferlijstStatus::Concept,
+            ];
+        });
 
-        return view('cijfers.overzicht', compact('vakken'));
+        $terVaststelling = $rijen->filter(fn ($r) => $r['status'] === CijferlijstStatus::Ingediend)->count();
+
+        return view('cijfers.overzicht', ['vakken' => $rijen, 'terVaststelling' => $terVaststelling]);
+    }
+
+    private function actievePeriode(): Periode
+    {
+        return Periode::where('actief', true)->firstOrFail();
+    }
+
+    private function magBewerken(Vak $vak, Cijferlijst $lijst): bool
+    {
+        $u = auth()->user();
+
+        if ($u->rol === Rol::Docent) {
+            return $u->docent_id !== null && $vak->docent_id === $u->docent_id
+                && $lijst->status === CijferlijstStatus::Concept;
+        }
+
+        if ($u->rol === Rol::Examencommissie) {
+            return in_array($lijst->status, [CijferlijstStatus::Ingediend, CijferlijstStatus::Vastgesteld], true);
+        }
+
+        return false;
     }
 
     private function autoriseerInzage(Vak $vak): void

@@ -97,4 +97,64 @@ class CijferTest extends TestCase
         // Reguliere invoer is voorbehouden aan de docent.
         $this->actingAs($ec)->post(route('vakken.cijfers.opslaan', $this->vak), [])->assertForbidden();
     }
+
+    private function examencommissie(): User
+    {
+        return User::firstOrCreate(['email' => 'ec@iuasr.test'], ['naam' => 'EC', 'rol' => Rol::Examencommissie]);
+    }
+
+    private function lijst(): \App\Models\Cijferlijst
+    {
+        return \App\Models\Cijferlijst::voor($this->vak, \App\Models\Periode::where('actief', true)->first());
+    }
+
+    public function test_docent_dient_in_en_examencommissie_stelt_vast(): void
+    {
+        $insch = $this->vak->deelnemers()->first();
+        $payload = ['poging' => [$insch->id => 'tentamen'], 'cijfer' => [$insch->id => []]];
+        foreach ($this->vak->toetsonderdelen as $od) {
+            $payload['cijfer'][$insch->id][$od->id] = '7,0';
+        }
+
+        $this->actingAs($this->docent)->post(route('vakken.cijfers.opslaan', $this->vak), $payload);
+        $this->actingAs($this->docent)->post(route('vakken.cijfers.indienen', $this->vak))->assertRedirect();
+        $this->assertSame(\App\Enums\CijferlijstStatus::Ingediend, $this->lijst()->status);
+
+        // Docent mag na indienen niet meer bewerken.
+        $this->actingAs($this->docent)->post(route('vakken.cijfers.opslaan', $this->vak), $payload)->assertForbidden();
+
+        // Examencommissie stelt vast -> resultaten definitief.
+        $this->actingAs($this->examencommissie())->post(route('vakken.cijfers.vaststellen', $this->vak))->assertRedirect();
+        $this->assertSame(\App\Enums\CijferlijstStatus::Vastgesteld, $this->lijst()->status);
+        $this->assertDatabaseHas('resultaten', ['inschrijving_id' => $insch->id, 'definitief' => true]);
+    }
+
+    public function test_terugsturen_zet_de_lijst_terug_naar_concept(): void
+    {
+        $this->actingAs($this->docent)->post(route('vakken.cijfers.indienen', $this->vak));
+        $this->actingAs($this->examencommissie())
+            ->post(route('vakken.cijfers.terugsturen', $this->vak), ['opmerking' => 'Cijfer nakijken'])
+            ->assertRedirect();
+
+        $lijst = $this->lijst();
+        $this->assertSame(\App\Enums\CijferlijstStatus::Concept, $lijst->status);
+        $this->assertSame('Cijfer nakijken', $lijst->opmerking);
+    }
+
+    public function test_correctie_na_vaststelling_door_examencommissie_wordt_gelogd(): void
+    {
+        $this->actingAs($this->docent)->post(route('vakken.cijfers.indienen', $this->vak));
+        $ec = $this->examencommissie();
+        $this->actingAs($ec)->post(route('vakken.cijfers.vaststellen', $this->vak));
+
+        $insch = $this->vak->deelnemers()->first();
+        $od = $this->vak->toetsonderdelen->first();
+        $this->actingAs($ec)->post(route('vakken.cijfers.opslaan', $this->vak), [
+            'poging' => [$insch->id => 'tentamen'],
+            'cijfer' => [$insch->id => [$od->id => '8,0']],
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('resultaten', ['inschrijving_id' => $insch->id, 'toetsonderdeel_id' => $od->id, 'cijfer' => 8.0]);
+        $this->assertDatabaseHas('audit_logs', ['veld' => 'cijfer', 'actie' => 'wijziging']);
+    }
 }

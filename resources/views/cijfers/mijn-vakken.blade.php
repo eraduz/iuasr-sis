@@ -23,11 +23,13 @@
     <tbody>
       @forelse ($vakken as $r)
         @php
-          $vak = $r['vak'];
-          if ($r['aantal'] === 0) { $badge = 's-draft'; $tekst = 'Geen deelnemers'; }
+          $vak = $r['vak']; $st = $r['status'];
+          if ($st !== App\Enums\CijferlijstStatus::Concept) { $badge = $st->badge(); $tekst = $st->label(); }
+          elseif ($r['aantal'] === 0) { $badge = 's-draft'; $tekst = 'Geen deelnemers'; }
           elseif ($r['ingevoerd'] === 0) { $badge = 's-draft'; $tekst = 'Nog niet gestart'; }
           elseif ($r['ingevoerd'] < $r['aantal']) { $badge = 's-incomplete'; $tekst = $r['ingevoerd'].'/'.$r['aantal'].' ingevoerd'; }
-          else { $badge = 's-approved'; $tekst = 'Volledig'; }
+          else { $badge = 's-incomplete'; $tekst = 'Volledig — nog niet ingediend'; }
+          $vergrendeld = $st !== App\Enums\CijferlijstStatus::Concept;
         @endphp
         <tr>
           <td class="nm">{{ $vak->naam }}</td>
@@ -37,7 +39,7 @@
           <td class="tnum">{{ $r['aantal'] }}</td>
           <td class="tnum">{{ $r['onderdelen'] }}</td>
           <td><span class="iuasr-dash-status {{ $badge }}">{{ $tekst }}</span></td>
-          <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" href="{{ route('vakken.cijfers', $vak) }}">Cijfers invoeren</a></td>
+          <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm {{ $vergrendeld ? '' : 'iuasr-dash-btn--primary' }}" href="{{ route('vakken.cijfers', $vak) }}">{{ $vergrendeld ? 'Bekijken' : 'Cijfers invoeren' }}</a></td>
         </tr>
       @empty
         <tr><td colspan="8"><div class="iuasr-dash-empty" style="border:0;"><h3>Geen vakken gekoppeld</h3><p>Er zijn nog geen vakken aan uw docentprofiel gekoppeld.</p></div></td></tr>

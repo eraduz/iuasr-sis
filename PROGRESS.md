@@ -7,7 +7,7 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
 
 ## Projectstatus
 
-- **Huidige fase:** Fase 4 — Cijfers & rolscheiding (increment 1 opgeleverd)
+- **Huidige fase:** Fase 4 — Cijfers & rolscheiding (increment 1 + 2 opgeleverd)
 - **Laatst bijgewerkt:** 2026-07-07
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 
@@ -66,8 +66,14 @@ opleverpunt aantoonbaar klaar is.
     (Examencie/Directie, inzage + gelogd); cijfer-tabblad op studentdetail gevuld;
     audit-logging op invoer/wijziging en inzage. Rolscheiding: SZ geen toegang,
     docent alleen eigen vak, examencie/directie read-only. 36 tests groen.
-  - Nog te doen: examencommissie-vaststelling + correctie (strikt/gelogd),
-    leerjaar-herbeoordeling op EC-drempel, herkansing als aparte poging.
+  - Increment 2: vaststellingsworkflow via `Cijferlijst` (vak × periode), status
+    concept → ingediend → vastgesteld. Docent dient in (daarna vergrendeld);
+    examencommissie stelt vast of stuurt terug (met opmerking) en kan een
+    vastgestelde lijst corrigeren (gelogd). Resultaten worden bij vaststellen
+    definitief. Status zichtbaar in mijn-vakken, cijferoverzicht en op het
+    examencommissie-dashboard ("ter vaststelling"). 52 tests groen.
+  - Nog te doen: leerjaar-herbeoordeling op EC-drempel (zodra per opleiding
+    ingevuld), herkansing als aparte poging (nu één rij per onderdeel).
 - [ ] **Fase 5 — Rapporten + documenten**
   - Cijferlijsten, overzichten, documentgeneratie.
 - [ ] **Fase 6 — Portaalkoppeling**

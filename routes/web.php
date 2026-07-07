@@ -116,8 +116,17 @@ Route::middleware('auth')->group(function () {
     Route::middleware('rol:docent,examencommissie,directie')->group(function () {
         Route::get('/vakken/{vak}/cijfers', [CijferController::class, 'invoer'])->name('vakken.cijfers');
     });
-    Route::middleware('rol:docent')->group(function () {
+    // Opslaan: docent (concept) of examencommissie (correctie na indienen/vaststellen).
+    Route::middleware('rol:docent,examencommissie')->group(function () {
         Route::post('/vakken/{vak}/cijfers', [CijferController::class, 'opslaan'])->name('vakken.cijfers.opslaan');
+    });
+    // Vaststellingsworkflow.
+    Route::middleware('rol:docent')->group(function () {
+        Route::post('/vakken/{vak}/indienen', [CijferController::class, 'indienen'])->name('vakken.cijfers.indienen');
+    });
+    Route::middleware('rol:examencommissie')->group(function () {
+        Route::post('/vakken/{vak}/vaststellen', [CijferController::class, 'vaststellen'])->name('vakken.cijfers.vaststellen');
+        Route::post('/vakken/{vak}/terugsturen', [CijferController::class, 'terugsturen'])->name('vakken.cijfers.terugsturen');
     });
 
     // --- Cijferinzage & rapporten — Examencommissie & Directie ---
