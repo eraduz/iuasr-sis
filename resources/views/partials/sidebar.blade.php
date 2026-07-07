@@ -56,7 +56,6 @@
             'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
             'Onderwijs' => [
                 ['Mijn vakken', 'mijn-vakken', 'book', 'mijn-vakken'],
-                ['Cijferinvoer', 'cijferinvoer', 'grade', 'cijferinvoer'],
             ],
         ],
         Rol::Examencommissie->value => [
