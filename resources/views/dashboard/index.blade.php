@@ -31,43 +31,34 @@
     <span>Als Studentenzaken heeft u <b>geen inzage in cijfers</b>. Dit wordt server-side afgedwongen (rolscheiding), niet alleen in de interface.</span>
   </div>
 
-  {{-- NT2-examen bewaking: 1 jaar vanaf inschrijfdatum om te halen --}}
+  {{-- Signaleringen voor Studentenzaken — compacte tegels; ruimte voor
+       toekomstige herinneringen/attenderingen naast de NT2-bewaking. --}}
   @php
     $verlopen = $nt2->where('status', 'verlopen');
     $binnenkort = $nt2->filter(fn ($r) => $r['status'] === 'open' && $r['dagen'] !== null && $r['dagen'] <= 30);
   @endphp
-  <div class="sis-card" style="margin-top:16px;">
-    <div class="sis-card__hd"><h3>NT2-examen bewaking</h3><span class="hint">1 jaar vanaf inschrijfdatum om succesvol af te ronden</span></div>
-    @if ($nt2->isEmpty())
-      <p class="sis-muted" style="font-size:13px;margin:0;">Geen openstaande NT2-verplichtingen — alle NT2-plichtige studenten hebben het examen behaald.</p>
-    @else
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
-        <span class="iuasr-dash-status s-rejected">{{ $verlopen->count() }} termijn verstreken</span>
-        <span class="iuasr-dash-status s-incomplete">{{ $binnenkort->count() }} binnen 30 dagen</span>
-        <span class="iuasr-dash-status s-draft">{{ $nt2->count() }} openstaand totaal</span>
-      </div>
-      <div class="iuasr-dash-tbl-card" style="border:0;max-height:340px;overflow:auto;">
-        <table class="iuasr-dash-tbl">
-          <thead><tr><th>Studentnr.</th><th>Naam</th><th>Deadline</th><th style="text-align:right;">Resterend</th><th class="row-act"></th></tr></thead>
-          <tbody>
-            @foreach ($nt2 as $r)
-              @php $s = $r['student']; $verl = $r['status'] === 'verlopen'; $bijna = ! $verl && $r['dagen'] !== null && $r['dagen'] <= 30; @endphp
-              <tr>
-                <td class="tnum">{{ $s->studentnummer }}</td>
-                <td class="nm">{{ $s->volledigeNaam() }}</td>
-                <td class="dt">{{ $r['deadline']?->format('d-m-Y') ?? '—' }}</td>
-                <td style="text-align:right;">
-                  @if ($verl)<span class="iuasr-dash-status s-rejected">{{ abs($r['dagen']) }} dagen te laat</span>
-                  @elseif ($bijna)<span class="iuasr-dash-status s-incomplete">nog {{ $r['dagen'] }} dagen</span>
-                  @else<span class="sis-muted">nog {{ $r['dagen'] }} dagen</span>@endif
-                </td>
-                <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('studenten.show', $s) }}">Openen</a></td>
-              </tr>
-            @endforeach
-          </tbody>
-        </table>
-      </div>
-    @endif
+  <div class="sis-grid-2" style="margin-top:16px;align-items:start;">
+    <div class="sis-card">
+      <div class="sis-card__hd"><h3>NT2-examen</h3>@if ($nt2->isNotEmpty())<span class="hint">{{ $nt2->count() }} openstaand</span>@endif</div>
+      @if ($nt2->isEmpty())
+        <p class="sis-muted" style="font-size:13px;margin:0;">Geen openstaande NT2-verplichtingen.</p>
+      @else
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+          @if ($verlopen->count())<span class="iuasr-dash-status s-rejected">{{ $verlopen->count() }} verstreken</span>@endif
+          @if ($binnenkort->count())<span class="iuasr-dash-status s-incomplete">{{ $binnenkort->count() }} &lt; 30 dagen</span>@endif
+        </div>
+        <ul class="iuasr-dash-log" style="margin:0;">
+          @foreach ($nt2->take(4) as $r)
+            @php $s = $r['student']; $verl = $r['status'] === 'verlopen'; @endphp
+            <li>
+              <a href="{{ route('studenten.show', $s) }}"><b>{{ $s->volledigeNaam() }}</b></a>
+              <time>@if ($verl)<span style="color:var(--secColor100);">{{ abs($r['dagen']) }} dagen te laat</span>@else nog {{ $r['dagen'] }} dagen @endif</time>
+            </li>
+          @endforeach
+        </ul>
+        @if ($nt2->count() > 4)<p class="sis-muted" style="font-size:12px;margin:8px 2px 0;">+ {{ $nt2->count() - 4 }} meer…</p>@endif
+      @endif
+    </div>
   </div>
 
 @elseif ($rol === App\Enums\Rol::Financien)

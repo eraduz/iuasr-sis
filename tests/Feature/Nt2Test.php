@@ -57,9 +57,9 @@ class Nt2Test extends TestCase
 
         $this->actingAs($sz)->get(route('dashboard'))
             ->assertOk()
-            ->assertSee('NT2-examen bewaking')
-            ->assertSee('261002')   // openstaand (verlopen) staat in de lijst
-            ->assertDontSee('261003'); // behaald hoort NIET in de bewakingslijst
+            ->assertSee('NT2-examen')
+            ->assertSee('Mehmet')   // 261002 (verstreken) staat in de lijst
+            ->assertDontSee('Bouzidi'); // 261003 (behaald) hoort NIET in de lijst
     }
 
     public function test_studentenzaken_legt_nt2_resultaat_vast(): void
