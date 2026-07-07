@@ -117,6 +117,23 @@ class FinancienTest extends TestCase
         $this->assertEqualsWithDelta(2000 - round(4000 / 12 * 4, 2), $status['terugbetaling'], 0.01);
     }
 
+    public function test_actieve_student_die_vooruit_betaalt_krijgt_geen_terugbetaling(): void
+    {
+        $this->tarief(4000);
+        $student = Student::where('studentnummer', '261011')->first(); // actief
+        $insch = $student->inschrijvingen()->first();
+
+        // Volledig jaarbedrag vooruit betaald terwijl de student nog is ingeschreven.
+        $student->betalingen()->create([
+            'inschrijving_id' => $insch->id, 'bedrag' => 4000, 'datum' => '2025-09-15',
+        ]);
+
+        $status = Collegegeldstatus::voor($student->fresh());
+        $this->assertSame(0.0, $status['terugbetaling']); // geen terugbetaling: nog ingeschreven
+        $this->assertGreaterThan(0, $status['vooruitbetaald']); // maar wel een tegoed
+        $this->assertFalse($status['achterstand']);
+    }
+
     public function test_studentenzaken_registreert_geen_betaling(): void
     {
         $this->actingAs($this->sz)->get(route('financien'))->assertForbidden();

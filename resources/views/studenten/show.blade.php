@@ -118,6 +118,11 @@
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
                 <span>Terug te betalen aan student: <b>€ {{ number_format($financieel['terugbetaling'], 2, ',', '.') }}</b></span>
               </div>
+            @elseif ($financieel['vooruitbetaald'] > 0)
+              <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-top:12px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Vooruitbetaald (tegoed): <b>€ {{ number_format($financieel['vooruitbetaald'], 2, ',', '.') }}</b> <span class="sis-muted" style="font-size:11px;">· nog ingeschreven, verrekend met resterende maanden</span></span>
+              </div>
             @else
               <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-top:12px;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>

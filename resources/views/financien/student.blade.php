@@ -16,6 +16,8 @@
       <span class="iuasr-dash-status s-rejected" style="align-self:flex-start;">Nog te betalen € {{ number_format($status['openstaand'], 2, ',', '.') }}</span>
     @elseif ($status['terugbetaling'] > 0)
       <span class="iuasr-dash-status s-submitted" style="align-self:flex-start;">Terugbetaling € {{ number_format($status['terugbetaling'], 2, ',', '.') }}</span>
+    @elseif ($status['vooruitbetaald'] > 0)
+      <span class="iuasr-dash-status s-requested" style="align-self:flex-start;">Vooruitbetaald € {{ number_format($status['vooruitbetaald'], 2, ',', '.') }}</span>
     @else
       <span class="iuasr-dash-status s-approved" style="align-self:flex-start;">Voldaan</span>
     @endif
@@ -26,7 +28,9 @@
   <div class="iuasr-dash-stat"><span class="lbl">Verschuldigd (pro rata)</span><span class="val" style="font-size:22px;">€ {{ number_format($status['verschuldigd'], 2, ',', '.') }}</span><span class="delta">{{ $status['maanden'] }} {{ $status['maanden'] === 1 ? 'maand' : 'maanden' }} ingeschreven</span></div>
   <div class="iuasr-dash-stat"><span class="lbl">Betaald</span><span class="val" style="font-size:22px;">€ {{ number_format($status['betaald'], 2, ',', '.') }}</span></div>
   @if ($status['terugbetaling'] > 0)
-    <div class="iuasr-dash-stat iuasr-dash-stat--alert"><span class="lbl">Terug te betalen</span><span class="val" style="font-size:22px;">€ {{ number_format($status['terugbetaling'], 2, ',', '.') }}</span><span class="delta">teveel betaald</span></div>
+    <div class="iuasr-dash-stat iuasr-dash-stat--alert"><span class="lbl">Terug te betalen</span><span class="val" style="font-size:22px;">€ {{ number_format($status['terugbetaling'], 2, ',', '.') }}</span><span class="delta">teveel betaald · inschrijving beëindigd</span></div>
+  @elseif ($status['vooruitbetaald'] > 0)
+    <div class="iuasr-dash-stat"><span class="lbl">Vooruitbetaald</span><span class="val" style="font-size:22px;">€ {{ number_format($status['vooruitbetaald'], 2, ',', '.') }}</span><span class="delta">tegoed · nog ingeschreven</span></div>
   @else
     <div class="iuasr-dash-stat {{ $status['achterstand'] ? 'iuasr-dash-stat--alert' : 'iuasr-dash-stat--ok' }}"><span class="lbl">Openstaand</span><span class="val" style="font-size:22px;">€ {{ number_format($status['openstaand'], 2, ',', '.') }}</span><span class="delta">saldo</span></div>
   @endif

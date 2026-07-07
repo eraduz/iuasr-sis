@@ -50,7 +50,17 @@ class Collegegeldstatus
 
         $betaald = (float) $student->betalingen->sum('bedrag');
         $openstaand = round(max(0, $verschuldigd - $betaald), 2);
-        $terugbetaling = round(max(0, $betaald - $verschuldigd), 2);
+        $teveel = round(max(0, $betaald - $verschuldigd), 2);
+
+        // Een lopende (nog niet beëindigde) inschrijving is het volledige jaar
+        // verschuldigd; wie vooruit betaalt heeft een TEGOED, geen terugbetaling.
+        // Een terugbetaling ontstaat pas als de inschrijving is beëindigd
+        // (uitgeschreven/afgestudeerd) en er meer is betaald dan pro rata verschuldigd.
+        $lopend = $student->inschrijvingen->contains(fn ($i) => in_array($i->status, [
+            InschrijvingStatus::Actief,
+            InschrijvingStatus::Geschorst,
+            InschrijvingStatus::Aangemeld,
+        ], true));
 
         return [
             'jaarbedrag' => $jaarbedrag !== null ? round($jaarbedrag, 2) : null,
@@ -59,7 +69,9 @@ class Collegegeldstatus
             'verschuldigd' => round($verschuldigd, 2),
             'betaald' => round($betaald, 2),
             'openstaand' => $openstaand,
-            'terugbetaling' => $terugbetaling,
+            'terugbetaling' => $lopend ? 0.0 : $teveel,
+            'vooruitbetaald' => $lopend ? $teveel : 0.0,
+            'lopend' => $lopend,
             'saldo' => round($betaald - $verschuldigd, 2),
             'achterstand' => $openstaand > 0,
         ];
