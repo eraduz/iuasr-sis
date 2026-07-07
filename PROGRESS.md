@@ -36,15 +36,23 @@ opleverpunt aantoonbaar klaar is.
     `php artisan migrate --seed` en de testsuite draaien groen; de app boot op
     `http://127.0.0.1:8000` (dashboard + SSO-login geven HTTP 200).
   - Nog te doen: Entra ID/OIDC-integratie, TO-document.
-- [~] **Fase 3 — Kern-CRUD** (increment 1 opgeleverd)
+- [~] **Fase 3 — Kern-CRUD** (increment 1 + 2 opgeleverd)
   - Student/inschrijving/opleiding-beheer door SZ (identiteit, geen cijfers).
-  - Gedaan: dev-login (tijdelijk, vervangt Entra later), server-side rolscheiding
-    op alle routes; server-gerenderde shell (header/sidebar per rol); studentenlijst
-    (zoek op studentnummer), studentdetail (BSN gemaskeerd + gelogde inzage; cijfer-
-    tabblad afgeschermd voor SZ), inschrijven met automatische nummergeneratie;
-    audit-logging op aanmaak en BSN-inzage. 12 tests groen; live geverifieerd.
-  - Nog te doen: herinschrijven, uitschrijven, verklaringen (A4), student muteren,
-    opzoektabellen-beheer, rijkere synthetische dataset.
+  - Increment 1: dev-login (tijdelijk, vervangt Entra later), server-side
+    rolscheiding op alle routes; server-gerenderde shell; studentenlijst (zoek op
+    studentnummer), studentdetail (BSN gemaskeerd + gelogde inzage; cijfer-tabblad
+    afgeschermd voor SZ), inschrijven met automatische nummergeneratie.
+  - Increment 2: lifecycle via `InschrijvingStatus`-enum (incl. geschorst) —
+    muteren, herinschrijven (studentnummer blijft), uitschrijven (uitschrijfdatum
+    = einde maand), schorsen/opheffen met één klik; verklaringen (A4, geen
+    cijfers/BSN, uitgifte gelogd); opzoektabellen-beheer (generieke CRUD voor
+    opleidingen, vakken, perioden, klassen, docenten, landen, nationaliteiten);
+    gebruikers & rollen (toegangsmatrix + rol wijzigen, gelogd); audit-log
+    (alleen-lezen); klassenlijst-rapport (A4). Rijkere synthetische dataset.
+  - 20 tests groen (rolscheiding, lifecycle, mutatie, verklaring, beheer);
+    alle schermen live geverifieerd.
+  - Nog te doen: cijferrapport/tentamenlijst (na Fase 4), student toevoegen los
+    van aanmelding is al mogelijk via inschrijven.
 - [ ] **Fase 4 — Cijfers + rolscheiding**
   - Genormaliseerde resultaatregels, docent-invoer eigen vak, server-side autorisatie.
 - [ ] **Fase 5 — Rapporten + documenten**
@@ -102,6 +110,10 @@ Deze zijn nog niet vastgesteld. Vraag de opdrachtgever; verzin geen waarden.
 | 2026-07-06 | Studentnummer BEVESTIGD: jaarprefix (2) + volgnummer, totaal 6 tekens (voorbeeld 261234). |
 | 2026-07-06 | Tijdelijke dev-login (alleen lokaal) om rolscheiding te bouwen/testen; vervangen door Entra ID SSO in latere fase. |
 | 2026-07-06 | App-shell (header/sidebar) server-side gerenderd op basis van de ingelogde rol; `sis-shell.js` (localStorage-demo) niet meer leidend in de app. |
+| 2026-07-07 | Inschrijvingstatus als enum met o.a. `geschorst`; schorsen/opheffen met één klik (omkeerbaar). |
+| 2026-07-07 | Uitschrijfdatum wordt berekend als einde van de lopende maand (wettelijke regel). |
+| 2026-07-07 | Verklaringen bevatten nooit cijfers of BSN; uitgifte wordt gelogd. |
+| 2026-07-07 | Opzoektabellen-beheer via één generieke referentie-CRUD (registry), i.p.v. losse controllers per tabel. |
 
 ---
 

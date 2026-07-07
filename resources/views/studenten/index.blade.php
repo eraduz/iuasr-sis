@@ -52,15 +52,11 @@
           <td>{{ $insch?->klas?->code ?? '—' }}</td>
           <td class="tnum">{{ $insch?->inschrijfdatum?->format('Y') ?? '—' }}</td>
           <td>
-            @php
-              $st = $insch?->status ?? 'onbekend';
-              $badge = match ($st) {
-                'actief' => 's-approved', 'afgestudeerd' => 's-pay',
-                'uitgeschreven' => 's-draft', 'onderbroken' => 's-incomplete',
-                default => 's-draft',
-              };
-            @endphp
-            <span class="iuasr-dash-status {{ $badge }}">{{ ucfirst($st) }}</span>
+            @if ($insch?->status)
+              <span class="iuasr-dash-status {{ $insch->status->badge() }}">{{ $insch->status->label() }}</span>
+            @else
+              <span class="iuasr-dash-status s-draft">—</span>
+            @endif
           </td>
           <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('studenten.show', $student) }}">Openen</a></td>
         </tr>

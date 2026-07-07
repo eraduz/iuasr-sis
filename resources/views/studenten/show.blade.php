@@ -22,7 +22,7 @@
       </div>
     </div>
     @if ($huidige)
-      <span class="iuasr-dash-status s-approved" style="align-self:flex-start;">{{ ucfirst($huidige->status) }}</span>
+      <span class="iuasr-dash-status {{ $huidige->status->badge() }}" style="align-self:flex-start;">{{ $huidige->status->label() }}</span>
     @endif
   </div>
 </div>
@@ -91,22 +91,52 @@
           <dt>Leerjaar</dt><dd>{{ $huidige->leerjaar ?? '—' }}</dd>
           <dt>Periode</dt><dd>{{ $huidige->periode?->naam ?? '—' }}</dd>
           <dt>Inschrijfdatum</dt><dd>{{ $huidige->inschrijfdatum?->format('d-m-Y') ?? '—' }}</dd>
-          <dt>Status</dt><dd><span class="iuasr-dash-status s-approved">{{ ucfirst($huidige->status) }}</span></dd>
+          @if ($huidige->uitschrijfdatum && $huidige->status === App\Enums\InschrijvingStatus::Uitgeschreven)
+            <dt>Uitschrijfdatum</dt><dd>{{ $huidige->uitschrijfdatum->format('d-m-Y') }}</dd>
+          @endif
+          <dt>Status</dt><dd><span class="iuasr-dash-status {{ $huidige->status->badge() }}">{{ $huidige->status->label() }}</span></dd>
           <dt>Studentnummer</dt><dd class="tnum">{{ $student->studentnummer }}</dd>
         </dl>
       @else
         <p class="sis-muted">Geen actieve inschrijving.</p>
       @endif
     </div>
-    <div class="sis-card">
-      <div class="sis-card__hd"><h3>Inschrijfhistorie</h3></div>
-      <ul class="iuasr-dash-log">
-        @forelse ($student->inschrijvingen->sortByDesc('inschrijfdatum') as $i)
-          <li><b>{{ ucfirst($i->status) }} — {{ $i->opleiding?->naam }}</b><time>{{ $i->inschrijfdatum?->format('d-m-Y') }} · {{ $i->periode?->code }}</time></li>
-        @empty
-          <li>Geen historie.</li>
-        @endforelse
-      </ul>
+    <div>
+      <div class="sis-card">
+        <div class="sis-card__hd"><h3>Inschrijfhistorie</h3></div>
+        <ul class="iuasr-dash-log">
+          @forelse ($student->inschrijvingen->sortByDesc('inschrijfdatum') as $i)
+            <li><b>{{ $i->status->label() }} — {{ $i->opleiding?->naam }}</b><time>{{ $i->inschrijfdatum?->format('d-m-Y') }} · {{ $i->periode?->code }}</time></li>
+          @empty
+            <li>Geen historie.</li>
+          @endforelse
+        </ul>
+      </div>
+
+      @if (auth()->user()->magInschrijvingBeheren())
+        <div class="sis-card">
+          <div class="sis-card__hd"><h3>Acties</h3></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('studenten.edit', $student) }}">Gegevens muteren</a>
+            <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('herinschrijven.form', $student) }}">Herinschrijven</a>
+            <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('verklaringen', ['student' => $student->id]) }}">Verklaring</a>
+            @if ($huidige)
+              {{-- Schorsen / opheffen met één klik --}}
+              <form method="POST" action="{{ route('studenten.schors', $student) }}" style="display:inline;">
+                @csrf
+                @if ($huidige->status === App\Enums\InschrijvingStatus::Geschorst)
+                  <button type="submit" class="iuasr-dash-btn iuasr-dash-btn--sm">Schorsing opheffen</button>
+                @else
+                  <button type="submit" class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger">Schorsen</button>
+                @endif
+              </form>
+              @if ($huidige->status !== App\Enums\InschrijvingStatus::Uitgeschreven)
+                <a class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" href="{{ route('uitschrijven.form', $student) }}">Uitschrijven</a>
+              @endif
+            @endif
+          </div>
+        </div>
+      @endif
     </div>
   </div>
 </section>

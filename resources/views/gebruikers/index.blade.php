@@ -1,0 +1,75 @@
+@extends('layouts.app')
+
+@section('titel', 'Gebruikers & rollen')
+
+@php
+  $J = '<span class="sis-access sis-access--yes"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>';
+  $N = '<span class="sis-access sis-access--no"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>';
+  $tag = fn($t) => '<span class="sis-pill-soft" style="font-size:10.5px;">'.$t.'</span>';
+  $matrix = [
+    ['Studenten inzien',       [$J, $N, $J, $tag('beperkt'), $N]],
+    ['Persoonsgegevens / BSN', [$J, $N, $N, $N, $J]],
+    ['In-/uitschrijven',       [$J, $N, $N, $N, $N]],
+    ['Cijfers invoeren',       [$N, $tag('eigen vak'), $N, $N, $N]],
+    ['Cijfers inzien',         [$N, $tag('eigen vak'), $J, $J, $N]],
+    ['Verklaringen uitgeven',  [$J, $N, $N, $N, $N]],
+    ['Opzoektabellen beheren', [$N, $N, $N, $N, $J]],
+  ];
+@endphp
+
+@section('inhoud')
+<div class="sis-crumb"><a href="{{ route('dashboard') }}">Dashboard</a><span class="sep">›</span><b>Gebruikers &amp; rollen</b></div>
+
+<div class="iuasr-dash-vhead">
+  <div>
+    <h1>Gebruikers &amp; rollen</h1>
+    <div class="summary"><b>{{ $gebruikers->count() }}</b> gebruikers · <b>{{ count($rollen) }}</b> rollen · toegang via IUASR SSO</div>
+  </div>
+  <div class="iuasr-dash-vhead__actions"><a class="iuasr-dash-btn" href="{{ route('audit-log') }}">Audit-log</a></div>
+</div>
+
+<div class="sis-card" style="margin-bottom:18px;">
+  <div class="sis-card__hd"><h3>Toegangsmatrix</h3><span class="hint">Wat elke rol mag — dit stuurt de zichtbaarheid van cijfers en persoonsgegevens</span></div>
+  <div class="iuasr-dash-tbl-card" style="border:0;overflow-x:auto;">
+    <table class="iuasr-dash-tbl" style="min-width:720px;">
+      <thead><tr><th>Recht</th>@foreach ($rollen as $r)<th style="text-align:center;">{{ $r->label() }}</th>@endforeach</tr></thead>
+      <tbody>
+        @foreach ($matrix as [$recht, $cellen])
+          <tr><td class="nm">{{ $recht }}</td>@foreach ($cellen as $c)<td style="text-align:center;">{!! $c !!}</td>@endforeach</tr>
+        @endforeach
+      </tbody>
+    </table>
+  </div>
+  <p class="sis-tblnote">Cijfers zijn bewust <b>niet</b> zichtbaar voor Studentenzaken. Docenten zien alleen hun eigen vak. Directie en examencommissie hebben inzage; alleen de examencommissie stelt vast.</p>
+</div>
+
+<div class="sis-card">
+  <div class="sis-card__hd"><h3>Gebruikers</h3></div>
+  <div class="iuasr-dash-tbl-card" style="border:0;">
+    <table class="iuasr-dash-tbl">
+      <thead><tr><th>Naam</th><th>E-mail</th><th>Rol</th><th>Laatste login</th><th>Status</th><th class="row-act">Wijzigen</th></tr></thead>
+      <tbody>
+        @foreach ($gebruikers as $g)
+          <tr>
+            <td class="nm">{{ $g->naam }}</td>
+            <td class="dt">{{ $g->email }}</td>
+            <td><span class="sis-rolebadge r-{{ $g->rol->value }}">{{ $g->rol->label() }}</span></td>
+            <td class="dt">{{ $g->laatst_ingelogd_op?->diffForHumans() ?? 'nooit' }}</td>
+            <td>@if($g->actief)<span class="iuasr-dash-status s-approved">Actief</span>@else<span class="iuasr-dash-status s-draft">Inactief</span>@endif</td>
+            <td class="row-act">
+              <form method="POST" action="{{ route('gebruikers.rol', $g) }}" style="display:flex;gap:6px;align-items:center;justify-content:flex-end;">
+                @csrf @method('PUT')
+                <select name="rol" style="height:30px;font-size:12.5px;">
+                  @foreach ($rollen as $r)<option value="{{ $r->value }}" @selected($g->rol === $r)>{{ $r->label() }}</option>@endforeach
+                </select>
+                <label class="sis-check-inline" style="font-size:11.5px;"><input type="checkbox" name="actief" value="1" @checked($g->actief)> actief</label>
+                <button type="submit" class="iuasr-dash-btn iuasr-dash-btn--sm">Opslaan</button>
+              </form>
+            </td>
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+  </div>
+</div>
+@endsection

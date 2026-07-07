@@ -77,6 +77,13 @@ class ReferentieSeeder extends Seeder
                 'naam' => "Islamitische Theologie jaar {$jaar}", 'leerjaar' => $jaar, 'groep' => 'dag',
             ]);
         }
+        $pabo = Opleiding::where('code', 'PABO')->first();
+        $mgv = Opleiding::where('code', 'MGV')->first();
+        $krn = Opleiding::where('code', 'KRN')->first();
+        Klas::create(['opleiding_id' => $pabo->id, 'code' => 'PB-1A', 'naam' => 'PABO jaar 1A', 'leerjaar' => 1, 'groep' => 'dag']);
+        Klas::create(['opleiding_id' => $pabo->id, 'code' => 'PB-2B', 'naam' => 'PABO jaar 2B', 'leerjaar' => 2, 'groep' => 'dag']);
+        Klas::create(['opleiding_id' => $mgv->id, 'code' => 'MGV-D', 'naam' => 'MGV deeltijd', 'leerjaar' => 1, 'groep' => 'deeltijd']);
+        Klas::create(['opleiding_id' => $krn->id, 'code' => 'KH-2', 'naam' => 'Koran & Hifz jaar 2', 'leerjaar' => 2, 'groep' => 'deeltijd']);
 
         // Voorbeeldvak met genormaliseerde toetsstructuur (deelresultaten + weging).
         $vak = Vak::create([

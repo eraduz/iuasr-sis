@@ -17,6 +17,7 @@ class AuditLogger
     public const AANMAAK = 'aanmaak';
     public const WIJZIGING = 'wijziging';
     public const VERWIJDERING = 'verwijdering';
+    public const UITGIFTE = 'uitgifte';
 
     public static function log(
         string $actie,

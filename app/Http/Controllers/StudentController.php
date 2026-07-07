@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use App\Support\AuditLogger;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -43,6 +44,41 @@ class StudentController extends Controller
         $magCijfers = auth()->user()->magCijfersInzien();
 
         return view('studenten.show', compact('student', 'huidige', 'magCijfers'));
+    }
+
+    /** Muteren van persoonsgegevens (Studentenzaken/Beheerder). */
+    public function edit(Student $student): View
+    {
+        return view('studenten.edit', compact('student'));
+    }
+
+    public function update(Request $request, Student $student): RedirectResponse
+    {
+        $data = $request->validate([
+            'voornaam' => ['required', 'string', 'max:255'],
+            'tussenvoegsel' => ['nullable', 'string', 'max:60'],
+            'achternaam' => ['required', 'string', 'max:255'],
+            'roepnaam' => ['nullable', 'string', 'max:255'],
+            'geboortedatum' => ['nullable', 'date'],
+            'geboorteplaats' => ['nullable', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'email_prive' => ['nullable', 'email', 'max:255'],
+            'telefoon' => ['nullable', 'string', 'max:40'],
+            'adres' => ['nullable', 'string', 'max:255'],
+            'postcode' => ['nullable', 'string', 'max:20'],
+            'woonplaats' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $gewijzigd = array_keys(array_diff_assoc($data, $student->only(array_keys($data))));
+        $student->update($data);
+
+        AuditLogger::log(AuditLogger::WIJZIGING, $student, veld: 'persoonsgegevens', context: [
+            'velden' => $gewijzigd,
+        ]);
+
+        return redirect()
+            ->route('studenten.show', $student)
+            ->with('status', 'Persoonsgegevens bijgewerkt.');
     }
 
     /**

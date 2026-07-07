@@ -1,9 +1,15 @@
 <?php
 
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\DevLoginController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GebruikerController;
+use App\Http\Controllers\InschrijvingActiesController;
 use App\Http\Controllers\InschrijvingController;
+use App\Http\Controllers\RapportController;
+use App\Http\Controllers\ReferentieController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\VerklaringController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -15,7 +21,6 @@ use Illuminate\Support\Facades\Route;
 | Rolscheiding wordt server-side afgedwongen via de 'rol'-middleware en Gates.
 */
 
-// --- Inloggen (gast) ---
 Route::get('/login', function () {
     $devUsers = app()->environment('local', 'testing')
         ? User::orderBy('rol')->get(['id', 'naam', 'rol'])
@@ -27,49 +32,74 @@ Route::get('/login', function () {
 Route::post('/dev-login', [DevLoginController::class, 'store'])->name('dev-login');
 Route::post('/logout', [DevLoginController::class, 'destroy'])->name('logout');
 
-// --- Ingelogd ---
 Route::middleware('auth')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Studenten inzien: Studentenzaken, Beheerder, Examencommissie, Directie.
+    // --- Studenten inzien: SZ, Beheerder, Examencommissie, Directie ---
     Route::middleware('rol:studentenzaken,beheerder,examencommissie,directie')->group(function () {
         Route::get('/studenten', [StudentController::class, 'index'])->name('studenten.index');
         Route::get('/studenten/{student}', [StudentController::class, 'show'])->name('studenten.show');
         Route::get('/studenten/{student}/bsn', [StudentController::class, 'bsn'])->name('studenten.bsn');
     });
 
-    // Identiteit & inschrijving beheren: Studentenzaken, Beheerder.
+    // --- Identiteit & inschrijving beheren: SZ, Beheerder ---
     Route::middleware('rol:studentenzaken,beheerder')->group(function () {
+        // Inschrijven
         Route::get('/inschrijven', [InschrijvingController::class, 'create'])->name('inschrijven');
         Route::post('/inschrijven', [InschrijvingController::class, 'store'])->name('inschrijven.store');
-        Route::view('/herinschrijven', 'placeholder')->name('herinschrijven');
-        Route::view('/uitschrijven', 'placeholder')->name('uitschrijven');
-        Route::view('/verklaringen', 'placeholder')->name('verklaringen');
-        Route::view('/rapporten', 'placeholder')->name('rapporten');
+
+        // Muteren
+        Route::get('/studenten/{student}/muteren', [StudentController::class, 'edit'])->name('studenten.edit');
+        Route::put('/studenten/{student}', [StudentController::class, 'update'])->name('studenten.update');
+
+        // Schorsen (één klik, omkeerbaar)
+        Route::post('/studenten/{student}/schorsen', [InschrijvingActiesController::class, 'schors'])->name('studenten.schors');
+
+        // Herinschrijven
+        Route::get('/herinschrijven', [InschrijvingActiesController::class, 'kiesHerinschrijven'])->name('herinschrijven');
+        Route::get('/studenten/{student}/herinschrijven', [InschrijvingActiesController::class, 'herinschrijvenForm'])->name('herinschrijven.form');
+        Route::post('/studenten/{student}/herinschrijven', [InschrijvingActiesController::class, 'herinschrijven'])->name('herinschrijven.store');
+
+        // Uitschrijven
+        Route::get('/uitschrijven', [InschrijvingActiesController::class, 'kiesUitschrijven'])->name('uitschrijven');
+        Route::get('/studenten/{student}/uitschrijven', [InschrijvingActiesController::class, 'uitschrijvenForm'])->name('uitschrijven.form');
+        Route::post('/studenten/{student}/uitschrijven', [InschrijvingActiesController::class, 'uitschrijven'])->name('uitschrijven.store');
+
+        // Verklaringen (A4)
+        Route::get('/verklaringen', [VerklaringController::class, 'index'])->name('verklaringen');
+
+        // Rapporten (SZ: geen cijferkolom)
+        Route::get('/rapporten', [RapportController::class, 'index'])->name('rapporten');
+        Route::get('/rapporten/klassenlijst', [RapportController::class, 'klassenlijst'])->name('rapporten.klassenlijst');
     });
 
-    // Docent — eigen vak.
+    // --- Docent — eigen vak ---
     Route::middleware('rol:docent')->group(function () {
         Route::view('/mijn-vakken', 'placeholder')->name('mijn-vakken');
         Route::view('/cijferinvoer', 'placeholder')->name('cijferinvoer');
     });
 
-    // Cijferinzage — Examencommissie & Directie.
+    // --- Cijferinzage & rapporten — Examencommissie & Directie ---
     Route::middleware('rol:examencommissie,directie')->group(function () {
         Route::view('/cijferoverzicht', 'placeholder')->name('cijferoverzicht');
+        Route::get('/rapporten-inzage', [RapportController::class, 'index'])->name('rapporten.inzage');
     });
 
-    // Rapporten (inzage) voor examencommissie/directie hergebruiken de naam niet;
-    // eigen route zodat de rol-scheiding zuiver blijft.
-    Route::middleware('rol:examencommissie,directie')->group(function () {
-        Route::view('/rapporten-inzage', 'placeholder')->name('rapporten.inzage');
-    });
-
-    // Beheer.
+    // --- Beheer — Beheerder ---
     Route::middleware('rol:beheerder')->group(function () {
-        Route::view('/gebruikers', 'placeholder')->name('gebruikers');
-        Route::view('/opzoektabellen', 'placeholder')->name('opzoektabellen');
-        Route::view('/audit-log', 'placeholder')->name('audit-log');
+        Route::get('/gebruikers', [GebruikerController::class, 'index'])->name('gebruikers');
+        Route::put('/gebruikers/{gebruiker}/rol', [GebruikerController::class, 'updateRol'])->name('gebruikers.rol');
+
+        Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');
+
+        // Opzoektabellen (generieke referentie-CRUD)
+        Route::get('/opzoektabellen', [ReferentieController::class, 'index'])->name('opzoektabellen');
+        Route::get('/opzoektabellen/{tabel}/nieuw', [ReferentieController::class, 'create'])->name('opzoektabellen.create');
+        Route::post('/opzoektabellen/{tabel}', [ReferentieController::class, 'store'])->name('opzoektabellen.store');
+        Route::get('/opzoektabellen/{tabel}/{id}/bewerken', [ReferentieController::class, 'edit'])->name('opzoektabellen.edit');
+        Route::put('/opzoektabellen/{tabel}/{id}', [ReferentieController::class, 'update'])->name('opzoektabellen.update');
+        Route::delete('/opzoektabellen/{tabel}/{id}', [ReferentieController::class, 'destroy'])->name('opzoektabellen.destroy');
+        Route::get('/opzoektabellen/{tabel}', [ReferentieController::class, 'index'])->name('opzoektabellen.tabel');
     });
 });
