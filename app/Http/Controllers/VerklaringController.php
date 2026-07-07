@@ -17,14 +17,27 @@ class VerklaringController extends Controller
 
     public function index(Request $request): View
     {
-        $studenten = Student::orderBy('studentnummer')->get(['id', 'studentnummer', 'voornaam', 'tussenvoegsel', 'achternaam']);
-
         $type = in_array($request->query('type'), self::TYPES, true) ? $request->query('type') : 'studentbewijs';
+        $zoek = trim((string) $request->query('q', ''));
 
         /** @var Student|null $student */
         $student = $request->filled('student')
             ? Student::with(['inschrijvingen.opleiding', 'inschrijvingen.periode'])->find($request->query('student'))
             : null;
+
+        // Zoekresultaten — op studentnummer (prefix) of naam. Beperkt tot 20.
+        $resultaten = collect();
+        if ($zoek !== '' && ! $student) {
+            $resultaten = Student::query()
+                ->where(function ($q) use ($zoek) {
+                    $q->where('studentnummer', 'like', $zoek.'%')
+                        ->orWhere('achternaam', 'like', '%'.$zoek.'%')
+                        ->orWhere('voornaam', 'like', '%'.$zoek.'%');
+                })
+                ->orderBy('studentnummer')
+                ->limit(20)
+                ->get(['id', 'studentnummer', 'voornaam', 'tussenvoegsel', 'achternaam']);
+        }
 
         $verklaring = null;
         if ($student) {
@@ -33,7 +46,7 @@ class VerklaringController extends Controller
             AuditLogger::log(AuditLogger::UITGIFTE, $student, veld: 'verklaring', context: ['type' => $type]);
         }
 
-        return view('verklaringen.index', compact('studenten', 'student', 'type', 'verklaring'));
+        return view('verklaringen.index', compact('student', 'type', 'verklaring', 'zoek', 'resultaten'));
     }
 
     /** Bouwt de tekstblokken voor het gekozen verklaringstype. */

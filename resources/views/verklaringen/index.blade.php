@@ -33,25 +33,55 @@
 
 <div class="verk-layout">
   <div>
-    <form method="GET" action="{{ route('verklaringen') }}" class="sis-card" style="margin-bottom:16px;">
+    <div class="sis-card" style="margin-bottom:16px;">
       <div class="sis-card__hd"><h3>Student</h3></div>
-      <div class="sis-fld" style="margin-bottom:10px;">
-        <select name="student" onchange="this.form.submit()">
-          <option value="">— kies student —</option>
-          @foreach ($studenten as $s)
-            <option value="{{ $s->id }}" @selected($student && $student->id === $s->id)>{{ $s->studentnummer }} — {{ $s->volledigeNaam() }}</option>
-          @endforeach
-        </select>
-      </div>
-      <input type="hidden" name="type" value="{{ $type }}">
-    </form>
+
+      @if ($student)
+        {{-- Gekozen student --}}
+        <div class="iuasr-dash-intake" style="margin-bottom:0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <div style="flex:1;min-width:0;">
+            <b>{{ $student->volledigeNaam() }}</b>
+            <small>Studentnr. {{ $student->studentnummer }}</small>
+          </div>
+          <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('verklaringen', ['type' => $type]) }}">Andere kiezen</a>
+        </div>
+      @else
+        {{-- Zoekbalk: op studentnummer of naam --}}
+        <form method="GET" action="{{ route('verklaringen') }}" style="display:flex;gap:8px;margin-bottom:12px;">
+          <input type="hidden" name="type" value="{{ $type }}">
+          <div class="search" style="position:relative;flex:1;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--blackAltText);pointer-events:none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="search" name="q" value="{{ $zoek }}" placeholder="Zoek op studentnummer of naam…" autofocus
+              style="width:100%;height:38px;padding:7px 11px 7px 34px;font-family:inherit;font-size:13.5px;border:1px solid var(--borderColor);border-radius:4px;">
+          </div>
+          <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit">Zoek</button>
+        </form>
+
+        @if ($zoek !== '')
+          <div class="sis-worklist">
+            @forelse ($resultaten as $r)
+              <a class="sis-work" href="{{ route('verklaringen', ['student' => $r->id, 'type' => $type]) }}">
+                <span class="sis-work__ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+                <div class="sis-work__bd"><b>{{ $r->volledigeNaam() }}</b><small>{{ $r->studentnummer }}</small></div>
+                <span class="sis-work__meta">Kies →</span>
+              </a>
+            @empty
+              <p class="sis-muted" style="font-size:13px;margin:4px 2px;">Geen studenten gevonden voor “{{ $zoek }}”.</p>
+            @endforelse
+          </div>
+        @else
+          <p class="sis-muted" style="font-size:12.5px;margin:0;">Typ een studentnummer of naam en klik op Zoek.</p>
+        @endif
+      @endif
+    </div>
 
     <div class="sis-card">
       <div class="sis-card__hd"><h3>Type verklaring</h3></div>
       <div style="display:flex;flex-direction:column;gap:8px;">
         @foreach ($types as $sleutel => [$titel, $oms])
           <a class="sis-choice {{ $type === $sleutel ? 'is-selected' : '' }}" style="padding:12px 14px;"
-             href="{{ route('verklaringen', array_filter(['student' => $student?->id, 'type' => $sleutel])) }}">
+             href="{{ route('verklaringen', array_filter(['student' => $student?->id, 'q' => $student ? null : $zoek, 'type' => $sleutel])) }}">
             <h4 style="margin:0 0 3px;font-size:14px;">{{ $titel }}</h4>
             <p>{{ $oms }}</p>
           </a>
