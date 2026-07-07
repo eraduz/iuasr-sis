@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\DevLoginController;
+use App\Http\Controllers\CijferController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GebruikerController;
 use App\Http\Controllers\InschrijvingActiesController;
@@ -80,13 +81,21 @@ Route::middleware('auth')->group(function () {
 
     // --- Docent — eigen vak ---
     Route::middleware('rol:docent')->group(function () {
-        Route::view('/mijn-vakken', 'placeholder')->name('mijn-vakken');
-        Route::view('/cijferinvoer', 'placeholder')->name('cijferinvoer');
+        Route::get('/mijn-vakken', [CijferController::class, 'mijnVakken'])->name('mijn-vakken');
+        Route::get('/cijferinvoer', fn () => redirect()->route('mijn-vakken'))->name('cijferinvoer');
+    });
+
+    // --- Cijferinvoer/-inzage per vak (docent eigen vak; examencie/directie inzage) ---
+    Route::middleware('rol:docent,examencommissie,directie')->group(function () {
+        Route::get('/vakken/{vak}/cijfers', [CijferController::class, 'invoer'])->name('vakken.cijfers');
+    });
+    Route::middleware('rol:docent')->group(function () {
+        Route::post('/vakken/{vak}/cijfers', [CijferController::class, 'opslaan'])->name('vakken.cijfers.opslaan');
     });
 
     // --- Cijferinzage & rapporten — Examencommissie & Directie ---
     Route::middleware('rol:examencommissie,directie')->group(function () {
-        Route::view('/cijferoverzicht', 'placeholder')->name('cijferoverzicht');
+        Route::get('/cijferoverzicht', [CijferController::class, 'overzicht'])->name('cijferoverzicht');
         Route::get('/rapporten-inzage', [RapportController::class, 'index'])->name('rapporten.inzage');
     });
 

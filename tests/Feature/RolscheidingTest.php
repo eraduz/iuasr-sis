@@ -46,7 +46,7 @@ class RolscheidingTest extends TestCase
         $u = $this->gebruiker(Rol::Docent);
 
         $this->actingAs($u)->get('/studenten')->assertForbidden();
-        $this->actingAs($u)->get('/cijferinvoer')->assertOk();
+        $this->actingAs($u)->get('/mijn-vakken')->assertOk();
     }
 
     public function test_examencommissie_ziet_studenten_en_cijferoverzicht(): void

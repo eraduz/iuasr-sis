@@ -65,7 +65,25 @@ class StudentController extends Controller
 
         $magCijfers = auth()->user()->magCijfersInzien();
 
-        return view('studenten.show', compact('student', 'huidige', 'magCijfers'));
+        // Cijfers per vak — alleen voor rollen met inzage; inzage wordt gelogd.
+        $cijferVakken = collect();
+        if ($magCijfers) {
+            $student->load('resultaten.toetsonderdeel.vak.toetsonderdelen', 'resultaten.toetsonderdeel.vak.opleiding');
+            foreach ($student->resultaten->groupBy(fn ($r) => $r->toetsonderdeel->vak_id) as $rs) {
+                $vak = $rs->first()->toetsonderdeel->vak;
+                $cijferVakken->push([
+                    'vak' => $vak,
+                    'eind' => \App\Support\Cijferberekening::eindcijfer($vak, $rs),
+                    'ec' => \App\Support\Cijferberekening::ec($vak, $rs),
+                ]);
+            }
+            if ($cijferVakken->isNotEmpty()
+                && in_array(auth()->user()->rol, [\App\Enums\Rol::Examencommissie, \App\Enums\Rol::Directie], true)) {
+                AuditLogger::log(AuditLogger::INZAGE, $student, veld: 'cijfers');
+            }
+        }
+
+        return view('studenten.show', compact('student', 'huidige', 'magCijfers', 'cijferVakken'));
     }
 
     /** Muteren van persoonsgegevens (Studentenzaken/Beheerder). */

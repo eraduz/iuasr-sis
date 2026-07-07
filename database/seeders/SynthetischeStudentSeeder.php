@@ -38,6 +38,11 @@ class SynthetischeStudentSeeder extends Seeder
             ['261008', 'Bilal', 'Yıldırım', 'M', '2003-04-11', 'Dordrecht', 'MGV', 'MGV-D', 1, InschrijvingStatus::Actief],
             ['261009', 'Nora', 'Haddadi', 'V', '2004-10-08', 'Rotterdam', 'PABO', 'PB-1A', 1, InschrijvingStatus::Actief],
             ['261010', 'Amal', 'Ahmadi', 'V', '2005-02-27', 'Delft', 'KRN', 'KH-2', 1, InschrijvingStatus::Aangemeld],
+            // Extra ISLTH jaar-1 studenten (deelnemers van ARA-101, voor cijferinvoer).
+            ['261011', 'Ibrahim', 'Chakir', 'M', '2005-05-19', 'Rotterdam', 'ISLTH', 'IT-1', 1, InschrijvingStatus::Actief],
+            ['261012', 'Zaynab', 'Amrani', 'V', '2005-08-03', 'Gouda', 'ISLTH', 'IT-1', 1, InschrijvingStatus::Actief],
+            ['261013', 'Yusuf', 'Karadeniz', 'M', '2004-12-14', 'Rotterdam', 'ISLTH', 'IT-1', 1, InschrijvingStatus::Actief],
+            ['261014', 'Maryam', 'Sabri', 'V', '2005-03-28', 'Capelle a/d IJssel', 'ISLTH', 'IT-1', 1, InschrijvingStatus::Actief],
         ];
 
         foreach ($set as [$nr, $voornaam, $achternaam, $geslacht, $geb, $plaats, $oplCode, $klasCode, $leerjaar, $status]) {

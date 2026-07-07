@@ -7,8 +7,8 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
 
 ## Projectstatus
 
-- **Huidige fase:** Fase 3 — Kern-CRUD (increment 1 opgeleverd)
-- **Laatst bijgewerkt:** 2026-07-06
+- **Huidige fase:** Fase 4 — Cijfers & rolscheiding (increment 1 opgeleverd)
+- **Laatst bijgewerkt:** 2026-07-07
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 
 ---
@@ -58,8 +58,16 @@ opleverpunt aantoonbaar klaar is.
     studentenlijst-filter); alle schermen live geverifieerd.
   - Nog te doen: cijferrapport/tentamenlijst (na Fase 4), student toevoegen los
     van aanmelding is al mogelijk via inschrijven.
-- [ ] **Fase 4 — Cijfers + rolscheiding**
+- [~] **Fase 4 — Cijfers + rolscheiding** (increment 1 opgeleverd)
   - Genormaliseerde resultaatregels, docent-invoer eigen vak, server-side autorisatie.
+  - Gedaan: docent → Mijn vakken + Cijferinvoer (grid met deelresultaten, weging,
+    poging, vrijstelling; live gewogen eindcijfer, cesuur 5,5); EC-toekenning
+    (alle meetellende onderdelen ≥ cesuur ⇒ vak-EC, anders 0); cijferoverzicht
+    (Examencie/Directie, inzage + gelogd); cijfer-tabblad op studentdetail gevuld;
+    audit-logging op invoer/wijziging en inzage. Rolscheiding: SZ geen toegang,
+    docent alleen eigen vak, examencie/directie read-only. 36 tests groen.
+  - Nog te doen: examencommissie-vaststelling + correctie (strikt/gelogd),
+    leerjaar-herbeoordeling op EC-drempel, herkansing als aparte poging.
 - [ ] **Fase 5 — Rapporten + documenten**
   - Cijferlijsten, overzichten, documentgeneratie.
 - [ ] **Fase 6 — Portaalkoppeling**
@@ -90,8 +98,12 @@ Deze zijn nog niet vastgesteld. Vraag de opdrachtgever; verzin geen waarden.
 - [x] **Studentnummerformaat** — BEVESTIGD 2026-07-06: jaarprefix (2) + volgnummer,
   totaal 6 tekens (voorbeeld 261234). Vastgelegd in `config/sis.php`.
 - [ ] **Nummerbeleid bij heringstroom** — behoudt student oud nummer of nieuw nummer?
-- [ ] **Voldoende-grens per opleiding** — welke cijfergrens telt als voldoende?
-- [ ] **EC-drempels per opleiding** — normen voor voortgang/BSA per opleiding.
+- [x] **Voldoende-grens (cesuur)** — BEVESTIGD 2026-07-07: **5,5** voor alle
+  opleidingen (per opleiding overschrijfbaar via `opleidingen.voldoende_grens`).
+- [ ] **EC-drempels per opleiding** — BESLUIT 2026-07-07: **per opleiding
+  verschillend**; veld staat klaar (`opleidingen.ec_overgang_drempel`, nu null),
+  Beheer vult per opleiding in via Opzoektabellen. Blokkeert alleen de latere
+  leerjaar-herbeoordeling, niet de cijferinvoer.
 
 ---
 
@@ -119,6 +131,9 @@ Deze zijn nog niet vastgesteld. Vraag de opdrachtgever; verzin geen waarden.
 | 2026-07-07 | Uitschrijfdatum wordt berekend als einde van de lopende maand (wettelijke regel). |
 | 2026-07-07 | Verklaringen bevatten nooit cijfers of BSN; uitgifte wordt gelogd. |
 | 2026-07-07 | Opzoektabellen-beheer via één generieke referentie-CRUD (registry), i.p.v. losse controllers per tabel. |
+| 2026-07-07 | Cesuur (voldoende-grens) bevestigd op 5,5 voor alle opleidingen; per opleiding overschrijfbaar. |
+| 2026-07-07 | EC-overgangsdrempel per opleiding (veld klaar, door Beheer in te vullen). |
+| 2026-07-07 | Reguliere cijferinvoer alleen door de docent (eigen vak); examencie/directie hebben inzage. Vaststelling/correctie door examencie volgt in Fase 4 increment 2. |
 
 ---
 

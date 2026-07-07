@@ -201,11 +201,37 @@
     </div>
   @else
     <div class="sis-card">
-      <div class="sis-card__hd"><h3>Cijferoverzicht</h3><span class="hint">leesweergave</span></div>
-      <div class="iuasr-dash-empty" style="border:0;padding:36px 20px;">
-        <h3>Nog geen resultaten</h3>
-        <p>Cijferinvoer en het genormaliseerde resultaatoverzicht worden gebouwd in <b>Fase 4</b>. De datamodel-structuur (resultaatregels met toetsonderdelen en weging) staat al.</p>
+      <div class="sis-card__hd"><h3>Cijferoverzicht</h3><span class="hint">leesweergave · inzage gelogd</span></div>
+      @php $totaalEc = $cijferVakken->sum(fn($c) => $c['ec'] ?? 0); @endphp
+      <div class="iuasr-dash-tbl-card" style="border:0;">
+        <table class="iuasr-dash-tbl">
+          <thead><tr><th>Vak</th><th>Code</th><th>EC-waarde</th><th>Eindcijfer</th><th>EC behaald</th></tr></thead>
+          <tbody>
+            @forelse ($cijferVakken as $c)
+              @php $vak = $c['vak']; $eind = $c['eind']; @endphp
+              <tr>
+                <td class="nm">{{ $vak->naam }}</td>
+                <td class="tnum">{{ $vak->code }}</td>
+                <td class="tnum">{{ $vak->ec }}</td>
+                <td>
+                  @if ($eind['status']==='vr')<span class="sis-pill-soft">VR</span>
+                  @elseif ($eind['status']==='cijfer')<b class="tnum">{{ number_format($eind['cijfer'],1,',','') }}</b>
+                  @elseif ($eind['status']==='onvolledig')<span class="sis-muted">onvolledig</span>
+                  @else<span class="sis-muted">—</span>@endif
+                </td>
+                <td class="tnum">{{ $c['ec'] === null ? '—' : $c['ec'] }}</td>
+              </tr>
+            @empty
+              <tr><td colspan="5" style="padding:24px;text-align:center;color:var(--blackAltText);">Nog geen resultaten geregistreerd voor deze student.</td></tr>
+            @endforelse
+          </tbody>
+        </table>
       </div>
+      @if ($cijferVakken->isNotEmpty())
+        <dl class="sis-dl" style="margin-top:14px;grid-template-columns:150px 1fr;">
+          <dt>EC totaal behaald</dt><dd><b class="tnum">{{ $totaalEc }}</b></dd>
+        </dl>
+      @endif
     </div>
   @endunless
 </section>

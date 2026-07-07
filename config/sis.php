@@ -49,8 +49,9 @@ return [
     'cijfers' => [
         'schaal_min' => 1.0,
         'schaal_max' => 10.0,
-        // Terugval-voldoendegrens; per opleiding overschrijfbaar. TE BEVESTIGEN.
-        'voldoende_grens_terugval' => null,
+        // BEVESTIGD (opdrachtgever, 2026-07-07): cesuur 5,5 voor alle opleidingen.
+        // Per opleiding overschrijfbaar via opleidingen.voldoende_grens.
+        'voldoende_grens_terugval' => 5.5,
         'decimalen' => 1,
     ],
 

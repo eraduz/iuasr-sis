@@ -46,13 +46,14 @@ enum Rol: string
         };
     }
 
-    /** Mag deze rol cijfers invoeren of muteren? (Docent enkel eigen vak.) */
+    /**
+     * Mag deze rol cijfers invoeren/muteren? Alleen de Docent (eigen vak).
+     * Het vaststellen en corrigeren door de examencommissie is een aparte,
+     * strikt gelogde bevoegdheid (latere fase), niet de reguliere invoer.
+     */
     public function magCijfersInvoeren(): bool
     {
-        return match ($this) {
-            self::Docent, self::Examencommissie => true,
-            self::Studentenzaken, self::Directie, self::Beheerder => false,
-        };
+        return $this === self::Docent;
     }
 
     /** Mag deze rol identiteit/inschrijving beheren? */

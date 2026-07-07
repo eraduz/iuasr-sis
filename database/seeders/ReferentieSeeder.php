@@ -52,27 +52,27 @@ class ReferentieSeeder extends Seeder
         $theologie = Opleiding::create([
             'faculteit_id' => $fiw->id, 'code' => 'ISLTH', 'naam' => 'Bachelor Islamitische Theologie',
             'soort' => 'bachelor', 'nominale_jaren' => 4, 'ec_totaal' => 240,
-            'voldoende_grens' => null, 'ec_overgang_drempel' => null, 'actief' => true,
+            'voldoende_grens' => 5.5, 'ec_overgang_drempel' => null, 'actief' => true,
         ]);
         Opleiding::create([
             'faculteit_id' => $foo->id, 'code' => 'PABO', 'naam' => 'PABO — Leraar Basisonderwijs',
             'soort' => 'bachelor', 'nominale_jaren' => 4, 'ec_totaal' => 240,
-            'voldoende_grens' => null, 'ec_overgang_drempel' => null, 'actief' => true,
+            'voldoende_grens' => 5.5, 'ec_overgang_drempel' => null, 'actief' => true,
         ]);
         Opleiding::create([
             'faculteit_id' => $fiw->id, 'code' => 'MGV', 'naam' => 'Master Isl. Geestelijke Verzorging',
             'soort' => 'master', 'nominale_jaren' => 2, 'ec_totaal' => 120,
-            'voldoende_grens' => null, 'ec_overgang_drempel' => null, 'actief' => true,
+            'voldoende_grens' => 5.5, 'ec_overgang_drempel' => null, 'actief' => true,
         ]);
         Opleiding::create([
             'faculteit_id' => $fiw->id, 'code' => 'KRN', 'naam' => 'Cursus Koran & Hifz',
             'soort' => 'cursus', 'nominale_jaren' => 1, 'ec_totaal' => null,
-            'voldoende_grens' => null, 'ec_overgang_drempel' => null, 'actief' => true,
+            'voldoende_grens' => 5.5, 'ec_overgang_drempel' => null, 'actief' => true,
         ]);
         Opleiding::create([
             'faculteit_id' => $fiw->id, 'code' => 'ARAB', 'naam' => 'Cursus Arabisch',
             'soort' => 'cursus', 'nominale_jaren' => 1, 'ec_totaal' => null,
-            'voldoende_grens' => null, 'ec_overgang_drempel' => null, 'actief' => true,
+            'voldoende_grens' => 5.5, 'ec_overgang_drempel' => null, 'actief' => true,
         ]);
 
         // Klassen (opleiding + leerjaar).
@@ -99,5 +99,16 @@ class ReferentieSeeder extends Seeder
         Toetsonderdeel::create(['vak_id' => $vak->id, 'code' => 'TEN', 'naam' => 'Schriftelijk tentamen', 'type' => 'tentamen', 'weging' => 0.60, 'telt_mee' => true, 'volgorde' => 1]);
         Toetsonderdeel::create(['vak_id' => $vak->id, 'code' => 'WST', 'naam' => 'Werkstuk', 'type' => 'werkstuk', 'weging' => 0.25, 'telt_mee' => true, 'volgorde' => 2]);
         Toetsonderdeel::create(['vak_id' => $vak->id, 'code' => 'PRE', 'naam' => 'Presentatie', 'type' => 'presentatie', 'weging' => 0.15, 'telt_mee' => true, 'volgorde' => 3]);
+
+        // Leerjaar-1 vak (waar de meeste synthetische studenten zitten), met de
+        // toetsopbouw uit het design: schriftelijk 40% / mondeling 25% / tentamen 35%.
+        $vak1 = Vak::create([
+            'opleiding_id' => $theologie->id, 'docent_id' => $aydin->id,
+            'code' => 'ISLTH-ARA-101', 'naam' => 'Arabische grammatica I',
+            'ec' => 6, 'leerjaar' => 1, 'blok' => 1, 'actief' => true,
+        ]);
+        Toetsonderdeel::create(['vak_id' => $vak1->id, 'code' => 'SCH', 'naam' => 'Deeltoets schriftelijk', 'type' => 'tentamen', 'weging' => 0.40, 'telt_mee' => true, 'volgorde' => 1]);
+        Toetsonderdeel::create(['vak_id' => $vak1->id, 'code' => 'MON', 'naam' => 'Mondeling (recitatie)', 'type' => 'mondeling', 'weging' => 0.25, 'telt_mee' => true, 'volgorde' => 2]);
+        Toetsonderdeel::create(['vak_id' => $vak1->id, 'code' => 'TEN', 'naam' => 'Eindtentamen', 'type' => 'tentamen', 'weging' => 0.35, 'telt_mee' => true, 'volgorde' => 3]);
     }
 }
