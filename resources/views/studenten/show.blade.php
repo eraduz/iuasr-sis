@@ -233,9 +233,10 @@
     </div>
   </div>
 
-  {{-- Documenten van de student (privé opgeslagen; inzage gelogd) --}}
+  {{-- Documenten van de student (privé opgeslagen; inzage gelogd) — halve breedte --}}
   @if (auth()->user()->magInschrijvingBeheren())
-    <div class="sis-card" style="margin-top:16px;" id="documenten">
+    <div class="sis-grid-2" style="margin-top:16px;align-items:start;">
+      <div class="sis-card" id="documenten">
       <div class="sis-card__hd"><h3>Documenten</h3><span class="hint">identiteitsbewijs, diploma, cijferlijst, pasfoto — privé opgeslagen, inzage gelogd</span></div>
 
       <form method="POST" action="{{ route('studenten.documenten.later', $student) }}" style="margin-bottom:12px;">
@@ -253,15 +254,15 @@
         @foreach (App\Models\StudentDocument::SOORTEN as $key => $label)
           @php $docs = $perSoort[$key] ?? collect(); @endphp
           <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--borderColor, #e5e5ea);">
-            <div style="flex:0 0 200px;min-width:170px;">
-              <div style="font-weight:600;color:var(--priColor100);font-size:13.5px;">{{ $label }}</div>
+            <div style="flex:0 0 150px;min-width:140px;">
+              <div style="font-weight:600;color:var(--priColor100);font-size:13px;">{{ $label }}</div>
               @if ($docs->isNotEmpty())
                 <span class="iuasr-dash-status s-approved" style="margin-top:6px;display:inline-block;">{{ $docs->count() }} geüpload</span>
               @else
                 <span class="sis-muted" style="font-size:12px;">nog niet geüpload</span>
               @endif
             </div>
-            <div style="flex:1;min-width:260px;">
+            <div style="flex:1;min-width:190px;">
               @foreach ($docs as $doc)
                 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:var(--blackAltText);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -285,6 +286,7 @@
         @endforeach
       </div>
       <p class="sis-tblnote" style="margin-top:10px;">Toegestaan: pdf, jpg, png · max 8 MB per bestand. Inzage en afgifte worden gelogd.</p>
+      </div>
     </div>
   @endif
 
