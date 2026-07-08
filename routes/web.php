@@ -49,7 +49,11 @@ Route::middleware('auth')->group(function () {
     // Digitaal ondertekende documenten — archief/log (Beheerder, Directie, Studentenzaken)
     Route::middleware('rol:beheerder,directie,studentenzaken')->group(function () {
         Route::get('/ondertekende-documenten', [OndertekeningController::class, 'index'])->name('ondertekening');
+        // Eigen PDF uploaden en laten waarmerken.
+        Route::get('/ondertekende-documenten/uploaden', [OndertekeningController::class, 'uploadForm'])->name('ondertekening.uploaden');
+        Route::post('/ondertekende-documenten/ondertekenen', [OndertekeningController::class, 'onderteken'])->name('ondertekening.onderteken');
         Route::get('/ondertekende-documenten/{document}/download', [OndertekeningController::class, 'download'])->name('ondertekening.download');
+        Route::get('/ondertekende-documenten/{document}/waarmerk', [OndertekeningController::class, 'downloadWaarmerk'])->name('ondertekening.waarmerk');
     });
 
     // --- Studenten inzien: SZ, Beheerder, Examencommissie, Directie ---

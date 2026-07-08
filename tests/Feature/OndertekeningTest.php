@@ -11,6 +11,7 @@ use Database\Seeders\GebruikerSeeder;
 use Database\Seeders\ReferentieSeeder;
 use Database\Seeders\SynthetischeStudentSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -83,5 +84,46 @@ class OndertekeningTest extends TestCase
 
         $this->actingAs(User::where('rol', Rol::Docent)->first())->get(route('ondertekening'))->assertForbidden();
         $this->actingAs(User::where('rol', Rol::Financien)->first())->get(route('ondertekening'))->assertForbidden();
+    }
+
+    public function test_eigen_pdf_uploaden_en_waarmerken(): void
+    {
+        $file = UploadedFile::fake()->create('brief.pdf', 50, 'application/pdf');
+        $bytes = (string) file_get_contents($file->getRealPath());
+
+        $this->actingAs($this->sz)->post(route('ondertekening.onderteken'), [
+            'titel' => 'Toelatingsbrief', 'ontvanger' => 'Gemeente Rotterdam', 'bestand' => $file,
+        ])->assertRedirect(route('ondertekening'));
+
+        $doc = OndertekendDocument::where('type', 'upload')->firstOrFail();
+        $this->assertSame('Toelatingsbrief', $doc->titel);
+        $this->assertSame('Gemeente Rotterdam', $doc->ontvanger);
+        $this->assertSame(hash('sha256', $bytes), $doc->sha256); // hash van het origineel
+        Storage::disk('local')->assertExists($doc->pad);
+        Storage::disk('local')->assertExists($doc->waarmerk_pad);
+
+        // Origineel én waarmerk zijn te downloaden.
+        $this->actingAs($this->sz)->get(route('ondertekening.download', $doc))->assertOk();
+        $this->actingAs($this->sz)->get(route('ondertekening.waarmerk', $doc))->assertOk();
+
+        // Publieke verificatie bevestigt dat het originele bestand ongewijzigd is.
+        $this->assertTrue(Documentondertekening::isOngewijzigd($doc, $bytes));
+    }
+
+    public function test_upload_module_alleen_voor_bevoegde_rollen(): void
+    {
+        $this->actingAs(User::where('rol', Rol::Directie)->first())->get(route('ondertekening.uploaden'))->assertOk();
+        $this->actingAs(User::where('rol', Rol::Docent)->first())->get(route('ondertekening.uploaden'))->assertForbidden();
+        $this->actingAs(User::where('rol', Rol::Examencommissie)->first())->post(route('ondertekening.onderteken'), [])->assertForbidden();
+    }
+
+    public function test_niet_pdf_wordt_geweigerd(): void
+    {
+        $file = UploadedFile::fake()->create('script.exe', 10);
+
+        $this->actingAs($this->sz)->post(route('ondertekening.onderteken'), [
+            'titel' => 'x', 'ontvanger' => 'y', 'bestand' => $file,
+        ])->assertSessionHasErrors('bestand');
+        $this->assertSame(0, OndertekendDocument::where('type', 'upload')->count());
     }
 }

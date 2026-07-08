@@ -14,8 +14,14 @@ class OndertekendDocument extends Model
 
     protected $fillable = [
         'code', 'type', 'titel', 'student_id', 'ontvanger',
-        'uitgegeven_door_id', 'sha256', 'bestandsnaam', 'pad',
+        'uitgegeven_door_id', 'sha256', 'bestandsnaam', 'pad', 'waarmerk_pad',
     ];
+
+    /** Een door de gebruiker geüpload (in plaats van gegenereerd) document. */
+    public function isUpload(): bool
+    {
+        return $this->type === 'upload';
+    }
 
     public function student(): BelongsTo
     {

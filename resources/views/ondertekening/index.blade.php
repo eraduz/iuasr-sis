@@ -12,8 +12,13 @@
   </div>
   <div class="iuasr-dash-vhead__actions">
     <a class="iuasr-dash-btn" href="{{ route('verificatie') }}" target="_blank">Publieke verificatiepagina</a>
+    <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('ondertekening.uploaden') }}">Document ondertekenen</a>
   </div>
 </div>
+
+@if (session('status'))
+  <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-bottom:16px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>{{ session('status') }}</span></div>
+@endif
 
 <form method="GET" action="{{ route('ondertekening') }}" class="iuasr-dash-filters">
   <div class="search" style="grid-column:1 / -1;">
@@ -33,7 +38,14 @@
           <td>{{ $doc->ontvanger ?? '—' }}</td>
           <td>{{ $doc->uitgegevenDoor?->naam ?? '—' }}</td>
           <td class="dt">{{ $doc->created_at->format('d-m-Y H:i') }}</td>
-          <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('ondertekening.download', $doc) }}">Downloaden</a></td>
+          <td class="row-act" style="white-space:nowrap;text-align:right;">
+            @if ($doc->isUpload())
+              <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('ondertekening.download', $doc) }}">Origineel</a>
+              <a class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" href="{{ route('ondertekening.waarmerk', $doc) }}">Waarmerk</a>
+            @else
+              <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('ondertekening.download', $doc) }}">Downloaden</a>
+            @endif
+          </td>
         </tr>
       @empty
         <tr><td colspan="6"><div class="iuasr-dash-empty" style="border:0;"><h3>Nog geen ondertekende documenten</h3><p>Genereer bijvoorbeeld een verklaring; deze wordt automatisch ondertekend en hier gearchiveerd.</p></div></td></tr>

@@ -71,9 +71,14 @@ opleverpunt aantoonbaar klaar is.
     logregistratie (wie/wanneer/aan wie). Verklaringen worden nu als ondertekende
     PDF gegenereerd (ontvanger verplicht). Archief 'Ondertekende documenten'
     (Beheerder/Directie/Studentenzaken) + publieke verificatiepagina (/verificatie,
-    geen login) met optionele bestand-hashcontrole + WordPress-shortcode. Nog te
-    doen: upload-onderteken-download, auto-sign van overige gegenereerde PDF's,
-    eventueel cryptografische PAdES-ondertekening zodra een certificaat er is.
+    geen login) met optionele bestand-hashcontrole + WordPress-shortcode.
+  - Ondertekenmodule increment 2: eigen PDF uploaden en laten waarmerken
+    (Studentenzaken, Directie=opleidingsdirecteuren/bestuur, Beheerder). Het
+    origineel blijft ongewijzigd (werkt voor elk PDF-formaat), krijgt een SHA-256
+    + verificatiecode en een apart digitaal waarmerk-certificaat (PDF). Origineel
+    én waarmerk downloadbaar uit het archief; uitgifte gelogd. Nog te doen:
+    auto-sign van overige gegenereerde PDF's, eventueel PAdES-ondertekening zodra
+    er een certificaat is.
   - NT2-bewaking: NT2-plichtige studenten hebben 1 jaar vanaf de inschrijfdatum
     om het examen te halen. Deadline wordt afgeleid; `nt2_behaald_op` vastlegbaar
     via het wijzigscherm. Dashboardvenster bij Studentenzaken toont de openstaande

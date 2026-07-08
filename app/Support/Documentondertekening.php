@@ -54,11 +54,61 @@ class Documentondertekening
         ]);
     }
 
+    /**
+     * Waarmerkt een door de gebruiker geüploade PDF: archiveert het originele
+     * bestand, berekent het SHA-256-echtheidskenmerk en genereert een digitaal
+     * waarmerk-certificaat (met verificatiecode). Het origineel wordt NIET
+     * gewijzigd, zodat elk PDF-formaat werkt.
+     *
+     * @param  array{titel?:string,ontvanger?:string|null,uitgegeven_door_id?:int|null}  $meta
+     */
+    public static function ondertekenUpload(string $origineleBytes, string $origineleNaam, array $meta): OndertekendDocument
+    {
+        $code = self::genereerCode();
+        $sha = hash('sha256', $origineleBytes);
+        $user = isset($meta['uitgegeven_door_id']) ? User::find($meta['uitgegeven_door_id']) : null;
+
+        $origineelPad = 'ondertekend/'.$code.'-origineel.pdf';
+        Storage::disk(self::DISK)->put($origineelPad, $origineleBytes);
+
+        $waarmerkHtml = view('pdf.waarmerk', [
+            'code' => $code,
+            'titel' => $meta['titel'] ?? $origineleNaam,
+            'ontvanger' => $meta['ontvanger'] ?? null,
+            'origineleNaam' => $origineleNaam,
+            'sha256' => $sha,
+            'ondertekenaar' => $user,
+            'verifyUrl' => route('verificatie'),
+        ])->render();
+        $waarmerkPad = 'ondertekend/'.$code.'-waarmerk.pdf';
+        Storage::disk(self::DISK)->put($waarmerkPad, self::renderPdf($waarmerkHtml));
+
+        return OndertekendDocument::create([
+            'code' => $code,
+            'type' => 'upload',
+            'titel' => $meta['titel'] ?? $origineleNaam,
+            'ontvanger' => $meta['ontvanger'] ?? null,
+            'uitgegeven_door_id' => $meta['uitgegeven_door_id'] ?? null,
+            'sha256' => $sha,
+            'bestandsnaam' => $origineleNaam,
+            'pad' => $origineelPad,
+            'waarmerk_pad' => $waarmerkPad,
+        ]);
+    }
+
     public static function pdfBytes(OndertekendDocument $document): ?string
     {
+        return self::bestandBytes($document->pad);
+    }
+
+    public static function bestandBytes(?string $pad): ?string
+    {
+        if (! $pad) {
+            return null;
+        }
         $disk = Storage::disk(self::DISK);
 
-        return $disk->exists($document->pad) ? $disk->get($document->pad) : null;
+        return $disk->exists($pad) ? $disk->get($pad) : null;
     }
 
     /** Controleert of geüploade PDF-bytes overeenkomen met het gearchiveerde origineel. */

@@ -6,6 +6,7 @@ use App\Models\OndertekendDocument;
 use App\Support\AuditLogger;
 use App\Support\Documentondertekening;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -32,6 +33,51 @@ class OndertekeningController extends Controller
             ->withQueryString();
 
         return view('ondertekening.index', compact('documenten', 'zoek'));
+    }
+
+    /** Uploadformulier: eigen PDF laten waarmerken. */
+    public function uploadForm(): View
+    {
+        return view('ondertekening.uploaden');
+    }
+
+    /** Waarmerkt een geüploade PDF (SHA-256 + verificatiecode + certificaat). */
+    public function onderteken(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'titel' => ['required', 'string', 'max:200'],
+            'ontvanger' => ['required', 'string', 'max:255'],
+            'bestand' => ['required', 'file', 'mimes:pdf', 'max:15360'],
+        ]);
+
+        $bytes = (string) file_get_contents($data['bestand']->getRealPath());
+        $doc = Documentondertekening::ondertekenUpload($bytes, $data['bestand']->getClientOriginalName(), [
+            'titel' => $data['titel'],
+            'ontvanger' => $data['ontvanger'],
+            'uitgegeven_door_id' => auth()->id(),
+        ]);
+
+        AuditLogger::log(AuditLogger::UITGIFTE, $doc, veld: 'ondertekend_document', context: [
+            'code' => $doc->code, 'ontvanger' => $data['ontvanger'], 'type' => 'upload',
+        ]);
+
+        return redirect()->route('ondertekening')
+            ->with('status', 'Document gewaarmerkt met verificatiecode '.$doc->code.'.');
+    }
+
+    /** Waarmerk-certificaat van een geüpload document downloaden (gelogd). */
+    public function downloadWaarmerk(OndertekendDocument $document): StreamedResponse
+    {
+        $bytes = Documentondertekening::bestandBytes($document->waarmerk_pad);
+        abort_if($bytes === null, 404, 'Waarmerk niet gevonden.');
+
+        AuditLogger::log(AuditLogger::INZAGE, $document->student ?? $document, veld: 'ondertekend_document', context: [
+            'code' => $document->code, 'onderdeel' => 'waarmerk',
+        ]);
+
+        return response()->streamDownload(fn () => print($bytes), 'waarmerk-'.$document->code.'.pdf', [
+            'Content-Type' => 'application/pdf',
+        ]);
     }
 
     /** Gearchiveerd ondertekend document opnieuw downloaden (gelogd). */
