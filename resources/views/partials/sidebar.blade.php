@@ -32,6 +32,7 @@
             'Studenten' => [
                 ['Alle studenten', 'studenten.index', 'students', 'studenten.*'],
                 ['Student inschrijven', 'inschrijven', 'plus', 'inschrijven'],
+                ['Bulk inschrijven', 'bulk-inschrijven', 'plus', 'bulk-inschrijven*'],
                 ['Herinschrijven', 'herinschrijven', 'refresh', 'herinschrijven'],
                 ['Uitschrijven', 'uitschrijven', 'userx', 'uitschrijven'],
             ],

@@ -56,6 +56,12 @@ opleverpunt aantoonbaar klaar is.
     heet "Alle studenten".
   - 27 tests groen (rolscheiding, lifecycle, mutatie, verklaring, beheer, notities,
     studentenlijst-filter); alle schermen live geverifieerd.
+  - Bulk-inschrijving: CSV-export van het aanmeldportaal in bulk inschrijven
+    (Studentenzaken/Beheerder). Header-gebaseerde kolomherkenning (tolerant voor
+    `;`/`,` en Nederlandse kopnamen), controlestap (wat wordt ingeschreven / wat
+    overgeslagen: onbekende opleiding, duplicaat op naam+geb.datum of e-mail),
+    daarna definitief inschrijven met automatisch studentnummer + vaktoewijzing.
+    BSN wordt NIET geïmporteerd (AVG). Sjabloon-download aanwezig.
   - Aanmeldportaal-velden: huisnummer, provincie, land, onderwijsinstelling +
     afstudeerjaar vorige opleiding toegevoegd aan wijzigscherm en studentpagina
     (straat=adres, stad=woonplaats, IBAN=rekeningnummer bestonden al).

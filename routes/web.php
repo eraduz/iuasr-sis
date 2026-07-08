@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\DevLoginController;
 use App\Http\Controllers\BetalingController;
+use App\Http\Controllers\BulkInschrijvingController;
 use App\Http\Controllers\CijferController;
 use App\Http\Controllers\CollegegeldController;
 use App\Http\Controllers\DashboardController;
@@ -69,6 +70,12 @@ Route::middleware('auth')->group(function () {
         // Inschrijven
         Route::get('/inschrijven', [InschrijvingController::class, 'create'])->name('inschrijven');
         Route::post('/inschrijven', [InschrijvingController::class, 'store'])->name('inschrijven.store');
+
+        // Bulk-inschrijven (CSV-export van het aanmeldportaal) — controle -> bevestigen
+        Route::get('/bulk-inschrijven', [BulkInschrijvingController::class, 'form'])->name('bulk-inschrijven');
+        Route::get('/bulk-inschrijven/sjabloon', [BulkInschrijvingController::class, 'sjabloon'])->name('bulk-inschrijven.sjabloon');
+        Route::post('/bulk-inschrijven/controle', [BulkInschrijvingController::class, 'controle'])->name('bulk-inschrijven.controle');
+        Route::post('/bulk-inschrijven', [BulkInschrijvingController::class, 'importeer'])->name('bulk-inschrijven.importeer');
 
         // Muteren
         Route::get('/studenten/{student}/muteren', [StudentController::class, 'edit'])->name('studenten.edit');
