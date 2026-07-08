@@ -138,7 +138,7 @@ class Documentondertekening
         $ontvanger = e($meta['ontvanger'] ?? '—');
         $verifyUrl = route('verificatie');
 
-        return '<div style="margin-top:26px;padding-top:8px;border-top:2px solid #1E1446;font-family:DejaVu Sans;font-size:9.5px;color:#1E1446;line-height:1.5;">'
+        return '<div style="margin-top:12px;padding-top:6px;border-top:2px solid #1E1446;font-family:DejaVu Sans;font-size:8.5px;color:#1E1446;line-height:1.4;">'
             .'<b>Digitaal ondertekend</b> door '.$naam.($rol ? ' ('.$rol.')' : '').' namens IUASR op '.$datum.'.<br>'
             .'Verstrekt aan: <b>'.$ontvanger.'</b><br>'
             .'Verificatiecode: <b>'.$code.'</b> — controleer echtheid op '.e($verifyUrl).'<br>'
