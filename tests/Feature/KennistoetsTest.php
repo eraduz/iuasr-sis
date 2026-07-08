@@ -78,6 +78,22 @@ class KennistoetsTest extends TestCase
         Carbon::setTestNow();
     }
 
+    public function test_beheerder_beheert_kennistoetsen_via_opzoektabellen(): void
+    {
+        $pabo = \App\Models\Opleiding::where('code', 'PABO')->first();
+
+        $this->actingAs(User::where('rol', Rol::Beheerder)->first())
+            ->get(route('opzoektabellen.tabel', 'kennistoetsen'))->assertOk()->assertSee('RWT');
+
+        $this->actingAs(User::where('rol', Rol::Beheerder)->first())
+            ->post(route('opzoektabellen.store', 'kennistoetsen'), [
+                'opleiding_id' => $pabo->id, 'code' => 'LKT-EXTRA', 'naam' => 'Extra kennistoets',
+                'volgorde' => 9, 'actief' => 1,
+            ])->assertRedirect();
+
+        $this->assertDatabaseHas('kennistoetsen', ['code' => 'LKT-EXTRA', 'opleiding_id' => $pabo->id]);
+    }
+
     public function test_rolscheiding_alleen_studentenzaken_registreert(): void
     {
         $student = $this->paboStudent();

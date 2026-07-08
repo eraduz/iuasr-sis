@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Docent;
 use App\Models\Faculteit;
+use App\Models\Kennistoets;
 use App\Models\Klas;
 use App\Models\Land;
 use App\Models\Nationaliteit;
@@ -64,6 +65,23 @@ class ReferentieController extends Controller
                     'ec' => ['label' => 'EC', 'type' => 'number', 'rules' => 'required|integer|min:0'],
                     'leerjaar' => ['label' => 'Leerjaar', 'type' => 'number', 'rules' => 'nullable|integer|min:1|max:10'],
                     'blok' => ['label' => 'Blok', 'type' => 'number', 'rules' => 'nullable|integer|min:1|max:4'],
+                    'actief' => ['label' => 'Actief', 'type' => 'checkbox'],
+                ],
+            ],
+            'kennistoetsen' => [
+                'model' => Kennistoets::class, 'enkel' => 'Kennistoets', 'meer' => 'Landelijke kennistoetsen',
+                'kolommen' => [
+                    'Code' => fn ($m) => $m->code,
+                    'Naam' => fn ($m) => $m->naam,
+                    'Opleiding' => fn ($m) => $m->opleiding?->code ?? '—',
+                    'Volgorde' => fn ($m) => $m->volgorde,
+                    'Actief' => fn ($m) => $m->actief ? 'Ja' : 'Nee',
+                ],
+                'velden' => [
+                    'opleiding_id' => ['label' => 'Opleiding', 'type' => 'belongsto', 'model' => Opleiding::class, 'toon' => 'naam', 'rules' => 'required|exists:opleidingen,id'],
+                    'code' => ['label' => 'Code', 'type' => 'text', 'rules' => 'required|string|max:20', 'hint' => 'bv. RWT of LKT-TAAL'],
+                    'naam' => ['label' => 'Naam', 'type' => 'text', 'rules' => 'required|string|max:120'],
+                    'volgorde' => ['label' => 'Volgorde', 'type' => 'number', 'rules' => 'nullable|integer|min:0|max:99', 'hint' => 'volgorde op het dossier'],
                     'actief' => ['label' => 'Actief', 'type' => 'checkbox'],
                 ],
             ],
