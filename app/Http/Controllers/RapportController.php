@@ -174,6 +174,48 @@ class RapportController extends Controller
     }
 
     /**
+     * EC-rapport: studievoortgang per opleiding/klas — cumulatief behaalde EC
+     * per student t.o.v. het nominale totaal. Voor Examencommissie en Directie.
+     */
+    public function ecRapport(Request $request): View
+    {
+        $data = $request->validate([
+            'opleiding_id' => ['nullable', 'exists:opleidingen,id'],
+            'leerjaar' => ['nullable', 'integer', 'min:1', 'max:10'],
+            'klas_id' => ['nullable', 'exists:klassen,id'],
+        ]);
+
+        $opleidingen = Opleiding::orderBy('naam')->get();
+        $klassen = Klas::with('opleiding')->orderBy('code')->get();
+
+        $rijen = Inschrijving::query()
+            ->with(['student', 'opleiding', 'klas'])
+            ->where('status', 'actief')
+            ->when($data['opleiding_id'] ?? null, fn ($q, $v) => $q->where('opleiding_id', $v))
+            ->when($data['leerjaar'] ?? null, fn ($q, $v) => $q->where('leerjaar', $v))
+            ->when($data['klas_id'] ?? null, fn ($q, $v) => $q->where('klas_id', $v))
+            ->get()
+            ->sortBy(fn ($i) => $i->student->studentnummer)
+            ->map(function ($i) {
+                $tr = Transcript::voor($i->student);
+
+                return ['inschrijving' => $i, 'behaald' => $tr['behaaldeEc'], 'totaal' => $tr['ecTotaal']];
+            })->values();
+
+        $gemiddeld = $rijen->count() ? round($rijen->avg('behaald'), 1) : null;
+
+        return view('rapporten.ec-rapport', [
+            'rijen' => $rijen,
+            'opleidingen' => $opleidingen,
+            'klassen' => $klassen,
+            'gemiddeld' => $gemiddeld,
+            'gekozenOpleiding' => $data['opleiding_id'] ?? null,
+            'gekozenLeerjaar' => $data['leerjaar'] ?? null,
+            'gekozenKlas' => $data['klas_id'] ?? null,
+        ]);
+    }
+
+    /**
      * Leerjaar-herbeoordeling: per actieve student de behaalde EC t.o.v. de
      * EC-overgangsdrempel van de opleiding, met overgangsadvies (positief /
      * voorwaardelijk / negatief). Voor Examencommissie en Directie.

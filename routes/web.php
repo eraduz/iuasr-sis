@@ -180,6 +180,8 @@ Route::middleware('auth')->group(function () {
         // Cijferlijst / transcript per student (+ ondertekende PDF).
         Route::get('/cijferlijst', [RapportController::class, 'cijferlijst'])->name('cijferlijst');
         Route::post('/cijferlijst/{student}/pdf', [RapportController::class, 'cijferlijstPdf'])->name('cijferlijst.pdf');
+        // EC-rapport (studievoortgang per opleiding/klas).
+        Route::get('/ec-rapport', [RapportController::class, 'ecRapport'])->name('ec-rapport');
     });
 
     // --- Alumni-rapport — Studentenzaken & Directie ---

@@ -141,7 +141,7 @@ opleverpunt aantoonbaar klaar is.
     default 30 EC (landelijke BSA-norm vanaf 2026-2027), per opleiding aanpasbaar
     via Opzoektabellen.
   - Fase 4 afgerond. 87 tests groen.
-- [~] **Fase 5 — Rapporten + documenten** (increment 1 opgeleverd)
+- [x] **Fase 5 — Rapporten + documenten** (afgerond, increment 1 t/m 3)
   - Al eerder gebouwd: klassenlijst, alumni-rapport, Excel-export actieve
     studenten (incl. IBAN), overgangsadvies, verklaringen-PDF + digitale
     ondertekening.
@@ -155,8 +155,12 @@ opleverpunt aantoonbaar klaar is.
     resultaten (beste poging per onderdeel, eindcijfer, EC, status) met
     samenvatting (deelnemers/geslaagd/gemiddelde); printbaar en downloadbaar als
     ondertekende PDF op briefpapier. Toegang: docent (eigen vak), examencommissie,
-    directie; links vanaf cijferoverzicht en cijferinvoer. 93 tests groen.
-  - Nog te doen: EC-rapport per opleiding/klas (samenvattend).
+    directie; links vanaf cijferoverzicht en cijferinvoer.
+  - Increment 3: EC-rapport. Studievoortgang per opleiding/klas — cumulatief
+    behaalde EC per student t.o.v. het nominale totaal, met voortgangsbalk,
+    filter op opleiding/leerjaar/klas en gemiddelde. Voor Examencommissie en
+    Directie; Rapporten-kaart + menu geactiveerd.
+  - Fase 5 afgerond. 95 tests groen.
 - [ ] **Fase 6 — Portaalkoppeling**
   - Koppeling met publiek aanmeldportaal (gescheiden regime).
 - [ ] **Fase 7 — Migratie**
