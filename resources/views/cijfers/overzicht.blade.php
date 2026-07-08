@@ -19,6 +19,13 @@
   </div>
 @endif
 
+<form method="GET" action="{{ route('cijferoverzicht') }}" class="iuasr-dash-filters" style="margin-bottom:16px;">
+  <div class="search" style="grid-column:1 / -1;">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="search" name="q" value="{{ $zoek }}" placeholder="Zoek op vakcode, vaknaam of docent… (Enter)">
+  </div>
+</form>
+
 <div class="iuasr-dash-tbl-card">
   <table class="iuasr-dash-tbl">
     <thead><tr><th>Vak</th><th>Code</th><th>Opleiding</th><th>Docent</th><th>Studenten</th><th>Gem.</th><th>Geslaagd</th><th>Status</th><th class="row-act"></th></tr></thead>

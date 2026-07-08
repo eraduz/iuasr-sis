@@ -342,10 +342,20 @@ class CijferController extends Controller
     }
 
     /** Examencommissie/Directie: overzicht van alle vakken met status en gemiddelde. */
-    public function overzicht(): View
+    public function overzicht(Request $request): View
     {
+        $zoek = trim((string) $request->query('q', ''));
         $periode = Periode::where('actief', true)->first();
-        $vakken = Vak::where('actief', true)->with(['opleiding', 'docent', 'toetsonderdelen'])->orderBy('code')->get();
+        $vakken = Vak::where('actief', true)
+            ->with(['opleiding', 'docent', 'toetsonderdelen'])
+            ->when($zoek !== '', function ($q) use ($zoek) {
+                $q->where(function ($w) use ($zoek) {
+                    $w->where('code', 'like', '%'.$zoek.'%')
+                        ->orWhere('naam', 'like', '%'.$zoek.'%')
+                        ->orWhereHas('docent', fn ($d) => $d->where('achternaam', 'like', '%'.$zoek.'%'));
+                });
+            })
+            ->orderBy('code')->get();
         $lijsten = $periode
             ? Cijferlijst::where('periode_id', $periode->id)->whereIn('vak_id', $vakken->pluck('id'))->get()->keyBy('vak_id')
             : collect();
@@ -379,7 +389,7 @@ class CijferController extends Controller
 
         $terVaststelling = $rijen->filter(fn ($r) => $r['status'] === CijferlijstStatus::Ingediend)->count();
 
-        return view('cijfers.overzicht', ['vakken' => $rijen, 'terVaststelling' => $terVaststelling]);
+        return view('cijfers.overzicht', ['vakken' => $rijen, 'terVaststelling' => $terVaststelling, 'zoek' => $zoek]);
     }
 
     private function actievePeriode(): Periode
