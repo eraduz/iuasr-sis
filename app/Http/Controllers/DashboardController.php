@@ -70,6 +70,13 @@ class DashboardController extends Controller
             default => [],
         };
 
+        // Lijst 'studenten met vrijstelling' — voor iedereen behalve Beheerder
+        // en Financiële Administratie (die hebben er geen belang bij).
+        $vrijstellingLijst = collect();
+        if (! in_array($rol, [Rol::Beheerder, Rol::Financien], true)) {
+            $vrijstellingLijst = Statistiek::vrijstellingStudenten();
+        }
+
         // Signaleringen voor Studentenzaken (lijsten onder de statistieken).
         $nt2 = collect();
         $docLater = collect();
@@ -94,6 +101,6 @@ class DashboardController extends Controller
             $docLater = Student::where('documenten_later', true)->orderBy('achternaam')->get();
         }
 
-        return view('dashboard.index', compact('kpi', 'nt2', 'docLater', 'stat', 'openBesluiten'));
+        return view('dashboard.index', compact('kpi', 'nt2', 'docLater', 'stat', 'openBesluiten', 'vrijstellingLijst'));
     }
 }

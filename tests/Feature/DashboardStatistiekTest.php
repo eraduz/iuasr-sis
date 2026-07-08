@@ -77,6 +77,25 @@ class DashboardStatistiekTest extends TestCase
             ->assertSee('Cijferverdeling');
     }
 
+    public function test_vrijstellingslijst_zichtbaar_voor_onderwijsrollen(): void
+    {
+        // De seeder legt één demo-vrijstelling vast (student 261001).
+        foreach ([Rol::Studentenzaken, Rol::Docent, Rol::Examencommissie, Rol::Directie, Rol::Bestuur] as $rol) {
+            $this->actingAs(User::where('rol', $rol)->first())
+                ->get(route('dashboard'))
+                ->assertOk()
+                ->assertSee('Studenten met vrijstelling');
+        }
+    }
+
+    public function test_vrijstellingslijst_niet_voor_beheer_en_financien(): void
+    {
+        $this->actingAs(User::where('rol', Rol::Beheerder)->first())
+            ->get(route('dashboard'))->assertOk()->assertDontSee('Studenten met vrijstelling');
+        $this->actingAs(User::where('rol', Rol::Financien)->first())
+            ->get(route('dashboard'))->assertOk()->assertDontSee('Studenten met vrijstelling');
+    }
+
     public function test_financien_dashboard_toont_bedragen_en_betaalgraad(): void
     {
         $this->actingAs(User::where('rol', Rol::Financien)->first())

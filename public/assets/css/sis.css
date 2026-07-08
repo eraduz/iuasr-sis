@@ -618,3 +618,14 @@
 }
 .sis-help-link:hover { background: var(--priColor100); color: #FFFFFF; border-color: var(--priColor100); }
 .sis-help-link svg { display: block; }
+
+/* Duidelijke groene succesmelding (flash) */
+.iuasr-dash-alert--ok {
+  background: #EAF3F0; color: #285C4D;
+  border: 1px solid rgba(40, 92, 77, 0.28);
+}
+.iuasr-dash-alert--ok b { color: #1d453a; font-weight: 700; }
+.iuasr-dash-alert--flash {
+  font-size: 14px; padding: 14px 16px; align-items: center;
+  box-shadow: 0 3px 12px rgba(30, 20, 70, 0.07);
+}

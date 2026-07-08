@@ -27,7 +27,7 @@
     <div class="iuasr-dash-stat"><span class="lbl">Studenten</span><span class="val">{{ $kpi['studenten'] }}</span><span class="delta">in het systeem</span></div>
     <div class="iuasr-dash-stat iuasr-dash-stat--ok"><span class="lbl">Actief ingeschreven</span><span class="val">{{ $kpi['inschrijvingen'] }}</span><span class="delta">huidige periode</span></div>
     <div class="iuasr-dash-stat"><span class="lbl">Afgestudeerd</span><span class="val">{{ $kpi['afgestudeerd'] }}</span><span class="delta">alumni</span></div>
-    <div class="iuasr-dash-stat"><span class="lbl">Vrijstellingen</span><span class="val">{{ $stat['vrijstellingen'] ?? 0 }}</span><span class="delta">vastgelegd</span></div>
+    <div class="iuasr-dash-stat"><span class="lbl">Vrijstellingen</span><span class="val">{{ $stat['vrijstellingen'] ?? 0 }}</span><span class="delta">vak-vrijstellingen</span></div>
   </div>
 
   <div class="sis-chartgrid" style="margin-top:16px;">
@@ -200,7 +200,7 @@
     <div class="iuasr-dash-stat {{ $kpi['ter_vaststelling'] > 0 ? 'iuasr-dash-stat--alert' : '' }}"><span class="lbl">Ter vaststelling</span><span class="val">{{ $kpi['ter_vaststelling'] }}</span><span class="delta">ingediende cijferlijsten</span></div>
     <div class="iuasr-dash-stat iuasr-dash-stat--ok"><span class="lbl">Slaagpercentage</span><span class="val">{{ $slaag['percentage'] }}%</span><span class="delta">{{ $slaag['voldoende'] }}/{{ $slaag['totaal'] }} toetsen voldoende</span></div>
     <div class="iuasr-dash-stat"><span class="lbl">Herkansingen</span><span class="val">{{ $stat['herkansingen'] ?? 0 }}</span><span class="delta">geregistreerd</span></div>
-    <div class="iuasr-dash-stat"><span class="lbl">Vrijstellingen</span><span class="val">{{ $stat['vrijstellingen'] ?? 0 }}</span><span class="delta">vastgelegd</span></div>
+    <div class="iuasr-dash-stat"><span class="lbl">Vrijstellingen</span><span class="val">{{ $stat['vrijstellingen'] ?? 0 }}</span><span class="delta">vak-vrijstellingen</span></div>
   </div>
 
   @if (($stat['besluitenOpen'] ?? 0) > 0)
@@ -328,6 +328,34 @@
       <h3>Gebruikers per rol</h3><p class="sub">Toegang &amp; rolscheiding</p>
       @include('partials.charts.bar', ['data' => $stat['gebruikersPerRol'] ?? [], 'kleur' => 'var(--priColor200)'])
     </div>
+  </div>
+@endif
+
+{{-- Studenten met vrijstelling — zichtbaar voor alle rollen behalve Beheer/Financiën --}}
+@if ($vrijstellingLijst->isNotEmpty())
+  @php $magDossier = in_array($rol, [App\Enums\Rol::Studentenzaken, App\Enums\Rol::Examencommissie, App\Enums\Rol::Directie], true); @endphp
+  <div class="sis-card" style="margin-top:16px;">
+    <div class="sis-card__hd"><h3>Studenten met vrijstelling</h3><span class="hint">{{ $vrijstellingLijst->count() }} student(en)</span></div>
+    <div class="iuasr-dash-tbl-card" style="border:0;">
+      <table class="iuasr-dash-tbl">
+        <thead><tr><th style="width:110px;">Studentnr.</th><th style="width:220px;">Naam</th><th>Vrijgestelde vakken</th></tr></thead>
+        <tbody>
+          @foreach ($vrijstellingLijst as $r)
+            <tr>
+              <td class="tnum">{{ $r['student']->studentnummer }}</td>
+              <td class="nm">
+                @if ($magDossier)<a href="{{ route('studenten.show', $r['student']) }}">{{ $r['student']->volledigeNaam() }}</a>
+                @else {{ $r['student']->volledigeNaam() }}@endif
+              </td>
+              <td>
+                @foreach ($r['vakken'] as $v)<span class="sis-pill-soft" title="{{ $v->naam }}" style="margin:0 4px 4px 0;">{{ $v->code }}</span>@endforeach
+              </td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+    <p class="sis-tblnote" style="margin-top:6px;">Een vrijstelling betekent dat het vak als behaald geldt met de volledige EC (vermelding VR), zonder cijfer. Verleend door de examencommissie.</p>
   </div>
 @endif
 

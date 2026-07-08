@@ -65,6 +65,7 @@
 
   <h2>4. Uw dashboard</h2>
   <p>Na het inloggen ziet u uw dashboard met kerncijfers en grafieken die bij uw rol passen — bijvoorbeeld aantallen studenten, instroom, slaagpercentages of financiële cijfers. Signaleringen (zoals NT2-deadlines of nog aan te leveren documenten) staan er ook.</p>
+  <p>Onderaan het dashboard staat een lijst <b>Studenten met vrijstelling</b>, met per student de vrijgestelde vakken. Deze is zichtbaar voor alle rollen behalve Beheer en de Financiële Administratie.</p>
 
   <h2>5. Werken met studenten (Studentenzaken)</h2>
   <h3>Student zoeken</h3>

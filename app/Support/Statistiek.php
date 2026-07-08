@@ -167,6 +167,25 @@ class Statistiek
         return Vaktoewijzing::where('vrijgesteld', true)->count();
     }
 
+    /**
+     * Studenten met minstens één vrijstelling, met de vrijgestelde vakken.
+     * @return \Illuminate\Support\Collection<int, array{student: Student, vakken: \Illuminate\Support\Collection}>
+     */
+    public static function vrijstellingStudenten(): \Illuminate\Support\Collection
+    {
+        return Vaktoewijzing::where('vrijgesteld', true)
+            ->with(['vak', 'inschrijving.student'])
+            ->get()
+            ->filter(fn ($t) => $t->inschrijving?->student && $t->vak)
+            ->groupBy(fn ($t) => $t->inschrijving->student_id)
+            ->map(fn ($groep) => [
+                'student' => $groep->first()->inschrijving->student,
+                'vakken' => $groep->map(fn ($t) => $t->vak)->unique('id')->sortBy('code')->values(),
+            ])
+            ->sortBy(fn ($r) => $r['student']->achternaam)
+            ->values();
+    }
+
     /** Financieel totaaloverzicht over actieve studenten (synthetisch). */
     public static function financieel(): array
     {
