@@ -18,6 +18,10 @@
 </div>
 
 <form method="GET" action="{{ route('ec-rapport') }}" class="iuasr-dash-filters" style="margin-bottom:16px;">
+  <div class="search" style="grid-column:1 / -1;">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="search" name="q" value="{{ $zoek }}" placeholder="Zoek op studentnummer of naam… (Enter)">
+  </div>
   <div class="sis-fld" style="margin:0;">
     <label>Opleiding</label>
     <select name="opleiding_id" onchange="this.form.submit()">

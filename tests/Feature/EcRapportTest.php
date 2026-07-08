@@ -51,6 +51,19 @@ class EcRapportTest extends TestCase
             ->assertSee('Behaald EC');
     }
 
+    public function test_zoekbalk_filtert_op_studentnummer(): void
+    {
+        $student = Student::where('studentnummer', '261001')->first();
+
+        $response = $this->actingAs(User::where('rol', Rol::Examencommissie)->first())
+            ->get(route('ec-rapport', ['q' => '261001']));
+
+        $response->assertOk()->assertSee('261001');
+        // Een andere student mag niet in de gefilterde lijst staan.
+        $ander = Student::where('studentnummer', '!=', '261001')->first();
+        $response->assertDontSee($ander->volledigeNaam());
+    }
+
     public function test_ec_rapport_alleen_voor_cijferinzage(): void
     {
         $this->actingAs(User::where('rol', Rol::Examencommissie)->first())->get(route('ec-rapport'))->assertOk();

@@ -184,6 +184,7 @@ class RapportController extends Controller
             'leerjaar' => ['nullable', 'integer', 'min:1', 'max:10'],
             'klas_id' => ['nullable', 'exists:klassen,id'],
         ]);
+        $zoek = trim((string) $request->query('q', ''));
 
         $opleidingen = Opleiding::orderBy('naam')->get();
         $klassen = Klas::with('opleiding')->orderBy('code')->get();
@@ -194,6 +195,7 @@ class RapportController extends Controller
             ->when($data['opleiding_id'] ?? null, fn ($q, $v) => $q->where('opleiding_id', $v))
             ->when($data['leerjaar'] ?? null, fn ($q, $v) => $q->where('leerjaar', $v))
             ->when($data['klas_id'] ?? null, fn ($q, $v) => $q->where('klas_id', $v))
+            ->when($zoek !== '', fn ($q) => $this->zoekStudent($q, $zoek))
             ->get()
             ->sortBy(fn ($i) => $i->student->studentnummer)
             ->map(function ($i) {
@@ -212,7 +214,18 @@ class RapportController extends Controller
             'gekozenOpleiding' => $data['opleiding_id'] ?? null,
             'gekozenLeerjaar' => $data['leerjaar'] ?? null,
             'gekozenKlas' => $data['klas_id'] ?? null,
+            'zoek' => $zoek,
         ]);
+    }
+
+    /** Filtert een inschrijvingen-query op studentnummer (prefix) of naam. */
+    private function zoekStudent($query, string $zoek)
+    {
+        return $query->whereHas('student', function ($s) use ($zoek) {
+            $s->where('studentnummer', 'like', $zoek.'%')
+                ->orWhere('achternaam', 'like', '%'.$zoek.'%')
+                ->orWhere('voornaam', 'like', '%'.$zoek.'%');
+        });
     }
 
     /**
@@ -226,6 +239,7 @@ class RapportController extends Controller
             'opleiding_id' => ['nullable', 'exists:opleidingen,id'],
             'leerjaar' => ['nullable', 'integer', 'min:1', 'max:10'],
         ]);
+        $zoek = trim((string) $request->query('q', ''));
 
         $opleidingen = Opleiding::orderBy('naam')->get();
 
@@ -234,6 +248,7 @@ class RapportController extends Controller
             ->where('status', 'actief')
             ->when($data['opleiding_id'] ?? null, fn ($q, $v) => $q->where('opleiding_id', $v))
             ->when($data['leerjaar'] ?? null, fn ($q, $v) => $q->where('leerjaar', $v))
+            ->when($zoek !== '', fn ($q) => $this->zoekStudent($q, $zoek))
             ->get()
             ->sortBy(fn ($i) => $i->student->studentnummer)
             ->map(fn ($i) => ['inschrijving' => $i, 'advies' => \App\Support\Overgangsbeoordeling::voor($i)])
@@ -247,6 +262,7 @@ class RapportController extends Controller
             'telling' => $telling,
             'gekozenOpleiding' => $data['opleiding_id'] ?? null,
             'gekozenLeerjaar' => $data['leerjaar'] ?? null,
+            'zoek' => $zoek,
         ]);
     }
 
@@ -259,12 +275,14 @@ class RapportController extends Controller
             'klas_id' => ['nullable', 'exists:klassen,id'],
             'alleen_actief' => ['sometimes', 'boolean'],
         ]);
+        $zoek = trim((string) $request->query('q', ''));
 
         $q = Inschrijving::query()
             ->with(['student', 'opleiding', 'klas', 'periode'])
             ->when($data['opleiding_id'] ?? null, fn ($q, $v) => $q->where('opleiding_id', $v))
             ->when($data['periode_id'] ?? null, fn ($q, $v) => $q->where('periode_id', $v))
             ->when($data['klas_id'] ?? null, fn ($q, $v) => $q->where('klas_id', $v))
+            ->when($zoek !== '', fn ($q) => $this->zoekStudent($q, $zoek))
             ->when($request->boolean('alleen_actief'), fn ($q) => $q->where('status', 'actief'));
 
         $inschrijvingen = $q->get()->sortBy(fn ($i) => $i->student->studentnummer)->values();
@@ -273,7 +291,7 @@ class RapportController extends Controller
         $periode = ($data['periode_id'] ?? null) ? Periode::find($data['periode_id']) : null;
         $klas = ($data['klas_id'] ?? null) ? Klas::find($data['klas_id']) : null;
 
-        return view('rapporten.klassenlijst', compact('inschrijvingen', 'opleiding', 'periode', 'klas'));
+        return view('rapporten.klassenlijst', compact('inschrijvingen', 'opleiding', 'periode', 'klas', 'zoek'));
     }
 
     /**
@@ -281,17 +299,20 @@ class RapportController extends Controller
      * telefoon, e-mail). Zichtbaar voor Studentenzaken en Directie. Bevat geen
      * cijfers of BSN.
      */
-    public function alumni(): View
+    public function alumni(Request $request): View
     {
+        $zoek = trim((string) $request->query('q', ''));
+
         // Alleen studenten waarvan de MEEST RECENTE inschrijving 'afgestudeerd' is.
         $alumni = Inschrijving::query()
             ->with(['student', 'opleiding'])
             ->where('status', 'afgestudeerd')
+            ->when($zoek !== '', fn ($q) => $this->zoekStudent($q, $zoek))
             ->whereRaw('inschrijvingen.inschrijfdatum = (select max(i2.inschrijfdatum) from inschrijvingen i2 where i2.student_id = inschrijvingen.student_id)')
             ->get()
             ->sortBy(fn ($i) => $i->student->achternaam)
             ->values();
 
-        return view('rapporten.alumni', compact('alumni'));
+        return view('rapporten.alumni', compact('alumni', 'zoek'));
     }
 }

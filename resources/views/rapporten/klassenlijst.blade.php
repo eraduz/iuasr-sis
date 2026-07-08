@@ -7,6 +7,12 @@
 
 <div class="sis-toolbar">
   <span class="meta"><b>Klassenlijst</b> · {{ $opleiding?->naam ?? 'alle opleidingen' }}{{ $klas ? ' · '.$klas->code : '' }}{{ $periode ? ' · '.$periode->naam : '' }}</span>
+  <form method="GET" action="{{ route('rapporten.klassenlijst') }}" style="display:flex;gap:6px;align-items:center;">
+    @if($opleiding)<input type="hidden" name="opleiding_id" value="{{ $opleiding->id }}">@endif
+    @if($periode)<input type="hidden" name="periode_id" value="{{ $periode->id }}">@endif
+    @if($klas)<input type="hidden" name="klas_id" value="{{ $klas->id }}">@endif
+    <input type="search" name="q" value="{{ $zoek }}" placeholder="Zoek op studentnummer of naam…" style="padding:7px 11px;border:1px solid var(--borderColor,#cfcfd6);border-radius:6px;font-size:13px;min-width:220px;">
+  </form>
   <span class="grow"></span>
   <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('rapporten') }}">Terug</a>
   <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="button" onclick="window.print()">Printen / PDF</button>
@@ -15,8 +21,8 @@
 <div class="sis-paper-stage">
   <div class="sis-a4">
     <div class="sis-a4__head">
-      <img src="{{ asset('assets/img/logo-dark.png') }}" alt="IUASR">
-      <div class="org"><b>Islamic University of Applied Sciences Rotterdam</b>Bureau Studentenzaken<br>Postbus 12345 · 3000 AB Rotterdam</div>
+      <img src="{{ asset('assets/img/iuasr-logo.png') }}?v={{ filemtime(public_path('assets/img/iuasr-logo.png')) }}" alt="IUASR">
+      <div class="org">Bergsingel 135 · 3037 GC Rotterdam<br>Tel: +31 (0)10 485 47 21<br>szaken@iuasr.nl</div>
     </div>
     <h1>Klassenlijst</h1>
     <p class="doc-sub">{{ $opleiding?->naam ?? 'Alle opleidingen' }}{{ $klas ? ' · klas '.$klas->code : '' }}{{ $periode ? ' · '.$periode->naam : '' }}</p>
