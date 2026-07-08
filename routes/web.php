@@ -106,6 +106,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('/documenten/{document}', [StudentDocumentController::class, 'destroy'])->name('documenten.destroy');
         Route::post('/studenten/{student}/documenten-later', [StudentDocumentController::class, 'later'])->name('studenten.documenten.later');
 
+        // Landelijke kennistoetsen (PABO) registreren
+        Route::post('/studenten/{student}/kennistoetsen', [App\Http\Controllers\KennistoetsController::class, 'bijwerken'])->name('studenten.kennistoetsen.bijwerken');
+
         // Vrijstellingen (administratief; SZ registreert het examencommissie-besluit)
         Route::post('/studenten/{student}/vrijstellingen', [App\Http\Controllers\VrijstellingController::class, 'store'])->name('studenten.vrijstellingen.store');
         Route::delete('/studenten/{student}/vrijstellingen/{vaktoewijzing}', [App\Http\Controllers\VrijstellingController::class, 'destroy'])->name('studenten.vrijstellingen.destroy');

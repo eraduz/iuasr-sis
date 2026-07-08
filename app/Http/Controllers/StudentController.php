@@ -122,8 +122,9 @@ class StudentController extends Controller
         $grondslagen = \App\Enums\VrijstellingGrondslag::opties();
         $besluiten = \App\Models\Vrijstellingsbesluit::where('student_id', $student->id)
             ->with(['vak', 'aangemaaktDoor', 'verwerktDoor'])->latest()->get();
+        $kennistoetsen = \App\Support\Kennistoetsbewaking::voor($student);
 
-        return view('studenten.show', compact('student', 'huidige', 'magCijfers', 'cijferVakken', 'financieel', 'vakHistorie', 'grondslagen', 'besluiten'));
+        return view('studenten.show', compact('student', 'huidige', 'magCijfers', 'cijferVakken', 'financieel', 'vakHistorie', 'grondslagen', 'besluiten', 'kennistoetsen'));
     }
 
     /** Muteren van persoonsgegevens (Studentenzaken/Beheerder). */

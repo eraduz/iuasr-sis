@@ -133,6 +133,50 @@
           </dd>
         </dl>
       </div>
+
+      @if ($kennistoetsen['vereist'])
+        @php $ktMagBew = auth()->user()->magInschrijvingBeheren(); @endphp
+        <div class="sis-card" style="margin-top:16px;">
+          <div class="sis-card__hd">
+            <h3>Landelijke kennistoetsen</h3>
+            <span class="hint">{{ $kennistoetsen['behaald'] }}/{{ $kennistoetsen['totaal'] }} behaald · deadline {{ optional($kennistoetsen['deadline'])->format('d-m-Y') ?? '—' }}</span>
+          </div>
+          <div class="iuasr-dash-tbl-card" style="border:0;">
+            <table class="iuasr-dash-tbl">
+              <thead>
+                <tr><th>Toets</th><th>Status</th>@if ($ktMagBew)<th></th>@endif</tr>
+              </thead>
+              <tbody>
+                @foreach ($kennistoetsen['toetsen'] as $rij)
+                  <tr>
+                    <td class="nm">{{ $rij['toets']->naam }}</td>
+                    <td>
+                      @if ($rij['status'] === 'behaald')
+                        <span class="iuasr-dash-status s-approved">Behaald op {{ optional($rij['behaald_op'])->format('d-m-Y') }}</span>
+                      @elseif ($rij['status'] === 'verlopen')
+                        <span class="iuasr-dash-status s-rejected">Termijn verstreken</span>
+                      @else
+                        <span class="iuasr-dash-status s-incomplete">Openstaand</span>
+                      @endif
+                    </td>
+                    @if ($ktMagBew)
+                      <td style="text-align:right;">
+                        <form method="POST" action="{{ route('studenten.kennistoetsen.bijwerken', $student) }}" style="display:flex;gap:6px;justify-content:flex-end;">
+                          @csrf
+                          <input type="hidden" name="kennistoets_id" value="{{ $rij['toets']->id }}">
+                          <input type="date" name="behaald_op" value="{{ optional($rij['behaald_op'])->format('Y-m-d') }}" style="padding:5px 8px;border:1px solid var(--borderColor);border-radius:6px;font-size:12px;">
+                          <button class="iuasr-dash-btn iuasr-dash-btn--sm" type="submit">Opslaan</button>
+                        </form>
+                      </td>
+                    @endif
+                  </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+          <p class="sis-tblnote" style="margin-top:6px;">PABO-kennistoetsen · te halen binnen {{ config('sis.kennistoetsen.termijn_jaren', 2) }} jaar.@if ($ktMagBew) Vul een datum in en klik Opslaan; leeg = wissen.@endif</p>
+        </div>
+      @endif
     </div>
 
     {{-- Rechterkolom --}}

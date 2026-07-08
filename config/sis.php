@@ -63,6 +63,13 @@ return [
         'herbeoordeling' => ['juli', 'januari'],
     ],
 
+    'kennistoetsen' => [
+        // Landelijke kennistoetsen (bv. PABO: RWT reken-/wiskundetoets + LKT
+        // taal en rekenen). Termijn waarbinnen de student ze moet halen,
+        // gerekend vanaf de (eerste) inschrijfdatum.
+        'termijn_jaren' => 2,
+    ],
+
     /*
     |----------------------------------------------------------------------
     | Rollen (rolscheiding vanaf de eerste regel code)

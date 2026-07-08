@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             VaktoewijzingSeeder::class,
             ResultatenSeeder::class,
             CollegegeldSeeder::class,
+            KennistoetsSeeder::class,
         ]);
     }
 }

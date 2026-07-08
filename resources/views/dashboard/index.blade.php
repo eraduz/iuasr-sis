@@ -124,6 +124,36 @@
     </div>
   </div>
 
+  @if ($kennistoetsBewaking->isNotEmpty())
+    @php
+      $ktVerlopen = $kennistoetsBewaking->filter(fn ($r) => $r['kt']['status'] === 'verlopen');
+      $ktBinnen = $kennistoetsBewaking->filter(fn ($r) => $r['kt']['status'] === 'open' && ($r['kt']['dagen'] ?? 999) <= 90);
+    @endphp
+    <div class="sis-card" style="margin-top:16px;">
+      <div class="sis-card__hd"><h3>Landelijke kennistoetsen (PABO)</h3><span class="hint">{{ $kennistoetsBewaking->count() }} student(en)</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+        @if ($ktVerlopen->count())<span class="iuasr-dash-status s-rejected">{{ $ktVerlopen->count() }} termijn verstreken</span>@endif
+        @if ($ktBinnen->count())<span class="iuasr-dash-status s-incomplete">{{ $ktBinnen->count() }} &lt; 90 dagen</span>@endif
+      </div>
+      <ul class="iuasr-dash-log" style="margin:0;">
+        @foreach ($kennistoetsBewaking->take(5) as $r)
+          @php
+            $s = $r['student']; $kt = $r['kt'];
+            $ktDeadline = $kt['deadline']?->format('d-m-Y') ?? '—';
+            $ktInfo = $kt['status'] === 'verlopen'
+              ? 'termijn verstreken ('.$ktDeadline.')'
+              : 'deadline '.$ktDeadline.($kt['dagen'] !== null ? ' · nog '.$kt['dagen'].' dagen' : '');
+          @endphp
+          <li>
+            <a href="{{ route('studenten.show', $s) }}"><b>{{ $s->volledigeNaam() }}</b> · {{ $s->studentnummer }}</a>
+            <time>{{ $kt['behaald'] }}/{{ $kt['totaal'] }} behaald · <span @if($kt['status'] === 'verlopen')style="color:var(--secColor100);"@endif>{{ $ktInfo }}</span></time>
+          </li>
+        @endforeach
+      </ul>
+      @if ($kennistoetsBewaking->count() > 5)<p class="sis-muted" style="font-size:12px;margin:8px 2px 0;">+ {{ $kennistoetsBewaking->count() - 5 }} meer…</p>@endif
+    </div>
+  @endif
+
 {{-- ========================= FINANCIËLE ADMINISTRATIE ========================= --}}
 @elseif ($rol === App\Enums\Rol::Financien)
   @php $fin = $stat['financieel'] ?? ['verschuldigd'=>0,'betaald'=>0,'openstaand'=>0,'achterstand_aantal'=>0,'betaalgraad'=>0,'openstaand_per_opleiding'=>[]]; @endphp

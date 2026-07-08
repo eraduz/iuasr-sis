@@ -76,6 +76,9 @@
   <p>Open het dossier, tabblad <b>Persoonsgegevens</b>, en kies <b>Wijzig gegevens</b>. Onder <b>Acties</b> vindt u herinschrijven, uitschrijven en schorsen.</p>
   <h3>Documenten</h3>
   <p>In het dossier uploadt u documenten (identiteitsbewijs, diploma, cijferlijst, pasfoto, overig). Ontbreekt iets nog, zet dan <b>“levert later aan”</b> aan — de student verschijnt dan als herinnering op het dashboard.</p>
+  <h3>Landelijke kennistoetsen (PABO)</h3>
+  <p>Studenten van de PABO moeten de landelijke kennistoetsen halen (de RWT reken-/wiskundetoets en de LKT-kennisbasistoetsen taal en rekenen), binnen <b>twee jaar</b> na inschrijving. Zodra een student zich voor de PABO inschrijft, verschijnt op het dossier (kaart <b>Landelijke kennistoetsen</b>) automatisch de status per toets met de deadline. Registreer een behaalde toets door de datum in te vullen en op <b>Opslaan</b> te klikken. Op het dashboard van Studentenzaken staan de studenten met openstaande of verstreken toetsen — vergelijkbaar met de NT2-bewaking.</p>
+
   <h3>Vrijstellingen (workflow examencommissie &rarr; Studentenzaken)</h3>
   <p>Een vrijstelling wordt <b>verleend door de examencommissie</b>. De examencommissie legt het besluit vast en stuurt het intern naar Studentenzaken; het verschijnt dan als taak op uw dashboard onder <b>Vrijstellingsbesluiten van de examencommissie</b>. Klik op <b>Verwerken</b> en de vrijstelling wordt automatisch op het vak van de student vastgelegd — u hoeft niets over te typen. Is het vak nog niet toegewezen, dan krijgt u een melding om het eerst toe te wijzen.</p>
   <p>U kunt een vrijstelling ook <b>handmatig</b> vastleggen onder <b>Inschrijving &amp; klas</b> (bijvoorbeeld bij een papieren besluit), altijd met de <b>referentie van het examencommissie-besluit</b>. Een vrijstelling levert de volledige studiepunten (EC) op zonder cijfer (vermelding “VR”).</p>

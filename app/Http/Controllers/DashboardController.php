@@ -81,9 +81,21 @@ class DashboardController extends Controller
         $nt2 = collect();
         $docLater = collect();
         $openBesluiten = collect();
+        $kennistoetsBewaking = collect();
         if ($rol === Rol::Studentenzaken) {
             $openBesluiten = \App\Models\Vrijstellingsbesluit::where('status', 'open')
                 ->with(['student', 'vak', 'aangemaaktDoor'])->latest()->get();
+
+            // Landelijke kennistoetsen (PABO): studenten die nog niet alles behaald hebben.
+            $opleidingMetToets = \App\Models\Kennistoets::where('actief', true)->pluck('opleiding_id')->unique();
+            if ($opleidingMetToets->isNotEmpty()) {
+                $kennistoetsBewaking = Student::whereHas('inschrijvingen', fn ($q) => $q->where('status', 'actief')->whereIn('opleiding_id', $opleidingMetToets))
+                    ->with('inschrijvingen')->get()
+                    ->map(fn ($s) => ['student' => $s, 'kt' => \App\Support\Kennistoetsbewaking::voor($s)])
+                    ->filter(fn ($r) => $r['kt']['vereist'] && $r['kt']['status'] !== 'afgerond')
+                    ->sortBy(fn ($r) => $r['kt']['dagen'] ?? PHP_INT_MAX)
+                    ->values();
+            }
 
             $nt2 = Student::where('nt2_examen_vereist', true)
                 ->whereNull('nt2_behaald_op')
@@ -101,6 +113,6 @@ class DashboardController extends Controller
             $docLater = Student::where('documenten_later', true)->orderBy('achternaam')->get();
         }
 
-        return view('dashboard.index', compact('kpi', 'nt2', 'docLater', 'stat', 'openBesluiten', 'vrijstellingLijst'));
+        return view('dashboard.index', compact('kpi', 'nt2', 'docLater', 'stat', 'openBesluiten', 'vrijstellingLijst', 'kennistoetsBewaking'));
     }
 }
