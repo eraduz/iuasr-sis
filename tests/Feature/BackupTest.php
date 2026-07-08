@@ -97,4 +97,33 @@ class BackupTest extends TestCase
         $this->actingAs(User::where('rol', Rol::Studentenzaken)->first())->get(route('backup'))->assertForbidden();
         $this->actingAs(User::where('rol', Rol::Directie)->first())->get(route('backup'))->assertForbidden();
     }
+
+    public function test_uitpakken_met_juist_wachtwoord_herstelt_bestanden(): void
+    {
+        $zip = Backup::maak('Wachtwoord-123!');
+        $doel = storage_path('app/test-herstel-'.uniqid());
+
+        $this->artisan('backup:uitpakken', [
+            'archief' => $zip, '--wachtwoord' => 'Wachtwoord-123!', '--doel' => $doel,
+        ])->assertSuccessful();
+
+        $this->assertFileExists($doel.'/database.sql');
+        $this->assertFileExists($doel.'/.env');
+
+        \Illuminate\Support\Facades\File::deleteDirectory($doel);
+        @unlink($zip);
+    }
+
+    public function test_uitpakken_met_onjuist_wachtwoord_faalt(): void
+    {
+        $zip = Backup::maak('Wachtwoord-123!');
+        $doel = storage_path('app/test-herstel-fout-'.uniqid());
+
+        $this->artisan('backup:uitpakken', [
+            'archief' => $zip, '--wachtwoord' => 'FoutWachtwoord', '--doel' => $doel,
+        ])->assertFailed();
+
+        \Illuminate\Support\Facades\File::deleteDirectory($doel);
+        @unlink($zip);
+    }
 }
