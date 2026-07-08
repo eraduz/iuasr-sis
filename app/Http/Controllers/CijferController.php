@@ -10,9 +10,11 @@ use App\Models\Resultaat;
 use App\Models\Vak;
 use App\Support\AuditLogger;
 use App\Support\Cijferberekening;
+use App\Support\Documentondertekening;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Cijferregistratie met vaststellingsworkflow (Fase 4).
@@ -256,6 +258,87 @@ class CijferController extends Controller
         AuditLogger::log(AuditLogger::WIJZIGING, $vak, veld: 'cijferlijst', context: ['status' => 'teruggestuurd']);
 
         return redirect()->route('vakken.cijfers', $vak)->with('status', 'Cijferlijst teruggestuurd naar de docent.');
+    }
+
+    /** Read-only tentamenlijst (deelnemers + resultaten) van een vak. */
+    public function tentamenlijst(Vak $vak): View
+    {
+        $this->autoriseerInzage($vak);
+        $vak->load(['opleiding', 'toetsonderdelen', 'docent']);
+        $periode = $this->actievePeriode();
+        $lijst = Cijferlijst::voor($vak, $periode);
+
+        [$rijen, $grens, $samenvatting] = $this->tentamenlijstData($vak);
+
+        AuditLogger::log(AuditLogger::INZAGE, $vak, veld: 'tentamenlijst', context: ['vak' => $vak->code]);
+
+        return view('cijfers.tentamenlijst', compact('vak', 'rijen', 'grens', 'samenvatting', 'lijst', 'periode'));
+    }
+
+    /** Officiële tentamenlijst als ondertekende PDF (op briefpapier). */
+    public function tentamenlijstPdf(Request $request, Vak $vak): StreamedResponse
+    {
+        $this->autoriseerInzage($vak);
+        $data = $request->validate(['ontvanger' => ['required', 'string', 'max:255']]);
+        $vak->load(['opleiding', 'toetsonderdelen', 'docent']);
+        $periode = $this->actievePeriode();
+
+        [$rijen, $grens, $samenvatting] = $this->tentamenlijstData($vak);
+
+        $html = view('pdf.tentamenlijst', [
+            'vak' => $vak, 'rijen' => $rijen, 'grens' => $grens, 'samenvatting' => $samenvatting,
+            'periode' => $periode, 'ondertekenaar' => auth()->user()->naam,
+        ])->render();
+
+        $doc = Documentondertekening::ondertekenHtml($html, [
+            'type' => 'tentamenlijst',
+            'titel' => 'Tentamenlijst '.$vak->code,
+            'ontvanger' => $data['ontvanger'],
+            'uitgegeven_door_id' => auth()->id(),
+        ]);
+
+        AuditLogger::log(AuditLogger::UITGIFTE, $vak, veld: 'tentamenlijst', context: [
+            'code' => $doc->code, 'ontvanger' => $data['ontvanger'], 'vak' => $vak->code,
+        ]);
+
+        return response()->streamDownload(
+            fn () => print(Documentondertekening::pdfBytes($doc)),
+            $doc->bestandsnaam,
+            ['Content-Type' => 'application/pdf'],
+        );
+    }
+
+    /** @return array{0: \Illuminate\Support\Collection, 1: float|null, 2: array} */
+    private function tentamenlijstData(Vak $vak): array
+    {
+        $deelnemers = $vak->deelnemers()->get();
+        $resultaten = Resultaat::whereIn('toetsonderdeel_id', $vak->toetsonderdelen->pluck('id'))
+            ->whereIn('inschrijving_id', $deelnemers->pluck('id'))->get();
+        $grens = Cijferberekening::voldoendeGrens($vak);
+
+        $rijen = $deelnemers->map(function ($insch) use ($vak, $resultaten) {
+            $eigen = $resultaten->where('inschrijving_id', $insch->id);
+            $perOnderdeel = [];
+            foreach ($vak->toetsonderdelen as $od) {
+                $perOnderdeel[$od->id] = Cijferberekening::beste($eigen, $od->id);
+            }
+
+            return [
+                'student' => $insch->student,
+                'perOnderdeel' => $perOnderdeel,
+                'eind' => Cijferberekening::eindcijfer($vak, $eigen),
+                'ec' => Cijferberekening::ec($vak, $eigen),
+            ];
+        })->sortBy(fn ($r) => $r['student']->achternaam)->values();
+
+        $cijfers = $rijen->map(fn ($r) => $r['eind'])->filter(fn ($e) => $e['status'] === 'cijfer')->map(fn ($e) => $e['cijfer']);
+        $samenvatting = [
+            'aantal' => $rijen->count(),
+            'geslaagd' => $rijen->filter(fn ($r) => ($r['ec'] ?? 0) > 0)->count(),
+            'gemiddeld' => $cijfers->count() ? round($cijfers->avg(), 1) : null,
+        ];
+
+        return [$rijen, $grens, $samenvatting];
     }
 
     /** Examencommissie/Directie: overzicht van alle vakken met status en gemiddelde. */

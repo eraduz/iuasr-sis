@@ -154,6 +154,9 @@ Route::middleware('auth')->group(function () {
     // --- Cijferinvoer/-inzage per vak (docent eigen vak; examencie/directie inzage) ---
     Route::middleware('rol:docent,examencommissie,directie')->group(function () {
         Route::get('/vakken/{vak}/cijfers', [CijferController::class, 'invoer'])->name('vakken.cijfers');
+        // Tentamenlijst per vak (read-only overzicht + ondertekende PDF).
+        Route::get('/vakken/{vak}/tentamenlijst', [CijferController::class, 'tentamenlijst'])->name('vakken.tentamenlijst');
+        Route::post('/vakken/{vak}/tentamenlijst/pdf', [CijferController::class, 'tentamenlijstPdf'])->name('vakken.tentamenlijst.pdf');
     });
     // Opslaan: docent (concept) of examencommissie (correctie na indienen/vaststellen).
     Route::middleware('rol:docent,examencommissie')->group(function () {

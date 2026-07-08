@@ -35,7 +35,10 @@
           <td class="tnum">{{ $r['geslaagd'] }}/{{ $r['aantal'] }}</td>
           <td><span class="iuasr-dash-status {{ $r['status']->badge() }}">{{ $r['status']->label() }}</span></td>
           @php $terVast = $r['status'] === App\Enums\CijferlijstStatus::Ingediend; @endphp
-          <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm {{ $terVast ? 'iuasr-dash-btn--primary' : '' }}" href="{{ route('vakken.cijfers', $vak) }}">{{ $terVast ? 'Beoordelen' : 'Bekijken' }}</a></td>
+          <td class="row-act" style="white-space:nowrap;text-align:right;">
+            <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('vakken.tentamenlijst', $vak) }}">Tentamenlijst</a>
+            <a class="iuasr-dash-btn iuasr-dash-btn--sm {{ $terVast ? 'iuasr-dash-btn--primary' : '' }}" href="{{ route('vakken.cijfers', $vak) }}">{{ $terVast ? 'Beoordelen' : 'Bekijken' }}</a>
+          </td>
         </tr>
       @empty
         <tr><td colspan="9"><div class="iuasr-dash-empty" style="border:0;"><h3>Geen vakken</h3></div></td></tr>

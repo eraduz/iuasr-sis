@@ -150,9 +150,13 @@ opleverpunt aantoonbaar klaar is.
     zoekfunctie + per-studiejaar tabellen en totaal behaalde EC; downloadbaar als
     ONDERTEKENDE PDF op het IUASR-briefpapier (past op briefpapier, gelogd).
     Cijferinzage → Examencommissie en Directie (nooit Studentenzaken → 403).
-    Menu-item + Rapporten-kaart 'Cijferlijst' geactiveerd. 90 tests groen.
-  - Nog te doen: tentamenlijst per vak (deelnemers + resultaten), EC-rapport per
-    opleiding/klas.
+    Menu-item + Rapporten-kaart 'Cijferlijst' geactiveerd.
+  - Increment 2: tentamenlijst per vak. Read-only overzicht van deelnemers +
+    resultaten (beste poging per onderdeel, eindcijfer, EC, status) met
+    samenvatting (deelnemers/geslaagd/gemiddelde); printbaar en downloadbaar als
+    ondertekende PDF op briefpapier. Toegang: docent (eigen vak), examencommissie,
+    directie; links vanaf cijferoverzicht en cijferinvoer. 93 tests groen.
+  - Nog te doen: EC-rapport per opleiding/klas (samenvattend).
 - [ ] **Fase 6 — Portaalkoppeling**
   - Koppeling met publiek aanmeldportaal (gescheiden regime).
 - [ ] **Fase 7 — Migratie**

@@ -20,7 +20,8 @@
     <h1>{{ $vak->naam }}</h1>
     <div class="summary"><b>{{ $vak->code }}</b> · {{ $vak->opleiding?->naam }} · {{ $vak->ec }} EC · {{ $rijen->count() }} studenten</div>
   </div>
-  <div class="iuasr-dash-vhead__actions">
+  <div class="iuasr-dash-vhead__actions" style="gap:8px;align-items:center;">
+    <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('vakken.tentamenlijst', $vak) }}">Tentamenlijst</a>
     <span class="iuasr-dash-status {{ $status->badge() }}">{{ $status->label() }}</span>
     @unless ($magInvoeren)<span class="sis-role-note"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg> Alleen-lezen</span>@endunless
   </div>
