@@ -70,7 +70,7 @@
       </div>
     @endif
 
-    <p class="muted">Deze pagina bevestigt de herkomst en onveranderlijkheid van door IUASR uitgegeven documenten. Vragen? studentenzaken@iuasr.nl</p>
+    <p class="muted">Deze pagina bevestigt de herkomst en onveranderlijkheid van door IUASR uitgegeven documenten. Vragen? szaken@iuasr.nl</p>
   </div>
 </body>
 </html>

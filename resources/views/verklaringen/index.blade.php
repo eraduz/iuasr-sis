@@ -119,7 +119,7 @@
       <div class="sis-a4" style="min-height:auto;">
         <div class="sis-a4__head">
           <img src="{{ asset('assets/img/logo-dark.png') }}" alt="IUASR">
-          <div class="org"><b>Islamic University of Applied Sciences Rotterdam</b>Bureau Studentenzaken<br>Postbus 12345 · 3000 AB Rotterdam<br>studentenzaken@iuasr.nl</div>
+          <div class="org"><b>Islamic University of Applied Sciences Rotterdam</b>Bureau Studentenzaken<br>Postbus 12345 · 3000 AB Rotterdam<br>szaken@iuasr.nl</div>
         </div>
         <h1>{{ $verklaring['title'] }}</h1>
         <p class="doc-sub">{{ $verklaring['sub'] }}</p>
