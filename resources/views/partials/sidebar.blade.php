@@ -65,6 +65,7 @@
             'Studenten' => [['Alle studenten', 'studenten.index', 'students', 'studenten.*']],
             'Cijfers' => [
                 ['Cijferoverzicht', 'cijferoverzicht', 'grade', 'cijferoverzicht'],
+                ['Cijferlijst', 'cijferlijst', 'report', 'cijferlijst'],
                 ['Leerjaar-herbeoordeling', 'overgang', 'grade', 'overgang'],
             ],
             'Rapporten' => [['Rapporten', 'rapporten.inzage', 'report', 'rapporten.inzage']],
@@ -74,6 +75,7 @@
             'Studenten' => [['Studenten (beperkt)', 'studenten.index', 'students', 'studenten.*']],
             'Cijfers' => [
                 ['Cijferoverzicht', 'cijferoverzicht', 'eye', 'cijferoverzicht'],
+                ['Cijferlijst', 'cijferlijst', 'report', 'cijferlijst'],
                 ['Leerjaar-herbeoordeling', 'overgang', 'grade', 'overgang'],
             ],
             'Rapporten' => [['Rapporten', 'rapporten.inzage', 'report', 'rapporten.inzage']],

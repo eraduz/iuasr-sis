@@ -174,6 +174,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/rapporten-inzage', [RapportController::class, 'index'])->name('rapporten.inzage');
         // Leerjaar-herbeoordeling / overgangsadvies (EC t.o.v. drempel).
         Route::get('/overgang', [RapportController::class, 'overgang'])->name('overgang');
+        // Cijferlijst / transcript per student (+ ondertekende PDF).
+        Route::get('/cijferlijst', [RapportController::class, 'cijferlijst'])->name('cijferlijst');
+        Route::post('/cijferlijst/{student}/pdf', [RapportController::class, 'cijferlijstPdf'])->name('cijferlijst.pdf');
     });
 
     // --- Alumni-rapport — Studentenzaken & Directie ---

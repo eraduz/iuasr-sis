@@ -1,0 +1,62 @@
+<?php
+
+namespace App\Support;
+
+use App\Models\Resultaat;
+use App\Models\Student;
+use App\Models\Vak;
+
+/**
+ * Bouwt het cijferoverzicht (transcript / cijferlijst) van een student op:
+ * per studiejaar de vakken met eindcijfer, EC en status. Wordt gebruikt voor
+ * zowel het scherm als de officiële (ondertekende) PDF-cijferlijst.
+ *
+ * Cijferinzage is voorbehouden aan Docent (eigen vak), Examencommissie en
+ * Directie — nooit Studentenzaken. Autorisatie ligt bij de route/controller.
+ */
+class Transcript
+{
+    /**
+     * @return array{studiejaren: array<int, array>, behaaldeEc: int, ecTotaal: int|null}
+     */
+    public static function voor(Student $student): array
+    {
+        $student->loadMissing(['inschrijvingen.opleiding', 'inschrijvingen.periode']);
+
+        $studiejaren = $student->inschrijvingen
+            ->sortBy(fn ($i) => $i->inschrijfdatum)
+            ->map(function ($insch) {
+                $vakken = Vak::where('opleiding_id', $insch->opleiding_id)
+                    ->where('leerjaar', $insch->leerjaar)
+                    ->where('actief', true)
+                    ->with('toetsonderdelen')
+                    ->orderBy('blok')->orderBy('code')
+                    ->get();
+
+                $resultaten = Resultaat::where('inschrijving_id', $insch->id)->get();
+
+                $regels = $vakken->map(function ($vak) use ($resultaten) {
+                    $eigen = $resultaten->whereIn('toetsonderdeel_id', $vak->toetsonderdelen->pluck('id'));
+
+                    return [
+                        'vak' => $vak,
+                        'eind' => Cijferberekening::eindcijfer($vak, $eigen),
+                        'ec' => Cijferberekening::ec($vak, $eigen),
+                    ];
+                })->values();
+
+                return [
+                    'inschrijving' => $insch,
+                    'regels' => $regels,
+                    'behaaldeEc' => (int) $regels->sum(fn ($r) => $r['ec'] ?? 0),
+                    'mogelijkeEc' => (int) $vakken->sum('ec'),
+                ];
+            })->values();
+
+        return [
+            'studiejaren' => $studiejaren->all(),
+            'behaaldeEc' => (int) $studiejaren->sum('behaaldeEc'),
+            'ecTotaal' => $student->inschrijvingen->first()?->opleiding?->ec_totaal,
+        ];
+    }
+}

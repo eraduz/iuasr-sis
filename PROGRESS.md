@@ -141,8 +141,18 @@ opleverpunt aantoonbaar klaar is.
     default 30 EC (landelijke BSA-norm vanaf 2026-2027), per opleiding aanpasbaar
     via Opzoektabellen.
   - Fase 4 afgerond. 87 tests groen.
-- [ ] **Fase 5 — Rapporten + documenten**
-  - Cijferlijsten, overzichten, documentgeneratie.
+- [~] **Fase 5 — Rapporten + documenten** (increment 1 opgeleverd)
+  - Al eerder gebouwd: klassenlijst, alumni-rapport, Excel-export actieve
+    studenten (incl. IBAN), overgangsadvies, verklaringen-PDF + digitale
+    ondertekening.
+  - Increment 1: officiële cijferlijst / transcript per student. `Transcript`
+    bouwt per studiejaar de vakken met eindcijfer, EC en status op. Scherm met
+    zoekfunctie + per-studiejaar tabellen en totaal behaalde EC; downloadbaar als
+    ONDERTEKENDE PDF op het IUASR-briefpapier (past op briefpapier, gelogd).
+    Cijferinzage → Examencommissie en Directie (nooit Studentenzaken → 403).
+    Menu-item + Rapporten-kaart 'Cijferlijst' geactiveerd. 90 tests groen.
+  - Nog te doen: tentamenlijst per vak (deelnemers + resultaten), EC-rapport per
+    opleiding/klas.
 - [ ] **Fase 6 — Portaalkoppeling**
   - Koppeling met publiek aanmeldportaal (gescheiden regime).
 - [ ] **Fase 7 — Migratie**

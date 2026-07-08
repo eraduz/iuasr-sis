@@ -6,7 +6,10 @@ use App\Models\Inschrijving;
 use App\Models\Klas;
 use App\Models\Opleiding;
 use App\Models\Periode;
+use App\Models\Student;
 use App\Support\AuditLogger;
+use App\Support\Documentondertekening;
+use App\Support\Transcript;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
@@ -108,6 +111,66 @@ class RapportController extends Controller
         }, $bestandsnaam, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         ]);
+    }
+
+    /**
+     * Cijferlijst / transcript per student: volledig cijferoverzicht per
+     * studiejaar met eindcijfer, EC en status. Cijferinzage → Examencommissie
+     * en Directie. Inzage wordt gelogd.
+     */
+    public function cijferlijst(Request $request): View
+    {
+        $zoek = trim((string) $request->query('q', ''));
+        $student = $request->filled('student') ? Student::find($request->query('student')) : null;
+
+        $resultaten = collect();
+        if ($zoek !== '' && ! $student) {
+            $resultaten = Student::query()
+                ->where(function ($q) use ($zoek) {
+                    $q->where('studentnummer', 'like', $zoek.'%')
+                        ->orWhere('achternaam', 'like', '%'.$zoek.'%')
+                        ->orWhere('voornaam', 'like', '%'.$zoek.'%');
+                })
+                ->orderBy('studentnummer')->limit(20)
+                ->get(['id', 'studentnummer', 'voornaam', 'tussenvoegsel', 'achternaam']);
+        }
+
+        $transcript = null;
+        if ($student) {
+            $transcript = Transcript::voor($student);
+            AuditLogger::log(AuditLogger::INZAGE, $student, veld: 'cijferlijst', context: ['bron' => 'transcript']);
+        }
+
+        return view('rapporten.cijferlijst', compact('student', 'transcript', 'zoek', 'resultaten'));
+    }
+
+    /** Officiële cijferlijst als ondertekende PDF (op briefpapier). */
+    public function cijferlijstPdf(Request $request, Student $student): StreamedResponse
+    {
+        $data = $request->validate(['ontvanger' => ['required', 'string', 'max:255']]);
+
+        $transcript = Transcript::voor($student);
+        $html = view('pdf.cijferlijst', [
+            'student' => $student, 'transcript' => $transcript, 'ondertekenaar' => auth()->user()->naam,
+        ])->render();
+
+        $doc = Documentondertekening::ondertekenHtml($html, [
+            'type' => 'cijferlijst',
+            'titel' => 'Cijferlijst '.$student->studentnummer,
+            'student_id' => $student->id,
+            'ontvanger' => $data['ontvanger'],
+            'uitgegeven_door_id' => auth()->id(),
+        ]);
+
+        AuditLogger::log(AuditLogger::UITGIFTE, $student, veld: 'cijferlijst', context: [
+            'code' => $doc->code, 'ontvanger' => $data['ontvanger'],
+        ]);
+
+        return response()->streamDownload(
+            fn () => print(Documentondertekening::pdfBytes($doc)),
+            $doc->bestandsnaam,
+            ['Content-Type' => 'application/pdf'],
+        );
     }
 
     /**
