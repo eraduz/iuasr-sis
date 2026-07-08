@@ -93,6 +93,7 @@
                 ['Gebruikers & rollen', 'gebruikers', 'users', 'gebruikers'],
                 ['Opzoektabellen', 'opzoektabellen', 'db', 'opzoektabellen'],
                 ['Audit-log', 'audit-log', 'log', 'audit-log'],
+                ['Back-up & herstel', 'backup', 'db', 'backup'],
             ],
             'Documenten' => [
                 ['Ondertekende documenten', 'ondertekening', 'cert', 'ondertekening*'],

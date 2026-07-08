@@ -200,6 +200,10 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');
 
+        // Recovery-backup (versleutelde ZIP met database, applicatie en bestanden)
+        Route::get('/beheer/backup', [App\Http\Controllers\BackupController::class, 'index'])->name('backup');
+        Route::post('/beheer/backup', [App\Http\Controllers\BackupController::class, 'download'])->name('backup.download');
+
         // Opzoektabellen (generieke referentie-CRUD)
         Route::get('/opzoektabellen', [ReferentieController::class, 'index'])->name('opzoektabellen');
         Route::get('/opzoektabellen/{tabel}/nieuw', [ReferentieController::class, 'create'])->name('opzoektabellen.create');
