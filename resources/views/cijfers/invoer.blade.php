@@ -51,9 +51,8 @@
         <tr>
           <th style="width:190px;">Student</th>
           @foreach ($vak->toetsonderdelen as $od)
-            <th style="text-align:center;">{{ $od->naam }}<br><span class="sis-weegcell">{{ rtrim(rtrim(number_format($od->weging*100,0),'0'),'.') }}%</span></th>
+            <th style="text-align:center;">{{ $od->naam }}<br><span class="sis-weegcell">{{ rtrim(rtrim(number_format($od->weging*100,0),'0'),'.') }}% · 1e / herk.</span></th>
           @endforeach
-          <th style="text-align:center;">Poging</th>
           <th style="text-align:center;">Vrijstelling</th>
           <th style="text-align:right;">Eindcijfer</th>
         </tr>
@@ -64,18 +63,18 @@
           <tr data-insch="{{ $insch->id }}">
             <td class="nm">{{ $student->volledigeNaam() }}<small>{{ $student->studentnummer }}</small></td>
             @foreach ($vak->toetsonderdelen as $od)
-              @php $res = $rij['resultaten'][$od->id] ?? null; $val = $res && $res->cijfer !== null ? number_format($res->cijfer,1,',','') : ''; @endphp
+              @php
+                $res = $rij['resultaten'][$od->id] ?? [];
+                $p1 = ($res['tentamen'] ?? null) && $res['tentamen']->cijfer !== null ? number_format($res['tentamen']->cijfer,1,',','') : '';
+                $ph = ($res['herkansing'] ?? null) && $res['herkansing']->cijfer !== null ? number_format($res['herkansing']->cijfer,1,',','') : '';
+              @endphp
               <td style="text-align:center;">
-                <input class="sis-grade-input" inputmode="decimal" name="cijfer[{{ $insch->id }}][{{ $od->id }}]" value="{{ $val }}" {{ $magInvoeren ? '' : 'disabled' }}>
+                <div class="sis-od-cell" style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+                  <input class="sis-grade-input g1" inputmode="decimal" title="1e poging" name="cijfer[{{ $insch->id }}][{{ $od->id }}]" value="{{ $p1 }}" placeholder="1e" {{ $magInvoeren ? '' : 'disabled' }}>
+                  <input class="sis-grade-input gh" inputmode="decimal" title="Herkansing" name="herkansing[{{ $insch->id }}][{{ $od->id }}]" value="{{ $ph }}" placeholder="herk." style="opacity:.9;" {{ $magInvoeren ? '' : 'disabled' }}>
+                </div>
               </td>
             @endforeach
-            <td style="text-align:center;">
-              <input type="hidden" name="poging[{{ $insch->id }}]" value="{{ $rij['poging'] }}">
-              <span class="sis-attempt">
-                <button type="button" data-p="tentamen" class="{{ $rij['poging']==='tentamen' ? 'is-on' : '' }}" {{ $magInvoeren ? '' : 'disabled' }}>Tent.</button>
-                <button type="button" data-p="herkansing" class="{{ $rij['poging']==='herkansing' ? 'is-on' : '' }}" {{ $magInvoeren ? '' : 'disabled' }}>Herk.</button>
-              </span>
-            </td>
             <td style="text-align:center;">
               <label class="sis-check-inline" style="justify-content:center;"><input type="checkbox" class="vr-check" name="vrijstelling[{{ $insch->id }}]" value="1" @checked($rij['vrijstelling']) {{ $magInvoeren ? '' : 'disabled' }}></label>
             </td>
@@ -87,7 +86,7 @@
             </td>
           </tr>
         @empty
-          <tr><td colspan="{{ $vak->toetsonderdelen->count() + 4 }}"><div class="iuasr-dash-empty" style="border:0;"><h3>Geen deelnemers</h3><p>Er zijn geen actieve studenten voor dit vak in de huidige periode.</p></div></td></tr>
+          <tr><td colspan="{{ $vak->toetsonderdelen->count() + 3 }}"><div class="iuasr-dash-empty" style="border:0;"><h3>Geen deelnemers</h3><p>Er zijn geen actieve studenten voor dit vak in de huidige periode.</p></div></td></tr>
         @endforelse
       </tbody>
     </table>
@@ -142,23 +141,31 @@
   @endif
 @endif
 
-<p class="sis-tblnote">Eindcijfer = gewogen gemiddelde van de deelresultaten (1 decimaal). Bij <b>Vrijstelling</b> vervallen de deelvelden en geldt “VR”. EC worden toegekend als álle meetellende onderdelen voldoende zijn.</p>
+<p class="sis-tblnote">Per onderdeel vult u de <b>1e poging</b> en (indien van toepassing) de <b>herkansing</b> in; de <b>beste</b> van beide telt mee. Eindcijfer = gewogen gemiddelde van de deelresultaten (1 decimaal). Bij <b>Vrijstelling</b> vervallen de deelvelden en geldt “VR”. EC worden toegekend als álle meetellende onderdelen voldoende zijn.</p>
 
 @push('scripts')
 <script>
   var WEGING = @json($vak->toetsonderdelen->pluck('weging')->map(fn($w)=>(float)$w)->values());
   var CESUUR = {{ $grens }};
 
+  function num(el){ var v = parseFloat((el.value || '').replace(',', '.')); return isNaN(v) ? null : v; }
+
   function calcRow(tr) {
     var vr = tr.querySelector('.vr-check').checked;
-    var inputs = tr.querySelectorAll('.sis-grade-input');
+    var cells = tr.querySelectorAll('.sis-od-cell');
     var finalCell = tr.querySelector('.final');
-    inputs.forEach(function (i) { i.disabled = vr || i.dataset.locked === '1'; i.classList.remove('is-pass','is-fail'); });
+    tr.querySelectorAll('.sis-grade-input').forEach(function (i) { i.disabled = vr || i.dataset.locked === '1'; i.classList.remove('is-pass','is-fail'); });
     if (vr) { finalCell.innerHTML = '<span class="sis-pill-soft">VR</span>'; return; }
+
     var som = 0, gew = 0, compleet = true, any = false;
-    inputs.forEach(function (i, idx) {
-      var v = parseFloat((i.value || '').replace(',', '.'));
-      if (!isNaN(v)) { som += v * WEGING[idx]; gew += WEGING[idx]; any = true; i.classList.add(v >= CESUUR ? 'is-pass' : 'is-fail'); }
+    cells.forEach(function (cell, idx) {
+      var g1 = cell.querySelector('.g1'), gh = cell.querySelector('.gh');
+      var v1 = num(g1), vh = num(gh);
+      if (v1 !== null) g1.classList.add(v1 >= CESUUR ? 'is-pass' : 'is-fail');
+      if (vh !== null) gh.classList.add(vh >= CESUUR ? 'is-pass' : 'is-fail');
+      // Beste poging telt mee voor het eindcijfer.
+      var best = (v1 === null) ? vh : (vh === null ? v1 : Math.max(v1, vh));
+      if (best !== null) { som += best * WEGING[idx]; gew += WEGING[idx]; any = true; }
       else { compleet = false; }
     });
     if (!any) { finalCell.innerHTML = '<span class="sis-muted">—</span>'; return; }
@@ -174,14 +181,6 @@
     });
     var vr = tr.querySelector('.vr-check');
     if (vr) vr.addEventListener('change', function () { calcRow(tr); });
-    tr.querySelectorAll('.sis-attempt button').forEach(function (b) {
-      b.addEventListener('click', function () {
-        if (b.disabled) return;
-        tr.querySelectorAll('.sis-attempt button').forEach(function (x) { x.classList.remove('is-on'); });
-        b.classList.add('is-on');
-        tr.querySelector('input[name^="poging"]').value = b.dataset.p;
-      });
-    });
   });
 </script>
 @endpush

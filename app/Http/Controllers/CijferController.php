@@ -82,14 +82,17 @@ class CijferController extends Controller
             $eigen = $resultaten->where('inschrijving_id', $insch->id);
             $perOnderdeel = [];
             foreach ($vak->toetsonderdelen as $od) {
-                $perOnderdeel[$od->id] = Cijferberekening::beste($eigen, $od->id);
+                $vanOd = $eigen->where('toetsonderdeel_id', $od->id);
+                $perOnderdeel[$od->id] = [
+                    'tentamen' => $vanOd->firstWhere('poging', 'tentamen'),
+                    'herkansing' => $vanOd->firstWhere('poging', 'herkansing'),
+                ];
             }
 
             return [
                 'inschrijving' => $insch,
                 'student' => $insch->student,
                 'resultaten' => $perOnderdeel,
-                'poging' => $eigen->first()?->poging ?? 'tentamen',
                 'vrijstelling' => (bool) $eigen->firstWhere('vrijstelling', true),
                 'eind' => Cijferberekening::eindcijfer($vak, $eigen),
                 'ec' => Cijferberekening::ec($vak, $eigen),
@@ -106,17 +109,20 @@ class CijferController extends Controller
         $lijst = Cijferlijst::voor($vak, $periode);
         abort_unless($this->magBewerken($vak, $lijst), 403, 'Deze cijferlijst mag u nu niet bewerken.');
 
-        $cijfers = $request->input('cijfer', []);
-        array_walk_recursive($cijfers, function (&$v) {
-            if (is_string($v)) {
-                $v = str_replace(',', '.', trim($v));
-            }
-        });
-        $request->merge(['cijfer' => $cijfers]);
+        // Kommadecimalen normaliseren voor beide invoervelden (1e poging + herkansing).
+        foreach (['cijfer', 'herkansing'] as $veld) {
+            $waarden = $request->input($veld, []);
+            array_walk_recursive($waarden, function (&$v) {
+                if (is_string($v)) {
+                    $v = str_replace(',', '.', trim($v));
+                }
+            });
+            $request->merge([$veld => $waarden]);
+        }
 
         $request->validate([
             'cijfer.*.*' => ['nullable', 'numeric', 'between:1,10'],
-            'poging.*' => ['nullable', 'in:tentamen,herkansing'],
+            'herkansing.*.*' => ['nullable', 'numeric', 'between:1,10'],
         ]);
 
         $vak->load('toetsonderdelen');
@@ -124,46 +130,58 @@ class CijferController extends Controller
         $deelnemers = $vak->deelnemers()->get();
         $correctie = auth()->user()->rol === Rol::Examencommissie && $lijst->status === CijferlijstStatus::Vastgesteld;
 
+        // Bestaande resultaten per (inschrijving, onderdeel, poging_nr): meerdere
+        // pogingen per onderdeel zijn toegestaan (tentamen = 1, herkansing = 2).
         $bestaand = Resultaat::whereIn('toetsonderdeel_id', $vak->toetsonderdelen->pluck('id'))
             ->whereIn('inschrijving_id', $deelnemers->pluck('id'))->get()
-            ->keyBy(fn ($r) => $r->inschrijving_id.'-'.$r->toetsonderdeel_id);
+            ->keyBy(fn ($r) => $r->inschrijving_id.'-'.$r->toetsonderdeel_id.'-'.$r->poging_nr);
+
+        // Poging 1 = reguliere toets, poging 2 = herkansing (aparte regel).
+        $pogingen = [
+            ['naam' => 'tentamen', 'nr' => 1, 'veld' => 'cijfer'],
+            ['naam' => 'herkansing', 'nr' => 2, 'veld' => 'herkansing'],
+        ];
 
         foreach ($deelnemers as $insch) {
             $vrij = (bool) data_get($request->input('vrijstelling'), $insch->id);
-            $poging = data_get($request->input('poging'), $insch->id, 'tentamen');
             $gewijzigd = false;
 
             foreach ($vak->toetsonderdelen as $od) {
-                $raw = data_get($request->input('cijfer'), $insch->id.'.'.$od->id);
-                $cijfer = ($raw === null || $raw === '') ? null : (float) $raw;
-                if ($vrij) {
-                    $cijfer = null;
-                }
+                foreach ($pogingen as $p) {
+                    $raw = data_get($request->input($p['veld']), $insch->id.'.'.$od->id);
+                    $cijfer = ($raw === null || $raw === '') ? null : (float) $raw;
 
-                $res = $bestaand->get($insch->id.'-'.$od->id);
-                if ($res === null && ! $vrij && $cijfer === null) {
-                    continue;
-                }
+                    // Vrijstelling geldt voor de reguliere poging; een herkansing vervalt dan.
+                    $isVrij = $vrij && $p['naam'] === 'tentamen';
+                    if ($vrij) {
+                        $cijfer = null;
+                    }
 
-                $res ??= new Resultaat([
-                    'inschrijving_id' => $insch->id,
-                    'student_id' => $insch->student_id,
-                    'toetsonderdeel_id' => $od->id,
-                ]);
-                $res->fill([
-                    'poging' => $poging,
-                    'poging_nr' => 1,
-                    'vrijstelling' => $vrij,
-                    'cijfer' => $cijfer,
-                    'voldoende' => $vrij ? true : ($cijfer !== null ? $cijfer >= $grens : null),
-                    'ingevoerd_door_id' => auth()->id(),
-                    'toetsdatum' => $res->toetsdatum ?? now()->toDateString(),
-                    'definitief' => $lijst->status === CijferlijstStatus::Vastgesteld,
-                ]);
+                    $res = $bestaand->get($insch->id.'-'.$od->id.'-'.$p['nr']);
+                    if ($res === null && ! $isVrij && $cijfer === null) {
+                        continue; // niets in te voeren voor deze poging
+                    }
 
-                if ($res->isDirty()) {
-                    $res->save();
-                    $gewijzigd = true;
+                    $res ??= new Resultaat([
+                        'inschrijving_id' => $insch->id,
+                        'student_id' => $insch->student_id,
+                        'toetsonderdeel_id' => $od->id,
+                    ]);
+                    $res->fill([
+                        'poging' => $p['naam'],
+                        'poging_nr' => $p['nr'],
+                        'vrijstelling' => $isVrij,
+                        'cijfer' => $cijfer,
+                        'voldoende' => $isVrij ? true : ($cijfer !== null ? $cijfer >= $grens : null),
+                        'ingevoerd_door_id' => auth()->id(),
+                        'toetsdatum' => $res->toetsdatum ?? now()->toDateString(),
+                        'definitief' => $lijst->status === CijferlijstStatus::Vastgesteld,
+                    ]);
+
+                    if ($res->isDirty()) {
+                        $res->save();
+                        $gewijzigd = true;
+                    }
                 }
             }
 

@@ -98,6 +98,36 @@ class CijferTest extends TestCase
         $this->actingAs($ec)->post(route('vakken.cijfers.opslaan', $this->vak), [])->assertForbidden();
     }
 
+    public function test_herkansing_als_aparte_poging_en_beste_telt(): void
+    {
+        $insch = $this->vak->deelnemers()->first();
+        $od = $this->vak->toetsonderdelen->first();
+
+        // 1e poging onvoldoende.
+        $this->actingAs($this->docent)->post(route('vakken.cijfers.opslaan', $this->vak), [
+            'cijfer' => [$insch->id => [$od->id => '4,0']],
+        ]);
+        $this->assertDatabaseHas('resultaten', [
+            'inschrijving_id' => $insch->id, 'toetsonderdeel_id' => $od->id,
+            'poging' => 'tentamen', 'poging_nr' => 1, 'cijfer' => 4.0,
+        ]);
+
+        // Herkansing als APARTE pogingregel, voldoende.
+        $this->actingAs($this->docent)->post(route('vakken.cijfers.opslaan', $this->vak), [
+            'cijfer' => [$insch->id => [$od->id => '4,0']],
+            'herkansing' => [$insch->id => [$od->id => '7,0']],
+        ]);
+        $this->assertDatabaseHas('resultaten', [
+            'inschrijving_id' => $insch->id, 'toetsonderdeel_id' => $od->id,
+            'poging' => 'herkansing', 'poging_nr' => 2, 'cijfer' => 7.0,
+        ]);
+
+        // Twee losse pogingregels; de beste (7,0) telt mee.
+        $eigen = Resultaat::where('inschrijving_id', $insch->id)->where('toetsonderdeel_id', $od->id)->get();
+        $this->assertCount(2, $eigen);
+        $this->assertEqualsWithDelta(7.0, (float) Cijferberekening::beste($eigen, $od->id)->cijfer, 0.01);
+    }
+
     private function examencommissie(): User
     {
         return User::firstOrCreate(['email' => 'ec@iuasr.test'], ['naam' => 'EC', 'rol' => Rol::Examencommissie]);
