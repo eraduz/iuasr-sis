@@ -27,10 +27,16 @@ class Cijferberekening
      * Eindcijfer-status van een vak voor één student.
      *
      * @param  Collection<int, Resultaat>  $resultaten  resultaten van de student voor dit vak
+     * @param  bool  $vrijgesteld  administratieve vrijstelling voor het hele vak (door SZ vastgelegd)
      * @return array{status: 'vr'|'onvolledig'|'leeg'|'cijfer', cijfer: float|null}
      */
-    public static function eindcijfer(Vak $vak, Collection $resultaten): array
+    public static function eindcijfer(Vak $vak, Collection $resultaten, bool $vrijgesteld = false): array
     {
+        // Administratieve vak-vrijstelling wint: geen numeriek eindcijfer.
+        if ($vrijgesteld) {
+            return ['status' => 'vr', 'cijfer' => null];
+        }
+
         $onderdelen = $vak->toetsonderdelen;
         if ($onderdelen->isEmpty()) {
             return ['status' => 'leeg', 'cijfer' => null];
@@ -72,8 +78,13 @@ class Cijferberekening
     }
 
     /** EC toegekend voor een student/vak (0 of vak.ec; null als grens ontbreekt). */
-    public static function ec(Vak $vak, Collection $resultaten): ?int
+    public static function ec(Vak $vak, Collection $resultaten, bool $vrijgesteld = false): ?int
     {
+        // Vrijstelling kent de volledige vak-EC toe, onafhankelijk van de cesuur.
+        if ($vrijgesteld) {
+            return (int) $vak->ec;
+        }
+
         return EcBerekening::bepaalEc($vak, $resultaten, self::voldoendeGrens($vak));
     }
 

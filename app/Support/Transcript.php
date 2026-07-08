@@ -35,13 +35,17 @@ class Transcript
 
                 $resultaten = Resultaat::where('inschrijving_id', $insch->id)->get();
 
-                $regels = $vakken->map(function ($vak) use ($resultaten) {
+                $vrijVakIds = \App\Models\Vaktoewijzing::where('inschrijving_id', $insch->id)
+                    ->where('vrijgesteld', true)->pluck('vak_id')->flip();
+
+                $regels = $vakken->map(function ($vak) use ($resultaten, $vrijVakIds) {
                     $eigen = $resultaten->whereIn('toetsonderdeel_id', $vak->toetsonderdelen->pluck('id'));
+                    $vrij = isset($vrijVakIds[$vak->id]);
 
                     return [
                         'vak' => $vak,
-                        'eind' => Cijferberekening::eindcijfer($vak, $eigen),
-                        'ec' => Cijferberekening::ec($vak, $eigen),
+                        'eind' => Cijferberekening::eindcijfer($vak, $eigen, $vrij),
+                        'ec' => Cijferberekening::ec($vak, $eigen, $vrij),
                     ];
                 })->values();
 

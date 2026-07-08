@@ -79,9 +79,12 @@ class CijferController extends Controller
             ->whereIn('inschrijving_id', $deelnemers->pluck('id'))->get();
 
         $grens = Cijferberekening::voldoendeGrens($vak);
+        $vrijInschr = \App\Models\Vaktoewijzing::where('vak_id', $vak->id)->where('vrijgesteld', true)
+            ->whereIn('inschrijving_id', $deelnemers->pluck('id'))->pluck('inschrijving_id')->flip();
 
-        $rijen = $deelnemers->map(function ($insch) use ($vak, $resultaten) {
+        $rijen = $deelnemers->map(function ($insch) use ($vak, $resultaten, $vrijInschr) {
             $eigen = $resultaten->where('inschrijving_id', $insch->id);
+            $vrij = isset($vrijInschr[$insch->id]);
             $perOnderdeel = [];
             foreach ($vak->toetsonderdelen as $od) {
                 $vanOd = $eigen->where('toetsonderdeel_id', $od->id);
@@ -96,8 +99,9 @@ class CijferController extends Controller
                 'student' => $insch->student,
                 'resultaten' => $perOnderdeel,
                 'vrijstelling' => (bool) $eigen->firstWhere('vrijstelling', true),
-                'eind' => Cijferberekening::eindcijfer($vak, $eigen),
-                'ec' => Cijferberekening::ec($vak, $eigen),
+                'vak_vrijgesteld' => $vrij,
+                'eind' => Cijferberekening::eindcijfer($vak, $eigen, $vrij),
+                'ec' => Cijferberekening::ec($vak, $eigen, $vrij),
             ];
         });
 
@@ -315,9 +319,12 @@ class CijferController extends Controller
         $resultaten = Resultaat::whereIn('toetsonderdeel_id', $vak->toetsonderdelen->pluck('id'))
             ->whereIn('inschrijving_id', $deelnemers->pluck('id'))->get();
         $grens = Cijferberekening::voldoendeGrens($vak);
+        $vrijInschr = \App\Models\Vaktoewijzing::where('vak_id', $vak->id)->where('vrijgesteld', true)
+            ->whereIn('inschrijving_id', $deelnemers->pluck('id'))->pluck('inschrijving_id')->flip();
 
-        $rijen = $deelnemers->map(function ($insch) use ($vak, $resultaten) {
+        $rijen = $deelnemers->map(function ($insch) use ($vak, $resultaten, $vrijInschr) {
             $eigen = $resultaten->where('inschrijving_id', $insch->id);
+            $vrij = isset($vrijInschr[$insch->id]);
             $perOnderdeel = [];
             foreach ($vak->toetsonderdelen as $od) {
                 $perOnderdeel[$od->id] = Cijferberekening::beste($eigen, $od->id);
@@ -326,8 +333,9 @@ class CijferController extends Controller
             return [
                 'student' => $insch->student,
                 'perOnderdeel' => $perOnderdeel,
-                'eind' => Cijferberekening::eindcijfer($vak, $eigen),
-                'ec' => Cijferberekening::ec($vak, $eigen),
+                'vak_vrijgesteld' => $vrij,
+                'eind' => Cijferberekening::eindcijfer($vak, $eigen, $vrij),
+                'ec' => Cijferberekening::ec($vak, $eigen, $vrij),
             ];
         })->sortBy(fn ($r) => $r['student']->achternaam)->values();
 
@@ -364,16 +372,19 @@ class CijferController extends Controller
             $deelnemers = $vak->deelnemers()->get();
             $resultaten = Resultaat::whereIn('toetsonderdeel_id', $vak->toetsonderdelen->pluck('id'))
                 ->whereIn('inschrijving_id', $deelnemers->pluck('id'))->get();
+            $vrijInschr = \App\Models\Vaktoewijzing::where('vak_id', $vak->id)->where('vrijgesteld', true)
+                ->whereIn('inschrijving_id', $deelnemers->pluck('id'))->pluck('inschrijving_id')->flip();
 
             $cijfers = [];
             $geslaagd = 0;
             foreach ($deelnemers as $insch) {
                 $eigen = $resultaten->where('inschrijving_id', $insch->id);
-                $eind = Cijferberekening::eindcijfer($vak, $eigen);
+                $vrij = isset($vrijInschr[$insch->id]);
+                $eind = Cijferberekening::eindcijfer($vak, $eigen, $vrij);
                 if ($eind['status'] === 'cijfer') {
                     $cijfers[] = $eind['cijfer'];
                 }
-                if ((Cijferberekening::ec($vak, $eigen) ?? 0) > 0) {
+                if ((Cijferberekening::ec($vak, $eigen, $vrij) ?? 0) > 0) {
                     $geslaagd++;
                 }
             }

@@ -67,7 +67,7 @@
           @endforeach
           <td class="r">@if($eind['status']==='cijfer')<span class="{{ $eind['cijfer'] < $grens ? 'fail' : 'pass' }}">{{ $eindTekst($eind) }}</span>@else{{ $eindTekst($eind) }}@endif</td>
           <td class="c">{{ $ec !== null ? $ec : '—' }}</td>
-          <td>@if(($ec ?? 0) > 0)Behaald @elseif($eind['status']==='cijfer')Niet behaald @elseif($eind['status']==='vr')Vrijstelling @else Open @endif</td>
+          <td>@if($eind['status']==='vr')Vrijstelling @elseif(($ec ?? 0) > 0)Behaald @elseif($eind['status']==='cijfer')Niet behaald @else Open @endif</td>
         </tr>
       @endforeach
     </tbody>

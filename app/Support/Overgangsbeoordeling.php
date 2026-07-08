@@ -53,8 +53,15 @@ class Overgangsbeoordeling
             ->whereIn('toetsonderdeel_id', $vakken->flatMap->toetsonderdelen->pluck('id'))
             ->get();
 
+        $vrijVakIds = \App\Models\Vaktoewijzing::where('inschrijving_id', $inschrijving->id)
+            ->where('vrijgesteld', true)->pluck('vak_id')->flip();
+
         $totaal = 0;
         foreach ($vakken as $vak) {
+            if (isset($vrijVakIds[$vak->id])) {
+                $totaal += (int) $vak->ec; // vrijstelling: volledige EC
+                continue;
+            }
             $eigen = $resultaten->whereIn('toetsonderdeel_id', $vak->toetsonderdelen->pluck('id'));
             $totaal += EcBerekening::bepaalEc($vak, $eigen, Cijferberekening::voldoendeGrens($vak)) ?? 0;
         }

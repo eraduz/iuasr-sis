@@ -83,13 +83,32 @@ class StudentController extends Controller
         $cijferVakken = collect();
         if ($magCijfers) {
             $student->load('resultaten.toetsonderdeel.vak.toetsonderdelen', 'resultaten.toetsonderdeel.vak.opleiding');
+
+            // Administratief vrijgestelde vakken (door SZ vastgelegd op de toewijzing).
+            $vrijToewijzingen = \App\Models\Vaktoewijzing::whereIn('inschrijving_id', $student->inschrijvingen->pluck('id'))
+                ->where('vrijgesteld', true)->with('vak.toetsonderdelen', 'vak.opleiding')->get();
+            $vrijVakIds = $vrijToewijzingen->pluck('vak_id')->flip();
+
             foreach ($student->resultaten->groupBy(fn ($r) => $r->toetsonderdeel->vak_id) as $rs) {
                 $vak = $rs->first()->toetsonderdeel->vak;
+                $vrij = isset($vrijVakIds[$vak->id]);
                 $cijferVakken->push([
                     'vak' => $vak,
-                    'eind' => \App\Support\Cijferberekening::eindcijfer($vak, $rs),
-                    'ec' => \App\Support\Cijferberekening::ec($vak, $rs),
+                    'eind' => \App\Support\Cijferberekening::eindcijfer($vak, $rs, $vrij),
+                    'ec' => \App\Support\Cijferberekening::ec($vak, $rs, $vrij),
                 ]);
+            }
+
+            // Vrijgestelde vakken zonder resultaten alsnog tonen (VR).
+            $reedsGetoond = $cijferVakken->pluck('vak.id')->flip();
+            foreach ($vrijToewijzingen as $vt) {
+                if ($vt->vak && ! isset($reedsGetoond[$vt->vak_id])) {
+                    $cijferVakken->push([
+                        'vak' => $vt->vak,
+                        'eind' => ['status' => 'vr', 'cijfer' => null],
+                        'ec' => (int) $vt->vak->ec,
+                    ]);
+                }
             }
             if ($cijferVakken->isNotEmpty()
                 && in_array(auth()->user()->rol, [\App\Enums\Rol::Examencommissie, \App\Enums\Rol::Directie], true)) {
@@ -100,7 +119,9 @@ class StudentController extends Controller
         // Financiële status (betalingsachterstand) — stuurt de waarschuwing en blokkades.
         $financieel = \App\Support\Collegegeldstatus::voor($student);
 
-        return view('studenten.show', compact('student', 'huidige', 'magCijfers', 'cijferVakken', 'financieel', 'vakHistorie'));
+        $grondslagen = \App\Enums\VrijstellingGrondslag::opties();
+
+        return view('studenten.show', compact('student', 'huidige', 'magCijfers', 'cijferVakken', 'financieel', 'vakHistorie', 'grondslagen'));
     }
 
     /** Muteren van persoonsgegevens (Studentenzaken/Beheerder). */

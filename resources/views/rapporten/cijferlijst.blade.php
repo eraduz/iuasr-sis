@@ -90,9 +90,9 @@
                 </td>
                 <td class="tnum" style="text-align:center;">{{ $ec !== null ? $ec : '—' }}</td>
                 <td>
-                  @if (($ec ?? 0) > 0)<span class="iuasr-dash-status s-approved">Behaald</span>
+                  @if ($eind['status']==='vr')<span class="iuasr-dash-status s-approved">Vrijstelling</span>
+                  @elseif (($ec ?? 0) > 0)<span class="iuasr-dash-status s-approved">Behaald</span>
                   @elseif ($eind['status']==='cijfer')<span class="iuasr-dash-status s-rejected">Niet behaald</span>
-                  @elseif ($eind['status']==='vr')<span class="iuasr-dash-status s-approved">Vrijstelling</span>
                   @else<span class="iuasr-dash-status s-draft">Open</span>@endif
                 </td>
               </tr>
