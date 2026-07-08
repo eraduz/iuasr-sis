@@ -65,6 +65,15 @@ opleverpunt aantoonbaar klaar is.
     gelogd; alleen Studentenzaken/Beheer.
   - "Student levert later aan"-vinkje bij de documenten → dashboardtegel
     (signaleringen) toont welke studenten diploma/documenten nog moeten aanleveren.
+  - Digitale documentondertekening (hash-gebaseerd, increment 1): gegenereerde
+    PDF's (dompdf) krijgen automatisch een handtekeningblok met verificatiecode
+    en SHA-256-echtheidskenmerk; gearchiveerd op de private schijf met
+    logregistratie (wie/wanneer/aan wie). Verklaringen worden nu als ondertekende
+    PDF gegenereerd (ontvanger verplicht). Archief 'Ondertekende documenten'
+    (Beheerder/Directie/Studentenzaken) + publieke verificatiepagina (/verificatie,
+    geen login) met optionele bestand-hashcontrole + WordPress-shortcode. Nog te
+    doen: upload-onderteken-download, auto-sign van overige gegenereerde PDF's,
+    eventueel cryptografische PAdES-ondertekening zodra een certificaat er is.
   - NT2-bewaking: NT2-plichtige studenten hebben 1 jaar vanaf de inschrijfdatum
     om het examen te halen. Deadline wordt afgeleid; `nt2_behaald_op` vastlegbaar
     via het wijzigscherm. Dashboardvenster bij Studentenzaken toont de openstaande

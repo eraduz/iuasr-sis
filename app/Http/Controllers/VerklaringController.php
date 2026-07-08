@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Student;
 use App\Support\AuditLogger;
+use App\Support\Documentondertekening;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Genereert officiële studentverklaringen op IUASR-briefpapier (A4). Bevat
@@ -51,6 +54,48 @@ class VerklaringController extends Controller
         }
 
         return view('verklaringen.index', compact('student', 'type', 'verklaring', 'zoek', 'resultaten', 'financieel'));
+    }
+
+    /**
+     * Genereert de verklaring als PDF, ondertekent deze automatisch (digitaal
+     * echtheidskenmerk + verificatiecode), archiveert en logt de uitgifte, en
+     * biedt de ondertekende PDF ter download aan.
+     */
+    public function genereer(Request $request): StreamedResponse|RedirectResponse
+    {
+        $data = $request->validate([
+            'student' => ['required', 'exists:studenten,id'],
+            'type' => ['required', 'in:'.implode(',', self::TYPES)],
+            'ontvanger' => ['required', 'string', 'max:255'],
+        ]);
+
+        $student = Student::with(['inschrijvingen.opleiding', 'inschrijvingen.periode'])->findOrFail($data['student']);
+
+        // Zelfde blokkade als de preview: geen officiële documenten bij achterstand.
+        if (\App\Support\Collegegeldstatus::voor($student)['achterstand']) {
+            return back()->withErrors(['ontvanger' => 'Geblokkeerd wegens betalingsachterstand.']);
+        }
+
+        $verklaring = $this->bouw($student, $data['type']);
+        $html = view('pdf.verklaring', ['student' => $student, 'verklaring' => $verklaring, 'type' => $data['type']])->render();
+
+        $doc = Documentondertekening::ondertekenHtml($html, [
+            'type' => 'verklaring:'.$data['type'],
+            'titel' => $verklaring['title'].' '.$student->studentnummer,
+            'student_id' => $student->id,
+            'ontvanger' => $data['ontvanger'],
+            'uitgegeven_door_id' => auth()->id(),
+        ]);
+
+        AuditLogger::log(AuditLogger::UITGIFTE, $student, veld: 'verklaring', context: [
+            'type' => $data['type'], 'code' => $doc->code, 'ontvanger' => $data['ontvanger'],
+        ]);
+
+        return response()->streamDownload(
+            fn () => print(Documentondertekening::pdfBytes($doc)),
+            $doc->bestandsnaam,
+            ['Content-Type' => 'application/pdf'],
+        );
     }
 
     /** Bouwt de tekstblokken voor het gekozen verklaringstype. */

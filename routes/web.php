@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GebruikerController;
 use App\Http\Controllers\InschrijvingActiesController;
 use App\Http\Controllers\InschrijvingController;
+use App\Http\Controllers\OndertekeningController;
 use App\Http\Controllers\RapportController;
 use App\Http\Controllers\ReferentieController;
 use App\Http\Controllers\StudentController;
@@ -38,9 +39,18 @@ Route::get('/login', function () {
 Route::post('/dev-login', [DevLoginController::class, 'store'])->name('dev-login');
 Route::post('/logout', [DevLoginController::class, 'destroy'])->name('logout');
 
+// Publieke echtheidscontrole van ondertekende documenten (geen login vereist).
+Route::match(['get', 'post'], '/verificatie', [OndertekeningController::class, 'verificatie'])->name('verificatie');
+
 Route::middleware('auth')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Digitaal ondertekende documenten — archief/log (Beheerder, Directie, Studentenzaken)
+    Route::middleware('rol:beheerder,directie,studentenzaken')->group(function () {
+        Route::get('/ondertekende-documenten', [OndertekeningController::class, 'index'])->name('ondertekening');
+        Route::get('/ondertekende-documenten/{document}/download', [OndertekeningController::class, 'download'])->name('ondertekening.download');
+    });
 
     // --- Studenten inzien: SZ, Beheerder, Examencommissie, Directie ---
     Route::middleware('rol:studentenzaken,beheerder,examencommissie,directie')->group(function () {
@@ -82,8 +92,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/studenten/{student}/uitschrijven', [InschrijvingActiesController::class, 'uitschrijvenForm'])->name('uitschrijven.form');
         Route::post('/studenten/{student}/uitschrijven', [InschrijvingActiesController::class, 'uitschrijven'])->name('uitschrijven.store');
 
-        // Verklaringen (A4)
+        // Verklaringen (A4) — preview + ondertekende PDF genereren
         Route::get('/verklaringen', [VerklaringController::class, 'index'])->name('verklaringen');
+        Route::post('/verklaringen/genereer', [VerklaringController::class, 'genereer'])->name('verklaringen.genereer');
 
         // Rapporten (SZ: geen cijferkolom)
         Route::get('/rapporten', [RapportController::class, 'index'])->name('rapporten');

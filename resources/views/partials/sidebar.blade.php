@@ -41,6 +41,7 @@
             'Documenten' => [
                 ['Rapporten', 'rapporten', 'report', 'rapporten'],
                 ['Verklaringen', 'verklaringen', 'cert', 'verklaringen'],
+                ['Ondertekende documenten', 'ondertekening', 'cert', 'ondertekening*'],
             ],
             'Financieel' => [
                 ['Collegegeld', 'collegegeld', 'euro', 'collegegeld'],
@@ -69,6 +70,7 @@
             'Studenten' => [['Studenten (beperkt)', 'studenten.index', 'students', 'studenten.*']],
             'Cijfers' => [['Cijferoverzicht', 'cijferoverzicht', 'eye', 'cijferoverzicht']],
             'Rapporten' => [['Rapporten', 'rapporten.inzage', 'report', 'rapporten.inzage']],
+            'Documenten' => [['Ondertekende documenten', 'ondertekening', 'cert', 'ondertekening*']],
         ],
         Rol::Beheerder->value => [
             'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
@@ -76,6 +78,9 @@
                 ['Gebruikers & rollen', 'gebruikers', 'users', 'gebruikers'],
                 ['Opzoektabellen', 'opzoektabellen', 'db', 'opzoektabellen'],
                 ['Audit-log', 'audit-log', 'log', 'audit-log'],
+            ],
+            'Documenten' => [
+                ['Ondertekende documenten', 'ondertekening', 'cert', 'ondertekening*'],
             ],
         ],
     ];

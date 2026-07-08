@@ -24,12 +24,20 @@
     <h1>Verklaring genereren</h1>
     <div class="summary">Officiële verklaring op IUASR-briefpapier · A4 · bevat geen cijfers of BSN</div>
   </div>
-  @if ($student)
-    <div class="iuasr-dash-vhead__actions">
-      <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="button" onclick="window.print()">Printen / PDF</button>
+  @if ($student && $verklaring)
+    <div class="iuasr-dash-vhead__actions" style="gap:8px;flex-wrap:wrap;align-items:center;">
+      <button class="iuasr-dash-btn iuasr-dash-btn--sm" type="button" onclick="window.print()">Printen</button>
+      <form method="POST" action="{{ route('verklaringen.genereer') }}" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        @csrf
+        <input type="hidden" name="student" value="{{ $student->id }}">
+        <input type="hidden" name="type" value="{{ $type }}">
+        <input type="text" name="ontvanger" required value="{{ old('ontvanger') }}" placeholder="Verstrekt aan (bv. DUO / gemeente)" style="padding:8px 10px;border:1px solid var(--stroke,#cfcfd6);border-radius:8px;min-width:220px;">
+        <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Ondertekende PDF</button>
+      </form>
     </div>
   @endif
 </div>
+@error('ontvanger')<div class="iuasr-dash-alert iuasr-dash-alert--danger" style="margin-bottom:12px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/></svg><span>{{ $message }}</span></div>@enderror
 
 <div class="verk-layout">
   <div>
