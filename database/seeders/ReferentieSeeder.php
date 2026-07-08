@@ -68,6 +68,18 @@ class ReferentieSeeder extends Seeder
             'startdatum' => '2024-09-01', 'einddatum' => '2025-07-31', 'actief' => false,
         ]);
 
+        // Extra toekomstige studiejaren, klaar voor productie (inactief; slechts
+        // één studiejaar is tegelijk actief).
+        foreach (range(2027, 2031) as $jaar) {
+            Periode::firstOrCreate(
+                ['code' => $jaar.'-'.($jaar + 1)],
+                [
+                    'naam' => 'Studiejaar '.$jaar.' / '.($jaar + 1),
+                    'startdatum' => $jaar.'-09-01', 'einddatum' => ($jaar + 1).'-07-31', 'actief' => false,
+                ],
+            );
+        }
+
         // Docenten (synthetisch — komen overeen met de mockups).
         $aydin = Docent::create(['code' => 'DOC-001', 'aanhef' => 'dr.', 'voornaam' => 'Yusuf', 'achternaam' => 'Aydın', 'email' => 'y.aydin@iuasr.nl']);
         Docent::create(['code' => 'DOC-002', 'aanhef' => 'dr.', 'voornaam' => 'Salima', 'achternaam' => 'Boujat', 'email' => 's.boujat@iuasr.nl']);

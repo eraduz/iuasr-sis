@@ -38,16 +38,16 @@ class PeriodeTest extends TestCase
         $beheerder = User::where('rol', Rol::Beheerder)->first();
 
         $this->actingAs($beheerder)->post(route('opzoektabellen.store', 'perioden'), [
-            'code' => '2027-2028',
-            'naam' => 'Studiejaar 2027 / 2028',
-            'startdatum' => '2027-09-01',
-            'einddatum' => '2028-07-31',
+            'code' => '2035-2036',
+            'naam' => 'Studiejaar 2035 / 2036',
+            'startdatum' => '2035-09-01',
+            'einddatum' => '2036-07-31',
             'actief' => '1',
         ])->assertRedirect(route('opzoektabellen.tabel', 'perioden'));
 
         $this->assertSame(1, Periode::where('actief', true)->count());
-        $this->assertSame('2027-2028', Periode::where('actief', true)->value('code'));
-        $this->assertDatabaseHas('perioden', ['code' => '2027-2028', 'actief' => true]);
+        $this->assertSame('2035-2036', Periode::where('actief', true)->value('code'));
+        $this->assertDatabaseHas('perioden', ['code' => '2035-2036', 'actief' => true]);
     }
 
     public function test_alleen_beheerder_beheert_perioden(): void
