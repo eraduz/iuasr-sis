@@ -127,6 +127,7 @@ class StudentController extends Controller
             'woonplaats' => ['nullable', 'string', 'max:255'],
             'provincie' => ['nullable', 'string', 'max:100'],
             'land_id' => ['nullable', 'exists:landen,id'],
+            'rekeningnummer' => ['nullable', 'string', 'max:40'],
             'vooropleiding' => ['nullable', 'string', 'max:255'],
             'diploma' => ['nullable', 'string', 'max:255'],
             'vorige_instelling' => ['nullable', 'string', 'max:255'],

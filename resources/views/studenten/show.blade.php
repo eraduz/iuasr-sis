@@ -86,6 +86,9 @@
             @if($student->postcode || $student->woonplaats)<br>{{ trim(($student->postcode ?? '').' '.($student->woonplaats ?? '')) }}@endif
             @if($student->provincie || $student->land)<br><span class="sis-muted">{{ trim(($student->provincie ?? '').(($student->provincie && $student->land) ? ' · ' : '').($student->land?->naam ?? '')) }}</span>@endif
           </dd>
+          @if (auth()->user()->magInschrijvingBeheren())
+            <dt>IBAN</dt><dd>{{ $student->rekeningnummer ?? '—' }} <span class="sis-muted" style="font-size:11px;">· versleuteld</span></dd>
+          @endif
         </dl>
       </div>
 

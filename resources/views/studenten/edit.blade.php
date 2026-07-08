@@ -72,6 +72,7 @@
         <div class="sis-fld"><label>E-mail (IUASR)</label><input type="email" name="email" value="{{ old('email', $student->email) }}"></div>
         <div class="sis-fld"><label>E-mail privé</label><input type="email" name="email_prive" value="{{ old('email_prive', $student->email_prive) }}"></div>
         <div class="sis-fld"><label>Telefoon</label><input type="text" name="telefoon" value="{{ old('telefoon', $student->telefoon) }}"></div>
+        <div class="sis-fld"><label>IBAN-rekeningnummer</label><input type="text" name="rekeningnummer" value="{{ old('rekeningnummer', $student->rekeningnummer) }}" placeholder="NL00 BANK 0123 4567 89"><div class="help">Versleuteld opgeslagen · alleen bevoegde rollen.</div></div>
         <div class="sis-fld-row sis-fld-row--21">
           <div class="sis-fld"><label>Straat</label><input type="text" name="adres" value="{{ old('adres', $student->adres) }}"></div>
           <div class="sis-fld"><label>Huisnummer</label><input type="text" name="huisnummer" value="{{ old('huisnummer', $student->huisnummer) }}"></div>

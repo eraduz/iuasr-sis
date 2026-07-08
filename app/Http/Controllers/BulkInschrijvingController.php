@@ -46,11 +46,11 @@ class BulkInschrijvingController extends Controller
         'stad' => ['stad', 'woonplaats', 'plaats', 'city'],
         'provincie' => ['provincie', 'province'],
         'land' => ['land', 'country'],
-        'iban' => ['iban', 'iban rekeningnummer', 'rekeningnummer'],
-        'diploma' => ['diploma', 'hoogst behaalde diploma', 'hoogste diploma'],
+        'iban' => ['iban', 'iban kandidaat', 'iban rekeningnummer', 'rekeningnummer'],
+        'diploma' => ['diploma', 'vooropleiding type', 'hoogst behaalde diploma', 'hoogste diploma'],
         'onderwijsinstelling' => ['onderwijsinstelling', 'naam onderwijsinstelling van vorige opleiding', 'naam onderwijsinstelling', 'vorige instelling', 'school'],
-        'afstudeerjaar' => ['afstudeerjaar', 'afstudeerjaar van vorige opleiding', 'afstudeer jaar'],
-        'opleiding' => ['opleiding', 'opleidingcode', 'opleiding code', 'studie', 'programma'],
+        'afstudeerjaar' => ['afstudeerjaar', 'jaar afstuderen', 'afstudeerjaar van vorige opleiding', 'afstudeer jaar'],
+        'opleiding' => ['opleiding', 'programme label', 'programme slug', 'programme', 'opleidingcode', 'opleiding code', 'studie', 'programma'],
         'leerjaar' => ['leerjaar', 'jaar'],
     ];
 
@@ -256,10 +256,19 @@ class BulkInschrijvingController extends Controller
         if (! $waarde) {
             return null;
         }
+        $w = trim($waarde);
 
-        return Opleiding::where('code', $waarde)
-            ->orWhere('naam', 'like', '%'.$waarde.'%')
-            ->first();
+        $opleiding = Opleiding::where('code', $w)->orWhere('naam', 'like', '%'.$w.'%')->first();
+        if ($opleiding) {
+            return $opleiding;
+        }
+
+        // Slug uit het portaal (bv. "bachelor-islamitische-theologie").
+        if (str_contains($w, '-')) {
+            return Opleiding::where('naam', 'like', '%'.str_replace('-', ' ', $w).'%')->first();
+        }
+
+        return null;
     }
 
     private function vindLand(?string $waarde): ?int

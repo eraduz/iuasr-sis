@@ -53,6 +53,7 @@
             <div class="sis-fld"><label>Woonplaats</label><input type="text" name="woonplaats" value="{{ old('woonplaats') }}"></div>
             <div class="sis-fld"><label>Telefoon</label><input type="text" name="telefoon" value="{{ old('telefoon') }}"></div>
           </div>
+          <div class="sis-fld"><label>IBAN-rekeningnummer</label><input type="text" name="rekeningnummer" value="{{ old('rekeningnummer') }}" placeholder="NL00 BANK 0123 4567 89"><div class="help">Versleuteld opgeslagen · alleen bevoegde rollen.</div></div>
         </fieldset>
 
         <fieldset class="sis-fieldset" style="margin-top:8px;">
@@ -142,7 +143,7 @@
       </div>
       <div class="sis-card">
         <div class="sis-card__hd"><h3>AVG</h3></div>
-        <p class="sis-muted" style="font-size:12.5px;line-height:1.6;margin:0;">Alleen strikt noodzakelijke gegevens worden vastgelegd (dataminimalisatie). BSN en rekeningnummer volgen pas na expliciet akkoord van de Functionaris Gegevensbescherming. Deze aanmaak wordt gelogd in de audit-log.</p>
+        <p class="sis-muted" style="font-size:12.5px;line-height:1.6;margin:0;">Alleen strikt noodzakelijke gegevens worden vastgelegd (dataminimalisatie). Het BSN volgt pas na expliciet akkoord van de Functionaris Gegevensbescherming. Het IBAN-rekeningnummer wordt versleuteld opgeslagen en is alleen zichtbaar voor bevoegde rollen. Deze aanmaak wordt gelogd in de audit-log.</p>
       </div>
     </div>
   </div>
