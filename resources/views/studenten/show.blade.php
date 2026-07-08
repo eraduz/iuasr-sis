@@ -209,49 +209,45 @@
         </label>
       </form>
 
-      <form method="POST" action="{{ route('studenten.documenten.upload', $student) }}" enctype="multipart/form-data" class="sis-form" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px;">
-        @csrf
-        <div class="sis-fld" style="margin:0;min-width:210px;">
-          <label>Soort</label>
-          <select name="soort" required>
-            @foreach (App\Models\StudentDocument::SOORTEN as $key => $label)
-              <option value="{{ $key }}">{{ $label }}</option>
-            @endforeach
-          </select>
-        </div>
-        <div class="sis-fld" style="margin:0;flex:1;min-width:220px;">
-          <label>Bestand (pdf, jpg, png · max 8 MB)</label>
-          <input type="file" name="bestand" accept=".pdf,.jpg,.jpeg,.png,.webp" required>
-        </div>
-        <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit">Uploaden</button>
-      </form>
       @error('bestand')<div class="iuasr-dash-alert iuasr-dash-alert--danger" style="margin-bottom:12px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/></svg><span>{{ $message }}</span></div>@enderror
 
-      <div class="iuasr-dash-tbl-card" style="border:0;">
-        <table class="iuasr-dash-tbl">
-          <thead><tr><th>Soort</th><th>Bestand</th><th style="text-align:right;">Grootte</th><th>Geüpload</th><th class="row-act"></th></tr></thead>
-          <tbody>
-            @forelse ($student->documenten as $doc)
-              <tr>
-                <td class="nm">{{ $doc->soortLabel() }}</td>
-                <td>{{ $doc->bestandsnaam }}</td>
-                <td class="tnum" style="text-align:right;">{{ number_format($doc->grootte / 1024, 0, ',', '.') }} kB</td>
-                <td class="dt">{{ $doc->created_at->format('d-m-Y') }} · {{ $doc->geuploadDoor?->naam ?? '—' }}</td>
-                <td class="row-act" style="white-space:nowrap;text-align:right;">
+      @php $perSoort = $student->documenten->groupBy('soort'); @endphp
+      <div class="iuasr-doc-lijst">
+        @foreach (App\Models\StudentDocument::SOORTEN as $key => $label)
+          @php $docs = $perSoort[$key] ?? collect(); @endphp
+          <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--borderColor, #e5e5ea);">
+            <div style="flex:0 0 200px;min-width:170px;">
+              <div style="font-weight:600;color:var(--priColor100);font-size:13.5px;">{{ $label }}</div>
+              @if ($docs->isNotEmpty())
+                <span class="iuasr-dash-status s-approved" style="margin-top:6px;display:inline-block;">{{ $docs->count() }} geüpload</span>
+              @else
+                <span class="sis-muted" style="font-size:12px;">nog niet geüpload</span>
+              @endif
+            </div>
+            <div style="flex:1;min-width:260px;">
+              @foreach ($docs as $doc)
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:var(--blackAltText);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  <span style="flex:1;min-width:120px;word-break:break-all;font-size:13px;">{{ $doc->bestandsnaam }} <span class="sis-muted" style="font-size:11px;">· {{ number_format($doc->grootte / 1024, 0, ',', '.') }} kB · {{ $doc->created_at->format('d-m-Y') }}</span></span>
                   <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('documenten.download', [$doc, 'bekijken' => 1]) }}" target="_blank">Bekijken</a>
                   <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('documenten.download', $doc) }}">Downloaden</a>
                   <form method="POST" action="{{ route('documenten.destroy', $doc) }}" onsubmit="return confirm('Dit document verwijderen?');" style="display:inline;">
                     @csrf @method('DELETE')
                     <button type="submit" class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger">Verwijderen</button>
                   </form>
-                </td>
-              </tr>
-            @empty
-              <tr><td colspan="5" style="color:var(--blackAltText);padding:14px;">Nog geen documenten geüpload.</td></tr>
-            @endforelse
-          </tbody>
-        </table>
+                </div>
+              @endforeach
+              <form method="POST" action="{{ route('studenten.documenten.upload', $student) }}" enctype="multipart/form-data" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                @csrf
+                <input type="hidden" name="soort" value="{{ $key }}">
+                <input type="file" name="bestand" accept=".pdf,.jpg,.jpeg,.png,.webp" required style="flex:1;min-width:170px;font-size:12.5px;">
+                <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Upload</button>
+              </form>
+            </div>
+          </div>
+        @endforeach
       </div>
+      <p class="sis-tblnote" style="margin-top:10px;">Toegestaan: pdf, jpg, png · max 8 MB per bestand. Inzage en afgifte worden gelogd.</p>
     </div>
   @endif
 
