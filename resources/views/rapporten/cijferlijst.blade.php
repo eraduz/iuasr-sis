@@ -61,6 +61,43 @@
       <p class="sis-muted" style="font-size:12.5px;margin:0;">Typ een studentnummer of naam en klik op Zoek.</p>
     @endif
   </div>
+
+  {{-- Tweede weergave: alle studenten per opleiding --}}
+  <div class="sis-card">
+    <div class="sis-card__hd"><h3>Of: alle studenten per opleiding</h3></div>
+    <form method="GET" action="{{ route('cijferlijst') }}" style="display:flex;gap:8px;">
+      <select name="opleiding_id" onchange="this.form.submit()" style="flex:1;height:38px;border:1px solid var(--borderColor);border-radius:4px;padding:0 10px;">
+        <option value="">Kies een opleiding…</option>
+        @foreach ($opleidingen as $o)<option value="{{ $o->id }}" @selected($opleidingId == $o->id)>{{ $o->naam }}</option>@endforeach
+      </select>
+    </form>
+
+    @if ($opleidingId)
+      @if ($perOpleiding->isEmpty())
+        <p class="sis-muted" style="font-size:13px;margin:12px 2px 0;">Geen actieve studenten voor deze opleiding.</p>
+      @else
+        <div class="iuasr-dash-tbl-card" style="border:0;margin-top:12px;">
+          <table class="iuasr-dash-tbl">
+            <thead><tr><th>Studentnr.</th><th>Naam</th><th style="text-align:center;">Leerjaar</th><th>Klas</th><th style="text-align:right;">Behaald EC</th><th></th></tr></thead>
+            <tbody>
+              @foreach ($perOpleiding as $r)
+                @php $i = $r['inschrijving']; @endphp
+                <tr>
+                  <td class="tnum">{{ $i->student->studentnummer }}</td>
+                  <td class="nm">{{ $i->student->volledigeNaam() }}</td>
+                  <td class="tnum" style="text-align:center;">{{ $i->leerjaar }}</td>
+                  <td>{{ $i->klas?->code ?? '—' }}</td>
+                  <td class="tnum" style="text-align:right;"><b>{{ $r['behaald'] }}</b>@if($r['totaal']) <span class="sis-muted" style="font-size:11px;">/ {{ $r['totaal'] }}</span>@endif</td>
+                  <td style="text-align:right;"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('cijferlijst', ['student' => $i->student->id]) }}">Cijferlijst</a></td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+        <p class="sis-tblnote" style="margin-top:8px;">{{ $perOpleiding->count() }} student(en). Klik op <b>Cijferlijst</b> voor het volledige transcript en de ondertekende PDF per student.</p>
+      @endif
+    @endif
+  </div>
 @else
   <div class="sis-card" style="margin-bottom:16px;">
     <div class="iuasr-dash-candidate__hd" style="margin:0;padding:0;border:0;">

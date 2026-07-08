@@ -141,7 +141,25 @@ class RapportController extends Controller
             AuditLogger::log(AuditLogger::INZAGE, $student, veld: 'cijferlijst', context: ['bron' => 'transcript']);
         }
 
-        return view('rapporten.cijferlijst', compact('student', 'transcript', 'zoek', 'resultaten'));
+        // Tweede weergave: alle actieve studenten van een opleiding met behaalde EC.
+        $opleidingen = Opleiding::orderBy('naam')->get();
+        $opleidingId = $request->integer('opleiding_id') ?: null;
+        $perOpleiding = collect();
+        if ($opleidingId && ! $student) {
+            $perOpleiding = Inschrijving::where('status', 'actief')->where('opleiding_id', $opleidingId)
+                ->with(['student', 'klas', 'opleiding'])
+                ->get()
+                ->sortBy(fn ($i) => $i->student->achternaam)
+                ->map(fn ($i) => [
+                    'inschrijving' => $i,
+                    'behaald' => Transcript::voor($i->student)['behaaldeEc'],
+                    'totaal' => $i->opleiding?->ec_totaal,
+                ])->values();
+        }
+
+        return view('rapporten.cijferlijst', compact(
+            'student', 'transcript', 'zoek', 'resultaten', 'opleidingen', 'opleidingId', 'perOpleiding'
+        ));
     }
 
     /** Officiële cijferlijst als ondertekende PDF (op briefpapier). */
