@@ -86,6 +86,10 @@
         Rol::Bestuur->value => [
             'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
             'Documenten' => [['Ondertekende documenten', 'ondertekening', 'cert', 'ondertekening*']],
+            'Handleidingen' => [
+                ['Medewerkershandleiding', 'handleiding.medewerkers', 'report', 'handleiding.medewerkers'],
+                ['Technische handleiding', 'handleiding.technisch', 'report', 'handleiding.technisch'],
+            ],
         ],
         Rol::Beheerder->value => [
             'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
@@ -94,6 +98,7 @@
                 ['Opzoektabellen', 'opzoektabellen', 'db', 'opzoektabellen'],
                 ['Audit-log', 'audit-log', 'log', 'audit-log'],
                 ['Back-up & herstel', 'backup', 'db', 'backup'],
+                ['Technische handleiding', 'handleiding.technisch', 'report', 'handleiding.technisch'],
             ],
             'Documenten' => [
                 ['Ondertekende documenten', 'ondertekening', 'cert', 'ondertekening*'],

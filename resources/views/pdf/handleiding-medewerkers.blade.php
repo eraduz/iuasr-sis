@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="nl">
+@php
+  $logoPad = public_path('assets/img/iuasr-logo.png');
+  $logo = is_file($logoPad) ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPad)) : null;
+@endphp
+<head>
+  <meta charset="utf-8">
+  <style>
+    @page { margin: 42px 46px 64px 46px; }
+    body { font-family: "DejaVu Sans", sans-serif; color: #1E1446; font-size: 10.5pt; line-height: 1.5; }
+    #footer { position: fixed; bottom: -44px; left: 0; right: 0; height: 30px; border-top: 1px solid #ddd; padding-top: 6px; font-size: 8pt; color: #666; }
+    #footer .r { text-align: right; }
+    #footer .num:after { content: counter(page); }
+    .cover { border-bottom: 3px solid #1E1446; padding-bottom: 14px; margin-bottom: 20px; }
+    .cover img { height: 96px; }
+    .cover h1 { font-size: 24pt; font-weight: bold; margin: 14px 0 2px; }
+    .cover .sub { font-size: 11pt; color: #666; margin: 0; }
+    h2 { font-size: 14pt; color: #C8102E; margin: 20px 0 6px; border-bottom: 1px solid #eee; padding-bottom: 3px; page-break-after: avoid; }
+    h3 { font-size: 11.5pt; margin: 14px 0 4px; page-break-after: avoid; }
+    p { margin: 0 0 9px; }
+    ul, ol { margin: 0 0 10px; padding-left: 20px; }
+    li { margin: 0 0 4px; }
+    .tip { background: #F5F3FA; border-left: 3px solid #1E1446; padding: 8px 12px; margin: 10px 0; font-size: 10pt; }
+    .let { background: #FBEFEF; border-left: 3px solid #C8102E; padding: 8px 12px; margin: 10px 0; font-size: 10pt; }
+    table.rol { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 8px 0 12px; }
+    table.rol th { background: #1E1446; color: #fff; text-align: left; padding: 6px 8px; font-size: 8.5pt; }
+    table.rol td { border-bottom: 1px solid #eee; padding: 6px 8px; vertical-align: top; }
+    b { color: #1E1446; }
+  </style>
+</head>
+<body>
+  <div id="footer">
+    <table style="width:100%;"><tr>
+      <td>IUASR SIS — Handleiding voor medewerkers · {{ now()->format('d-m-Y') }}</td>
+      <td class="r">Pagina <span class="num"></span></td>
+    </tr></table>
+  </div>
+
+  <div class="cover">
+    @if ($logo)<img src="{{ $logo }}" alt="IUASR">@endif
+    <h1>Handleiding voor medewerkers</h1>
+    <p class="sub">Intern Studentbeheersysteem (SIS) · Islamic University of Applied Sciences Rotterdam</p>
+  </div>
+
+  <h2>1. Waarvoor is dit systeem?</h2>
+  <p>Het Studentbeheersysteem (SIS) is de interne administratie voor Studentenzaken en de opleidingen. U beheert er studenten, inschrijvingen, cijfers, collegegeld, documenten en rapporten. Het systeem draait uitsluitend op het interne netwerk en is gescheiden van het publieke aanmeldportaal.</p>
+  <div class="let">Alle gegevens in de ontwikkel-/testomgeving zijn <b>synthetisch</b> (verzonnen). Ga zorgvuldig om met echte persoonsgegevens; deze vallen onder de AVG.</div>
+
+  <h2>2. Inloggen</h2>
+  <p>U logt in via uw IUASR-account (Microsoft-account, Single Sign-On). Kies uw account en u komt op uw persoonlijke dashboard. Elk personeelslid heeft een <b>rol</b> die bepaalt wat u kunt zien en doen.</p>
+
+  <h2>3. Rollen: wie mag wat</h2>
+  <p>Het systeem kent een strikte rolscheiding. Deze wordt aan de serverkant afgedwongen — u ziet alleen de schermen die bij uw rol horen.</p>
+  <table class="rol">
+    <tr><th>Rol</th><th>Wat u doet</th></tr>
+    <tr><td><b>Studentenzaken</b></td><td>Studenten in-/uitschrijven, gegevens en documenten beheren, collegegeld, verklaringen, vrijstellingen registreren. <b>Geen</b> cijferinzage.</td></tr>
+    <tr><td><b>Docent</b></td><td>Cijfers invoeren voor <b>uw eigen vakken</b> en indienen bij de examencommissie.</td></tr>
+    <tr><td><b>Examencommissie</b></td><td>Cijferlijsten vaststellen, tentamenlijsten en cijferlijsten inzien, studievoortgang beoordelen.</td></tr>
+    <tr><td><b>Directie</b></td><td>Instellingsbrede cijfers en rapporten inzien.</td></tr>
+    <tr><td><b>Financiële Administratie</b></td><td>Collegegeldbetalingen registreren en achterstanden bewaken.</td></tr>
+    <tr><td><b>Schoolbestuur</b></td><td>Kerncijfers en alle ondertekende documenten inzien.</td></tr>
+    <tr><td><b>Beheerder</b></td><td>Gebruikers/rollen, referentietabellen, audit-log en back-ups.</td></tr>
+  </table>
+
+  <h2>4. Uw dashboard</h2>
+  <p>Na het inloggen ziet u uw dashboard met kerncijfers en grafieken die bij uw rol passen — bijvoorbeeld aantallen studenten, instroom, slaagpercentages of financiële cijfers. Signaleringen (zoals NT2-deadlines of nog aan te leveren documenten) staan er ook.</p>
+
+  <h2>5. Werken met studenten (Studentenzaken)</h2>
+  <h3>Student zoeken</h3>
+  <p>Ga naar <b>Alle studenten</b> en gebruik de zoekbalk (studentnummer of naam). Klik op een student om het dossier te openen.</p>
+  <h3>Nieuwe student inschrijven</h3>
+  <p>Kies <b>Student inschrijven</b>, vul de gegevens in en bevestig. Het studentnummer wordt automatisch toegekend en de vakken van het studiejaar worden toegewezen. Voor grote aantallen bestaat <b>Bulk inschrijven</b> (CSV-export van het aanmeldportaal), met een controlestap vóór definitief importeren.</p>
+  <h3>Gegevens wijzigen</h3>
+  <p>Open het dossier, tabblad <b>Persoonsgegevens</b>, en kies <b>Wijzig gegevens</b>. Onder <b>Acties</b> vindt u herinschrijven, uitschrijven en schorsen.</p>
+  <h3>Documenten</h3>
+  <p>In het dossier uploadt u documenten (identiteitsbewijs, diploma, cijferlijst, pasfoto, overig). Ontbreekt iets nog, zet dan <b>“levert later aan”</b> aan — de student verschijnt dan als herinnering op het dashboard.</p>
+  <h3>Vrijstellingen</h3>
+  <p>Onder <b>Inschrijving &amp; klas</b> legt u een vrijstelling vast voor een toegewezen vak, met de <b>referentie van het examencommissie-besluit</b>. Een vrijstelling levert de volledige studiepunten (EC) op zonder cijfer (vermelding “VR”).</p>
+
+  <h2>6. Cijfers invoeren (Docent)</h2>
+  <p>Ga naar <b>Cijferinvoer</b> en kies een van uw vakken. Voer per toetsonderdeel de 1e poging en eventueel de herkansing in; het systeem berekent het gewogen eindcijfer en de EC. Als u klaar bent, <b>dient u de lijst in</b> bij de examencommissie. Daarna is de lijst vergrendeld.</p>
+  <div class="tip">U ziet en wijzigt uitsluitend uw eigen vakken. Bij een vrijstelling vervallen de invoervelden en geldt “VR”.</div>
+
+  <h2>7. Cijfers vaststellen &amp; lijsten (Examencommissie/Directie)</h2>
+  <p>In <b>Cijferoverzicht</b> ziet u alle vakken met status. Een ingediende lijst kunt u <b>vaststellen</b> of met een opmerking <b>terugsturen</b>. Per vak downloadt u een <b>tentamenlijst</b> (deelnemers + resultaten). Per student maakt u via <b>Cijferlijst</b> een officieel transcript. Beide zijn te printen en als ondertekende PDF te downloaden.</p>
+
+  <h2>8. Collegegeld &amp; betalingen</h2>
+  <p>Studentenzaken ziet per student de status verschuldigd/betaald/saldo (pro rata over de inschrijvingsmaanden). De <b>Financiële Administratie</b> registreert betalingen (ook via een Excel-import) en bewaakt achterstanden; bij een schuld worden herinschrijven en verklaringen geblokkeerd.</p>
+
+  <h2>9. Verklaringen &amp; ondertekende documenten</h2>
+  <p>Bij <b>Verklaring opstellen</b> genereert u bewijzen (bv. bewijs van inschrijving) op officieel briefpapier, digitaal gewaarmerkt met een verificatiecode. In <b>Ondertekende documenten</b> vindt u uw eigen gewaarmerkte documenten terug; u kunt ook zelf een PDF uploaden en laten waarmerken. Echtheid is te controleren op de publieke verificatiepagina.</p>
+
+  <h2>10. Rapporten</h2>
+  <p>Onder <b>Rapporten</b> maakt u o.a. de klassenlijst, het alumni-rapport, een Excel-export van actieve studenten (met IBAN, zonder BSN), het EC-rapport, het overgangsadvies en de cijfer-/tentamenlijsten. Elke lijst heeft een zoekbalk.</p>
+
+  <h2>11. Vragen of problemen?</h2>
+  <p>Neem bij vragen contact op met de systeembeheerder of Studentenzaken (szaken@iuasr.nl). Werkt iets niet zoals verwacht, meld dan wat u deed en wat u zag.</p>
+
+  <div class="tip">Deze handleiding wordt bijgewerkt zodra er nieuwe functies bij komen. Kijk bij twijfel of u de meest recente versie hebt (zie de datum onderaan).</div>
+</body>
+</html>

@@ -47,6 +47,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+    // PDF-handleidingen: medewerkers (iedereen) en technisch/herstel (Beheerder).
+    Route::get('/handleiding', [App\Http\Controllers\HandleidingController::class, 'medewerkers'])->name('handleiding.medewerkers');
+    Route::get('/handleiding/technisch', [App\Http\Controllers\HandleidingController::class, 'technisch'])->name('handleiding.technisch');
+
     // Digitaal ondertekende documenten — archief/log (Beheerder, Schoolbestuur, Directie, Studentenzaken)
     Route::middleware('rol:beheerder,bestuur,directie,studentenzaken')->group(function () {
         Route::get('/ondertekende-documenten', [OndertekeningController::class, 'index'])->name('ondertekening');

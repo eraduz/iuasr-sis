@@ -66,6 +66,11 @@ strikt gescheiden van het publieke aanmeldportaal. Zie
   schema-drops).
 - `php -l` / linting groen vóór elke commit. Migraties reversible.
 - Taal in UI en documentatie: Nederlands (U-vorm), geen emoji.
+- **Handleidingen bijhouden.** Bij ELKE nieuwe of gewijzigde functie worden de
+  twee PDF-handleidingen bijgewerkt: `resources/views/pdf/handleiding-medewerkers.blade.php`
+  (eindgebruikers) en `resources/views/pdf/handleiding-technisch.blade.php`
+  (technisch beheer/data-recovery). Genereer daarna opnieuw met
+  `php artisan handleidingen:genereren` (bestanden in `docs/handleidingen/`).
 
 ## Uit scope (niet bouwen tenzij expliciet gevraagd)
 - DUO/BRON-koppeling (blijft handmatig, apart regime)
