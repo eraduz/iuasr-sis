@@ -125,8 +125,8 @@
     @else
       <div class="sis-a4" style="min-height:auto;">
         <div class="sis-a4__head">
-          <img src="{{ asset('assets/img/logo-dark.png') }}" alt="IUASR">
-          <div class="org"><b>Islamic University of Applied Sciences Rotterdam</b>Bergsingel 135 · 3037 GC Rotterdam<br>Tel: +31 (0)10 485 47 21<br>szaken@iuasr.nl</div>
+          <img src="{{ asset('assets/img/iuasr-logo.png') }}?v={{ filemtime(public_path('assets/img/iuasr-logo.png')) }}" alt="IUASR">
+          <div class="org">Bergsingel 135 · 3037 GC Rotterdam<br>Tel: +31 (0)10 485 47 21<br>szaken@iuasr.nl · info@iuasr.nl</div>
         </div>
         <h1>{{ $verklaring['title'] }}</h1>
         <p class="doc-sub">{{ $verklaring['sub'] }}</p>

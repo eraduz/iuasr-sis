@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="nl">
 @php
-  $logoPad = public_path('assets/img/logo-dark.png');
+  $logoPad = public_path('assets/img/iuasr-logo.png');
   $logo = is_file($logoPad) ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPad)) : null;
 @endphp
 <head>
@@ -34,10 +34,10 @@
     <tr>
       <td>@if ($logo)<img src="{{ $logo }}" alt="IUASR" style="height:144px;">@else<b style="font-size:14pt;">IUASR</b>@endif</td>
       <td class="org">
-        <b>Islamic University of Applied Sciences Rotterdam</b>
         Bergsingel 135 &middot; 3037 GC Rotterdam<br>
         Tel: +31 (0)10 485 47 21<br>
-        szaken@iuasr.nl &middot; info@iuasr.nl
+        szaken@iuasr.nl<br>
+        info@iuasr.nl
       </td>
     </tr>
   </table>
