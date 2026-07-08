@@ -81,7 +81,20 @@
           <dt>E-mail (IUASR)</dt><dd>{{ $student->email ?? '—' }}</dd>
           <dt>E-mail privé</dt><dd>{{ $student->email_prive ?? '—' }}</dd>
           <dt>Telefoon</dt><dd>{{ $student->telefoon ?? '—' }}</dd>
-          <dt>Adres</dt><dd>{{ $student->adres ?? '—' }}@if($student->postcode || $student->woonplaats)<br>{{ trim(($student->postcode ?? '').' '.($student->woonplaats ?? '')) }}@endif</dd>
+          <dt>Adres</dt><dd>
+            {{ trim(($student->adres ?? '').' '.($student->huisnummer ?? '')) ?: '—' }}
+            @if($student->postcode || $student->woonplaats)<br>{{ trim(($student->postcode ?? '').' '.($student->woonplaats ?? '')) }}@endif
+            @if($student->provincie || $student->land)<br><span class="sis-muted">{{ trim(($student->provincie ?? '').(($student->provincie && $student->land) ? ' · ' : '').($student->land?->naam ?? '')) }}</span>@endif
+          </dd>
+        </dl>
+      </div>
+
+      <div class="sis-card" style="margin-top:16px;">
+        <div class="sis-card__hd"><h3>Vooropleiding</h3></div>
+        <dl class="sis-dl">
+          <dt>Hoogst behaalde diploma</dt><dd>{{ $student->diploma ?? '—' }}</dd>
+          <dt>Onderwijsinstelling</dt><dd>{{ $student->vorige_instelling ?? '—' }}</dd>
+          <dt>Afstudeerjaar</dt><dd>{{ $student->afstudeerjaar ?? '—' }}</dd>
         </dl>
       </div>
 
@@ -179,6 +192,65 @@
       @endif
     </div>
   </div>
+
+  {{-- Documenten van de student (privé opgeslagen; inzage gelogd) --}}
+  @if (auth()->user()->magInschrijvingBeheren())
+    <div class="sis-card" style="margin-top:16px;" id="documenten">
+      <div class="sis-card__hd"><h3>Documenten</h3><span class="hint">identiteitsbewijs, diploma, cijferlijst, pasfoto — privé opgeslagen, inzage gelogd</span></div>
+
+      <form method="POST" action="{{ route('studenten.documenten.later', $student) }}" style="margin-bottom:12px;">
+        @csrf
+        <label class="sis-check-inline">
+          <input type="checkbox" name="documenten_later" value="1" @checked($student->documenten_later) onchange="this.form.submit()">
+          <b>Student levert later aan</b> (diploma / cijferlijst e.d. volgen nog)
+        </label>
+      </form>
+
+      <form method="POST" action="{{ route('studenten.documenten.upload', $student) }}" enctype="multipart/form-data" class="sis-form" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px;">
+        @csrf
+        <div class="sis-fld" style="margin:0;min-width:210px;">
+          <label>Soort</label>
+          <select name="soort" required>
+            @foreach (App\Models\StudentDocument::SOORTEN as $key => $label)
+              <option value="{{ $key }}">{{ $label }}</option>
+            @endforeach
+          </select>
+        </div>
+        <div class="sis-fld" style="margin:0;flex:1;min-width:220px;">
+          <label>Bestand (pdf, jpg, png · max 8 MB)</label>
+          <input type="file" name="bestand" accept=".pdf,.jpg,.jpeg,.png,.webp" required>
+        </div>
+        <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit">Uploaden</button>
+      </form>
+      @error('bestand')<div class="iuasr-dash-alert iuasr-dash-alert--danger" style="margin-bottom:12px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/></svg><span>{{ $message }}</span></div>@enderror
+
+      <div class="iuasr-dash-tbl-card" style="border:0;">
+        <table class="iuasr-dash-tbl">
+          <thead><tr><th>Soort</th><th>Bestand</th><th style="text-align:right;">Grootte</th><th>Geüpload</th><th class="row-act"></th></tr></thead>
+          <tbody>
+            @forelse ($student->documenten as $doc)
+              <tr>
+                <td class="nm">{{ $doc->soortLabel() }}</td>
+                <td>{{ $doc->bestandsnaam }}</td>
+                <td class="tnum" style="text-align:right;">{{ number_format($doc->grootte / 1024, 0, ',', '.') }} kB</td>
+                <td class="dt">{{ $doc->created_at->format('d-m-Y') }} · {{ $doc->geuploadDoor?->naam ?? '—' }}</td>
+                <td class="row-act" style="white-space:nowrap;text-align:right;">
+                  <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('documenten.download', [$doc, 'bekijken' => 1]) }}" target="_blank">Bekijken</a>
+                  <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('documenten.download', $doc) }}">Downloaden</a>
+                  <form method="POST" action="{{ route('documenten.destroy', $doc) }}" onsubmit="return confirm('Dit document verwijderen?');" style="display:inline;">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger">Verwijderen</button>
+                  </form>
+                </td>
+              </tr>
+            @empty
+              <tr><td colspan="5" style="color:var(--blackAltText);padding:14px;">Nog geen documenten geüpload.</td></tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
+    </div>
+  @endif
 
   {{-- Acties — direct beschikbaar bij de persoonsgegevens --}}
   @if (auth()->user()->magInschrijvingBeheren())

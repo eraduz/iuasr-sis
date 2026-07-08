@@ -56,6 +56,15 @@ opleverpunt aantoonbaar klaar is.
     heet "Alle studenten".
   - 27 tests groen (rolscheiding, lifecycle, mutatie, verklaring, beheer, notities,
     studentenlijst-filter); alle schermen live geverifieerd.
+  - Aanmeldportaal-velden: huisnummer, provincie, land, onderwijsinstelling +
+    afstudeerjaar vorige opleiding toegevoegd aan wijzigscherm en studentpagina
+    (straat=adres, stad=woonplaats, IBAN=rekeningnummer bestonden al).
+  - Documentmodule: per student min. 6 documenten (identiteitsbewijs voor/achter,
+    diploma, cijferlijst, pasfoto, overig) uploaden, bekijken (inline) en
+    downloaden; bestanden op de PRIVATE schijf (buiten webroot), inzage/afgifte
+    gelogd; alleen Studentenzaken/Beheer.
+  - "Student levert later aan"-vinkje bij de documenten → dashboardtegel
+    (signaleringen) toont welke studenten diploma/documenten nog moeten aanleveren.
   - NT2-bewaking: NT2-plichtige studenten hebben 1 jaar vanaf de inschrijfdatum
     om het examen te halen. Deadline wordt afgeleid; `nt2_behaald_op` vastlegbaar
     via het wijzigscherm. Dashboardvenster bij Studentenzaken toont de openstaande

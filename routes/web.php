@@ -12,6 +12,7 @@ use App\Http\Controllers\InschrijvingController;
 use App\Http\Controllers\RapportController;
 use App\Http\Controllers\ReferentieController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentDocumentController;
 use App\Http\Controllers\VakstructuurController;
 use App\Http\Controllers\VaktoewijzingController;
 use App\Http\Controllers\VerklaringController;
@@ -64,6 +65,12 @@ Route::middleware('auth')->group(function () {
         // Interne notities per student
         Route::post('/studenten/{student}/notities', [StudentController::class, 'notitieStore'])->name('studenten.notities.store');
         Route::delete('/studenten/{student}/notities/{notitie}', [StudentController::class, 'notitieDestroy'])->name('studenten.notities.destroy');
+
+        // Documenten per student (identiteitsbewijs, diploma, cijferlijst, pasfoto, ...)
+        Route::post('/studenten/{student}/documenten', [StudentDocumentController::class, 'upload'])->name('studenten.documenten.upload');
+        Route::get('/documenten/{document}', [StudentDocumentController::class, 'download'])->name('documenten.download');
+        Route::delete('/documenten/{document}', [StudentDocumentController::class, 'destroy'])->name('documenten.destroy');
+        Route::post('/studenten/{student}/documenten-later', [StudentDocumentController::class, 'later'])->name('studenten.documenten.later');
 
         // Herinschrijven
         Route::get('/herinschrijven', [InschrijvingActiesController::class, 'kiesHerinschrijven'])->name('herinschrijven');

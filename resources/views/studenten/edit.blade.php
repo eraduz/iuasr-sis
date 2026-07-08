@@ -73,10 +73,36 @@
         <div class="sis-fld"><label>E-mail privé</label><input type="email" name="email_prive" value="{{ old('email_prive', $student->email_prive) }}"></div>
         <div class="sis-fld"><label>Telefoon</label><input type="text" name="telefoon" value="{{ old('telefoon', $student->telefoon) }}"></div>
         <div class="sis-fld-row sis-fld-row--21">
-          <div class="sis-fld"><label>Adres</label><input type="text" name="adres" value="{{ old('adres', $student->adres) }}"></div>
-          <div class="sis-fld"><label>Postcode</label><input type="text" name="postcode" value="{{ old('postcode', $student->postcode) }}"></div>
+          <div class="sis-fld"><label>Straat</label><input type="text" name="adres" value="{{ old('adres', $student->adres) }}"></div>
+          <div class="sis-fld"><label>Huisnummer</label><input type="text" name="huisnummer" value="{{ old('huisnummer', $student->huisnummer) }}"></div>
         </div>
-        <div class="sis-fld"><label>Woonplaats</label><input type="text" name="woonplaats" value="{{ old('woonplaats', $student->woonplaats) }}"></div>
+        <div class="sis-fld-row sis-fld-row--2">
+          <div class="sis-fld"><label>Postcode</label><input type="text" name="postcode" value="{{ old('postcode', $student->postcode) }}"></div>
+          <div class="sis-fld"><label>Stad</label><input type="text" name="woonplaats" value="{{ old('woonplaats', $student->woonplaats) }}"></div>
+        </div>
+        <div class="sis-fld-row sis-fld-row--2">
+          <div class="sis-fld"><label>Provincie</label><input type="text" name="provincie" value="{{ old('provincie', $student->provincie) }}"></div>
+          <div class="sis-fld"><label>Land</label>
+            <select name="land_id">
+              <option value="">— niet bekend —</option>
+              @foreach (App\Models\Land::orderBy('naam')->get() as $land)
+                <option value="{{ $land->id }}" @selected(old('land_id', $student->land_id) == $land->id)>{{ $land->naam }}</option>
+              @endforeach
+            </select>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="sis-card sis-form">
+      <fieldset class="sis-fieldset">
+        <legend>Vooropleiding</legend>
+        <div class="sis-fld"><label>Hoogst behaalde diploma</label><input type="text" name="diploma" value="{{ old('diploma', $student->diploma) }}"></div>
+        <div class="sis-fld"><label>Naam onderwijsinstelling vorige opleiding</label><input type="text" name="vorige_instelling" value="{{ old('vorige_instelling', $student->vorige_instelling) }}"></div>
+        <div class="sis-fld-row sis-fld-row--2">
+          <div class="sis-fld"><label>Afstudeerjaar</label><input type="text" name="afstudeerjaar" inputmode="numeric" placeholder="bv. 2024" value="{{ old('afstudeerjaar', $student->afstudeerjaar) }}"></div>
+          <div class="sis-fld"><label>Opleidingsrichting (vrij)</label><input type="text" name="vooropleiding" value="{{ old('vooropleiding', $student->vooropleiding) }}"></div>
+        </div>
       </fieldset>
     </div>
   </div>

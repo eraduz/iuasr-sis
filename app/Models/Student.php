@@ -40,6 +40,11 @@ class Student extends Model
         'email_prive',
         'vooropleiding',
         'diploma',
+        'huisnummer',
+        'provincie',
+        'vorige_instelling',
+        'afstudeerjaar',
+        'documenten_later',
         'taal_nederlands',
         'taal_arabisch',
         'nt2_examen_vereist',
@@ -58,6 +63,7 @@ class Student extends Model
             'taal_arabisch' => \App\Enums\TaalNiveau::class,
             'nt2_examen_vereist' => 'boolean',
             'nt2_behaald_op' => 'date',
+            'documenten_later' => 'boolean',
             // Gevoelige velden: versleuteld opgeslagen (AVG).
             'bsn' => VersleuteldGevoeligVeld::class,
             'rekeningnummer' => VersleuteldGevoeligVeld::class,
@@ -80,6 +86,12 @@ class Student extends Model
     public function notities(): HasMany
     {
         return $this->hasMany(StudentNotitie::class)->latest();
+    }
+
+    /** Ontvangen documenten (identiteitsbewijs, diploma, cijferlijst, pasfoto, ...). */
+    public function documenten(): HasMany
+    {
+        return $this->hasMany(StudentDocument::class)->latest();
     }
 
     public function nationaliteit(): BelongsTo

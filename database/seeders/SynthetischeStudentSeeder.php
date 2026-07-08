@@ -93,5 +93,8 @@ class SynthetischeStudentSeeder extends Seeder
             $student->update(['nt2_examen_vereist' => true, 'nt2_behaald_op' => $cfg['behaald']]);
             $student->inschrijvingen()->update(['inschrijfdatum' => $cfg['inschrijf']]);
         }
+
+        // Documenten-later (demo): enkele studenten leveren diploma/cijferlijst nog aan.
+        Student::whereIn('studentnummer', ['261005', '261009'])->update(['documenten_later' => true]);
     }
 }

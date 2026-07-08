@@ -59,6 +59,23 @@
         @if ($nt2->count() > 4)<p class="sis-muted" style="font-size:12px;margin:8px 2px 0;">+ {{ $nt2->count() - 4 }} meer…</p>@endif
       @endif
     </div>
+
+    <div class="sis-card">
+      <div class="sis-card__hd"><h3>Documenten later</h3>@if ($docLater->isNotEmpty())<span class="hint">{{ $docLater->count() }} student(en)</span>@endif</div>
+      @if ($docLater->isEmpty())
+        <p class="sis-muted" style="font-size:13px;margin:0;">Geen openstaande documentaanleveringen.</p>
+      @else
+        <ul class="iuasr-dash-log" style="margin:0;">
+          @foreach ($docLater->take(5) as $s)
+            <li>
+              <a href="{{ route('studenten.show', $s) }}#documenten"><b>{{ $s->volledigeNaam() }}</b> · {{ $s->studentnummer }}</a>
+              <time>diploma of benodigde documenten worden later aangeleverd</time>
+            </li>
+          @endforeach
+        </ul>
+        @if ($docLater->count() > 5)<p class="sis-muted" style="font-size:12px;margin:8px 2px 0;">+ {{ $docLater->count() - 5 }} meer…</p>@endif
+      @endif
+    </div>
   </div>
 
 @elseif ($rol === App\Enums\Rol::Financien)
