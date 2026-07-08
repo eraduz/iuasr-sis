@@ -6,8 +6,14 @@ use App\Models\Inschrijving;
 use App\Models\Klas;
 use App\Models\Opleiding;
 use App\Models\Periode;
+use App\Support\AuditLogger;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Rapporten — de web-opvolger van de oude Access-rapporten. In deze fase is de
@@ -23,6 +29,85 @@ class RapportController extends Controller
         $klassen = Klas::with('opleiding')->orderBy('code')->get();
 
         return view('rapporten.index', compact('opleidingen', 'perioden', 'klassen'));
+    }
+
+    /**
+     * Excel-export van ALLE actief ingeschreven studenten met alle gegevens
+     * behalve het BSN. Het IBAN-rekeningnummer wordt WÉL opgenomen (boekhouding
+     * en facturatie). Waarden worden als tekst weggeschreven zodat IBAN,
+     * telefoon en postcode niet worden verminkt. De export wordt gelogd.
+     */
+    public function actieveStudentenExport(): StreamedResponse
+    {
+        $inschrijvingen = Inschrijving::query()
+            ->with(['student.nationaliteit', 'student.land', 'opleiding', 'klas', 'periode'])
+            ->where('status', 'actief')
+            ->get()
+            ->sortBy(fn ($i) => $i->student->studentnummer)
+            ->values();
+
+        $kolommen = [
+            'Studentnummer', 'Voornaam', 'Tussenvoegsel', 'Achternaam', 'Geboortedatum', 'Geboorteplaats',
+            'Geslacht', 'Nationaliteit', 'E-mail (IUASR)', 'E-mail privé', 'Telefoon',
+            'Straat', 'Huisnummer', 'Postcode', 'Stad', 'Provincie', 'Land', 'IBAN',
+            'Hoogst behaalde diploma', 'Onderwijsinstelling', 'Afstudeerjaar',
+            'Nederlandse taal', 'Arabische taal', 'NT2 vereist', 'NT2 behaald op',
+            'Opleiding', 'Klas', 'Leerjaar', 'Studiejaar', 'Inschrijfdatum', 'Status',
+        ];
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Actieve studenten');
+
+        foreach ($kolommen as $i => $kop) {
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($i + 1).'1', $kop);
+        }
+        $laatsteKolom = Coordinate::stringFromColumnIndex(count($kolommen));
+        $sheet->getStyle('A1:'.$laatsteKolom.'1')->getFont()->setBold(true);
+
+        $rij = 2;
+        foreach ($inschrijvingen as $insch) {
+            $s = $insch->student;
+            $waarden = [
+                $s->studentnummer, $s->voornaam, $s->tussenvoegsel, $s->achternaam,
+                $s->geboortedatum?->format('d-m-Y'), $s->geboorteplaats, $s->geslacht,
+                $s->nationaliteit?->naam, $s->email, $s->email_prive, $s->telefoon,
+                $s->adres, $s->huisnummer, $s->postcode, $s->woonplaats, $s->provincie, $s->land?->naam,
+                $s->rekeningnummer, // IBAN — versleuteld opgeslagen, hier ontsleuteld voor boekhouding
+                $s->diploma, $s->vorige_instelling, $s->afstudeerjaar,
+                $s->taal_nederlands?->label(), $s->taal_arabisch?->label(),
+                $s->nt2_examen_vereist ? 'Ja' : 'Nee', $s->nt2_behaald_op?->format('d-m-Y'),
+                $insch->opleiding?->naam, $insch->klas?->code, $insch->leerjaar,
+                $insch->periode?->naam, $insch->inschrijfdatum?->format('d-m-Y'), $insch->status->label(),
+                // BSN wordt bewust NIET geëxporteerd.
+            ];
+            $kol = 1;
+            foreach ($waarden as $waarde) {
+                $sheet->setCellValueExplicit(
+                    Coordinate::stringFromColumnIndex($kol).$rij,
+                    (string) ($waarde ?? ''),
+                    DataType::TYPE_STRING,
+                );
+                $kol++;
+            }
+            $rij++;
+        }
+
+        foreach (range(1, count($kolommen)) as $c) {
+            $sheet->getColumnDimension(Coordinate::stringFromColumnIndex($c))->setAutoSize(true);
+        }
+
+        AuditLogger::log(AuditLogger::UITGIFTE, 'ActieveStudentenExport', veld: 'export', context: [
+            'aantal' => $inschrijvingen->count(), 'bevat_iban' => true, 'bevat_bsn' => false,
+        ]);
+
+        $bestandsnaam = 'actieve-studenten-'.now()->format('Ymd-Hi').'.xlsx';
+
+        return response()->streamDownload(function () use ($spreadsheet) {
+            (new Xlsx($spreadsheet))->save('php://output');
+        }, $bestandsnaam, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
     }
 
     /** Klassenlijst: alle studenten per opleiding/periode/klas — geen cijfers. */

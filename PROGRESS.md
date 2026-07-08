@@ -56,6 +56,11 @@ opleverpunt aantoonbaar klaar is.
     heet "Alle studenten".
   - 27 tests groen (rolscheiding, lifecycle, mutatie, verklaring, beheer, notities,
     studentenlijst-filter); alle schermen live geverifieerd.
+  - Excel-export (Rapporten): alle ACTIEF ingeschreven studenten met alle
+    gegevens in .xlsx (PhpSpreadsheet), inclusief IBAN voor boekhouding/facturatie
+    en ZONDER BSN. Waarden als tekst (IBAN/telefoon/postcode blijven intact).
+    Toegang: Studentenzaken, Financiën, Beheerder; export gelogd. Ook een knop op
+    het Financiën-scherm.
   - Bulk-inschrijving: CSV-export van het aanmeldportaal in bulk inschrijven
     (Studentenzaken/Beheerder). Header-gebaseerde kolomherkenning (tolerant voor
     `;`/`,` en Nederlandse kopnamen), controlestap (wat wordt ingeschreven / wat

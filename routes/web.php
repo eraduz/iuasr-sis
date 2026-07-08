@@ -58,6 +58,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/ondertekende-documenten/{document}/waarmerk', [OndertekeningController::class, 'downloadWaarmerk'])->name('ondertekening.waarmerk');
     });
 
+    // Actieve-studenten Excel-export (incl. IBAN, zonder BSN) — Studentenzaken, Financiën, Beheer
+    Route::middleware('rol:studentenzaken,financien,beheerder')->group(function () {
+        Route::get('/rapporten/actieve-studenten.xlsx', [RapportController::class, 'actieveStudentenExport'])->name('rapporten.actieve-studenten');
+    });
+
     // --- Studenten inzien: SZ, Beheerder, Examencommissie, Directie ---
     Route::middleware('rol:studentenzaken,beheerder,examencommissie,directie')->group(function () {
         Route::get('/studenten', [StudentController::class, 'index'])->name('studenten.index');

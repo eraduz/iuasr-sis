@@ -10,6 +10,9 @@
     <h1>Betalingen &amp; achterstand</h1>
     <div class="summary">Registreer betalingen en zie welke studenten een openstaande schuld hebben</div>
   </div>
+  <div class="iuasr-dash-vhead__actions">
+    <a class="iuasr-dash-btn" href="{{ route('rapporten.actieve-studenten') }}">Studenten-export (Excel, incl. IBAN)</a>
+  </div>
 </div>
 
 <div class="iuasr-dash-stats" style="grid-template-columns:repeat(3,1fr);">
