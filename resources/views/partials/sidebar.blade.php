@@ -93,6 +93,7 @@
         ],
         Rol::Beheerder->value => [
             'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
+            'Studenten' => [['Alle studenten', 'studenten.index', 'students', 'studenten.*']],
             'Beheer' => [
                 ['Gebruikers & rollen', 'gebruikers', 'users', 'gebruikers'],
                 ['Opzoektabellen', 'opzoektabellen', 'db', 'opzoektabellen'],
