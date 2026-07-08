@@ -91,16 +91,24 @@ class OndertekeningTest extends TestCase
         $file = UploadedFile::fake()->create('brief.pdf', 50, 'application/pdf');
         $bytes = (string) file_get_contents($file->getRealPath());
 
-        $this->actingAs($this->sz)->post(route('ondertekening.onderteken'), [
+        $response = $this->actingAs($this->sz)->post(route('ondertekening.onderteken'), [
             'titel' => 'Toelatingsbrief', 'ontvanger' => 'Gemeente Rotterdam', 'bestand' => $file,
-        ])->assertRedirect(route('ondertekening'));
+        ]);
 
         $doc = OndertekendDocument::where('type', 'upload')->firstOrFail();
+        $response->assertRedirect(route('ondertekening.klaar', $doc)); // resultaatscherm
         $this->assertSame('Toelatingsbrief', $doc->titel);
         $this->assertSame('Gemeente Rotterdam', $doc->ontvanger);
         $this->assertSame(hash('sha256', $bytes), $doc->sha256); // hash van het origineel
         Storage::disk('local')->assertExists($doc->pad);
         Storage::disk('local')->assertExists($doc->waarmerk_pad);
+
+        // Resultaatscherm toont beide bestanden.
+        $this->actingAs($this->sz)->get(route('ondertekening.klaar', $doc))
+            ->assertOk()
+            ->assertSee($doc->code)
+            ->assertSee('Origineel downloaden')
+            ->assertSee('Waarmerk downloaden');
 
         // Origineel én waarmerk zijn te downloaden.
         $this->actingAs($this->sz)->get(route('ondertekening.download', $doc))->assertOk();

@@ -17,6 +17,10 @@
     @csrf
     <fieldset class="sis-fieldset">
       <legend>Te ondertekenen document</legend>
+      <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-bottom:14px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/></svg>
+        <span>Uw origineel wordt <b>niet gewijzigd</b>. U krijgt <b>twee bestanden</b> terug: uw origineel én een apart digitaal <b>waarmerk-certificaat</b>.</span>
+      </div>
       @if ($errors->any())
         <div class="iuasr-dash-alert iuasr-dash-alert--danger" style="margin-bottom:12px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/></svg><span>{{ $errors->first() }}</span></div>
       @endif

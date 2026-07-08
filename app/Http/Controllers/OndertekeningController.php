@@ -61,8 +61,15 @@ class OndertekeningController extends Controller
             'code' => $doc->code, 'ontvanger' => $data['ontvanger'], 'type' => 'upload',
         ]);
 
-        return redirect()->route('ondertekening')
-            ->with('status', 'Document gewaarmerkt met verificatiecode '.$doc->code.'.');
+        // Resultaatscherm: legt uit dat het origineel bewaard blijft en toont
+        // beide bestanden (origineel + waarmerk) met de verificatiecode.
+        return redirect()->route('ondertekening.klaar', $doc);
+    }
+
+    /** Resultaatscherm na het ondertekenen: origineel + waarmerk naast elkaar. */
+    public function klaar(OndertekendDocument $document): View
+    {
+        return view('ondertekening.klaar', compact('document'));
     }
 
     /** Waarmerk-certificaat van een geüpload document downloaden (gelogd). */

@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
         // Eigen PDF uploaden en laten waarmerken.
         Route::get('/ondertekende-documenten/uploaden', [OndertekeningController::class, 'uploadForm'])->name('ondertekening.uploaden');
         Route::post('/ondertekende-documenten/ondertekenen', [OndertekeningController::class, 'onderteken'])->name('ondertekening.onderteken');
+        Route::get('/ondertekende-documenten/{document}/klaar', [OndertekeningController::class, 'klaar'])->name('ondertekening.klaar');
         Route::get('/ondertekende-documenten/{document}/download', [OndertekeningController::class, 'download'])->name('ondertekening.download');
         Route::get('/ondertekende-documenten/{document}/waarmerk', [OndertekeningController::class, 'downloadWaarmerk'])->name('ondertekening.waarmerk');
     });
