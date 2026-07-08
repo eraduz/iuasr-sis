@@ -47,49 +47,66 @@
 
 {{-- PANEEL: Persoonsgegevens --}}
 <section class="sis-tabpanel is-active" data-panel="persoon">
-  <div class="sis-grid-2">
-    <div class="sis-card">
-      <div class="sis-card__hd"><h3>Persoonsgegevens</h3><span class="hint">Bron: inschrijving</span></div>
-      <dl class="sis-dl">
-        <dt>Volledige naam</dt><dd><b>{{ $student->volledigeNaam() }}</b></dd>
-        <dt>Geboortedatum</dt><dd>{{ $student->geboortedatum?->format('d-m-Y') ?? '—' }}</dd>
-        <dt>Geboorteplaats</dt><dd>{{ $student->geboorteplaats ?? '—' }}</dd>
-        <dt>Nationaliteit</dt><dd>{{ $student->nationaliteit?->naam ?? '—' }}</dd>
-        <dt>BSN</dt><dd>
-          <span class="sis-masked" id="bsn-field">
-            <span id="bsn-value">••••••••</span>
-            @if ($magBsn)
-              <button class="reveal" type="button" id="bsn-toggle" data-url="{{ route('studenten.bsn', $student) }}">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
-                Tonen
-              </button>
+
+  {{-- Acties — bovenaan, direct bereikbaar --}}
+  @if (auth()->user()->magInschrijvingBeheren())
+    <div class="sis-card" style="margin-bottom:16px;">
+      <div class="sis-card__hd"><h3>Acties</h3></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('studenten.edit', $student) }}">Wijzig gegevens</a>
+        @if ($financieel['achterstand'])
+          <span class="iuasr-dash-btn iuasr-dash-btn--sm" aria-disabled="true" title="Geblokkeerd wegens betalingsachterstand" style="opacity:.5;cursor:not-allowed;">Herinschrijven (geblokkeerd)</span>
+          <span class="iuasr-dash-btn iuasr-dash-btn--sm" aria-disabled="true" title="Geblokkeerd wegens betalingsachterstand" style="opacity:.5;cursor:not-allowed;">Verklaring (geblokkeerd)</span>
+        @else
+          <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('herinschrijven.form', $student) }}">Herinschrijven</a>
+          <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('verklaringen', ['student' => $student->id]) }}">Verklaring</a>
+        @endif
+        @if ($huidige)
+          {{-- Schorsen / opheffen met één klik --}}
+          <form method="POST" action="{{ route('studenten.schors', $student) }}" style="display:inline;">
+            @csrf
+            @if ($huidige->status === App\Enums\InschrijvingStatus::Geschorst)
+              <button type="submit" class="iuasr-dash-btn iuasr-dash-btn--sm">Schorsing opheffen</button>
             @else
-              <span class="sis-shield"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> afgeschermd</span>
+              <button type="submit" class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger">Schorsen</button>
             @endif
-          </span>
-        </dd>
-      </dl>
-      <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-top:14px;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span>Het BSN is <b>versleuteld opgeslagen</b> en wordt gemaskeerd getoond. Tonen wordt <b>gelogd</b> in de audit-log. Het BSN wordt nooit geëxporteerd.</span>
+          </form>
+          @if ($huidige->status !== App\Enums\InschrijvingStatus::Uitgeschreven)
+            <a class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" href="{{ route('uitschrijven.form', $student) }}">Uitschrijven</a>
+          @endif
+        @endif
       </div>
     </div>
+  @endif
+
+  <div class="sis-grid-2" style="align-items:start;">
+    {{-- Linkerkolom --}}
     <div>
       <div class="sis-card">
-        <div class="sis-card__hd"><h3>Contact</h3></div>
+        <div class="sis-card__hd"><h3>Persoonsgegevens</h3><span class="hint">Bron: inschrijving</span></div>
         <dl class="sis-dl">
-          <dt>E-mail (IUASR)</dt><dd>{{ $student->email ?? '—' }}</dd>
-          <dt>E-mail privé</dt><dd>{{ $student->email_prive ?? '—' }}</dd>
-          <dt>Telefoon</dt><dd>{{ $student->telefoon ?? '—' }}</dd>
-          <dt>Adres</dt><dd>
-            {{ trim(($student->adres ?? '').' '.($student->huisnummer ?? '')) ?: '—' }}
-            @if($student->postcode || $student->woonplaats)<br>{{ trim(($student->postcode ?? '').' '.($student->woonplaats ?? '')) }}@endif
-            @if($student->provincie || $student->land)<br><span class="sis-muted">{{ trim(($student->provincie ?? '').(($student->provincie && $student->land) ? ' · ' : '').($student->land?->naam ?? '')) }}</span>@endif
+          <dt>Volledige naam</dt><dd><b>{{ $student->volledigeNaam() }}</b></dd>
+          <dt>Geboortedatum</dt><dd>{{ $student->geboortedatum?->format('d-m-Y') ?? '—' }}</dd>
+          <dt>Geboorteplaats</dt><dd>{{ $student->geboorteplaats ?? '—' }}</dd>
+          <dt>Nationaliteit</dt><dd>{{ $student->nationaliteit?->naam ?? '—' }}</dd>
+          <dt>BSN</dt><dd>
+            <span class="sis-masked" id="bsn-field">
+              <span id="bsn-value">••••••••</span>
+              @if ($magBsn)
+                <button class="reveal" type="button" id="bsn-toggle" data-url="{{ route('studenten.bsn', $student) }}">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                  Tonen
+                </button>
+              @else
+                <span class="sis-shield"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> afgeschermd</span>
+              @endif
+            </span>
           </dd>
-          @if (auth()->user()->magInschrijvingBeheren())
-            <dt>IBAN</dt><dd>{{ $student->rekeningnummer ?? '—' }} <span class="sis-muted" style="font-size:11px;">· versleuteld</span></dd>
-          @endif
         </dl>
+        <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-top:14px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>Het BSN is <b>versleuteld opgeslagen</b> en wordt gemaskeerd getoond. Tonen wordt <b>gelogd</b> in de audit-log. Het BSN wordt nooit geëxporteerd.</span>
+        </div>
       </div>
 
       <div class="sis-card" style="margin-top:16px;">
@@ -114,6 +131,26 @@
               @default<span class="sis-muted">Niet vereist</span>
             @endswitch
           </dd>
+        </dl>
+      </div>
+    </div>
+
+    {{-- Rechterkolom --}}
+    <div>
+      <div class="sis-card">
+        <div class="sis-card__hd"><h3>Contact</h3></div>
+        <dl class="sis-dl">
+          <dt>E-mail (IUASR)</dt><dd>{{ $student->email ?? '—' }}</dd>
+          <dt>E-mail privé</dt><dd>{{ $student->email_prive ?? '—' }}</dd>
+          <dt>Telefoon</dt><dd>{{ $student->telefoon ?? '—' }}</dd>
+          <dt>Adres</dt><dd>
+            {{ trim(($student->adres ?? '').' '.($student->huisnummer ?? '')) ?: '—' }}
+            @if($student->postcode || $student->woonplaats)<br>{{ trim(($student->postcode ?? '').' '.($student->woonplaats ?? '')) }}@endif
+            @if($student->provincie || $student->land)<br><span class="sis-muted">{{ trim(($student->provincie ?? '').(($student->provincie && $student->land) ? ' · ' : '').($student->land?->naam ?? '')) }}</span>@endif
+          </dd>
+          @if (auth()->user()->magInschrijvingBeheren())
+            <dt>IBAN</dt><dd>{{ $student->rekeningnummer ?? '—' }} <span class="sis-muted" style="font-size:11px;">· versleuteld</span></dd>
+          @endif
         </dl>
       </div>
 
@@ -251,36 +288,6 @@
     </div>
   @endif
 
-  {{-- Acties — direct beschikbaar bij de persoonsgegevens --}}
-  @if (auth()->user()->magInschrijvingBeheren())
-    <div class="sis-card" style="margin-top:16px;">
-      <div class="sis-card__hd"><h3>Acties</h3></div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('studenten.edit', $student) }}">Wijzig gegevens</a>
-        @if ($financieel['achterstand'])
-          <span class="iuasr-dash-btn iuasr-dash-btn--sm" aria-disabled="true" title="Geblokkeerd wegens betalingsachterstand" style="opacity:.5;cursor:not-allowed;">Herinschrijven (geblokkeerd)</span>
-          <span class="iuasr-dash-btn iuasr-dash-btn--sm" aria-disabled="true" title="Geblokkeerd wegens betalingsachterstand" style="opacity:.5;cursor:not-allowed;">Verklaring (geblokkeerd)</span>
-        @else
-          <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('herinschrijven.form', $student) }}">Herinschrijven</a>
-          <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('verklaringen', ['student' => $student->id]) }}">Verklaring</a>
-        @endif
-        @if ($huidige)
-          {{-- Schorsen / opheffen met één klik --}}
-          <form method="POST" action="{{ route('studenten.schors', $student) }}" style="display:inline;">
-            @csrf
-            @if ($huidige->status === App\Enums\InschrijvingStatus::Geschorst)
-              <button type="submit" class="iuasr-dash-btn iuasr-dash-btn--sm">Schorsing opheffen</button>
-            @else
-              <button type="submit" class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger">Schorsen</button>
-            @endif
-          </form>
-          @if ($huidige->status !== App\Enums\InschrijvingStatus::Uitgeschreven)
-            <a class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" href="{{ route('uitschrijven.form', $student) }}">Uitschrijven</a>
-          @endif
-        @endif
-      </div>
-    </div>
-  @endif
 </section>
 
 {{-- PANEEL: Inschrijving --}}
