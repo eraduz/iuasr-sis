@@ -77,7 +77,10 @@ class VerklaringController extends Controller
         }
 
         $verklaring = $this->bouw($student, $data['type']);
-        $html = view('pdf.verklaring', ['student' => $student, 'verklaring' => $verklaring, 'type' => $data['type']])->render();
+        $html = view('pdf.verklaring', [
+            'student' => $student, 'verklaring' => $verklaring, 'type' => $data['type'],
+            'ondertekenaar' => auth()->user()->naam,
+        ])->render();
 
         $doc = Documentondertekening::ondertekenHtml($html, [
             'type' => 'verklaring:'.$data['type'],

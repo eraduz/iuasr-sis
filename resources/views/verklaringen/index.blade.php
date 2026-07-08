@@ -6,6 +6,13 @@
 <style>
   .verk-layout { display: grid; grid-template-columns: 300px 1fr; gap: 18px; align-items: start; }
   @media (max-width: 980px) { .verk-layout { grid-template-columns: 1fr; } }
+  /* Bij printen alleen het A4-document tonen. */
+  @media print {
+    .iuasr-dash-vhead, .verk-side { display: none !important; }
+    .verk-layout { display: block !important; }
+    .sis-paper-stage { padding: 0 !important; background: #fff !important; border: 0 !important; }
+    .sis-a4 { box-shadow: none !important; margin: 0 auto !important; }
+  }
 </style>
 @endpush
 
@@ -40,7 +47,7 @@
 @error('ontvanger')<div class="iuasr-dash-alert iuasr-dash-alert--danger" style="margin-bottom:12px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/></svg><span>{{ $message }}</span></div>@enderror
 
 <div class="verk-layout">
-  <div>
+  <div class="verk-side">
     <div class="sis-card" style="margin-bottom:16px;">
       <div class="sis-card__hd"><h3>Student</h3></div>
 
@@ -119,7 +126,7 @@
       <div class="sis-a4" style="min-height:auto;">
         <div class="sis-a4__head">
           <img src="{{ asset('assets/img/logo-dark.png') }}" alt="IUASR">
-          <div class="org"><b>Islamic University of Applied Sciences Rotterdam</b>Bureau Studentenzaken<br>Postbus 12345 · 3000 AB Rotterdam<br>szaken@iuasr.nl</div>
+          <div class="org"><b>Islamic University of Applied Sciences Rotterdam</b>Bergsingel 135 · 3037 GC Rotterdam<br>Tel: +31 (0)10 485 47 21<br>szaken@iuasr.nl</div>
         </div>
         <h1>{{ $verklaring['title'] }}</h1>
         <p class="doc-sub">{{ $verklaring['sub'] }}</p>

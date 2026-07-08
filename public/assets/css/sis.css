@@ -411,7 +411,7 @@
   gap: 20px; padding-bottom: 14px; border-bottom: 2px solid var(--priColor100);
   margin-bottom: 20px;
 }
-.sis-a4__head img { height: 46px; width: auto; }
+.sis-a4__head img { height: 72px; width: auto; }
 .sis-a4__head .org { text-align: right; font-size: 9.5pt; color: var(--blackAltText); line-height: 1.45; }
 .sis-a4__head .org b { color: var(--priColor100); font-weight: 500; display: block; }
 .sis-a4 h1 {
