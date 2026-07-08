@@ -9,8 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
 {{-- Leidend design system (IUASR/iuasr-sis). Laadvolgorde: sis.css → plugin-dash.css --}}
-<link rel="stylesheet" href="{{ asset('assets/css/sis.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/css/iuasr-plugin-dash.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/sis.css') }}?v={{ filemtime(public_path('assets/css/sis.css')) }}">
+<link rel="stylesheet" href="{{ asset('assets/css/iuasr-plugin-dash.css') }}?v={{ filemtime(public_path('assets/css/iuasr-plugin-dash.css')) }}">
 @stack('head')
 </head>
 <body data-role="{{ auth()->user()?->rol?->value }}">

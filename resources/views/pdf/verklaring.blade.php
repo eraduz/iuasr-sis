@@ -32,7 +32,7 @@
 <body>
   <table class="head">
     <tr>
-      <td>@if ($logo)<img src="{{ $logo }}" alt="IUASR" style="height:72px;">@else<b style="font-size:14pt;">IUASR</b>@endif</td>
+      <td>@if ($logo)<img src="{{ $logo }}" alt="IUASR" style="height:144px;">@else<b style="font-size:14pt;">IUASR</b>@endif</td>
       <td class="org">
         <b>Islamic University of Applied Sciences Rotterdam</b>
         Bergsingel 135 &middot; 3037 GC Rotterdam<br>
