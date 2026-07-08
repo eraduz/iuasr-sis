@@ -30,10 +30,16 @@ class BetalingController extends Controller
             ->sortByDesc(fn ($r) => $r['status']['openstaand'])
             ->values();
 
-        // Studenten die teveel hebben betaald (terugbetaling).
+        // Studenten die teveel hebben betaald (terugbetaling) — inschrijving beëindigd.
         $terugbetalingen = $alle
             ->filter(fn ($r) => $r['status']['terugbetaling'] > 0)
             ->sortByDesc(fn ($r) => $r['status']['terugbetaling'])
+            ->values();
+
+        // Nog ingeschreven studenten met een tegoed (teveel betaald, geen terugbetaling).
+        $vooruitbetalingen = $alle
+            ->filter(fn ($r) => $r['status']['vooruitbetaald'] > 0)
+            ->sortByDesc(fn ($r) => $r['status']['vooruitbetaald'])
             ->values();
 
         $resultaten = $zoek !== ''
@@ -43,7 +49,7 @@ class BetalingController extends Controller
                 ->orderBy('studentnummer')->limit(20)->get()
             : collect();
 
-        return view('financien.index', compact('achterstanden', 'terugbetalingen', 'resultaten', 'zoek'));
+        return view('financien.index', compact('achterstanden', 'terugbetalingen', 'vooruitbetalingen', 'resultaten', 'zoek'));
     }
 
     public function student(Student $student): View

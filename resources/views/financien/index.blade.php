@@ -15,9 +15,10 @@
   </div>
 </div>
 
-<div class="iuasr-dash-stats" style="grid-template-columns:repeat(3,1fr);">
+<div class="iuasr-dash-stats" style="grid-template-columns:repeat(4,1fr);">
   <div class="iuasr-dash-stat iuasr-dash-stat--alert"><span class="lbl">Studenten met achterstand</span><span class="val">{{ $achterstanden->count() }}</span><span class="delta">€ {{ number_format($achterstanden->sum(fn($r)=>$r['status']['openstaand']), 0, ',', '.') }} openstaand</span></div>
-  <div class="iuasr-dash-stat"><span class="lbl">Terugbetalingen</span><span class="val">{{ $terugbetalingen->count() }}</span><span class="delta">€ {{ number_format($terugbetalingen->sum(fn($r)=>$r['status']['terugbetaling']), 0, ',', '.') }} teveel betaald</span></div>
+  <div class="iuasr-dash-stat"><span class="lbl">Tegoed (vooruitbetaald)</span><span class="val">{{ $vooruitbetalingen->count() }}</span><span class="delta">€ {{ number_format($vooruitbetalingen->sum(fn($r)=>$r['status']['vooruitbetaald']), 0, ',', '.') }} teveel betaald · nog ingeschreven</span></div>
+  <div class="iuasr-dash-stat"><span class="lbl">Terugbetalingen</span><span class="val">{{ $terugbetalingen->count() }}</span><span class="delta">€ {{ number_format($terugbetalingen->sum(fn($r)=>$r['status']['terugbetaling']), 0, ',', '.') }} · inschrijving beëindigd</span></div>
   <div class="iuasr-dash-stat iuasr-dash-stat--ok"><span class="lbl">Berekening</span><span class="val" style="font-size:15px;line-height:2;">Pro rata</span><span class="delta">jaartarief ÷ 12 × maanden</span></div>
 </div>
 
@@ -109,6 +110,30 @@
               <td class="tnum">€ {{ number_format($st['verschuldigd'], 2, ',', '.') }}</td>
               <td class="tnum">€ {{ number_format($st['betaald'], 2, ',', '.') }}</td>
               <td><span class="iuasr-dash-status s-submitted">€ {{ number_format($st['terugbetaling'], 2, ',', '.') }}</span></td>
+              <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('financien.student', $s) }}">Openen</a></td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+  </div>
+@endif
+
+@if ($vooruitbetalingen->isNotEmpty())
+  <div class="sis-card" style="margin-top:16px;">
+    <div class="sis-card__hd"><h3>Tegoed / vooruitbetaald</h3><span class="hint">nog ingeschreven · teveel betaald t.o.v. het pro rata verschuldigde bedrag</span></div>
+    <div class="iuasr-dash-tbl-card" style="border:0;">
+      <table class="iuasr-dash-tbl">
+        <thead><tr><th>Studentnr.</th><th>Naam</th><th>Verschuldigd</th><th>Betaald</th><th>Tegoed</th><th class="row-act"></th></tr></thead>
+        <tbody>
+          @foreach ($vooruitbetalingen as $r)
+            @php $s = $r['student']; $st = $r['status']; @endphp
+            <tr>
+              <td class="tnum">{{ $s->studentnummer }}</td>
+              <td class="nm">{{ $s->volledigeNaam() }}</td>
+              <td class="tnum">€ {{ number_format($st['verschuldigd'], 2, ',', '.') }}</td>
+              <td class="tnum">€ {{ number_format($st['betaald'], 2, ',', '.') }}</td>
+              <td><span class="iuasr-dash-status s-requested">€ {{ number_format($st['vooruitbetaald'], 2, ',', '.') }}</span></td>
               <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('financien.student', $s) }}">Openen</a></td>
             </tr>
           @endforeach

@@ -136,6 +136,21 @@ class FinancienTest extends TestCase
         $this->assertFalse($status['achterstand']);
     }
 
+    public function test_overzicht_toont_vooruitbetaalde_student(): void
+    {
+        $this->tarief(4000);
+        $student = Student::where('studentnummer', '261011')->first(); // actief
+        $insch = $student->inschrijvingen()->first();
+        $student->betalingen()->create([
+            'inschrijving_id' => $insch->id, 'bedrag' => 4000, 'datum' => '2025-09-15',
+        ]);
+
+        $this->actingAs($this->fin)->get(route('financien'))
+            ->assertOk()
+            ->assertSee('Tegoed / vooruitbetaald')
+            ->assertSee($student->volledigeNaam());
+    }
+
     public function test_studentenzaken_registreert_geen_betaling(): void
     {
         $this->actingAs($this->sz)->get(route('financien'))->assertForbidden();
