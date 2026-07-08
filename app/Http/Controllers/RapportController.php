@@ -110,6 +110,41 @@ class RapportController extends Controller
         ]);
     }
 
+    /**
+     * Leerjaar-herbeoordeling: per actieve student de behaalde EC t.o.v. de
+     * EC-overgangsdrempel van de opleiding, met overgangsadvies (positief /
+     * voorwaardelijk / negatief). Voor Examencommissie en Directie.
+     */
+    public function overgang(Request $request): View
+    {
+        $data = $request->validate([
+            'opleiding_id' => ['nullable', 'exists:opleidingen,id'],
+            'leerjaar' => ['nullable', 'integer', 'min:1', 'max:10'],
+        ]);
+
+        $opleidingen = Opleiding::orderBy('naam')->get();
+
+        $rijen = Inschrijving::query()
+            ->with(['student', 'opleiding'])
+            ->where('status', 'actief')
+            ->when($data['opleiding_id'] ?? null, fn ($q, $v) => $q->where('opleiding_id', $v))
+            ->when($data['leerjaar'] ?? null, fn ($q, $v) => $q->where('leerjaar', $v))
+            ->get()
+            ->sortBy(fn ($i) => $i->student->studentnummer)
+            ->map(fn ($i) => ['inschrijving' => $i, 'advies' => \App\Support\Overgangsbeoordeling::voor($i)])
+            ->values();
+
+        $telling = $rijen->groupBy(fn ($r) => $r['advies']['status'])->map->count();
+
+        return view('rapporten.overgang', [
+            'rijen' => $rijen,
+            'opleidingen' => $opleidingen,
+            'telling' => $telling,
+            'gekozenOpleiding' => $data['opleiding_id'] ?? null,
+            'gekozenLeerjaar' => $data['leerjaar'] ?? null,
+        ]);
+    }
+
     /** Klassenlijst: alle studenten per opleiding/periode/klas — geen cijfers. */
     public function klassenlijst(Request $request): View
     {

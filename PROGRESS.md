@@ -101,7 +101,7 @@ opleverpunt aantoonbaar klaar is.
     gevallen (verstreken / binnen 30 dagen / open) op urgentie gesorteerd.
   - Nog te doen: cijferrapport/tentamenlijst (na Fase 4), student toevoegen los
     van aanmelding is al mogelijk via inschrijven.
-- [~] **Fase 4 — Cijfers + rolscheiding** (increment 1 opgeleverd)
+- [x] **Fase 4 — Cijfers + rolscheiding** (afgerond, increment 1 t/m 6)
   - Genormaliseerde resultaatregels, docent-invoer eigen vak, server-side autorisatie.
   - Gedaan: docent → Mijn vakken + Cijferinvoer (grid met deelresultaten, weging,
     poging, vrijstelling; live gewogen eindcijfer, cesuur 5,5); EC-toekenning
@@ -131,8 +131,16 @@ opleverpunt aantoonbaar klaar is.
     aan de meest recente inschrijving, en toont een samenvatting (geïmporteerd /
     overgeslagen met reden per regel). Geen externe dependency (fgetcsv). 61
     tests groen.
-  - Nog te doen: leerjaar-herbeoordeling op EC-drempel (zodra per opleiding
-    ingevuld), herkansing als aparte poging (nu één rij per onderdeel).
+  - Increment 5: herkansing als APARTE poging in de cijferinvoer (per onderdeel
+    1e poging + herkansing als losse resultaatregels; beste telt voor eindcijfer
+    en EC).
+  - Increment 6: leerjaar-herbeoordeling / overgangsadvies. `Overgangsbeoordeling`
+    telt behaalde EC per student en toetst aan de EC-overgangsdrempel per
+    opleiding (positief / voorwaardelijk ≥75% / negatief). Rapport voor
+    Examencommissie en Directie, filterbaar op opleiding/leerjaar. EC-drempel
+    default 30 EC (landelijke BSA-norm vanaf 2026-2027), per opleiding aanpasbaar
+    via Opzoektabellen.
+  - Fase 4 afgerond. 87 tests groen.
 - [ ] **Fase 5 — Rapporten + documenten**
   - Cijferlijsten, overzichten, documentgeneratie.
 - [ ] **Fase 6 — Portaalkoppeling**

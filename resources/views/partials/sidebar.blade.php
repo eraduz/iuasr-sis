@@ -63,13 +63,19 @@
         Rol::Examencommissie->value => [
             'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
             'Studenten' => [['Alle studenten', 'studenten.index', 'students', 'studenten.*']],
-            'Cijfers' => [['Cijferoverzicht', 'cijferoverzicht', 'grade', 'cijferoverzicht']],
+            'Cijfers' => [
+                ['Cijferoverzicht', 'cijferoverzicht', 'grade', 'cijferoverzicht'],
+                ['Leerjaar-herbeoordeling', 'overgang', 'grade', 'overgang'],
+            ],
             'Rapporten' => [['Rapporten', 'rapporten.inzage', 'report', 'rapporten.inzage']],
         ],
         Rol::Directie->value => [
             'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
             'Studenten' => [['Studenten (beperkt)', 'studenten.index', 'students', 'studenten.*']],
-            'Cijfers' => [['Cijferoverzicht', 'cijferoverzicht', 'eye', 'cijferoverzicht']],
+            'Cijfers' => [
+                ['Cijferoverzicht', 'cijferoverzicht', 'eye', 'cijferoverzicht'],
+                ['Leerjaar-herbeoordeling', 'overgang', 'grade', 'overgang'],
+            ],
             'Rapporten' => [['Rapporten', 'rapporten.inzage', 'report', 'rapporten.inzage']],
             'Documenten' => [['Ondertekende documenten', 'ondertekening', 'cert', 'ondertekening*']],
         ],

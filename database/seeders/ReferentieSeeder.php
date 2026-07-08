@@ -54,16 +54,18 @@ class ReferentieSeeder extends Seeder
         $aydin = Docent::create(['code' => 'DOC-001', 'aanhef' => 'dr.', 'voornaam' => 'Yusuf', 'achternaam' => 'Aydın', 'email' => 'y.aydin@iuasr.nl']);
         Docent::create(['code' => 'DOC-002', 'aanhef' => 'dr.', 'voornaam' => 'Salima', 'achternaam' => 'Boujat', 'email' => 's.boujat@iuasr.nl']);
 
-        // Opleidingen — normen (voldoende_grens/ec_overgang_drempel) TE BEVESTIGEN → null.
+        // Opleidingen. voldoende_grens = 5,5. EC-overgangsdrempel voor bachelors:
+        // 30 EC (landelijke BSA-norm vanaf studiejaar 2026-2027) als vertrekpunt;
+        // per opleiding aan te passen conform de OER (Beheer → Opzoektabellen).
         $theologie = Opleiding::create([
             'faculteit_id' => $fiw->id, 'code' => 'ISLTH', 'naam' => 'Bachelor Islamitische Theologie',
             'soort' => 'bachelor', 'nominale_jaren' => 4, 'ec_totaal' => 240,
-            'voldoende_grens' => 5.5, 'ec_overgang_drempel' => null, 'actief' => true,
+            'voldoende_grens' => 5.5, 'ec_overgang_drempel' => 30, 'actief' => true,
         ]);
         Opleiding::create([
             'faculteit_id' => $foo->id, 'code' => 'PABO', 'naam' => 'PABO — Leraar Basisonderwijs',
             'soort' => 'bachelor', 'nominale_jaren' => 4, 'ec_totaal' => 240,
-            'voldoende_grens' => 5.5, 'ec_overgang_drempel' => null, 'actief' => true,
+            'voldoende_grens' => 5.5, 'ec_overgang_drempel' => 30, 'actief' => true,
         ]);
         Opleiding::create([
             'faculteit_id' => $fiw->id, 'code' => 'MGV', 'naam' => 'Master Isl. Geestelijke Verzorging',

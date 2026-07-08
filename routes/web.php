@@ -172,6 +172,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('rol:examencommissie,directie')->group(function () {
         Route::get('/cijferoverzicht', [CijferController::class, 'overzicht'])->name('cijferoverzicht');
         Route::get('/rapporten-inzage', [RapportController::class, 'index'])->name('rapporten.inzage');
+        // Leerjaar-herbeoordeling / overgangsadvies (EC t.o.v. drempel).
+        Route::get('/overgang', [RapportController::class, 'overgang'])->name('overgang');
     });
 
     // --- Alumni-rapport — Studentenzaken & Directie ---
