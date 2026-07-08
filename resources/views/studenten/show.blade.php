@@ -334,6 +334,22 @@
     </div>
   @endif
 
+  {{-- Gevaarlijke acties — uitsluitend Beheerder: student volledig verwijderen --}}
+  @if (auth()->user()->rol === App\Enums\Rol::Beheerder)
+    <div class="sis-card" style="margin-top:16px;border:1px solid var(--secColor100);">
+      <div class="sis-card__hd"><h3 style="color:var(--secColor100);">Student volledig verwijderen</h3><span class="hint">alleen voor foutieve records · Beheer</span></div>
+      <p class="sis-muted" style="font-size:13px;margin:0 0 12px;">
+        Verwijdert deze student en <b>alle</b> gekoppelde gegevens (inschrijvingen, cijfers, betalingen, documenten, notities, vrijstellingen) <b>onherstelbaar</b>. Ondertekende documenten blijven bewaard (losgekoppeld). Deze actie kan niet ongedaan worden gemaakt.
+      </p>
+      <form method="POST" action="{{ route('studenten.destroy', $student) }}" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;" onsubmit="return confirm('Weet u zeker dat u {{ $student->volledigeNaam() }} ({{ $student->studentnummer }}) VOLLEDIG en ONHERSTELBAAR wilt verwijderen?');">
+        @csrf
+        @method('DELETE')
+        <input type="text" name="bevestig_nummer" required autocomplete="off" placeholder="Typ {{ $student->studentnummer }} ter bevestiging" style="padding:8px 10px;border:1px solid var(--secColor100);border-radius:6px;min-width:220px;">
+        <button class="iuasr-dash-btn iuasr-dash-btn--sm" style="background:var(--secColor100);color:#fff;border-color:var(--secColor100);" type="submit">Definitief verwijderen</button>
+      </form>
+    </div>
+  @endif
+
 </section>
 
 {{-- PANEEL: Inschrijving --}}

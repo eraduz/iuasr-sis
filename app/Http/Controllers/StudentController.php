@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Rol;
 use App\Models\Student;
 use App\Models\StudentNotitie;
 use App\Support\AuditLogger;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
@@ -125,6 +127,40 @@ class StudentController extends Controller
         $kennistoetsen = \App\Support\Kennistoetsbewaking::voor($student);
 
         return view('studenten.show', compact('student', 'huidige', 'magCijfers', 'cijferVakken', 'financieel', 'vakHistorie', 'grondslagen', 'besluiten', 'kennistoetsen'));
+    }
+
+    /**
+     * Student VOLLEDIG en onherstelbaar verwijderen — uitsluitend Beheerder,
+     * bedoeld voor foutieve records. Alle gekoppelde gegevens (inschrijvingen,
+     * cijfers, betalingen, documenten, notities, vrijstellingen, kennistoetsen)
+     * cascaden mee; ondertekende documenten worden losgekoppeld (blijven bewaard).
+     * Dubbele beveiliging: bevestiging + exact studentnummer intypen.
+     */
+    public function destroy(Request $request, Student $student): RedirectResponse
+    {
+        abort_unless(auth()->user()->rol === Rol::Beheerder, 403);
+
+        $request->validate(['bevestig_nummer' => ['required', 'string']]);
+        if ($request->input('bevestig_nummer') !== $student->studentnummer) {
+            return back()->with('fout', 'Verwijderen afgebroken: het ingevoerde studentnummer komt niet overeen.');
+        }
+
+        // Fysieke documentbestanden van de private schijf verwijderen (DB-rijen cascaden).
+        foreach ($student->documenten as $document) {
+            if ($document->pad) {
+                Storage::disk('local')->delete($document->pad);
+            }
+        }
+
+        $nummer = $student->studentnummer;
+        AuditLogger::log(AuditLogger::VERWIJDERING, 'Student', $student->id, veld: 'student', context: [
+            'studentnummer' => $nummer, 'naam' => $student->volledigeNaam(),
+        ]);
+
+        $student->delete();
+
+        return redirect()->route('studenten.index')
+            ->with('status', "Student {$nummer} is volledig verwijderd.");
     }
 
     /** Muteren van persoonsgegevens (Studentenzaken/Beheerder). */

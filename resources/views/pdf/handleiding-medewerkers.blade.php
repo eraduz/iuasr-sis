@@ -60,7 +60,7 @@
     <tr><td><b>Directie</b></td><td>Instellingsbrede cijfers en rapporten inzien.</td></tr>
     <tr><td><b>Financiële Administratie</b></td><td>Collegegeldbetalingen registreren en achterstanden bewaken.</td></tr>
     <tr><td><b>Schoolbestuur</b></td><td>Kerncijfers en alle ondertekende documenten inzien.</td></tr>
-    <tr><td><b>Beheerder</b></td><td>Gebruikers/rollen, referentietabellen, audit-log en back-ups.</td></tr>
+    <tr><td><b>Beheerder</b></td><td>Gebruikers/rollen, referentietabellen, audit-log, back-ups en het volledig verwijderen van foutieve studentrecords.</td></tr>
   </table>
 
   <h2>4. Uw dashboard</h2>

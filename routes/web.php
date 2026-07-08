@@ -216,6 +216,9 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');
 
+        // Student VOLLEDIG verwijderen (foutieve records) — uitsluitend Beheerder.
+        Route::delete('/studenten/{student}', [StudentController::class, 'destroy'])->name('studenten.destroy');
+
         // Recovery-backup (versleutelde ZIP met database, applicatie en bestanden)
         Route::get('/beheer/backup', [App\Http\Controllers\BackupController::class, 'index'])->name('backup');
         Route::post('/beheer/backup', [App\Http\Controllers\BackupController::class, 'download'])->name('backup.download');
