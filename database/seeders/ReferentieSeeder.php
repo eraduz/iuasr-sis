@@ -98,12 +98,12 @@ class ReferentieSeeder extends Seeder
             'voldoende_grens' => 5.5, 'ec_overgang_drempel' => 30, 'actief' => true,
         ]);
         Opleiding::create([
-            'faculteit_id' => $fiw->id, 'code' => 'PMGV', 'naam' => 'Pre-Master Islamitisch Geestelijke Verzorging',
+            'faculteit_id' => $fiw->id, 'code' => 'PMGV', 'naam' => 'Pre-Master Islamitische Geestelijke Verzorging',
             'soort' => 'premaster', 'nominale_jaren' => 1, 'ec_totaal' => 60,
             'actief' => true,
         ]);
         Opleiding::create([
-            'faculteit_id' => $fiw->id, 'code' => 'MGV', 'naam' => 'Master Islamitisch Geestelijke Verzorging',
+            'faculteit_id' => $fiw->id, 'code' => 'MGV', 'naam' => 'Master Islamitische Geestelijke Verzorging',
             'soort' => 'master', 'nominale_jaren' => 2, 'ec_totaal' => 120,
             'voldoende_grens' => 5.5, 'ec_overgang_drempel' => null, 'actief' => true,
         ]);
