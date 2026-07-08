@@ -25,14 +25,32 @@ class ReferentieSeeder extends Seeder
         $fiw = Faculteit::create(['code' => 'FIW', 'naam' => 'Faculteit Islamitische Wetenschappen']);
         $foo = Faculteit::create(['code' => 'FOO', 'naam' => 'Faculteit Onderwijs & Opvoeding']);
 
+        // Bestaande (niet-EU) landen + alle 27 EU-lidstaten. Nederland staat maar
+        // één keer in de lijst. Codes zijn ISO 3166-1 alpha-2.
         foreach ([
             ['NL', 'Nederland'], ['TR', 'Turkije'], ['MA', 'Marokko'], ['SY', 'Syrië'],
+            // EU-lidstaten
+            ['BE', 'België'], ['BG', 'Bulgarije'], ['CY', 'Cyprus'], ['DK', 'Denemarken'],
+            ['DE', 'Duitsland'], ['EE', 'Estland'], ['FI', 'Finland'], ['FR', 'Frankrijk'],
+            ['GR', 'Griekenland'], ['HU', 'Hongarije'], ['IE', 'Ierland'], ['IT', 'Italië'],
+            ['HR', 'Kroatië'], ['LV', 'Letland'], ['LT', 'Litouwen'], ['LU', 'Luxemburg'],
+            ['MT', 'Malta'], ['AT', 'Oostenrijk'], ['PL', 'Polen'], ['PT', 'Portugal'],
+            ['RO', 'Roemenië'], ['SI', 'Slovenië'], ['SK', 'Slowakije'], ['ES', 'Spanje'],
+            ['CZ', 'Tsjechië'], ['SE', 'Zweden'],
         ] as [$code, $naam]) {
-            Land::create(['code' => $code, 'naam' => $naam]);
+            Land::firstOrCreate(['code' => $code], ['naam' => $naam]);
         }
 
-        foreach (['Nederlandse', 'Turkse', 'Marokkaanse', 'Syrische'] as $n) {
-            Nationaliteit::create(['naam' => $n]);
+        // Bestaande nationaliteiten + de EU-nationaliteiten (Nederlandse één keer).
+        foreach ([
+            'Nederlandse', 'Turkse', 'Marokkaanse', 'Syrische',
+            'Belgische', 'Bulgaarse', 'Cypriotische', 'Deense', 'Duitse', 'Estse',
+            'Finse', 'Franse', 'Griekse', 'Hongaarse', 'Ierse', 'Italiaanse',
+            'Kroatische', 'Letse', 'Litouwse', 'Luxemburgse', 'Maltese', 'Oostenrijkse',
+            'Poolse', 'Portugese', 'Roemeense', 'Sloveense', 'Slowaakse', 'Spaanse',
+            'Tsjechische', 'Zweedse',
+        ] as $n) {
+            Nationaliteit::firstOrCreate(['naam' => $n]);
         }
 
         // Studiejaar loopt van 1 september t/m 31 juli. Het huidige studiejaar
