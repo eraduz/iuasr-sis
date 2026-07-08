@@ -120,8 +120,10 @@ class StudentController extends Controller
         $financieel = \App\Support\Collegegeldstatus::voor($student);
 
         $grondslagen = \App\Enums\VrijstellingGrondslag::opties();
+        $besluiten = \App\Models\Vrijstellingsbesluit::where('student_id', $student->id)
+            ->with(['vak', 'aangemaaktDoor', 'verwerktDoor'])->latest()->get();
 
-        return view('studenten.show', compact('student', 'huidige', 'magCijfers', 'cijferVakken', 'financieel', 'vakHistorie', 'grondslagen'));
+        return view('studenten.show', compact('student', 'huidige', 'magCijfers', 'cijferVakken', 'financieel', 'vakHistorie', 'grondslagen', 'besluiten'));
     }
 
     /** Muteren van persoonsgegevens (Studentenzaken/Beheerder). */

@@ -54,6 +54,31 @@
     <span>Als Studentenzaken heeft u <b>geen inzage in cijfers</b>. Dit wordt server-side afgedwongen (rolscheiding), niet alleen in de interface.</span>
   </div>
 
+  @if ($openBesluiten->isNotEmpty())
+    <div class="sis-card" style="margin-top:16px;border-left:3px solid var(--secColor100);">
+      <div class="sis-card__hd"><h3>Vrijstellingsbesluiten van de examencommissie</h3><span class="hint">{{ $openBesluiten->count() }} te verwerken</span></div>
+      <div class="iuasr-dash-tbl-card" style="border:0;">
+        <table class="iuasr-dash-tbl">
+          <thead><tr><th>Student</th><th>Vak</th><th>Grondslag</th><th>Besluit</th><th></th></tr></thead>
+          <tbody>
+            @foreach ($openBesluiten->take(8) as $b)
+              <tr>
+                <td class="nm"><a href="{{ route('studenten.show', $b->student) }}">{{ $b->student->volledigeNaam() }}</a><small>{{ $b->student->studentnummer }}</small></td>
+                <td>{{ $b->vak?->code }} · {{ $b->vak?->naam }}</td>
+                <td>{{ $b->grondslag?->label() }}</td>
+                <td>{{ $b->besluit }}<br><small class="sis-muted">{{ $b->besluit_datum?->format('d-m-Y') }} · {{ $b->aangemaaktDoor?->naam }}</small></td>
+                <td style="text-align:right;">
+                  <form method="POST" action="{{ route('vrijstellingsbesluiten.verwerken', $b) }}" style="display:inline;">@csrf<button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Verwerken</button></form>
+                </td>
+              </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+      <p class="sis-tblnote" style="margin-top:6px;">“Verwerken” legt de vrijstelling direct vast op het vak van de student (volledige EC, vermelding VR) en meldt dit terug aan de examencommissie. Is het vak nog niet toegewezen, dan krijgt u een melding.</p>
+    </div>
+  @endif
+
   @php
     $verlopen = $nt2->where('status', 'verlopen');
     $binnenkort = $nt2->filter(fn ($r) => $r['status'] === 'open' && $r['dagen'] !== null && $r['dagen'] <= 30);
@@ -177,6 +202,13 @@
     <div class="iuasr-dash-stat"><span class="lbl">Herkansingen</span><span class="val">{{ $stat['herkansingen'] ?? 0 }}</span><span class="delta">geregistreerd</span></div>
     <div class="iuasr-dash-stat"><span class="lbl">Vrijstellingen</span><span class="val">{{ $stat['vrijstellingen'] ?? 0 }}</span><span class="delta">vastgelegd</span></div>
   </div>
+
+  @if (($stat['besluitenOpen'] ?? 0) > 0)
+    <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-top:16px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+      <span><b>{{ $stat['besluitenOpen'] }}</b> vrijstellingsbesluit(en) wachten op verwerking door Studentenzaken.</span>
+    </div>
+  @endif
 
   <div class="sis-chartgrid" style="margin-top:16px;">
     <div class="sis-chart-card">

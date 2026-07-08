@@ -76,6 +76,9 @@ Route::middleware('auth')->group(function () {
 
     // --- Identiteit & inschrijving beheren: SZ, Beheerder ---
     Route::middleware('rol:studentenzaken,beheerder')->group(function () {
+        // Vrijstellingsbesluit van de examencommissie verwerken (één klik).
+        Route::post('/vrijstellingsbesluiten/{besluit}/verwerken', [App\Http\Controllers\VrijstellingsbesluitController::class, 'verwerk'])->name('vrijstellingsbesluiten.verwerken');
+
         // Inschrijven
         Route::get('/inschrijven', [InschrijvingController::class, 'create'])->name('inschrijven');
         Route::post('/inschrijven', [InschrijvingController::class, 'store'])->name('inschrijven.store');
@@ -190,6 +193,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/cijferlijst/{student}/pdf', [RapportController::class, 'cijferlijstPdf'])->name('cijferlijst.pdf');
         // EC-rapport (studievoortgang per opleiding/klas).
         Route::get('/ec-rapport', [RapportController::class, 'ecRapport'])->name('ec-rapport');
+        // Vrijstellingsbesluit vastleggen en naar Studentenzaken sturen.
+        Route::post('/studenten/{student}/vrijstellingsbesluiten', [App\Http\Controllers\VrijstellingsbesluitController::class, 'store'])->name('vrijstellingsbesluiten.store');
+        Route::post('/vrijstellingsbesluiten/{besluit}/annuleren', [App\Http\Controllers\VrijstellingsbesluitController::class, 'annuleer'])->name('vrijstellingsbesluiten.annuleren');
     });
 
     // --- Alumni-rapport — Studentenzaken & Directie ---

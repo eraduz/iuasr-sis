@@ -75,8 +75,9 @@
   <p>Open het dossier, tabblad <b>Persoonsgegevens</b>, en kies <b>Wijzig gegevens</b>. Onder <b>Acties</b> vindt u herinschrijven, uitschrijven en schorsen.</p>
   <h3>Documenten</h3>
   <p>In het dossier uploadt u documenten (identiteitsbewijs, diploma, cijferlijst, pasfoto, overig). Ontbreekt iets nog, zet dan <b>“levert later aan”</b> aan — de student verschijnt dan als herinnering op het dashboard.</p>
-  <h3>Vrijstellingen</h3>
-  <p>Onder <b>Inschrijving &amp; klas</b> legt u een vrijstelling vast voor een toegewezen vak, met de <b>referentie van het examencommissie-besluit</b>. Een vrijstelling levert de volledige studiepunten (EC) op zonder cijfer (vermelding “VR”).</p>
+  <h3>Vrijstellingen (workflow examencommissie &rarr; Studentenzaken)</h3>
+  <p>Een vrijstelling wordt <b>verleend door de examencommissie</b>. De examencommissie legt het besluit vast en stuurt het intern naar Studentenzaken; het verschijnt dan als taak op uw dashboard onder <b>Vrijstellingsbesluiten van de examencommissie</b>. Klik op <b>Verwerken</b> en de vrijstelling wordt automatisch op het vak van de student vastgelegd — u hoeft niets over te typen. Is het vak nog niet toegewezen, dan krijgt u een melding om het eerst toe te wijzen.</p>
+  <p>U kunt een vrijstelling ook <b>handmatig</b> vastleggen onder <b>Inschrijving &amp; klas</b> (bijvoorbeeld bij een papieren besluit), altijd met de <b>referentie van het examencommissie-besluit</b>. Een vrijstelling levert de volledige studiepunten (EC) op zonder cijfer (vermelding “VR”).</p>
 
   <h2>6. Cijfers invoeren (Docent)</h2>
   <p>Ga naar <b>Cijferinvoer</b> en kies een van uw vakken. Voer per toetsonderdeel de 1e poging en eventueel de herkansing in; het systeem berekent het gewogen eindcijfer en de EC. Als u klaar bent, <b>dient u de lijst in</b> bij de examencommissie. Daarna is de lijst vergrendeld.</p>
@@ -84,6 +85,7 @@
 
   <h2>7. Cijfers vaststellen &amp; lijsten (Examencommissie/Directie)</h2>
   <p>In <b>Cijferoverzicht</b> ziet u alle vakken met status. Een ingediende lijst kunt u <b>vaststellen</b> of met een opmerking <b>terugsturen</b>. Per vak downloadt u een <b>tentamenlijst</b> (deelnemers + resultaten). Per student maakt u via <b>Cijferlijst</b> een officieel transcript. Beide zijn te printen en als ondertekende PDF te downloaden.</p>
+  <p><b>Vrijstelling voorstellen:</b> op het dossier van een student (tabblad <b>Inschrijving &amp; klas</b>) legt u een vrijstellingsbesluit vast en stuurt u het met <b>Naar Studentenzaken sturen</b> door. Studentenzaken verwerkt het; u ziet de status (openstaand/verwerkt) terug op het dossier en kunt een openstaand besluit annuleren.</p>
 
   <h2>8. Collegegeld &amp; betalingen</h2>
   <p>Studentenzaken ziet per student de status verschuldigd/betaald/saldo (pro rata over de inschrijvingsmaanden). De <b>Financiële Administratie</b> registreert betalingen (ook via een Excel-import) en bewaakt achterstanden; bij een schuld worden herinschrijven en verklaringen geblokkeerd.</p>

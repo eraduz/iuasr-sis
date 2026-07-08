@@ -383,6 +383,9 @@
       $vrijLijst = $toewijzingen->where('vrijgesteld', true);
       $nietVrij = $toewijzingen->where('vrijgesteld', false)->filter(fn ($t) => $t->vak);
       $magVrij = auth()->user()->magInschrijvingBeheren();
+      $magBesluit = in_array(auth()->user()->rol, [App\Enums\Rol::Examencommissie, App\Enums\Rol::Directie], true);
+      $openBesluitVakIds = $besluiten->where('status', App\Enums\VrijstellingsbesluitStatus::Open)->pluck('vak_id')->flip();
+      $besluitBaar = $nietVrij->filter(fn ($t) => ! isset($openBesluitVakIds[$t->vak_id]));
     @endphp
     <div class="sis-card" style="margin-top:16px;">
       <div class="sis-card__hd"><h3>Vrijstellingen</h3><span class="hint">{{ $huidige->periode?->naam }} · verleend door de examencommissie, vastgelegd door Studentenzaken</span></div>
@@ -448,6 +451,70 @@
         </form>
       @elseif ($magVrij)
         <p class="sis-muted" style="font-size:12.5px;margin:8px 0 0;">Alle toegewezen vakken zijn al vrijgesteld, of er zijn nog geen vakken toegewezen.</p>
+      @endif
+
+      {{-- Workflow: besluiten van de examencommissie richting Studentenzaken --}}
+      @if ($besluiten->isNotEmpty() || $magBesluit)
+        <div style="border-top:1px solid var(--borderSubtleColor);padding-top:14px;margin-top:14px;">
+          <h4 style="margin:0 0 8px;font-size:13px;">Besluiten van de examencommissie</h4>
+          @if ($besluiten->isEmpty())
+            <p class="sis-muted" style="font-size:12.5px;margin:0 0 10px;">Nog geen vrijstellingsbesluiten voor deze student.</p>
+          @else
+            <div class="iuasr-dash-tbl-card" style="border:0;margin-bottom:8px;">
+              <table class="iuasr-dash-tbl">
+                <thead><tr><th>Vak</th><th>Grondslag</th><th>Besluit</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                  @foreach ($besluiten as $b)
+                    <tr>
+                      <td class="nm">{{ $b->vak?->code }} · {{ $b->vak?->naam }}</td>
+                      <td>{{ $b->grondslag?->label() }}</td>
+                      <td>{{ $b->besluit }}<br><small class="sis-muted">{{ $b->besluit_datum?->format('d-m-Y') }} · {{ $b->aangemaaktDoor?->naam }}</small></td>
+                      <td><span class="iuasr-dash-status {{ $b->status->badge() }}">{{ $b->status->label() }}</span></td>
+                      <td style="text-align:right;white-space:nowrap;">
+                        @if ($b->status === App\Enums\VrijstellingsbesluitStatus::Open)
+                          @if ($magVrij)
+                            <form method="POST" action="{{ route('vrijstellingsbesluiten.verwerken', $b) }}" style="display:inline;">@csrf<button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Verwerken</button></form>
+                          @endif
+                          @if ($magBesluit)
+                            <form method="POST" action="{{ route('vrijstellingsbesluiten.annuleren', $b) }}" style="display:inline;" onsubmit="return confirm('Besluit annuleren?');">@csrf<button class="iuasr-dash-btn iuasr-dash-btn--sm" type="submit">Annuleren</button></form>
+                          @endif
+                        @elseif ($b->status === App\Enums\VrijstellingsbesluitStatus::Verwerkt)
+                          <small class="sis-muted">{{ $b->verwerktDoor?->naam }}<br>{{ $b->verwerkt_op?->format('d-m-Y') }}</small>
+                        @endif
+                      </td>
+                    </tr>
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
+          @endif
+
+          @if ($magBesluit && $besluitBaar->isNotEmpty())
+            <form method="POST" action="{{ route('vrijstellingsbesluiten.store', $student) }}" class="sis-form" style="margin-top:6px;">
+              @csrf
+              <h4 style="margin:0 0 10px;font-size:13px;">Vrijstelling voorstellen aan Studentenzaken</h4>
+              <div class="sis-fld-row sis-fld-row--2">
+                <div class="sis-fld"><label>Vak</label>
+                  <select name="vak_id" required>
+                    <option value="">Kies een toegewezen vak…</option>
+                    @foreach ($besluitBaar as $t)<option value="{{ $t->vak_id }}">{{ $t->vak->code }} · {{ $t->vak->naam }} ({{ $t->vak->ec }} EC)</option>@endforeach
+                  </select>
+                </div>
+                <div class="sis-fld"><label>Grondslag</label>
+                  <select name="grondslag" required>@foreach ($grondslagen as $val => $lbl)<option value="{{ $val }}">{{ $lbl }}</option>@endforeach</select>
+                </div>
+              </div>
+              <div class="sis-fld-row sis-fld-row--2">
+                <div class="sis-fld"><label>Besluit-referentie</label><input type="text" name="besluit" required placeholder="bv. EC-2026-014"></div>
+                <div class="sis-fld"><label>Besluitdatum</label><input type="date" name="besluit_datum" required></div>
+              </div>
+              <div class="sis-fld"><label>Toelichting (optioneel)</label><textarea name="toelichting" rows="2"></textarea></div>
+              <div style="display:flex;justify-content:flex-end;">
+                <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit">Naar Studentenzaken sturen</button>
+              </div>
+            </form>
+          @endif
+        </div>
       @endif
 
       <p class="sis-tblnote" style="margin-top:12px;">Een vrijstelling is <b>geen cijfer</b>: het vak telt als behaald met de volledige EC (vermelding <b>VR</b> op de cijferlijst), zonder eindcijfer. Leg altijd de referentie van het examencommissie-besluit vast.</p>

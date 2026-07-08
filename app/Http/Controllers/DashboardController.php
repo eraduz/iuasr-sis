@@ -50,6 +50,7 @@ class DashboardController extends Controller
                 'cijferlijstStatus' => Statistiek::cijferlijstStatus(),
                 'herkansingen' => Statistiek::herkansingen(),
                 'vrijstellingen' => Statistiek::vrijstellingen(),
+                'besluitenOpen' => \App\Models\Vrijstellingsbesluit::where('status', 'open')->count(),
                 'perOpleiding' => Statistiek::perOpleiding(),
             ],
             Rol::Financien => [
@@ -72,7 +73,11 @@ class DashboardController extends Controller
         // Signaleringen voor Studentenzaken (lijsten onder de statistieken).
         $nt2 = collect();
         $docLater = collect();
+        $openBesluiten = collect();
         if ($rol === Rol::Studentenzaken) {
+            $openBesluiten = \App\Models\Vrijstellingsbesluit::where('status', 'open')
+                ->with(['student', 'vak', 'aangemaaktDoor'])->latest()->get();
+
             $nt2 = Student::where('nt2_examen_vereist', true)
                 ->whereNull('nt2_behaald_op')
                 ->with('inschrijvingen')
@@ -89,6 +94,6 @@ class DashboardController extends Controller
             $docLater = Student::where('documenten_later', true)->orderBy('achternaam')->get();
         }
 
-        return view('dashboard.index', compact('kpi', 'nt2', 'docLater', 'stat'));
+        return view('dashboard.index', compact('kpi', 'nt2', 'docLater', 'stat', 'openBesluiten'));
     }
 }
