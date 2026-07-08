@@ -37,12 +37,21 @@
       <span class="tag">geen cijfers · beschikbaar</span>
     </div>
     @endif
+    @if (auth()->user()->magCijfersInzien())
+    <a class="sis-choice" href="{{ route('cijferoverzicht') }}">
+      <span class="sis-choice__ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+      <h4>Examen-/tentamenlijst</h4>
+      <p>Deelnemers en resultaten per toets — per vak te bekijken, printen en als ondertekende PDF te downloaden.</p>
+      <span class="tag">via Cijferoverzicht · Examencommissie &amp; Directie</span>
+    </a>
+    @else
     <div class="sis-choice" style="opacity:.55;">
       <span class="sis-choice__ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
       <h4>Examen-/tentamenlijst</h4>
-      <p>Deelnemers en resultaten per toets.</p>
-      <span class="tag">volgt in Fase 5</span>
+      <p>Deelnemers en resultaten per toets — voorbehouden aan cijfer-inzage (Examencommissie/Directie).</p>
+      <span class="tag">geen cijferinzage voor deze rol</span>
     </div>
+    @endif
     @if (auth()->user()->magCijfersInzien())
     <a class="sis-choice" href="{{ route('ec-rapport') }}">
       <span class="sis-choice__ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="8"/><rect x="12" y="6" width="3" height="12"/></svg></span>

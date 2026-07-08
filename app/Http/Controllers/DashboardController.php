@@ -2,38 +2,77 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Rol;
 use App\Models\AuditLog;
-use App\Models\Inschrijving;
+use App\Models\Cijferlijst;
+use App\Models\Periode;
 use App\Models\Student;
-use App\Models\User;
-use App\Models\Vak;
+use App\Support\Statistiek;
 use Illuminate\Contracts\View\View;
 
 class DashboardController extends Controller
 {
     /**
-     * Rolbewust dashboard. De view toont per rol een andere weergave; de shell
-     * (design system) verzorgt header/sidebar op basis van dezelfde rolsleutel.
+     * Rolbewust dashboard met statistieken en grafieken. Per rol worden alleen
+     * de relevante (en niet te zware) aggregaties berekend; cijfergebonden
+     * statistieken zijn voorbehouden aan rollen met cijferinzage.
      */
     public function index(): View
     {
-        $actievePeriodeId = \App\Models\Periode::where('actief', true)->value('id');
+        $rol = auth()->user()->rol;
+        $actievePeriodeId = Periode::where('actief', true)->value('id');
+        $kern = Statistiek::kern();
 
         $kpi = [
-            'studenten' => Student::count(),
-            'inschrijvingen' => Inschrijving::where('status', 'actief')->count(),
-            'vakken' => Vak::count(),
-            'gebruikers' => User::count(),
+            'studenten' => $kern['studenten'],
+            'inschrijvingen' => $kern['actief'],
+            'afgestudeerd' => $kern['afgestudeerd'],
+            'uitgeschreven' => $kern['uitgeschreven'],
+            'vakken' => $kern['vakken'],
+            'gebruikers' => $kern['gebruikers'],
             'audit' => AuditLog::count(),
-            'ter_vaststelling' => \App\Models\Cijferlijst::where('status', 'ingediend')
-                ->where('periode_id', $actievePeriodeId)->count(),
+            'ter_vaststelling' => Cijferlijst::where('status', 'ingediend')->where('periode_id', $actievePeriodeId)->count(),
         ];
 
-        // Signaleringen voor Studentenzaken.
+        $stat = match ($rol) {
+            Rol::Directie, Rol::Bestuur => [
+                'perOpleiding' => Statistiek::perOpleiding(),
+                'instroom' => Statistiek::instroomPerStudiejaar(),
+                'status' => Statistiek::statusVerdeling(),
+                'overgang' => Statistiek::overgangVerdeling(),
+                'slaag' => Statistiek::slaagpercentage(),
+                'financieel' => Statistiek::financieel(),
+            ],
+            Rol::Examencommissie => [
+                'slaag' => Statistiek::slaagpercentage(),
+                'cijferverdeling' => Statistiek::cijferverdeling(),
+                'overgang' => Statistiek::overgangVerdeling(),
+                'cijferlijstStatus' => Statistiek::cijferlijstStatus(),
+                'herkansingen' => Statistiek::herkansingen(),
+                'vrijstellingen' => Statistiek::vrijstellingen(),
+                'perOpleiding' => Statistiek::perOpleiding(),
+            ],
+            Rol::Financien => [
+                'financieel' => Statistiek::financieel(),
+            ],
+            Rol::Studentenzaken => [
+                'perOpleiding' => Statistiek::perOpleiding(),
+                'perLeerjaar' => Statistiek::perLeerjaar(),
+                'instroom' => Statistiek::instroomPerStudiejaar(),
+                'status' => Statistiek::statusVerdeling(),
+                'nt2' => Statistiek::nt2Verdeling(),
+                'vrijstellingen' => Statistiek::vrijstellingen(),
+            ],
+            Rol::Beheerder => [
+                'gebruikersPerRol' => Statistiek::gebruikersPerRol(),
+            ],
+            default => [],
+        };
+
+        // Signaleringen voor Studentenzaken (lijsten onder de statistieken).
         $nt2 = collect();
         $docLater = collect();
-        if (auth()->user()->rol === \App\Enums\Rol::Studentenzaken) {
-            // NT2-bewaking: op deadline (1 jaar vanaf inschrijfdatum) gesorteerd.
+        if ($rol === Rol::Studentenzaken) {
             $nt2 = Student::where('nt2_examen_vereist', true)
                 ->whereNull('nt2_behaald_op')
                 ->with('inschrijvingen')
@@ -47,10 +86,9 @@ class DashboardController extends Controller
                 ->sortBy(fn ($r) => $r['dagen'] ?? PHP_INT_MAX)
                 ->values();
 
-            // Documenten die later worden aangeleverd (diploma/cijferlijst e.d.).
             $docLater = Student::where('documenten_later', true)->orderBy('achternaam')->get();
         }
 
-        return view('dashboard.index', compact('kpi', 'nt2', 'docLater'));
+        return view('dashboard.index', compact('kpi', 'nt2', 'docLater', 'stat'));
     }
 }

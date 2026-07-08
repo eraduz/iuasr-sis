@@ -570,3 +570,41 @@
   display: inline-block; font-size: 11px; font-weight: 500; color: var(--blackAltText);
   background: var(--priColor102); padding: 2px 8px; border-radius: 999px;
 }
+
+/* ============================================================
+   STATISTIEK / GRAFIEKEN (server-gerenderd, geen externe libs)
+   ============================================================ */
+.sis-chart-card { background:#fff; border:1px solid var(--borderSubtleColor); border-radius:10px; padding:16px 18px; }
+.sis-chart-card h3 { font-family:var(--serif-font); font-weight:400; font-size:15px; margin:0 0 2px; color:var(--priColor100); }
+.sis-chart-card .sub { font-size:11.5px; color:var(--blackAltText); margin:0 0 14px; }
+.sis-chartgrid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; align-items:start; }
+@media (max-width:900px){ .sis-chartgrid { grid-template-columns:1fr; } }
+
+/* Horizontale staafgrafiek (CSS) */
+.sis-bars { display:flex; flex-direction:column; gap:9px; }
+.sis-bar-row { display:grid; grid-template-columns:120px 1fr 46px; align-items:center; gap:10px; }
+.sis-bar-lbl { font-size:12px; color:var(--priColor100); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sis-bar-track { height:16px; background:var(--priColor102); border-radius:6px; overflow:hidden; }
+.sis-bar-fill { display:block; height:100%; border-radius:6px; min-width:2px; transition:width .3s; }
+.sis-bar-val { font-size:12px; font-weight:600; color:var(--priColor100); text-align:right; font-variant-numeric:tabular-nums; }
+.sis-bars--empty { font-size:12.5px; color:var(--blackAltText); }
+
+/* Donut / cirkeldiagram (SVG) */
+.sis-donut-wrap { display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+.sis-donut { width:132px; height:132px; flex:0 0 auto; }
+.sis-donut-num { font-family:var(--serif-font); font-size:20px; fill:var(--priColor100); }
+.sis-donut-lbl { font-size:6.5px; fill:var(--blackAltText); text-transform:uppercase; letter-spacing:.08em; }
+.sis-donut-legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:var(--priColor100); }
+.sis-donut-legend li { display:flex; align-items:center; gap:8px; }
+.sis-donut-legend .dot { width:10px; height:10px; border-radius:3px; flex:0 0 auto; }
+.sis-donut-legend b { margin-left:auto; padding-left:14px; font-variant-numeric:tabular-nums; }
+
+/* Sparkline-staafjes voor trend (instroom per jaar e.d.) */
+.sis-spark { display:flex; align-items:flex-end; gap:8px; height:96px; padding-top:6px; }
+.sis-spark-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; justify-content:flex-end; height:100%; }
+.sis-spark-bar { width:100%; max-width:46px; background:var(--priColor200); border-radius:5px 5px 0 0; min-height:3px; }
+.sis-spark-val { font-size:11px; font-weight:600; color:var(--priColor100); }
+.sis-spark-lbl { font-size:10.5px; color:var(--blackAltText); text-align:center; line-height:1.2; }
+
+/* KPI-donut mini (percentage) */
+.sis-gauge-num { font-family:var(--serif-font); font-size:22px; fill:var(--priColor100); }
