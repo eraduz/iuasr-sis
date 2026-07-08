@@ -91,10 +91,11 @@ class BulkInschrijvingController extends Controller
             return back()->withErrors(['bestand' => 'Het bestand bevat geen gegevens.']);
         }
 
-        $periode = Periode::where('actief', true)->first();
-        if (! $periode) {
-            return back()->withErrors(['bestand' => 'Er is geen actief studiejaar ingesteld.']);
+        $perioden = Periode::orderByDesc('startdatum')->get();
+        if ($perioden->isEmpty()) {
+            return back()->withErrors(['bestand' => 'Er is geen studiejaar ingesteld.']);
         }
+        $standaardPeriode = $perioden->firstWhere('actief', true) ?? $perioden->first();
 
         $geldig = [];
         $fouten = [];
@@ -159,7 +160,8 @@ class BulkInschrijvingController extends Controller
         return view('bulk-inschrijven.controle', [
             'geldig' => $geldig,
             'fouten' => $fouten,
-            'periode' => $periode,
+            'perioden' => $perioden,
+            'standaardPeriodeId' => $standaardPeriode->id,
             'bestandsnaam' => $bestand->getClientOriginalName(),
         ]);
     }
@@ -173,12 +175,21 @@ class BulkInschrijvingController extends Controller
                 ->withErrors(['bestand' => 'Geen gecontroleerde import. Upload eerst een CSV.']);
         }
 
-        $periode = Periode::where('actief', true)->firstOrFail();
-        $jaar = (int) now()->format('Y');
+        $data = $request->validate(['periode_id' => ['nullable', 'exists:perioden,id']]);
+        $periode = ! empty($data['periode_id'])
+            ? Periode::findOrFail($data['periode_id'])
+            : Periode::where('actief', true)->firstOrFail();
+
+        // Studentnummer-jaarprefix volgt het intakejaar (start van het studiejaar).
+        $jaar = (int) ($periode->startdatum?->format('Y') ?? now()->format('Y'));
+        // Toekomstig studiejaar: inschrijfdatum = start van dat studiejaar; anders vandaag.
+        $inschrijfdatum = ($periode->startdatum && $periode->startdatum->isFuture())
+            ? $periode->startdatum->toDateString()
+            : now()->toDateString();
         $aantal = 0;
 
         foreach ($rijen as $r) {
-            DB::transaction(function () use ($r, $periode, $jaar, &$aantal) {
+            DB::transaction(function () use ($r, $periode, $jaar, $inschrijfdatum, &$aantal) {
                 $student = null;
                 for ($poging = 0; $poging < 5; $poging++) {
                     try {
@@ -219,7 +230,7 @@ class BulkInschrijvingController extends Controller
                     'periode_id' => $periode->id,
                     'leerjaar' => $r['leerjaar'] ?? 1,
                     'status' => 'actief',
-                    'inschrijfdatum' => now()->toDateString(),
+                    'inschrijfdatum' => $inschrijfdatum,
                     'invoerdatum' => now()->toDateString(),
                 ]);
 

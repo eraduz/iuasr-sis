@@ -8,7 +8,7 @@
 <div class="iuasr-dash-vhead">
   <div>
     <h1>Controleer de inschrijvingen</h1>
-    <div class="summary">Bestand <b>{{ $bestandsnaam }}</b> · studiejaar {{ $periode->naam }} · controleer voordat u definitief inschrijft</div>
+    <div class="summary">Bestand <b>{{ $bestandsnaam }}</b> · kies hieronder het <b>studiejaar</b> en controleer voordat u definitief inschrijft</div>
   </div>
 </div>
 
@@ -62,8 +62,14 @@
   <span class="grow"></span>
   <a class="iuasr-dash-btn" href="{{ route('bulk-inschrijven') }}">Annuleren</a>
   @if ($geldig)
-    <form method="POST" action="{{ route('bulk-inschrijven.importeer') }}" style="display:inline;">
+    <form method="POST" action="{{ route('bulk-inschrijven.importeer') }}" style="display:inline-flex;gap:10px;align-items:center;">
       @csrf
+      <label for="periode_id" style="font-size:13px;color:var(--blackAltText);">Studiejaar</label>
+      <select id="periode_id" name="periode_id" required style="padding:8px 10px;border:1px solid var(--borderColor);border-radius:6px;">
+        @foreach ($perioden as $p)
+          <option value="{{ $p->id }}" {{ $p->id == $standaardPeriodeId ? 'selected' : '' }}>{{ $p->naam }}{{ $p->actief ? ' · huidig' : '' }}</option>
+        @endforeach
+      </select>
       <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit">Definitief inschrijven ({{ count($geldig) }})</button>
     </form>
   @endif

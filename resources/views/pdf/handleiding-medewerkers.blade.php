@@ -71,7 +71,7 @@
   <h3>Student zoeken</h3>
   <p>Ga naar <b>Alle studenten</b> en gebruik de zoekbalk (studentnummer of naam). Klik op een student om het dossier te openen.</p>
   <h3>Nieuwe student inschrijven</h3>
-  <p>Kies <b>Student inschrijven</b>, vul de gegevens in en bevestig. Het studentnummer wordt automatisch toegekend en de vakken van het studiejaar worden toegewezen. Voor grote aantallen bestaat <b>Bulk inschrijven</b> (CSV-export van het aanmeldportaal), met een controlestap vóór definitief importeren.</p>
+  <p>Kies <b>Student inschrijven</b>, vul de gegevens in en bevestig. Het studentnummer wordt automatisch toegekend en de vakken van het studiejaar worden toegewezen. Voor grote aantallen bestaat <b>Bulk inschrijven</b> (CSV-export van het aanmeldportaal), met een controlestap vóór definitief importeren. In die controlestap <b>kiest u het studiejaar</b> waarin de studenten worden ingeschreven (bijvoorbeeld het komende jaar); bij een toekomstig studiejaar wordt de inschrijfdatum automatisch de startdatum (1 september).</p>
   <h3>Gegevens wijzigen</h3>
   <p>Open het dossier, tabblad <b>Persoonsgegevens</b>, en kies <b>Wijzig gegevens</b>. Onder <b>Acties</b> vindt u herinschrijven, uitschrijven en schorsen.</p>
   <h3>Documenten</h3>

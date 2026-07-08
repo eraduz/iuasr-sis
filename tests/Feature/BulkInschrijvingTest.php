@@ -69,6 +69,26 @@ class BulkInschrijvingTest extends TestCase
         $this->assertSame('actief', $nieuw->inschrijvingen()->first()->status->value);
     }
 
+    public function test_bevestigen_gebruikt_het_gekozen_studiejaar(): void
+    {
+        \Carbon\Carbon::setTestNow(\Carbon\Carbon::parse('2026-07-01'));
+
+        $csv = "voornaam;achternaam;geboortedatum;email;opleiding;leerjaar\r\n"
+            ."Volgend;Jaar;01-02-2005;volgend@example.com;ISLTH;1\r\n";
+        $volgend = \App\Models\Periode::where('code', '2026-2027')->firstOrFail();
+
+        $this->actingAs($this->sz)->post(route('bulk-inschrijven.controle'), ['bestand' => $this->csv($csv)])->assertOk();
+        $this->actingAs($this->sz)->post(route('bulk-inschrijven.importeer'), ['periode_id' => $volgend->id])
+            ->assertRedirect(route('studenten.index'));
+
+        $insch = Student::where('voornaam', 'Volgend')->first()->inschrijvingen()->first();
+        $this->assertSame($volgend->id, $insch->periode_id);
+        // Toekomstig studiejaar → inschrijfdatum = start van dat studiejaar (1 sep).
+        $this->assertSame('2026-09-01', $insch->inschrijfdatum->toDateString());
+
+        \Carbon\Carbon::setTestNow();
+    }
+
     public function test_bulk_alleen_voor_studentenzaken_en_beheer(): void
     {
         $this->actingAs(User::where('rol', Rol::Beheerder)->first())->get(route('bulk-inschrijven'))->assertOk();
