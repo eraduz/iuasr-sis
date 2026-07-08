@@ -68,6 +68,18 @@
   </table>
   <div class="let"><b>APP_KEY is kritiek.</b> Zonder de originele APP_KEY zijn de versleutelde velden (BSN, rekeningnummer) onherstelbaar. De sleutel zit in <code>.env</code> en wordt meegenomen in de back-up.</div>
 
+  <h3>E-mail (resultaten mailen)</h3>
+  <p>De examencommissie kan definitieve resultaten per e-mail naar studenten sturen. In <b>ontwikkeling</b> staat <code>MAIL_MAILER=log</code>: e-mails worden naar <code>storage/logs/laravel.log</code> geschreven, er gaan GEEN echte e-mails uit (AVG, synthetische data). In <b>productie</b> configureert u de IUASR-mailserver in <code>.env</code>:</p>
+  <span class="cmd">MAIL_MAILER=smtp
+MAIL_HOST=&lt;smtp.iuasr.nl&gt;
+MAIL_PORT=587
+MAIL_USERNAME=&lt;gebruiker&gt;
+MAIL_PASSWORD=&lt;wachtwoord&gt;
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@iuasr.nl
+MAIL_FROM_NAME="IUASR Studentenzaken"</span>
+  <p>Elke student ontvangt individueel de eigen (ondertekende) cijferlijst als bijlage; verzending wordt gelogd. Overweeg voor grote aantallen een queue (<code>QUEUE_CONNECTION</code> + worker).</p>
+
   <h2>3. Back-up maken</h2>
   <p>Een volledige back-up wordt gemaakt via de webapplicatie:</p>
   <ol>

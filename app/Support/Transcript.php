@@ -17,15 +17,16 @@ use App\Models\Vak;
 class Transcript
 {
     /**
+     * @param  bool  $alleenDefinitief  alleen door de examencommissie vastgestelde resultaten meetellen
      * @return array{studiejaren: array<int, array>, behaaldeEc: int, ecTotaal: int|null}
      */
-    public static function voor(Student $student): array
+    public static function voor(Student $student, bool $alleenDefinitief = false): array
     {
         $student->loadMissing(['inschrijvingen.opleiding', 'inschrijvingen.periode']);
 
         $studiejaren = $student->inschrijvingen
             ->sortBy(fn ($i) => $i->inschrijfdatum)
-            ->map(function ($insch) {
+            ->map(function ($insch) use ($alleenDefinitief) {
                 $vakken = Vak::where('opleiding_id', $insch->opleiding_id)
                     ->where('leerjaar', $insch->leerjaar)
                     ->where('actief', true)
@@ -33,7 +34,9 @@ class Transcript
                     ->orderBy('blok')->orderBy('code')
                     ->get();
 
-                $resultaten = Resultaat::where('inschrijving_id', $insch->id)->get();
+                $resultaten = Resultaat::where('inschrijving_id', $insch->id)
+                    ->when($alleenDefinitief, fn ($q) => $q->where('definitief', true))
+                    ->get();
 
                 $vrijVakIds = \App\Models\Vaktoewijzing::where('inschrijving_id', $insch->id)
                     ->where('vrijgesteld', true)->pluck('vak_id')->flip();

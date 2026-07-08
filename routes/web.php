@@ -193,6 +193,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/cijferlijst/{student}/pdf', [RapportController::class, 'cijferlijstPdf'])->name('cijferlijst.pdf');
         // EC-rapport (studievoortgang per opleiding/klas).
         Route::get('/ec-rapport', [RapportController::class, 'ecRapport'])->name('ec-rapport');
+        // Definitieve resultaten per e-mail naar studenten (per opleiding).
+        Route::get('/resultaten-mailen', [App\Http\Controllers\ResultatenMailController::class, 'overzicht'])->name('resultaten-mailen');
+        Route::post('/resultaten-mailen', [App\Http\Controllers\ResultatenMailController::class, 'versturen'])->name('resultaten-mailen.versturen');
         // Vrijstellingsbesluit vastleggen en naar Studentenzaken sturen.
         Route::post('/studenten/{student}/vrijstellingsbesluiten', [App\Http\Controllers\VrijstellingsbesluitController::class, 'store'])->name('vrijstellingsbesluiten.store');
         Route::post('/vrijstellingsbesluiten/{besluit}/annuleren', [App\Http\Controllers\VrijstellingsbesluitController::class, 'annuleer'])->name('vrijstellingsbesluiten.annuleren');

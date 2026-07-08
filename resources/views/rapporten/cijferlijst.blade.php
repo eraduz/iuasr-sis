@@ -95,6 +95,14 @@
           </table>
         </div>
         <p class="sis-tblnote" style="margin-top:8px;">{{ $perOpleiding->count() }} student(en). Klik op <b>Cijferlijst</b> voor het volledige transcript en de ondertekende PDF per student.</p>
+
+        <div style="display:flex;align-items:center;gap:12px;margin-top:12px;border-top:1px solid var(--borderSubtleColor);padding-top:12px;flex-wrap:wrap;">
+          <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('resultaten-mailen', ['opleiding_id' => $opleidingId]) }}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><path d="M4 4h16v16H4z"/><path d="m22 6-10 7L2 6"/></svg>
+            Definitieve resultaten mailen
+          </a>
+          <span class="sis-muted" style="font-size:12px;">Elke student ontvangt individueel de eigen (vastgestelde) cijferlijst als PDF-bijlage.</span>
+        </div>
       @endif
     @endif
   </div>
