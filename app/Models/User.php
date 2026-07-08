@@ -101,4 +101,9 @@ class User extends Authenticatable
     {
         return $this->rol->magBetalingenRegistreren();
     }
+
+    public function magAlleOndertekendeDocumentenZien(): bool
+    {
+        return $this->rol->magAlleOndertekendeDocumentenZien();
+    }
 }

@@ -17,12 +17,14 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class OndertekeningController extends Controller
 {
-    /** Archief/log van ondertekende documenten. */
+    /** Archief/log van ondertekende documenten — standaard alleen de EIGEN documenten. */
     public function index(Request $request): View
     {
         $zoek = trim((string) $request->query('q', ''));
+        $alles = auth()->user()->magAlleOndertekendeDocumentenZien();
 
         $documenten = OndertekendDocument::with(['student', 'uitgegevenDoor'])
+            ->unless($alles, fn ($q) => $q->where('uitgegeven_door_id', auth()->id()))
             ->when($zoek !== '', function ($q) use ($zoek) {
                 $q->where('code', 'like', '%'.$zoek.'%')
                     ->orWhere('titel', 'like', '%'.$zoek.'%')
@@ -32,7 +34,21 @@ class OndertekeningController extends Controller
             ->paginate(25)
             ->withQueryString();
 
-        return view('ondertekening.index', compact('documenten', 'zoek'));
+        return view('ondertekening.index', compact('documenten', 'zoek', 'alles'));
+    }
+
+    /**
+     * Toegangscontrole per document: alleen de ondertekenaar (eigenaar) mag zijn
+     * eigen document inzien/downloaden. Schoolbestuur en Beheerder mogen alles.
+     */
+    private function autoriseerToegang(OndertekendDocument $document): void
+    {
+        abort_unless(
+            auth()->user()->magAlleOndertekendeDocumentenZien()
+                || $document->uitgegeven_door_id === auth()->id(),
+            403,
+            'U mag alleen uw eigen ondertekende documenten inzien.',
+        );
     }
 
     /** Uploadformulier: eigen PDF laten waarmerken. */
@@ -69,12 +85,16 @@ class OndertekeningController extends Controller
     /** Resultaatscherm na het ondertekenen: origineel + waarmerk naast elkaar. */
     public function klaar(OndertekendDocument $document): View
     {
+        $this->autoriseerToegang($document);
+
         return view('ondertekening.klaar', compact('document'));
     }
 
     /** Waarmerk-certificaat van een geüpload document downloaden (gelogd). */
     public function downloadWaarmerk(OndertekendDocument $document): StreamedResponse
     {
+        $this->autoriseerToegang($document);
+
         $bytes = Documentondertekening::bestandBytes($document->waarmerk_pad);
         abort_if($bytes === null, 404, 'Waarmerk niet gevonden.');
 
@@ -90,6 +110,8 @@ class OndertekeningController extends Controller
     /** Gearchiveerd ondertekend document opnieuw downloaden (gelogd). */
     public function download(OndertekendDocument $document): StreamedResponse
     {
+        $this->autoriseerToegang($document);
+
         $bytes = Documentondertekening::pdfBytes($document);
         abort_if($bytes === null, 404, 'Bestand niet gevonden.');
 

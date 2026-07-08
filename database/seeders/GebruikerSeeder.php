@@ -23,6 +23,7 @@ class GebruikerSeeder extends Seeder
 
         User::create(['naam' => 'prof. Karima Nassar', 'email' => 'k.nassar@iuasr.nl', 'rol' => Rol::Examencommissie]);
         User::create(['naam' => 'drs. Bram de Wit', 'email' => 'b.dewit@iuasr.nl', 'rol' => Rol::Directie]);
+        User::create(['naam' => 'mr. Nadia Öztürk', 'email' => 'n.ozturk@iuasr.nl', 'rol' => Rol::Bestuur]);
         User::create(['naam' => 'Ismail Kaya', 'email' => 'i.kaya@iuasr.nl', 'rol' => Rol::Beheerder]);
     }
 }

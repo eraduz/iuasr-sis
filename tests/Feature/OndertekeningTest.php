@@ -80,10 +80,35 @@ class OndertekeningTest extends TestCase
     {
         $this->actingAs($this->sz)->get(route('ondertekening'))->assertOk();
         $this->actingAs(User::where('rol', Rol::Directie)->first())->get(route('ondertekening'))->assertOk();
+        $this->actingAs(User::where('rol', Rol::Bestuur)->first())->get(route('ondertekening'))->assertOk();
         $this->actingAs(User::where('rol', Rol::Beheerder)->first())->get(route('ondertekening'))->assertOk();
 
         $this->actingAs(User::where('rol', Rol::Docent)->first())->get(route('ondertekening'))->assertForbidden();
         $this->actingAs(User::where('rol', Rol::Financien)->first())->get(route('ondertekening'))->assertForbidden();
+    }
+
+    public function test_iedere_rol_ziet_alleen_eigen_documenten_bestuur_en_beheer_alles(): void
+    {
+        $doc = $this->genereer(); // eigenaar = $this->sz (Studentenzaken)
+        $andereSz = User::create(['naam' => 'Tweede SZ', 'email' => 'sz2@iuasr.nl', 'rol' => Rol::Studentenzaken]);
+        $directie = User::where('rol', Rol::Directie)->first();
+
+        // Eigenaar ziet het eigen document.
+        $this->actingAs($this->sz)->get(route('ondertekening'))->assertOk()->assertSee($doc->code);
+
+        // Andere Studentenzaken ziet het NIET en mag het niet downloaden.
+        $this->actingAs($andereSz)->get(route('ondertekening'))->assertOk()->assertDontSee($doc->code);
+        $this->actingAs($andereSz)->get(route('ondertekening.download', $doc))->assertForbidden();
+        $this->actingAs($andereSz)->get(route('ondertekening.waarmerk', $doc))->assertForbidden();
+
+        // Directie (opleidingsdirecteur) ziet andermans document evenmin.
+        $this->actingAs($directie)->get(route('ondertekening'))->assertOk()->assertDontSee($doc->code);
+        $this->actingAs($directie)->get(route('ondertekening.download', $doc))->assertForbidden();
+
+        // Schoolbestuur en Beheerder zien en downloaden alles.
+        $this->actingAs(User::where('rol', Rol::Bestuur)->first())->get(route('ondertekening'))->assertOk()->assertSee($doc->code);
+        $this->actingAs(User::where('rol', Rol::Bestuur)->first())->get(route('ondertekening.download', $doc))->assertOk();
+        $this->actingAs(User::where('rol', Rol::Beheerder)->first())->get(route('ondertekening.download', $doc))->assertOk();
     }
 
     public function test_eigen_pdf_uploaden_en_waarmerken(): void

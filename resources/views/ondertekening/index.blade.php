@@ -8,7 +8,7 @@
 <div class="iuasr-dash-vhead">
   <div>
     <h1>Ondertekende documenten</h1>
-    <div class="summary">Archief en logregistratie van digitaal ondertekende PDF's · echtheidskenmerk (SHA-256)</div>
+    <div class="summary">Archief en logregistratie van digitaal ondertekende PDF's · echtheidskenmerk (SHA-256){{ $alles ? ' · alle documenten' : ' · alleen uw eigen documenten' }}</div>
   </div>
   <div class="iuasr-dash-vhead__actions">
     <a class="iuasr-dash-btn" href="{{ route('verificatie') }}" target="_blank">Publieke verificatiepagina</a>

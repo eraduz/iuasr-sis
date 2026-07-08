@@ -24,6 +24,7 @@ enum Rol: string
     case Docent = 'docent';
     case Examencommissie = 'examencommissie';
     case Directie = 'directie';
+    case Bestuur = 'bestuur';
     case Beheerder = 'beheerder';
 
     /** Leesbare naam voor UI en documenten (Nederlands, U-vorm). */
@@ -35,7 +36,21 @@ enum Rol: string
             self::Docent => 'Docent',
             self::Examencommissie => 'Examencommissie',
             self::Directie => 'Directie',
+            self::Bestuur => 'Schoolbestuur',
             self::Beheerder => 'Beheerder',
+        };
+    }
+
+    /**
+     * Mag deze rol ALLE ondertekende documenten inzien (niet alleen de eigen)?
+     * Alleen het Schoolbestuur en de Beheerder hebben dit brede inzicht; alle
+     * overige bevoegde rollen zien uitsluitend hun EIGEN ondertekende documenten.
+     */
+    public function magAlleOndertekendeDocumentenZien(): bool
+    {
+        return match ($this) {
+            self::Bestuur, self::Beheerder => true,
+            default => false,
         };
     }
 
@@ -71,7 +86,7 @@ enum Rol: string
     {
         return match ($this) {
             self::Docent, self::Examencommissie, self::Directie => true,
-            self::Studentenzaken, self::Beheerder => false,
+            self::Studentenzaken, self::Bestuur, self::Beheerder => false,
         };
     }
 
@@ -90,7 +105,7 @@ enum Rol: string
     {
         return match ($this) {
             self::Studentenzaken, self::Beheerder => true,
-            self::Docent, self::Examencommissie, self::Directie => false,
+            self::Docent, self::Examencommissie, self::Directie, self::Bestuur => false,
         };
     }
 

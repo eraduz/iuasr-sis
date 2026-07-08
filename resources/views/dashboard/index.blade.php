@@ -125,6 +125,21 @@
     <div class="iuasr-dash-stat"><span class="lbl">Actieve inschrijvingen</span><span class="val">{{ $kpi['inschrijvingen'] }}</span><span class="delta">huidige periode</span></div>
   </div>
 
+@elseif ($rol === App\Enums\Rol::Bestuur)
+  <div class="iuasr-dash-vhead">
+    <div>
+      <h1>Schoolbestuur</h1>
+      <div class="summary">Toezicht op digitaal ondertekende documenten</div>
+    </div>
+    <div class="iuasr-dash-vhead__actions">
+      <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('ondertekening') }}">Ondertekende documenten</a>
+    </div>
+  </div>
+  <div class="iuasr-dash-alert iuasr-dash-alert--info">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M8.21 13.89 7 22l5-3 5 3-1.21-8.11"/></svg>
+    <span>Als Schoolbestuur heeft u inzage in <b>alle</b> digitaal ondertekende documenten van de organisatie.</span>
+  </div>
+
 @elseif ($rol === App\Enums\Rol::Beheerder)
   <div class="iuasr-dash-vhead">
     <div>

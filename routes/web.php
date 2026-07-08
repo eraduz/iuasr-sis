@@ -47,8 +47,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Digitaal ondertekende documenten — archief/log (Beheerder, Directie, Studentenzaken)
-    Route::middleware('rol:beheerder,directie,studentenzaken')->group(function () {
+    // Digitaal ondertekende documenten — archief/log (Beheerder, Schoolbestuur, Directie, Studentenzaken)
+    Route::middleware('rol:beheerder,bestuur,directie,studentenzaken')->group(function () {
         Route::get('/ondertekende-documenten', [OndertekeningController::class, 'index'])->name('ondertekening');
         // Eigen PDF uploaden en laten waarmerken.
         Route::get('/ondertekende-documenten/uploaden', [OndertekeningController::class, 'uploadForm'])->name('ondertekening.uploaden');

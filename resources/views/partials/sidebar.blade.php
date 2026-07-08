@@ -73,6 +73,10 @@
             'Rapporten' => [['Rapporten', 'rapporten.inzage', 'report', 'rapporten.inzage']],
             'Documenten' => [['Ondertekende documenten', 'ondertekening', 'cert', 'ondertekening*']],
         ],
+        Rol::Bestuur->value => [
+            'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
+            'Documenten' => [['Ondertekende documenten', 'ondertekening', 'cert', 'ondertekening*']],
+        ],
         Rol::Beheerder->value => [
             'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
             'Beheer' => [

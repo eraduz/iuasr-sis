@@ -83,6 +83,11 @@ opleverpunt aantoonbaar klaar is.
     PDF gegenereerd (ontvanger verplicht). Archief 'Ondertekende documenten'
     (Beheerder/Directie/Studentenzaken) + publieke verificatiepagina (/verificatie,
     geen login) met optionele bestand-hashcontrole + WordPress-shortcode.
+  - Ondertekenmodule increment 3 (privacy/rolscheiding): het archief toont voor
+    elke gebruiker alleen de EIGEN ondertekende documenten. Nieuwe rol
+    Schoolbestuur (Bestuur) + Beheerder zien ALLES; Directie (opleidingsdirecteur)
+    en Studentenzaken zien uitsluitend hun eigen documenten. Eigenaarscontrole
+    ook op download/waarmerk/resultaatscherm (403 bij andermans document).
   - Ondertekenmodule increment 2: eigen PDF uploaden en laten waarmerken
     (Studentenzaken, Directie=opleidingsdirecteuren/bestuur, Beheerder). Het
     origineel blijft ongewijzigd (werkt voor elk PDF-formaat), krijgt een SHA-256
