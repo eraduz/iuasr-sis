@@ -31,6 +31,7 @@ class Inschrijving extends Model
         'uitschrijfdatum',
         'afstudeerdatum',
         'betaalwijze',         // termijnen | contant (informatief; geen betaalmodule)
+        'aanwezigheidsregeling_50',
         'opmerkingen',
     ];
 
@@ -38,6 +39,7 @@ class Inschrijving extends Model
     {
         return [
             'status' => InschrijvingStatus::class,
+            'aanwezigheidsregeling_50' => 'boolean',
             'leerjaar' => 'integer',
             'inschrijfdatum' => 'date',
             'invoerdatum' => 'date',
@@ -79,5 +81,10 @@ class Inschrijving extends Model
     public function vaktoewijzingen(): HasMany
     {
         return $this->hasMany(Vaktoewijzing::class);
+    }
+
+    public function presenties(): HasMany
+    {
+        return $this->hasMany(Presentie::class);
     }
 }

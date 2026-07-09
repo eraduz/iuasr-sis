@@ -19,7 +19,7 @@
 
 <div class="iuasr-dash-tbl-card">
   <table class="iuasr-dash-tbl">
-    <thead><tr><th>Vak</th><th>Code</th><th>Opleiding</th><th>EC</th><th>Studenten</th><th>Onderdelen</th><th>Cijferstatus</th><th class="row-act"></th></tr></thead>
+    <thead><tr><th>Vak</th><th>Code</th><th>Opleiding</th><th>EC</th><th>Studenten</th><th>Onderdelen</th><th>Cijferstatus</th><th>Aanwezigheid</th><th class="row-act"></th></tr></thead>
     <tbody>
       @forelse ($vakken as $r)
         @php
@@ -30,6 +30,12 @@
           elseif ($r['ingevoerd'] < $r['aantal']) { $badge = 's-incomplete'; $tekst = $r['ingevoerd'].'/'.$r['aantal'].' ingevoerd'; }
           else { $badge = 's-incomplete'; $tekst = 'Volledig — nog niet ingediend'; }
           $vergrendeld = $st !== App\Enums\CijferlijstStatus::Concept;
+
+          $p = $r['presentie'];
+          if ($p['deelnemers'] === 0) { $pBadge = 's-draft'; $pTekst = '—'; }
+          elseif ($p['volledig']) { $pBadge = 's-approved'; $pTekst = 'Volledig'; }
+          elseif ($p['weken_geregistreerd'] === 0) { $pBadge = 's-rejected'; $pTekst = 'Niet gestart'; }
+          else { $pBadge = 's-incomplete'; $pTekst = $p['weken_geregistreerd'].'/'.$p['weken_totaal'].' weken'; }
         @endphp
         <tr>
           <td class="nm">{{ $vak->naam }}</td>
@@ -39,13 +45,17 @@
           <td class="tnum">{{ $r['aantal'] }}</td>
           <td class="tnum">{{ $r['onderdelen'] }}</td>
           <td><span class="iuasr-dash-status {{ $badge }}">{{ $tekst }}</span></td>
-          <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm {{ $vergrendeld ? '' : 'iuasr-dash-btn--primary' }}" href="{{ route('vakken.cijfers', $vak) }}">{{ $vergrendeld ? 'Bekijken' : 'Cijfers invoeren' }}</a></td>
+          <td><span class="iuasr-dash-status {{ $pBadge }}">{{ $pTekst }}</span></td>
+          <td class="row-act" style="white-space:nowrap;">
+            <a class="iuasr-dash-btn iuasr-dash-btn--sm {{ $p['volledig'] || $p['deelnemers'] === 0 ? '' : 'iuasr-dash-btn--primary' }}" href="{{ route('vakken.presentie', $vak) }}">Aanwezigheid</a>
+            <a class="iuasr-dash-btn iuasr-dash-btn--sm {{ $vergrendeld ? '' : 'iuasr-dash-btn--primary' }}" href="{{ route('vakken.cijfers', $vak) }}">{{ $vergrendeld ? 'Bekijken' : 'Cijfers invoeren' }}</a>
+          </td>
         </tr>
       @empty
-        <tr><td colspan="8"><div class="iuasr-dash-empty" style="border:0;"><h3>Geen vakken gekoppeld</h3><p>Er zijn nog geen vakken aan uw docentprofiel gekoppeld.</p></div></td></tr>
+        <tr><td colspan="9"><div class="iuasr-dash-empty" style="border:0;"><h3>Geen vakken gekoppeld</h3><p>Er zijn nog geen vakken aan uw docentprofiel gekoppeld.</p></div></td></tr>
       @endforelse
     </tbody>
   </table>
 </div>
-<p class="sis-tblnote">Het eindcijfer is het gewogen gemiddelde van de deelresultaten; EC worden pas toegekend als álle meetellende onderdelen voldoende zijn (cesuur 5,5).</p>
+<p class="sis-tblnote">Het eindcijfer is het gewogen gemiddelde van de deelresultaten; EC worden pas toegekend als álle meetellende onderdelen voldoende zijn (cesuur 5,5). Het <b>registreren van de aanwezigheid</b> tijdens college is verplicht: leg per onderwijsweek per student 1 (aanwezig) of 0 (afwezig) vast.</p>
 @endsection

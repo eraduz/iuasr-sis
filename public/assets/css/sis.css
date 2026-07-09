@@ -470,6 +470,9 @@
   .iuasr-dash-main { padding: 0 !important; margin: 0 !important; }
   .sis-paper-stage { background: #FFFFFF !important; border: 0 !important; padding: 0 !important; box-shadow: none !important; }
   .sis-a4 { box-shadow: none !important; width: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
+  /* Presentielijst: bewaarknoppen en kolomacties horen niet op papier. */
+  .sis-savebar, .sis-weekall { display: none !important; }
+  .sis-pres-select { border: 0 !important; background: transparent !important; -webkit-appearance: none; appearance: none; }
   @page { margin: 12mm; }
 }
 
@@ -571,6 +574,32 @@
 .sis-pill-soft {
   display: inline-block; font-size: 11px; font-weight: 500; color: var(--blackAltText);
   background: var(--priColor102); padding: 2px 8px; border-radius: 999px;
+}
+
+/* ============================================================
+   PRESENTIE (aanwezigheidsregistratie per college)
+   ============================================================ */
+.sis-pres-select {
+  width: 52px; height: 32px; text-align: center; text-align-last: center;
+  font-family: inherit; font-size: 14px; font-weight: 500;
+  color: var(--priColor100); font-variant-numeric: tabular-nums;
+  border: 1px solid var(--borderColor); border-radius: 4px; background: #FFFFFF;
+}
+.sis-pres-select:focus {
+  outline: none; border-color: var(--secColor100);
+  box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.18);
+}
+.sis-pres-select[disabled] { background: var(--priColor102); color: var(--blackAltText); }
+.sis-weekall {
+  margin-top: 4px; font-family: inherit; font-size: 10.5px; font-weight: 500;
+  padding: 2px 7px; border: 1px solid var(--borderColor); border-radius: 999px;
+  background: #FFFFFF; color: var(--blackAltText); cursor: pointer;
+}
+.sis-weekall:hover { border-color: var(--priColor100); color: var(--priColor100); }
+/* Label achter de studentnaam: deze student heeft de 50%-aanwezigheidsregeling. */
+.sis-pill-regeling {
+  margin-left: 6px; color: #7a5510; background: rgba(214, 154, 45, 0.16);
+  font-weight: 600;
 }
 
 /* ============================================================

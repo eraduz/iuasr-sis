@@ -254,6 +254,132 @@ class Statistiek
         ];
     }
 
+    /*
+    |----------------------------------------------------------------------
+    | Presentie (aanwezigheid)
+    |----------------------------------------------------------------------
+    | Geaggregeerd uit `presenties`; een niet-geregistreerde week telt niet
+    | mee. De norm is 80%, of 50% bij de aanwezigheidsregeling.
+    */
+
+    /** Basisquery over presenties, optioneel beperkt tot opleiding(en) en/of één docent. */
+    private static function presentieQuery(?array $ids, ?int $docentId = null): \Illuminate\Database\Query\Builder
+    {
+        return \Illuminate\Support\Facades\DB::table('presenties')
+            ->join('vakken', 'vakken.id', '=', 'presenties.vak_id')
+            ->when($ids !== null, fn ($q) => $q->whereIn('vakken.opleiding_id', $ids))
+            ->when($docentId !== null, fn ($q) => $q->where('vakken.docent_id', $docentId));
+    }
+
+    /** Kerncijfers aanwezigheid: registraties, gemiddeld percentage, studenten onder de norm. */
+    public static function presentie($opleidingIds = null, ?int $docentId = null): array
+    {
+        $ids = self::ids($opleidingIds);
+
+        $totaal = (clone self::presentieQuery($ids, $docentId))->count();
+        $aanwezig = (clone self::presentieQuery($ids, $docentId))->where('presenties.aanwezig', true)->count();
+
+        // Per (student × vak) het percentage tegen de eigen norm leggen.
+        $normStandaard = (float) config('sis.presentie.norm', 0.80);
+        $normRegeling = (float) config('sis.presentie.norm_regeling', 0.50);
+
+        $perStudentVak = self::presentieQuery($ids, $docentId)
+            ->join('inschrijvingen', 'inschrijvingen.id', '=', 'presenties.inschrijving_id')
+            ->selectRaw('presenties.inschrijving_id, presenties.vak_id, inschrijvingen.aanwezigheidsregeling_50 as regeling,
+                count(*) as n, sum(presenties.aanwezig) as a')
+            ->groupBy('presenties.inschrijving_id', 'presenties.vak_id', 'inschrijvingen.aanwezigheidsregeling_50')
+            ->get();
+
+        $onderNorm = $perStudentVak->filter(function ($r) use ($normStandaard, $normRegeling) {
+            $norm = $r->regeling ? $normRegeling : $normStandaard;
+
+            return $r->n > 0 && ($r->a / $r->n) < $norm;
+        })->count();
+
+        return [
+            'registraties' => $totaal,
+            'aanwezig' => $aanwezig,
+            'afwezig' => $totaal - $aanwezig,
+            'percentage' => $totaal > 0 ? (int) round($aanwezig / $totaal * 100) : 0,
+            'onder_norm' => $onderNorm,
+            'beoordeeld' => $perStudentVak->count(),
+            'met_regeling' => Inschrijving::where('status', 'actief')
+                ->where('aanwezigheidsregeling_50', true)
+                ->when($ids !== null, fn ($q) => $q->whereIn('opleiding_id', $ids))->count(),
+        ];
+    }
+
+    /** Gemiddelde aanwezigheid per opleiding. @return list<array{label:string,value:int}> */
+    public static function presentiePerOpleiding($opleidingIds = null): array
+    {
+        $ids = self::ids($opleidingIds);
+
+        return self::presentieQuery($ids)
+            ->join('opleidingen', 'opleidingen.id', '=', 'vakken.opleiding_id')
+            ->selectRaw('opleidingen.code as label, round(avg(presenties.aanwezig) * 100) as value')
+            ->groupBy('opleidingen.code')->orderByDesc('value')
+            ->get()->map(fn ($r) => ['label' => $r->label, 'value' => (int) $r->value])->all();
+    }
+
+    /** Gemiddelde aanwezigheid per vak (docent: eigen vakken). @return list<array{label:string,value:int}> */
+    public static function presentiePerVak($opleidingIds = null, ?int $docentId = null): array
+    {
+        $ids = self::ids($opleidingIds);
+
+        return self::presentieQuery($ids, $docentId)
+            ->selectRaw('vakken.code as label, round(avg(presenties.aanwezig) * 100) as value')
+            ->groupBy('vakken.code')->orderByDesc('value')->limit(12)
+            ->get()->map(fn ($r) => ['label' => $r->label, 'value' => (int) $r->value])->all();
+    }
+
+    /** Aanwezigheid in banden — kwaliteitsbeeld van de opleiding. */
+    public static function presentieVerdeling($opleidingIds = null, ?int $docentId = null): array
+    {
+        $ids = self::ids($opleidingIds);
+
+        $rijen = self::presentieQuery($ids, $docentId)
+            ->selectRaw('presenties.inschrijving_id, presenties.vak_id, count(*) as n, sum(presenties.aanwezig) as a')
+            ->groupBy('presenties.inschrijving_id', 'presenties.vak_id')
+            ->get();
+
+        $banden = ['0–50%' => 0, '50–80%' => 0, '80–100%' => 0];
+        foreach ($rijen as $r) {
+            $p = $r->n > 0 ? $r->a / $r->n : 0;
+            $band = match (true) {
+                $p < 0.5 => '0–50%',
+                $p < 0.8 => '50–80%',
+                default => '80–100%',
+            };
+            $banden[$band]++;
+        }
+
+        return [
+            ['label' => '80–100%', 'value' => $banden['80–100%'], 'kleur' => self::GROEN],
+            ['label' => '50–80%', 'value' => $banden['50–80%'], 'kleur' => self::GOUD],
+            ['label' => '0–50%', 'value' => $banden['0–50%'], 'kleur' => self::ROOD],
+        ];
+    }
+
+    /**
+     * Actieve studenten met de 50%-aanwezigheidsregeling, met hun opleiding.
+     *
+     * @return \Illuminate\Support\Collection<int, array{student: Student, inschrijving: Inschrijving}>
+     */
+    public static function aanwezigheidsregelingStudenten($opleidingIds = null): \Illuminate\Support\Collection
+    {
+        $ids = self::ids($opleidingIds);
+
+        return Inschrijving::where('status', 'actief')
+            ->where('aanwezigheidsregeling_50', true)
+            ->when($ids !== null, fn ($q) => $q->whereIn('opleiding_id', $ids))
+            ->with(['student', 'opleiding', 'periode'])
+            ->get()
+            ->filter(fn (Inschrijving $i) => $i->student !== null)
+            ->map(fn (Inschrijving $i) => ['student' => $i->student, 'inschrijving' => $i])
+            ->sortBy(fn ($r) => $r['student']->achternaam)
+            ->values();
+    }
+
     /** NT2-bewaking: open / verstreken / behaald. */
     public static function nt2Verdeling(): array
     {

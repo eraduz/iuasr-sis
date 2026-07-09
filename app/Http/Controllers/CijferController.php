@@ -11,6 +11,7 @@ use App\Models\Vak;
 use App\Support\AuditLogger;
 use App\Support\Cijferberekening;
 use App\Support\Documentondertekening;
+use App\Support\Presentiebewaking;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -54,6 +55,8 @@ class CijferController extends Controller
                 'ingevoerd' => $ingevoerd,
                 'onderdelen' => $vak->toetsonderdelen->count(),
                 'status' => $lijsten[$vak->id]?->status ?? CijferlijstStatus::Concept,
+                // Presentieregistratie is voor de docent verplicht; toon de stand.
+                'presentie' => Presentiebewaking::voorVak($vak)['samenvatting'],
             ];
         });
 

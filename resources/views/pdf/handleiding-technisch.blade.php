@@ -130,9 +130,21 @@ MAIL_FROM_NAME="IUASR Studentenzaken"</span>
     <li>Inzage/mutatie van cijfers en BSN wordt gelogd (audit-log, alleen-lezen voor Beheer).</li>
     <li>Rolscheiding wordt server-side afgedwongen; wijzig dit niet zonder reden.</li>
     <li><b>Directie is opleidinggebonden.</b> De koppeltabel <code>directie_opleidingen</code> (user &harr; opleiding) bepaalt welke studenten, cijfers en rapporten een directielid ziet. Beheer wijst dit toe via <b>Gebruikers &amp; rollen &rarr; Directie — opleidingtoewijzing</b>. Zonder toewijzing ziet een directielid <b>niets</b> (need-to-know). Een dubbel ingeschreven student is zichtbaar voor de directie van elke opleiding waarin hij/zij actief is. De filtering loopt via <code>User::opleidingIds()</code>, <code>Student::scopeZichtbaarVoor()</code> en per-opleiding gefilterde statistieken.</li>
+    <li><b>Presentiegegevens zijn onderwijsinhoudelijk.</b> Studentenzaken, Financiële Administratie en Beheer hebben géén toegang tot presentielijsten of aanwezigheidspercentages (Gate <code>presentie-inzien</code>). Registreren mag alleen de docent van het eigen vak (Gate <code>presentie-registreren</code>). Inzage en mutatie worden gelogd.</li>
   </ul>
 
-  <h2>7. Regulier onderhoud</h2>
+  <h2>7. Presentie (aanwezigheidsregistratie)</h2>
+  <p>De docent registreert per college de aanwezigheid; dit is verplicht. Het model is bewust <b>genormaliseerd</b>: één regel per student &times; vak &times; onderwijsweek — nooit vaste weekkolommen op de inschrijving.</p>
+  <table class="kv">
+    <tr><td class="k">Tabel</td><td><code>presenties</code> (<code>inschrijving_id</code>, <code>vak_id</code>, <code>week</code>, <code>aanwezig</code>, <code>geregistreerd_door_id</code>) met unieke sleutel op (<code>inschrijving_id</code>, <code>vak_id</code>, <code>week</code>).</td></tr>
+    <tr><td class="k">Regeling</td><td>Kolom <code>inschrijvingen.aanwezigheidsregeling_50</code> (boolean). Bewust op de <b>inschrijving</b>, niet op de student: zij geldt per opleiding en per studiejaar en moet bij herinschrijving opnieuw worden toegekend.</td></tr>
+    <tr><td class="k">Normen</td><td><code>config/sis.php</code> &rarr; <code>presentie.weken_per_blok</code> (8), <code>presentie.norm</code> (0.80) en <code>presentie.norm_regeling</code> (0.50).</td></tr>
+    <tr><td class="k">Logica</td><td><code>App\Support\Presentiebewaking</code> — percentage, norm per student, volledigheid per week. <code>App\Support\Statistiek</code> levert de dashboard-aggregaties.</td></tr>
+  </table>
+  <div class="let"><b>Ontbrekende registratie is geen afwezigheid.</b> Het percentage wordt berekend over de <b>geregistreerde</b> weken. Een week zonder regel telt niet mee — anders zou nalatigheid van de docent op de student worden afgewenteld. Een week geldt pas als “geregistreerd” wanneer álle presentieplichtige deelnemers een waarde hebben.</div>
+  <p>Vrijgestelde studenten (<code>vaktoewijzingen.vrijgesteld</code>) volgen het vak niet en worden bij het opslaan overgeslagen, óók als het formulier voor hen een waarde meestuurt. Wijzigt u <code>weken_per_blok</code>, dan blijven bestaande registraties met een hoger weeknummer in de database staan maar verdwijnen zij uit het scherm; ruim ze in dat geval expliciet op.</p>
+
+  <h2>8. Regulier onderhoud</h2>
   <ul>
     <li><b>Migraties:</b> <code>php artisan migrate</code> na een update (reversible; maak eerst een back-up).</li>
     <li><b>Cache:</b> <code>php artisan optimize:clear</code> bij onverwacht gedrag na wijzigingen.</li>

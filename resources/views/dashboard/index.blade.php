@@ -198,18 +198,38 @@
 
 {{-- ========================= DOCENT ========================= --}}
 @elseif ($rol === App\Enums\Rol::Docent)
+  @php $pres = $stat['presentie'] ?? ['percentage'=>0,'registraties'=>0,'onder_norm'=>0,'met_regeling'=>0]; @endphp
   <div class="iuasr-dash-vhead">
     <div>
       <h1>Docent</h1>
-      <div class="summary">Cijferinvoer voor <b>uw eigen vakken</b></div>
+      <div class="summary">Cijferinvoer en aanwezigheidsregistratie voor <b>uw eigen vakken</b></div>
     </div>
     <div class="iuasr-dash-vhead__actions">
+      <a class="iuasr-dash-btn" href="{{ route('presentieoverzicht') }}">Aanwezigheid</a>
       <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('cijferinvoer') }}">Cijfers invoeren</a>
     </div>
   </div>
   <div class="iuasr-dash-alert iuasr-dash-alert--info">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
     <span>U ziet en muteert <b>alleen uw eigen vakken</b>. Andere vakken en persoonsdossiers zijn niet toegankelijk.</span>
+  </div>
+
+  <div class="iuasr-dash-stats" style="margin-top:16px;">
+    <div class="iuasr-dash-stat"><span class="lbl">Gemiddelde aanwezigheid</span><span class="val">{{ $pres['percentage'] }}%</span></div>
+    <div class="iuasr-dash-stat"><span class="lbl">Registraties</span><span class="val">{{ $pres['registraties'] }}</span></div>
+    <div class="iuasr-dash-stat {{ $pres['onder_norm'] > 0 ? 'iuasr-dash-stat--alert' : '' }}"><span class="lbl">Studenten onder de norm</span><span class="val">{{ $pres['onder_norm'] }}</span></div>
+    <div class="iuasr-dash-stat"><span class="lbl">Met 50%-regeling</span><span class="val">{{ $pres['met_regeling'] }}</span></div>
+  </div>
+
+  <div class="sis-chartgrid" style="margin-top:16px;">
+    <div class="sis-chart-card">
+      <div class="sis-card__hd"><h3>Aanwezigheid per vak</h3><span class="hint">gemiddeld % van de geregistreerde colleges</span></div>
+      @include('partials.charts.bar', ['data' => $stat['presentiePerVak'] ?? [], 'eenheid' => '%', 'leeg' => 'Nog geen registraties.'])
+    </div>
+    <div class="sis-chart-card">
+      <div class="sis-card__hd"><h3>Verdeling aanwezigheid</h3><span class="hint">per student per vak</span></div>
+      @include('partials.charts.bar', ['data' => $stat['presentieVerdeling'] ?? [], 'leeg' => 'Nog geen registraties.'])
+    </div>
   </div>
 
 {{-- ========================= EXAMENCOMMISSIE ========================= --}}
@@ -277,10 +297,12 @@
     </div>
   </div>
 
+  @php $pres = $stat['presentie'] ?? ['percentage'=>0,'onder_norm'=>0,'met_regeling'=>0]; @endphp
   <div class="iuasr-dash-stats">
     <div class="iuasr-dash-stat iuasr-dash-stat--ok"><span class="lbl">Actief ingeschreven</span><span class="val">{{ $kpi['inschrijvingen'] }}</span><span class="delta">van {{ $kpi['studenten'] }} studenten</span></div>
     <div class="iuasr-dash-stat"><span class="lbl">Afgestudeerd</span><span class="val">{{ $kpi['afgestudeerd'] }}</span><span class="delta">alumni</span></div>
     <div class="iuasr-dash-stat"><span class="lbl">Studiesucces</span><span class="val">{{ $slaag['percentage'] }}%</span><span class="delta">toetsen voldoende</span></div>
+    <div class="iuasr-dash-stat"><span class="lbl">Aanwezigheid</span><span class="val">{{ $pres['percentage'] }}%</span><span class="delta">{{ $pres['onder_norm'] }} onder de norm</span></div>
     <div class="iuasr-dash-stat"><span class="lbl">Uitgeschreven</span><span class="val">{{ $kpi['uitgeschreven'] }}</span><span class="delta">uitval</span></div>
   </div>
 
@@ -300,6 +322,20 @@
     <div class="sis-chart-card">
       <h3>Overgangsadvies</h3><p class="sub">Actieve studenten · EC t.o.v. drempel</p>
       @include('partials.charts.donut', ['segments' => $stat['overgang'] ?? [], 'middenLabel' => 'studenten'])
+    </div>
+  </div>
+
+  <div class="sis-chartgrid" style="margin-top:16px;">
+    <div class="sis-chart-card">
+      <h3>Aanwezigheid</h3><p class="sub">{{ $isBestuur ? 'Gemiddeld per opleiding' : 'Gemiddeld per vak' }} · onderwijskwaliteit</p>
+      @include('partials.charts.bar', [
+        'data' => ($isBestuur ? ($stat['presentiePerOpleiding'] ?? []) : ($stat['presentiePerVak'] ?? [])),
+        'kleur' => App\Support\Statistiek::GROEN, 'eenheid' => '%', 'leeg' => 'Nog geen registraties.',
+      ])
+    </div>
+    <div class="sis-chart-card">
+      <h3>Verdeling aanwezigheid</h3><p class="sub">Per student per vak · norm 80% (50% bij regeling)</p>
+      @include('partials.charts.donut', ['segments' => $stat['presentieVerdeling'] ?? [], 'middenLabel' => 'metingen'])
     </div>
   </div>
 
@@ -358,6 +394,65 @@
       <h3>Gebruikers per rol</h3><p class="sub">Toegang &amp; rolscheiding</p>
       @include('partials.charts.bar', ['data' => $stat['gebruikersPerRol'] ?? [], 'kleur' => 'var(--priColor200)'])
     </div>
+  </div>
+@endif
+
+{{-- Presentieregistratie die achterloopt — registreren is voor de docent verplicht --}}
+@if ($presentieAchterstand->isNotEmpty())
+  <div class="sis-card" style="margin-top:16px;border-left:3px solid var(--secColor100);">
+    <div class="sis-card__hd">
+      <h3>Aanwezigheidsregistratie nog niet volledig</h3>
+      <span class="hint">{{ $presentieAchterstand->count() }} vak(ken)</span>
+    </div>
+    <div class="iuasr-dash-tbl-card" style="border:0;">
+      <table class="iuasr-dash-tbl">
+        <thead><tr><th style="width:90px;">Code</th><th style="width:220px;">Vak</th>@if ($rol !== App\Enums\Rol::Docent)<th>Docent</th>@endif<th>Ontbrekende weken</th><th class="row-act"></th></tr></thead>
+        <tbody>
+          @foreach ($presentieAchterstand as $r)
+            <tr>
+              <td class="tnum">{{ $r['vak']->code }}</td>
+              <td class="nm">{{ $r['vak']->naam }}</td>
+              @if ($rol !== App\Enums\Rol::Docent)<td>{{ $r['vak']->docent?->volledigeNaam() ?? '—' }}</td>@endif
+              <td>
+                @foreach ($r['samenvatting']['weken_ontbrekend'] as $w)<span class="sis-pill-soft" style="margin:0 4px 4px 0;">week {{ $w }}</span>@endforeach
+              </td>
+              <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('vakken.presentie', $r['vak']) }}">{{ $rol === App\Enums\Rol::Docent ? 'Registreren' : 'Bekijken' }}</a></td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+    <p class="sis-tblnote" style="margin-top:6px;">De docent legt per onderwijsweek de aanwezigheid vast (1 = aanwezig, 0 = afwezig). Een week telt pas als geregistreerd zodra álle presentieplichtige studenten een waarde hebben.</p>
+  </div>
+@endif
+
+{{-- Studenten met de 50%-aanwezigheidsregeling --}}
+@if ($regelingLijst->isNotEmpty())
+  @php $magDossierRegeling = in_array($rol, [App\Enums\Rol::Studentenzaken, App\Enums\Rol::Examencommissie, App\Enums\Rol::Directie, App\Enums\Rol::Bestuur, App\Enums\Rol::Beheerder], true); @endphp
+  <div class="sis-card" style="margin-top:16px;border-left:3px solid var(--goud,#D69A2D);">
+    <div class="sis-card__hd">
+      <h3>Studenten met 50%-aanwezigheidsregeling</h3>
+      <span class="hint">{{ $regelingLijst->count() }} student(en)</span>
+    </div>
+    <div class="iuasr-dash-tbl-card" style="border:0;">
+      <table class="iuasr-dash-tbl">
+        <thead><tr><th style="width:110px;">Studentnr.</th><th style="width:240px;">Naam</th><th>Opleiding</th><th>Studiejaar</th></tr></thead>
+        <tbody>
+          @foreach ($regelingLijst as $r)
+            <tr>
+              <td class="tnum">{{ $r['student']->studentnummer }}</td>
+              <td class="nm">
+                @if ($magDossierRegeling)<a href="{{ route('studenten.show', $r['student']) }}">{{ $r['student']->volledigeNaam() }}</a>
+                @else {{ $r['student']->volledigeNaam() }}@endif
+              </td>
+              <td>{{ $r['inschrijving']->opleiding?->naam ?? '—' }}</td>
+              <td>{{ $r['inschrijving']->periode?->naam ?? '—' }}</td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+    <p class="sis-tblnote" style="margin-top:6px;">Deze studenten hoeven minimaal <b>de helft</b> van de lessen, practica en colleges bij te wonen in plaats van {{ (int) round(config('sis.presentie.norm') * 100) }}%. Studentenzaken legt de regeling vast met toestemming van de directie; zij geldt per opleiding en per studiejaar.</p>
   </div>
 @endif
 

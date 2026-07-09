@@ -21,6 +21,7 @@
             'log' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
             'money' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="12" cy="14.5" r="1.6"/></svg>',
             'euro' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 7a7 7 0 1 0 0 10"/><line x1="3" y1="10" x2="13" y2="10"/><line x1="3" y1="14" x2="13" y2="14"/></svg>',
+            'check' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
             default => '',
         };
     };
@@ -58,6 +59,7 @@
             'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
             'Onderwijs' => [
                 ['Mijn vakken', 'mijn-vakken', 'book', 'mijn-vakken'],
+                ['Aanwezigheid', 'presentieoverzicht', 'check', 'presentieoverzicht'],
             ],
         ],
         Rol::Examencommissie->value => [
@@ -69,6 +71,7 @@
                 ['Leerjaar-herbeoordeling', 'overgang', 'grade', 'overgang'],
                 ['EC-rapport', 'ec-rapport', 'report', 'ec-rapport'],
             ],
+            'Onderwijs' => [['Aanwezigheid', 'presentieoverzicht', 'check', 'presentieoverzicht']],
             'Rapporten' => [['Rapporten', 'rapporten.inzage', 'report', 'rapporten.inzage']],
         ],
         Rol::Directie->value => [
@@ -80,12 +83,14 @@
                 ['Leerjaar-herbeoordeling', 'overgang', 'grade', 'overgang'],
                 ['EC-rapport', 'ec-rapport', 'report', 'ec-rapport'],
             ],
+            'Onderwijs' => [['Aanwezigheid', 'presentieoverzicht', 'check', 'presentieoverzicht']],
             'Rapporten' => [['Rapporten', 'rapporten.inzage', 'report', 'rapporten.inzage']],
             'Documenten' => [['Ondertekende documenten', 'ondertekening', 'cert', 'ondertekening*']],
         ],
         Rol::Bestuur->value => [
             'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
             'Studenten' => [['Alle studenten', 'studenten.index', 'students', 'studenten.*']],
+            'Onderwijs' => [['Aanwezigheid', 'presentieoverzicht', 'check', 'presentieoverzicht']],
             'Documenten' => [['Ondertekende documenten', 'ondertekening', 'cert', 'ondertekening*']],
             'Handleidingen' => [
                 ['Medewerkershandleiding', 'handleiding.medewerkers', 'report', 'handleiding.medewerkers'],

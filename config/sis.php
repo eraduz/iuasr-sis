@@ -72,6 +72,24 @@ return [
 
     /*
     |----------------------------------------------------------------------
+    | Presentie (aanwezigheidsregistratie)
+    |----------------------------------------------------------------------
+    | De docent registreert per college de aanwezigheid: 1 = aanwezig,
+    | 0 = afwezig, leeg = nog niet geregistreerd. Een blok telt een vast
+    | aantal onderwijsweken; per week legt de docent één registratie vast.
+    |
+    | BEVESTIGD (opdrachtgever, 2026-07-09): 8 weken per blok, één college
+    | per week; norm 80% aanwezigheid, of 50% voor studenten aan wie de
+    | 50%-aanwezigheidsregeling is toegekend.
+    */
+    'presentie' => [
+        'weken_per_blok' => 8,
+        'norm' => 0.80,
+        'norm_regeling' => 0.50,
+    ],
+
+    /*
+    |----------------------------------------------------------------------
     | Rollen (rolscheiding vanaf de eerste regel code)
     |----------------------------------------------------------------------
     | Bij voorkeur ontleend aan Entra-groepen. Autorisatie wordt ALTIJD

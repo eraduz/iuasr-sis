@@ -54,12 +54,12 @@
   <p>Het systeem kent een strikte rolscheiding. Deze wordt aan de serverkant afgedwongen — u ziet alleen de schermen die bij uw rol horen.</p>
   <table class="rol">
     <tr><th>Rol</th><th>Wat u doet</th></tr>
-    <tr><td><b>Studentenzaken</b></td><td>Studenten in-/uitschrijven, gegevens en documenten beheren, collegegeld, verklaringen, vrijstellingen registreren. <b>Geen</b> cijferinzage.</td></tr>
-    <tr><td><b>Docent</b></td><td>Cijfers invoeren voor <b>uw eigen vakken</b> en indienen bij de examencommissie.</td></tr>
-    <tr><td><b>Examencommissie</b></td><td>Cijferlijsten vaststellen, tentamenlijsten en cijferlijsten inzien, studievoortgang beoordelen.</td></tr>
-    <tr><td><b>Directie</b></td><td>Cijfers en rapporten inzien van <b>uitsluitend de eigen opleiding(en)</b>. Een directielid wordt door Beheer aan één of meer opleidingen gekoppeld en ziet alleen die studenten.</td></tr>
+    <tr><td><b>Studentenzaken</b></td><td>Studenten in-/uitschrijven, gegevens en documenten beheren, collegegeld, verklaringen, vrijstellingen registreren, de 50%-aanwezigheidsregeling vastleggen. <b>Geen</b> cijferinzage.</td></tr>
+    <tr><td><b>Docent</b></td><td>Cijfers invoeren voor <b>uw eigen vakken</b> en indienen bij de examencommissie. De <b>aanwezigheid</b> per college registreren (verplicht).</td></tr>
+    <tr><td><b>Examencommissie</b></td><td>Cijferlijsten vaststellen, tentamenlijsten en cijferlijsten inzien, studievoortgang en aanwezigheid beoordelen.</td></tr>
+    <tr><td><b>Directie</b></td><td>Cijfers, aanwezigheid en rapporten inzien van <b>uitsluitend de eigen opleiding(en)</b>. Een directielid wordt door Beheer aan één of meer opleidingen gekoppeld en ziet alleen die studenten.</td></tr>
     <tr><td><b>Financiële Administratie</b></td><td>Collegegeldbetalingen registreren en achterstanden bewaken.</td></tr>
-    <tr><td><b>Schoolbestuur</b></td><td>Kerncijfers en alle ondertekende documenten inzien.</td></tr>
+    <tr><td><b>Schoolbestuur</b></td><td>Kerncijfers, aanwezigheidsstatistiek en alle ondertekende documenten inzien.</td></tr>
     <tr><td><b>Beheerder</b></td><td>Gebruikers/rollen, referentietabellen, audit-log, back-ups en het volledig verwijderen van foutieve studentrecords.</td></tr>
   </table>
 
@@ -67,6 +67,7 @@
   <p>Na het inloggen ziet u uw dashboard met kerncijfers en grafieken die bij uw rol passen — bijvoorbeeld aantallen studenten, instroom, slaagpercentages of financiële cijfers. Signaleringen (zoals NT2-deadlines of nog aan te leveren documenten) staan er ook.</p>
   <p>Onderaan het dashboard staat een lijst <b>Studenten met vrijstelling</b>, met per student de vrijgestelde vakken. Deze is zichtbaar voor alle rollen behalve Beheer en de Financiële Administratie.</p>
   <p>Daarnaast toont het dashboard (voor Studentenzaken, Directie en de Financiële Administratie) een lijst <b>Studenten met een dubbele inschrijving</b>: studenten die twee opleidingen tegelijk volgen, met beide opleidingen erbij. Directie ziet hierin alleen studenten van de eigen opleiding(en).</p>
+  <p>Op het dashboard staat ook het venster <b>Studenten met 50%-aanwezigheidsregeling</b>, met de opleiding en het studiejaar waarvoor de regeling geldt. Docenten zien daarin alleen de studenten uit hun eigen vakken; Directie alleen die van de eigen opleiding(en); de Financiële Administratie ziet dit venster niet. Voor docenten, directie en schoolbestuur verschijnt daarnaast het venster <b>Aanwezigheidsregistratie nog niet volledig</b>, met de vakken en de weken die nog ontbreken.</p>
 
   <h2>5. Werken met studenten (Studentenzaken)</h2>
   <h3>Student zoeken</h3>
@@ -86,17 +87,42 @@
   <h3>Landelijke kennistoetsen (PABO)</h3>
   <p>Studenten van de PABO moeten de landelijke kennistoetsen halen (de RWT reken-/wiskundetoets en de LKT-kennisbasistoetsen taal en rekenen), binnen <b>twee jaar</b> na inschrijving. Zodra een student zich voor de PABO inschrijft, verschijnt op het dossier (kaart <b>Landelijke kennistoetsen</b>) automatisch de status per toets met de deadline. Registreer een behaalde toets door de datum in te vullen en op <b>Opslaan</b> te klikken. Op het dashboard van Studentenzaken staan de studenten met openstaande of verstreken toetsen — vergelijkbaar met de NT2-bewaking. De set kennistoetsen per opleiding wordt beheerd door Beheer via <b>Opzoektabellen &rarr; Landelijke kennistoetsen</b>.</p>
 
+  <h3>50%-aanwezigheidsregeling</h3>
+  <p>Normaal wordt van een student <b>80%</b> aanwezigheid verwacht. Met de <b>50%-aanwezigheidsregeling</b> hoeft de student minimaal de <b>helft</b> van de lessen, practica en colleges bij te wonen. De regeling wordt <b>toegestaan door de directie</b> en door Studentenzaken vastgelegd.</p>
+  <p>Open het dossier, tabblad <b>Inschrijving &amp; klas</b>. Onder <b>Huidige inschrijving</b> staat het vinkje <b>50% Aanwezigheidsregeling</b>. Zet het aan (of uit) en klik op <b>Opslaan</b>. De wijziging wordt gelogd.</p>
+  <div class="tip">De regeling hangt aan de <b>inschrijving</b>: zij geldt voor één opleiding in één studiejaar. Bij <b>herinschrijven</b> — of bij een tweede opleiding — moet de regeling dus <b>bewust opnieuw</b> worden toegekend. Zo blijft het een jaarlijks besluit van de directie en loopt zij niet stilzwijgend door.</div>
+  <p>De regeling is zichtbaar voor Studentenzaken, Docenten, Examencommissie, Directie, Schoolbestuur en Beheer — op het studentdossier, op het dashboard en (voor de docent) op de aanwezigheidslijst, waar de student het label <b>50%</b> achter de naam krijgt.</p>
+
   <h3>Vrijstellingen (workflow examencommissie &rarr; Studentenzaken)</h3>
   <p>Een vrijstelling wordt <b>verleend door de examencommissie</b>. De examencommissie legt het besluit vast en stuurt het intern naar Studentenzaken; het verschijnt dan als taak op uw dashboard onder <b>Vrijstellingsbesluiten van de examencommissie</b>. Klik op <b>Verwerken</b> en de vrijstelling wordt automatisch op het vak van de student vastgelegd — u hoeft niets over te typen. Is het vak nog niet toegewezen, dan krijgt u een melding om het eerst toe te wijzen.</p>
   <p>U kunt een vrijstelling ook <b>handmatig</b> vastleggen onder <b>Inschrijving &amp; klas</b> (bijvoorbeeld bij een papieren besluit), altijd met de <b>referentie van het examencommissie-besluit</b>. Een vrijstelling levert de volledige studiepunten (EC) op zonder cijfer (vermelding “VR”).</p>
 
-  <h2>6. Cijfers invoeren (Docent)</h2>
+  <h2>6. Cijfers en aanwezigheid (Docent)</h2>
+  <h3>Cijfers invoeren</h3>
   <p>Ga naar <b>Cijferinvoer</b> en kies een van uw vakken. Voer per toetsonderdeel de 1e poging en eventueel de herkansing in; het systeem berekent het gewogen eindcijfer en de EC. Als u klaar bent, <b>dient u de lijst in</b> bij de examencommissie. Daarna is de lijst vergrendeld.</p>
   <div class="tip">U ziet en wijzigt uitsluitend uw eigen vakken. Bij een vrijstelling vervallen de invoervelden en geldt “VR”.</div>
+
+  <h3>Aanwezigheid registreren (verplicht)</h3>
+  <p>Tijdens elk college registreert u de aanwezigheid van uw studenten. <b>Dit is verplicht.</b> Een blok telt <b>acht onderwijsweken</b>; per week legt u per student één waarde vast:</p>
+  <table class="rol">
+    <tr><th>Waarde</th><th>Betekenis</th></tr>
+    <tr><td><b>1</b></td><td>De student was aanwezig.</td></tr>
+    <tr><td><b>0</b></td><td>De student was afwezig.</td></tr>
+    <tr><td><b>–</b></td><td>Nog niet geregistreerd. Dit telt <b>niet</b> als afwezigheid.</td></tr>
+  </table>
+  <p>Ga naar <b>Mijn vakken</b> en klik bij een vak op <b>Aanwezigheid</b> (of kies <b>Aanwezigheid</b> in het menu voor een overzicht van al uw vakken). U ziet een tabel met uw studenten en de acht weken. Met het knopje <b>alle 1</b> boven een week zet u die hele week in één klik op aanwezig; daarna past u de uitzonderingen aan. Klik op <b>Aanwezigheid opslaan</b>. Het percentage per student wordt direct berekend.</p>
+  <p>Twee dingen ziet u meteen op de lijst:</p>
+  <ul>
+    <li>Studenten met een <b>vrijstelling</b> voor uw vak volgen de colleges niet. Bij hen vult u <b>niets</b> in; hun rij toont “Vrijgesteld — geen aanwezigheidsplicht”.</li>
+    <li>Studenten met de <b>50%-aanwezigheidsregeling</b> hebben het label <b>50%</b> achter hun naam en worden aan de <b>50%-norm</b> getoetst in plaats van 80%. De kolom <b>Norm</b> toont per student welke norm geldt.</li>
+  </ul>
+  <p>Op <b>Mijn vakken</b> en op uw dashboard ziet u per vak of de registratie <b>volledig</b> is. Een week telt pas als geregistreerd wanneer <b>álle</b> presentieplichtige studenten een waarde hebben. Ontbrekende weken worden expliciet benoemd. Uw dashboard toont daarnaast de gemiddelde aanwezigheid, het aantal studenten onder de norm, en grafieken per vak.</p>
+  <div class="tip">De aanwezigheidslijst is te <b>printen</b> (knop <b>Printen</b>), bijvoorbeeld om hem tijdens het college op papier bij te houden. Verwar deze lijst niet met de <b>presentielijst voor tentamens</b> (met handtekeningvak), die u vindt onder <b>Tentamenlijst</b>.</div>
 
   <h2>7. Cijfers vaststellen &amp; lijsten (Examencommissie/Directie)</h2>
   <p>In <b>Cijferoverzicht</b> ziet u alle vakken met status. Een ingediende lijst kunt u <b>vaststellen</b> of met een opmerking <b>terugsturen</b>. Per vak downloadt u een <b>presentielijst</b>: een tentamenlijst om <b>tijdens het tentamen</b> te gebruiken, met per student een vak voor de <b>handtekening</b> (aanwezigheidsbevestiging). Deze lijst bevat bewust <b>geen cijfers of studiepunten</b> — die privé-informatie mag niet zichtbaar zijn voor medestudenten. Per student maakt u via <b>Cijferlijst</b> een officieel transcript (mét cijfers). Beide zijn te printen (knop <b>Printen</b>) en als ondertekende PDF te downloaden. Directie ziet hierbij alleen de vakken en studenten van de eigen opleiding(en).</p>
   <p><b>Vrijstelling voorstellen:</b> op het dossier van een student (tabblad <b>Inschrijving &amp; klas</b>) legt u een vrijstellingsbesluit vast en stuurt u het met <b>Naar Studentenzaken sturen</b> door. Studentenzaken verwerkt het; u ziet de status (openstaand/verwerkt) terug op het dossier en kunt een openstaand besluit annuleren.</p>
+  <p><b>Aanwezigheid:</b> via het menu-item <b>Aanwezigheid</b> opent u het <b>aanwezigheidsoverzicht</b>: per vak de docent, het aantal deelnemers, of de registratie volledig is, de gemiddelde aanwezigheid en hoeveel studenten onder hun norm zitten. Klik op <b>Aanwezigheidslijst</b> voor de lijst per week. U kijkt alleen mee — registreren doet uitsluitend de docent van het vak. Directie ziet alleen de eigen opleiding(en). Zo is zichtbaar of docenten de verplichte registratie bijhouden en hoe de aanwezigheid zich per opleiding ontwikkelt.</p>
   <p><b>Resultaten mailen (einde blok):</b> in <b>Cijferlijst</b> kiest u onderaan een opleiding om alle studenten te zien. Met <b>Definitieve resultaten mailen</b> komt u op een controlescherm dat toont wie een e-mail krijgt en wie wordt overgeslagen (geen vastgestelde resultaten of geen e-mailadres). Na bevestiging ontvangt <b>elke student individueel</b> zijn/haar eigen officiële cijferlijst als PDF-bijlage. Alleen door de examencommissie vastgestelde resultaten worden verstuurd; de verzending wordt gelogd.</p>
 
   <h2>8. Collegegeld &amp; betalingen</h2>

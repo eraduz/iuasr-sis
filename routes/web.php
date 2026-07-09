@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AanwezigheidsregelingController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\DevLoginController;
 use App\Http\Controllers\BetalingController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\GebruikerController;
 use App\Http\Controllers\InschrijvingActiesController;
 use App\Http\Controllers\InschrijvingController;
 use App\Http\Controllers\OndertekeningController;
+use App\Http\Controllers\PresentieController;
 use App\Http\Controllers\RapportController;
 use App\Http\Controllers\ReferentieController;
 use App\Http\Controllers\StudentController;
@@ -149,6 +151,9 @@ Route::middleware('auth')->group(function () {
         // Vaktoewijzing per student aanpassen
         Route::get('/inschrijvingen/{inschrijving}/vakken', [VaktoewijzingController::class, 'edit'])->name('inschrijving.vakken');
         Route::put('/inschrijvingen/{inschrijving}/vakken', [VaktoewijzingController::class, 'update'])->name('inschrijving.vakken.update');
+
+        // 50%-aanwezigheidsregeling toekennen/intrekken (met toestemming directie).
+        Route::post('/inschrijvingen/{inschrijving}/aanwezigheidsregeling', [AanwezigheidsregelingController::class, 'bijwerken'])->name('inschrijving.aanwezigheidsregeling');
     });
 
     // --- Financiële Administratie: betalingen & achterstanden ---
@@ -186,6 +191,17 @@ Route::middleware('auth')->group(function () {
     Route::middleware('rol:examencommissie')->group(function () {
         Route::post('/vakken/{vak}/vaststellen', [CijferController::class, 'vaststellen'])->name('vakken.cijfers.vaststellen');
         Route::post('/vakken/{vak}/terugsturen', [CijferController::class, 'terugsturen'])->name('vakken.cijfers.terugsturen');
+    });
+
+    // --- Presentie (aanwezigheidsregistratie per college) ---
+    // Inzage: docent (eigen vak), examencommissie, directie (eigen opleiding), bestuur.
+    Route::middleware('rol:docent,examencommissie,directie,bestuur')->group(function () {
+        Route::get('/vakken/{vak}/presentie', [PresentieController::class, 'lijst'])->name('vakken.presentie');
+        Route::get('/presentieoverzicht', [PresentieController::class, 'overzicht'])->name('presentieoverzicht');
+    });
+    // Registreren: uitsluitend de docent van het eigen vak (verplicht).
+    Route::middleware('rol:docent')->group(function () {
+        Route::post('/vakken/{vak}/presentie', [PresentieController::class, 'opslaan'])->name('vakken.presentie.opslaan');
     });
 
     // --- Cijferinzage & rapporten — Examencommissie & Directie ---

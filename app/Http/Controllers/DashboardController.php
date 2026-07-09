@@ -49,6 +49,9 @@ class DashboardController extends Controller
             $kpi['uitgeschreven'] = (int) ($statussen['uitgeschreven'] ?? 0);
         }
 
+        // Docent: presentiestatistiek uitsluitend over de eigen vakken.
+        $docentId = $rol === Rol::Docent ? auth()->user()->docent_id : null;
+
         $stat = match ($rol) {
             Rol::Bestuur => [
                 'perOpleiding' => Statistiek::perOpleiding(),
@@ -57,6 +60,9 @@ class DashboardController extends Controller
                 'overgang' => Statistiek::overgangVerdeling(),
                 'slaag' => Statistiek::slaagpercentage(),
                 'financieel' => Statistiek::financieel(),
+                'presentie' => Statistiek::presentie(),
+                'presentiePerOpleiding' => Statistiek::presentiePerOpleiding(),
+                'presentieVerdeling' => Statistiek::presentieVerdeling(),
             ],
             Rol::Directie => [
                 'perOpleiding' => Statistiek::perOpleiding($eigenOpleidingIds),
@@ -65,6 +71,14 @@ class DashboardController extends Controller
                 'overgang' => Statistiek::overgangVerdeling($eigenOpleidingIds),
                 'slaag' => Statistiek::slaagpercentage($eigenOpleidingIds),
                 'financieel' => Statistiek::financieel($eigenOpleidingIds),
+                'presentie' => Statistiek::presentie($eigenOpleidingIds),
+                'presentiePerVak' => Statistiek::presentiePerVak($eigenOpleidingIds),
+                'presentieVerdeling' => Statistiek::presentieVerdeling($eigenOpleidingIds),
+            ],
+            Rol::Docent => [
+                'presentie' => Statistiek::presentie(null, $docentId),
+                'presentiePerVak' => Statistiek::presentiePerVak(null, $docentId),
+                'presentieVerdeling' => Statistiek::presentieVerdeling(null, $docentId),
             ],
             Rol::Examencommissie => [
                 'slaag' => Statistiek::slaagpercentage(),
@@ -75,6 +89,7 @@ class DashboardController extends Controller
                 'vrijstellingen' => Statistiek::vrijstellingen(),
                 'besluitenOpen' => \App\Models\Vrijstellingsbesluit::where('status', 'open')->count(),
                 'perOpleiding' => Statistiek::perOpleiding(),
+                'presentie' => Statistiek::presentie(),
             ],
             Rol::Financien => [
                 'financieel' => Statistiek::financieel(),
@@ -120,6 +135,31 @@ class DashboardController extends Controller
             $dubbeleInschrijving = $dubbeleInschrijving->sortBy('studentnummer')->values();
         }
 
+        // Venster 'Studenten met 50%-aanwezigheidsregeling'. Zichtbaar voor elke
+        // rol die de regeling mag kennen; Directie ziet alleen de eigen
+        // opleiding(en), de Docent alleen de studenten uit de eigen vakken.
+        $regelingLijst = collect();
+        if (auth()->user()->magAanwezigheidsregelingZien()) {
+            $regelingLijst = $rol === Rol::Docent
+                ? $this->regelingInEigenVakken($docentId)
+                : Statistiek::aanwezigheidsregelingStudenten($eigenOpleidingIds);
+        }
+
+        // Venster 'Presentieregistratie'. De registratie is voor de docent
+        // verplicht; directie en bestuur zien welke vakken achterlopen.
+        $presentieAchterstand = collect();
+        if (in_array($rol, [Rol::Docent, Rol::Directie, Rol::Bestuur], true)) {
+            $vakken = \App\Models\Vak::where('actief', true)
+                ->when($docentId !== null, fn ($q) => $q->where('docent_id', $docentId))
+                ->when($eigenOpleidingIds !== null, fn ($q) => $q->whereIn('opleiding_id', $eigenOpleidingIds))
+                ->with(['opleiding', 'docent'])->orderBy('code')->get();
+
+            $presentieAchterstand = $vakken
+                ->map(fn ($vak) => ['vak' => $vak, 'samenvatting' => \App\Support\Presentiebewaking::voorVak($vak)['samenvatting']])
+                ->filter(fn ($r) => ! $r['samenvatting']['volledig'] && $r['samenvatting']['deelnemers'] > 0)
+                ->values();
+        }
+
         // Signaleringen voor Studentenzaken (lijsten onder de statistieken).
         $nt2 = collect();
         $docLater = collect();
@@ -156,6 +196,32 @@ class DashboardController extends Controller
             $docLater = Student::where('documenten_later', true)->orderBy('achternaam')->get();
         }
 
-        return view('dashboard.index', compact('kpi', 'nt2', 'docLater', 'stat', 'openBesluiten', 'vrijstellingLijst', 'kennistoetsBewaking', 'dubbeleInschrijving'));
+        return view('dashboard.index', compact('kpi', 'nt2', 'docLater', 'stat', 'openBesluiten',
+            'vrijstellingLijst', 'kennistoetsBewaking', 'dubbeleInschrijving',
+            'regelingLijst', 'presentieAchterstand'));
+    }
+
+    /**
+     * Studenten met de 50%-regeling die daadwerkelijk deelnemen aan een vak van
+     * deze docent. De docent heeft geen toegang tot het studentdossier, maar
+     * moet de regeling wel kennen om de aanwezigheid juist te beoordelen.
+     *
+     * @return \Illuminate\Support\Collection<int, array{student: Student, inschrijving: \App\Models\Inschrijving}>
+     */
+    private function regelingInEigenVakken(?int $docentId): \Illuminate\Support\Collection
+    {
+        if ($docentId === null) {
+            return collect();
+        }
+
+        return \App\Models\Vak::where('docent_id', $docentId)->where('actief', true)->get()
+            ->flatMap(fn ($vak) => $vak->deelnemers()
+                ->where('inschrijvingen.aanwezigheidsregeling_50', true)
+                ->with(['student', 'opleiding', 'periode'])->get())
+            ->unique('id')
+            ->filter(fn ($i) => $i->student !== null)
+            ->map(fn ($i) => ['student' => $i->student, 'inschrijving' => $i])
+            ->sortBy(fn ($r) => $r['student']->achternaam)
+            ->values();
     }
 }

@@ -35,6 +35,19 @@ class AutorisatieServiceProvider extends ServiceProvider
             return true;
         });
 
+        // Presentie REGISTREREN — Docent enkel voor het eigen vak (verplicht).
+        Gate::define('presentie-registreren', function (User $user, ?Vak $vak = null) {
+            return $user->rol->magPresentieRegistreren()
+                && $vak !== null && $user->docent_id !== null
+                && $vak->docent_id === $user->docent_id;
+        });
+
+        // Presentielijsten INZIEN (Docent eigen vak, Examencie, Directie, Bestuur).
+        Gate::define('presentie-inzien', fn (User $user) => $user->rol->magPresentieInzien());
+
+        // 50%-aanwezigheidsregeling toekennen/intrekken (Studentenzaken, Beheerder).
+        Gate::define('aanwezigheidsregeling-beheren', fn (User $user) => $user->rol->magAanwezigheidsregelingBeheren());
+
         // Identiteit/inschrijving beheren (Studentenzaken, Beheerder).
         Gate::define('inschrijving-beheren', fn (User $user) => $user->rol->magInschrijvingBeheren());
 

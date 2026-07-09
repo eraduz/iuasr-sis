@@ -7,8 +7,9 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
 
 ## Projectstatus
 
-- **Huidige fase:** Fase 4 — Cijfers & rolscheiding (increment 1 + 2 opgeleverd)
-- **Laatst bijgewerkt:** 2026-07-08
+- **Huidige fase:** Fase 5 afgerond; aanwezigheidsmodule opgeleverd (buiten de
+  oorspronkelijke fasering, op verzoek van de opdrachtgever)
+- **Laatst bijgewerkt:** 2026-07-09
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 
 ---
@@ -161,6 +162,32 @@ opleverpunt aantoonbaar klaar is.
     filter op opleiding/leerjaar/klas en gemiddelde. Voor Examencommissie en
     Directie; Rapporten-kaart + menu geactiveerd.
   - Fase 5 afgerond. 95 tests groen.
+- [x] **Aanwezigheidsmodule** (extra, op verzoek opdrachtgever 2026-07-09)
+  - **50%-aanwezigheidsregeling**: vinkje op de INSCHRIJVING
+    (`inschrijvingen.aanwezigheidsregeling_50`), dus per opleiding én studiejaar;
+    bij herinschrijven bewust opnieuw toe te kennen. Studentenzaken/Beheer zetten
+    het vinkje (met toestemming van de directie, buiten het systeem); mutatie
+    gelogd. Zichtbaar voor SZ, Docent, Examencie, Directie, Bestuur, Beheer —
+    niet voor Financiën. Dashboardvenster "Studenten met 50%-aanwezigheidsregeling"
+    (docent: alleen eigen vakken; directie: alleen eigen opleidingen).
+  - **Presentieregistratie** (verplicht voor de docent): tabel `presenties`
+    (inschrijving × vak × week), 8 onderwijsweken per blok, waarde 1 = aanwezig,
+    0 = afwezig, geen regel = niet geregistreerd (telt NIET als afwezigheid).
+    Vrijgestelde studenten worden overgeslagen (server-side afgedwongen).
+    Norm 80%, of 50% bij de regeling; de docent ziet het label 50% op de lijst.
+  - Schermen: aanwezigheidslijst per vak (invoergrid met "alle 1"-kolomactie,
+    live percentage, printbaar), aanwezigheidsoverzicht per rol, kolom
+    "Aanwezigheid" op Mijn vakken, dashboardvenster "Aanwezigheidsregistratie nog
+    niet volledig" (docent/directie/bestuur) met de ontbrekende weken.
+  - Statistiek: gemiddelde aanwezigheid, verdeling in banden (0–50 / 50–80 /
+    80–100%), per opleiding (bestuur) en per vak (directie/docent); KPI-tegel op
+    het directie-/bestuursdashboard. Alles opleidinggebonden gefilterd.
+  - Rolscheiding: registreren = docent eigen vak (Gate `presentie-registreren`);
+    inzage = docent/examencie/directie(eigen opleiding)/bestuur (Gate
+    `presentie-inzien`). SZ, Financiën en Beheer hebben GEEN presentie-inzage.
+    Inzage en mutatie gelogd. 18 nieuwe tests; 167 tests groen.
+  - Naamgeving: UI zegt "Aanwezigheid"; de bestaande term *presentielijst* blijft
+    gereserveerd voor de tentamenlijst met handtekening.
 - [ ] **Fase 6 — Portaalkoppeling**
   - Koppeling met publiek aanmeldportaal (gescheiden regime).
 - [ ] **Fase 7 — Migratie**
@@ -197,6 +224,10 @@ Deze zijn nog niet vastgesteld. Vraag de opdrachtgever; verzin geen waarden.
   verschillend**; veld staat klaar (`opleidingen.ec_overgang_drempel`, nu null),
   Beheer vult per opleiding in via Opzoektabellen. Blokkeert alleen de latere
   leerjaar-herbeoordeling, niet de cijferinvoer.
+- [x] **Aanwezigheidsnorm** — BEVESTIGD 2026-07-09: **80%** regulier, **50%** bij
+  de aanwezigheidsregeling; **8 onderwijsweken per blok**, één college per week.
+  Vastgelegd in `config/sis.php` (`sis.presentie`). Nog niet per opleiding
+  instelbaar — vraag de opdrachtgever als dat later nodig blijkt.
 
 ---
 
@@ -244,6 +275,8 @@ Deze zijn nog niet vastgesteld. Vraag de opdrachtgever; verzin geen waarden.
 | 2026-07-09 | **Notities zichtbaar voor Directie en Bestuur** (alleen-lezen). Interne notities op het dossier: SZ/Beheer beheren (toevoegen/verwijderen), Directie en Schoolbestuur lezen mee. Bestuur kreeg toegang tot het studentdossier (studenten.index/show); BSN-inzage blijft voor Bestuur geweigerd. |
 | 2026-07-09 | **Directie per opleiding (opleidinggebonden zichtbaarheid).** Nieuwe koppeltabel `directie_opleidingen` (user ↔ opleiding, echte FK's, cascade). Een directielid ziet uitsluitend studenten, cijfers en rapporten van de toegewezen opleiding(en); zonder toewijzing niets (need-to-know). Toegepast op studentenlijst/-dossier, cijferoverzicht, cijferlijst, EC-rapport, overgang, alumni, resultaten-mailen én de dashboardstatistieken (per-opleiding gefilterd) + KPI-tegels. Beheer wijst toe via **Gebruikers & rollen → Directie — opleidingtoewijzing**. Seed: PABO-directeur (PABO), GV-directeur (PMGV+MGV), Theologie-directeur (ISLTH+cursussen). Een **dubbel ingeschreven** student is zichtbaar voor de directie van elke opleiding waarin hij/zij actief is. Helpers `User::opleidingIds()`, `Student::scopeZichtbaarVoor()`/`zichtbaarVoor()`. |
 | 2026-07-09 | **Dubbele inschrijving overal zichtbaar gemaakt.** Studentenlijst: opleidingkolom toont twee regels + label 'dubbele inschrijving' bij de naam. Dashboards van Studentenzaken, Directie en Financiële Administratie tonen een lijst 'Studenten met een dubbele inschrijving' (met beide opleidingen). Studentpagina toonde dit al (kop met '+' en pill). Financiën-dossier toont per inschrijving al de opleiding. |
+| 2026-07-09 | **50%-aanwezigheidsregeling.** Vastgelegd als vinkje "50% Aanwezigheidsregeling" op de studentpagina (tabblad Inschrijving & klas). Keuze opdrachtgever: ALLEEN een vinkje — geen besluitreferentie in de UI; de toestemming van de directie loopt buiten het systeem, de mutatie wordt wel gelogd (wie/wanneer/welke inschrijving). Reikwijdte: **per inschrijving** (= per opleiding én per studiejaar), dus bij herinschrijven of een tweede opleiding bewust opnieuw toe te kennen. Zetten: Studentenzaken/Beheer. Zien: SZ, Docent, Examencommissie, Directie, Bestuur, Beheer (niet Financiën). Dashboardvenster met de studenten, opleiding en studiejaar; docent ziet alleen studenten uit eigen vakken, directie alleen eigen opleiding(en). |
+| 2026-07-09 | **Presentieregistratie per college (verplicht voor de docent).** Genormaliseerd: tabel `presenties` = één regel per inschrijving × vak × onderwijsweek; nooit vaste weekkolommen. Keuze opdrachtgever: **8 weken per blok, één college per week**; norm **80%**, of **50%** bij de aanwezigheidsregeling. Docent voert per week 1 (aanwezig) of 0 (afwezig) in; een lege cel = nog niet geregistreerd en telt NIET als afwezigheid (anders wordt nalatigheid van de docent op de student afgewenteld). Een week geldt pas als geregistreerd wanneer álle presentieplichtige deelnemers een waarde hebben. **Vrijgestelde** studenten volgen het vak niet: geen invoer, server-side overgeslagen. De docent ziet op de lijst het label **50%** achter de naam en de geldende norm per student. Rolscheiding: registreren alleen docent van het eigen vak (Gate `presentie-registreren`); inzage docent/examencommissie/directie (eigen opleiding)/bestuur (Gate `presentie-inzien`); Studentenzaken, Financiën en Beheer hebben GEEN presentie-inzage — aanwezigheid is onderwijsinhoudelijke procesinformatie. Inzage en mutatie gelogd. Statistiek (gemiddelde aanwezigheid, verdeling 0–50/50–80/80–100%, per opleiding resp. per vak) op de dashboards van docent, directie en bestuur, opleidinggebonden gefilterd. UI-term is "Aanwezigheid"; *presentielijst* blijft de tentamenlijst met handtekening. |
 
 ---
 

@@ -58,6 +58,12 @@ class Vak extends Model
         return $this->hasManyThrough(Resultaat::class, Toetsonderdeel::class);
     }
 
+    /** Alle presentieregistraties van dit vak. */
+    public function presenties(): HasMany
+    {
+        return $this->hasMany(Presentie::class);
+    }
+
     /**
      * Deelnemers: actieve inschrijvingen in dezelfde opleiding (en, bij een
      * leerjaargebonden vak, hetzelfde leerjaar) in de actieve periode.

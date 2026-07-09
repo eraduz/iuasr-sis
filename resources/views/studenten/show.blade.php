@@ -385,7 +385,34 @@
           @endif
           <dt>Status</dt><dd><span class="iuasr-dash-status {{ $huidige->status->badge() }}">{{ $huidige->status->label() }}</span></dd>
           <dt>Studentnummer</dt><dd class="tnum">{{ $student->studentnummer }}</dd>
+          @if (auth()->user()->magAanwezigheidsregelingZien())
+            <dt>Aanwezigheid</dt>
+            <dd>
+              @if ($huidige->aanwezigheidsregeling_50)
+                <span class="iuasr-dash-status s-approved">50%-aanwezigheidsregeling</span>
+              @else
+                <span class="sis-muted">Reguliere norm ({{ (int) round(config('sis.presentie.norm') * 100) }}%)</span>
+              @endif
+            </dd>
+          @endif
         </dl>
+
+        @if (auth()->user()->magAanwezigheidsregelingBeheren())
+          {{-- De regeling geldt per opleiding én studiejaar: zij hangt aan DEZE inschrijving
+               en moet bij herinschrijving bewust opnieuw worden toegekend. --}}
+          <form method="POST" action="{{ route('inschrijving.aanwezigheidsregeling', $huidige) }}" style="margin-top:14px;border-top:1px solid var(--borderColor);padding-top:12px;">
+            @csrf
+            <label class="sis-check-inline">
+              <input type="checkbox" name="aanwezigheidsregeling_50" value="1" @checked($huidige->aanwezigheidsregeling_50)>
+              50% Aanwezigheidsregeling
+            </label>
+            <p class="sis-muted" style="font-size:12px;margin:6px 0 10px;">
+              De student hoeft dan minimaal de helft van de lessen, practica en colleges bij te wonen.
+              Alleen aanvinken met toestemming van de directie. Geldt voor {{ $huidige->opleiding?->code }} in {{ $huidige->periode?->naam ?? 'dit studiejaar' }}; de wijziging wordt gelogd.
+            </p>
+            <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Opslaan</button>
+          </form>
+        @endif
       @else
         <p class="sis-muted">Geen actieve inschrijving.</p>
       @endif

@@ -109,6 +109,57 @@ enum Rol: string
         };
     }
 
+    /**
+     * Mag deze rol de aanwezigheid registreren? Alleen de Docent, en uitsluitend
+     * voor het EIGEN vak (die vakcontrole staat in de Gate 'presentie-registreren').
+     * Registreren is voor de docent verplicht, niet optioneel.
+     */
+    public function magPresentieRegistreren(): bool
+    {
+        return $this === self::Docent;
+    }
+
+    /**
+     * Mag deze rol presentielijsten en aanwezigheidspercentages inzien?
+     * Docent (eigen vak), Examencommissie, Directie (eigen opleiding) en het
+     * Schoolbestuur (kwaliteitsbewaking). Studentenzaken en Financiën niet:
+     * aanwezigheid is onderwijsinhoudelijke procesinformatie.
+     */
+    public function magPresentieInzien(): bool
+    {
+        return match ($this) {
+            self::Docent, self::Examencommissie, self::Directie, self::Bestuur => true,
+            self::Studentenzaken, self::Financien, self::Beheerder => false,
+        };
+    }
+
+    /**
+     * Mag deze rol zien dat een student de 50%-aanwezigheidsregeling heeft?
+     * De docent heeft dit nodig op de presentielijst, de overige rollen op het
+     * studentdossier en het dashboard.
+     */
+    public function magAanwezigheidsregelingZien(): bool
+    {
+        return match ($this) {
+            self::Studentenzaken, self::Docent, self::Examencommissie,
+            self::Directie, self::Bestuur, self::Beheerder => true,
+            self::Financien => false,
+        };
+    }
+
+    /**
+     * Mag deze rol de 50%-aanwezigheidsregeling toekennen of intrekken?
+     * Studentenzaken legt het vinkje vast (met toestemming van de directie);
+     * de mutatie wordt gelogd.
+     */
+    public function magAanwezigheidsregelingBeheren(): bool
+    {
+        return match ($this) {
+            self::Studentenzaken, self::Beheerder => true,
+            default => false,
+        };
+    }
+
     /** Mag deze rol het BSN inzien? (gelogd) */
     public function magBsnInzien(): bool
     {

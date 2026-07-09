@@ -118,6 +118,26 @@ class User extends Authenticatable
         return $this->rol->magBsnInzien();
     }
 
+    public function magPresentieRegistreren(): bool
+    {
+        return $this->rol->magPresentieRegistreren();
+    }
+
+    public function magPresentieInzien(): bool
+    {
+        return $this->rol->magPresentieInzien();
+    }
+
+    public function magAanwezigheidsregelingZien(): bool
+    {
+        return $this->rol->magAanwezigheidsregelingZien();
+    }
+
+    public function magAanwezigheidsregelingBeheren(): bool
+    {
+        return $this->rol->magAanwezigheidsregelingBeheren();
+    }
+
     public function magFinancieelInzien(): bool
     {
         return $this->rol->magFinancieelInzien();
