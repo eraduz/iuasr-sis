@@ -24,7 +24,12 @@
       <h2 class="iuasr-dash-candidate__name">{{ $student->volledigeNaam() }}</h2>
       <div class="iuasr-dash-candidate__meta">
         <span>Studentnr. <b>{{ $student->studentnummer }}</b></span><span class="dot"></span>
-        <span>{{ $huidige?->opleiding?->naam ?? 'Geen inschrijving' }}</span>
+        @if ($actieveInschrijvingen->isNotEmpty())
+          <span>{{ $actieveInschrijvingen->map(fn ($i) => $i->opleiding?->naam)->filter()->implode('  +  ') }}</span>
+          @if ($actieveInschrijvingen->count() > 1)<span class="dot"></span><span class="sis-pill-soft">dubbele inschrijving · {{ $actieveInschrijvingen->count() }} opleidingen</span>@endif
+        @else
+          <span>{{ $huidige?->opleiding?->naam ?? 'Geen inschrijving' }}</span>
+        @endif
         @if ($huidige?->klas)<span class="dot"></span><span>Klas <b>{{ $huidige->klas->code }}</b></span>@endif
       </div>
     </div>
@@ -59,6 +64,9 @@
           <span class="iuasr-dash-btn iuasr-dash-btn--sm" aria-disabled="true" title="Geblokkeerd wegens betalingsachterstand" style="opacity:.5;cursor:not-allowed;">Verklaring (geblokkeerd)</span>
         @else
           <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('herinschrijven.form', $student) }}">Herinschrijven</a>
+          @if ($huidige && $huidige->status === App\Enums\InschrijvingStatus::Actief)
+            <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('herinschrijven.form', ['student' => $student, 'modus' => 'tweede']) }}">Tweede opleiding</a>
+          @endif
           <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('verklaringen', ['student' => $student->id]) }}">Verklaring</a>
         @endif
         @if ($huidige)

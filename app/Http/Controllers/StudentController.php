@@ -75,6 +75,8 @@ class StudentController extends Controller
         $actieve = $student->inschrijvingen->where('status', \App\Enums\InschrijvingStatus::Actief);
         $huidige = ($actieve->isNotEmpty() ? $actieve : $student->inschrijvingen)
             ->sortByDesc($sorteerKey)->first();
+        // Actieve inschrijvingen (kan er meer dan één zijn: dubbele opleiding).
+        $actieveInschrijvingen = $actieve->sortBy(fn ($i) => $i->opleiding?->naam)->values();
 
         // Vakhistorie: per studiejaar (inschrijving) de toegewezen vakken, gegroepeerd
         // per periode (blok). Blijft ook jaren later volledig raadpleegbaar.
@@ -131,7 +133,7 @@ class StudentController extends Controller
             ->with(['vak', 'aangemaaktDoor', 'verwerktDoor'])->latest()->get();
         $kennistoetsen = \App\Support\Kennistoetsbewaking::voor($student);
 
-        return view('studenten.show', compact('student', 'huidige', 'magCijfers', 'cijferVakken', 'financieel', 'vakHistorie', 'grondslagen', 'besluiten', 'kennistoetsen'));
+        return view('studenten.show', compact('student', 'huidige', 'actieveInschrijvingen', 'magCijfers', 'cijferVakken', 'financieel', 'vakHistorie', 'grondslagen', 'besluiten', 'kennistoetsen'));
     }
 
     /**

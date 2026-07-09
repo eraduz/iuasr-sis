@@ -76,6 +76,8 @@
   <p>Open het dossier, tabblad <b>Persoonsgegevens</b>, en kies <b>Wijzig gegevens</b>. Onder <b>Acties</b> vindt u herinschrijven, uitschrijven en schorsen.</p>
   <h3>Herinschrijven (met of zonder studiewissel)</h3>
   <p>Bij <b>Herinschrijven</b> maakt u een nieuwe inschrijving terwijl het studentnummer en de persoonsgegevens gelijk blijven. U kiest de <b>opleiding</b>: dezelfde opleiding (vervolg naar een volgend leerjaar of hetzelfde jaar overdoen) óf een <b>andere opleiding</b> (studiewissel — bijvoorbeeld van een cursus naar een bacheloropleiding). Kiest u een andere opleiding, dan wordt het leerjaar automatisch 1 en verschijnen alleen de klassen van die opleiding. De vakken worden op de gekozen opleiding en het gekozen leerjaar toegewezen; eerder behaalde resultaten blijven op de vorige inschrijving bewaard.</p>
+  <h3>Twee opleidingen tegelijk (dubbele inschrijving)</h3>
+  <p>Een student mag twee opleidingen tegelijk volgen. Kies op het dossier onder <b>Acties</b> de knop <b>Tweede opleiding</b>, selecteer een <b>andere</b> opleiding en (meestal) het huidige studiejaar. Er ontstaat een tweede actieve inschrijving; beide opleidingen staan bovenaan het dossier met de vermelding <b>dubbele inschrijving</b>. Dezelfde opleiding twee keer in hetzelfde studiejaar is niet mogelijk. Het <b>collegegeld wordt per studiejaar één keer</b> berekend, ook bij twee opleidingen.</p>
   <h3>Documenten</h3>
   <p>In het dossier uploadt u documenten (identiteitsbewijs, diploma, cijferlijst, pasfoto, overig). Ontbreekt iets nog, zet dan <b>“levert later aan”</b> aan — de student verschijnt dan als herinnering op het dashboard.</p>
   <h3>Landelijke kennistoetsen (PABO)</h3>

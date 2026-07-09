@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Enums\Rol;
 use App\Models\Betaling;
 use App\Models\CollegegeldTarief;
+use App\Models\Inschrijving;
+use App\Models\Opleiding;
 use App\Models\Periode;
 use App\Models\Student;
 use App\Models\User;
@@ -134,6 +136,28 @@ class FinancienTest extends TestCase
         $this->assertSame(0.0, $status['terugbetaling']); // geen terugbetaling: nog ingeschreven
         $this->assertGreaterThan(0, $status['vooruitbetaald']); // maar wel een tegoed
         $this->assertFalse($status['achterstand']);
+    }
+
+    public function test_collegegeld_wordt_eenmaal_per_studiejaar_berekend_bij_dubbele_inschrijving(): void
+    {
+        $this->tarief(4000);
+        $student = Student::where('studentnummer', '261011')->first(); // actief ISLTH
+        $insch = $student->inschrijvingen()->first();
+
+        $enkel = Collegegeldstatus::voor($student->fresh())['verschuldigd'];
+        $this->assertGreaterThan(0, $enkel);
+
+        // Tweede opleiding in HETZELFDE studiejaar (dubbele inschrijving).
+        Inschrijving::create([
+            'student_id' => $student->id,
+            'opleiding_id' => Opleiding::where('code', 'PABO')->value('id'),
+            'periode_id' => $insch->periode_id,
+            'leerjaar' => 1, 'status' => 'actief', 'inschrijfdatum' => $insch->inschrijfdatum,
+        ]);
+
+        $dubbel = Collegegeldstatus::voor($student->fresh())['verschuldigd'];
+        // Niet verdubbeld: collegegeld is per studiejaar één keer verschuldigd.
+        $this->assertEqualsWithDelta($enkel, $dubbel, 0.01);
     }
 
     public function test_overzicht_toont_vooruitbetaalde_student(): void

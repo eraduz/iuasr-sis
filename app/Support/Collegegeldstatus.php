@@ -42,10 +42,14 @@ class Collegegeldstatus
         $verschuldigd = 0.0;
         $maanden = 0;
         $jaarbedrag = null;
-        foreach ($student->inschrijvingen as $insch) {
-            $verschuldigd += self::verschuldigd($insch, $peildatum);
-            $maanden += self::maanden($insch, $peildatum);
-            $jaarbedrag ??= self::tarief($insch);
+        // Per STUDIEJAAR wordt collegegeld één keer berekend, ook wanneer de
+        // student in datzelfde jaar twee opleidingen volgt (dubbele inschrijving).
+        // De inschrijving met het hoogste verschuldigde bedrag is maatgevend.
+        foreach ($student->inschrijvingen->groupBy('periode_id') as $perStudiejaar) {
+            $maatgevend = $perStudiejaar->sortByDesc(fn ($i) => self::verschuldigd($i, $peildatum))->first();
+            $verschuldigd += self::verschuldigd($maatgevend, $peildatum);
+            $maanden += self::maanden($maatgevend, $peildatum);
+            $jaarbedrag ??= self::tarief($maatgevend);
         }
 
         $betaald = (float) $student->betalingen->sum('bedrag');

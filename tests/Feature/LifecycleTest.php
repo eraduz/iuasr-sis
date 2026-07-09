@@ -94,6 +94,38 @@ class LifecycleTest extends TestCase
         $this->assertDatabaseHas('audit_logs', ['veld' => 'herinschrijving', 'actie' => 'aanmaak']);
     }
 
+    public function test_student_kan_twee_opleidingen_tegelijk_volgen(): void
+    {
+        $pabo = Opleiding::where('code', 'PABO')->first();
+        $actief = Periode::where('actief', true)->value('id');
+
+        $this->actingAs($this->sz)->post(route('herinschrijven.store', $this->student), [
+            'opleiding_id' => $pabo->id,
+            'periode_id' => $actief,
+            'leerjaar' => 1,
+            'inschrijfdatum' => '2026-09-01',
+        ])->assertRedirect(route('studenten.show', $this->student));
+
+        $actieveOpleidingen = $this->student->inschrijvingen()
+            ->where('status', InschrijvingStatus::Actief)->pluck('opleiding_id')->all();
+        $this->assertCount(2, $actieveOpleidingen);
+        $this->assertContains($pabo->id, $actieveOpleidingen);
+        $this->assertContains(Opleiding::where('code', 'ISLTH')->value('id'), $actieveOpleidingen);
+    }
+
+    public function test_zelfde_opleiding_in_zelfde_studiejaar_wordt_geweigerd(): void
+    {
+        // De student is al ISLTH in het actieve studiejaar (setUp).
+        $this->actingAs($this->sz)->post(route('herinschrijven.store', $this->student), [
+            'opleiding_id' => Opleiding::where('code', 'ISLTH')->value('id'),
+            'periode_id' => Periode::where('actief', true)->value('id'),
+            'leerjaar' => 1,
+            'inschrijfdatum' => '2026-09-01',
+        ])->assertSessionHas('fout');
+
+        $this->assertSame(1, $this->student->inschrijvingen()->count());
+    }
+
     public function test_muteren_werkt_bij_en_logt(): void
     {
         $this->actingAs($this->sz)->put(route('studenten.update', $this->student), [

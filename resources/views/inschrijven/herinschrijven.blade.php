@@ -1,16 +1,24 @@
 @extends('layouts.app')
 
-@section('titel', 'Herinschrijven')
+@php $tweede = ($modus ?? 'herinschrijven') === 'tweede'; @endphp
+@section('titel', $tweede ? 'Tweede opleiding' : 'Herinschrijven')
 
 @section('inhoud')
-<div class="sis-crumb"><a href="{{ route('dashboard') }}">Dashboard</a><span class="sep">›</span><a href="{{ route('studenten.show', $student) }}">{{ $student->studentnummer }}</a><span class="sep">›</span><b>Herinschrijven</b></div>
+<div class="sis-crumb"><a href="{{ route('dashboard') }}">Dashboard</a><span class="sep">›</span><a href="{{ route('studenten.show', $student) }}">{{ $student->studentnummer }}</a><span class="sep">›</span><b>{{ $tweede ? 'Tweede opleiding' : 'Herinschrijven' }}</b></div>
 
 <div class="iuasr-dash-vhead">
   <div>
-    <h1>Herinschrijven</h1>
-    <div class="summary">Bestaande student · nieuwe periode</div>
+    <h1>{{ $tweede ? 'Tweede opleiding toevoegen' : 'Herinschrijven' }}</h1>
+    <div class="summary">{{ $tweede ? 'Extra opleiding naast de lopende inschrijving · dezelfde student' : 'Bestaande student · nieuwe periode' }}</div>
   </div>
 </div>
+
+@if ($tweede)
+  <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-bottom:16px;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/></svg>
+    <span>U voegt een <b>tweede opleiding</b> toe naast de lopende inschrijving. De student volgt dan twee opleidingen tegelijk. Kies een <b>andere opleiding</b> dan de huidige en het gewenste studiejaar; collegegeld wordt per studiejaar één keer berekend.</span>
+  </div>
+@endif
 
 @if ($errors->any())
   <div class="iuasr-dash-alert iuasr-dash-alert--danger" style="margin-bottom:16px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/></svg><span>Controleer de invoer: {{ $errors->first() }}</span></div>
@@ -48,11 +56,12 @@
           </select>
           <small class="sis-muted" style="font-size:12px;">Wisselt de student van opleiding (studiewissel)? Kies de nieuwe opleiding; het leerjaar wordt dan automatisch 1.</small>
         </div>
+        @php $actievePeriode = $perioden->firstWhere('actief', true); @endphp
         <div class="sis-fld">
           <label>Studiejaar <span class="req">*</span></label>
           <select name="periode_id" required>
             @foreach ($perioden as $p)
-              <option value="{{ $p->id }}" {{ old('periode_id') == $p->id ? 'selected' : '' }}>{{ $p->naam }}</option>
+              <option value="{{ $p->id }}" {{ old('periode_id', optional($actievePeriode)->id) == $p->id ? 'selected' : '' }}>{{ $p->naam }}{{ $p->actief ? ' · huidig' : '' }}</option>
             @endforeach
           </select>
         </div>
@@ -81,7 +90,7 @@
       <div class="sis-card__hd"><h3>Wat blijft gelijk</h3></div>
       <dl class="sis-dl">
         <dt>Studentnummer</dt><dd class="tnum">{{ $student->studentnummer }} <span class="sis-pill-soft">blijft gelijk</span></dd>
-        <dt>Vorige opleiding</dt><dd>{{ $huidige?->opleiding?->naam ?? '—' }}@if($huidige) · {{ $huidige->status->label() }}@endif</dd>
+        <dt>Vorige opleiding</dt><dd>{{ $huidige?->opleiding?->naam ?? '—' }}{{ $huidige ? ' · '.$huidige->status->label() : '' }}</dd>
         <dt>Persoonsgegevens</dt><dd>Ongewijzigd</dd>
       </dl>
     </div>

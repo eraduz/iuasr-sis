@@ -140,8 +140,10 @@ class InschrijvingActiesController extends Controller
         $klassen = Klas::with('opleiding')->orderBy('code')->get();
         $opleidingen = \App\Models\Opleiding::where('actief', true)->orderBy('naam')->get();
         $financieel = \App\Support\Collegegeldstatus::voor($student);
+        // 'tweede' = een tweede (parallelle) opleiding toevoegen naast een lopende.
+        $modus = request('modus') === 'tweede' ? 'tweede' : 'herinschrijven';
 
-        return view('inschrijven.herinschrijven', compact('student', 'huidige', 'perioden', 'klassen', 'opleidingen', 'financieel'));
+        return view('inschrijven.herinschrijven', compact('student', 'huidige', 'perioden', 'klassen', 'opleidingen', 'financieel', 'modus'));
     }
 
     public function herinschrijven(Request $request, Student $student): RedirectResponse
@@ -169,6 +171,15 @@ class InschrijvingActiesController extends Controller
             if ($klas && (int) $klas->opleiding_id !== (int) $data['opleiding_id']) {
                 return back()->withInput()->with('fout', 'De gekozen klas hoort niet bij de gekozen opleiding.');
             }
+        }
+
+        // Dubbele inschrijving is toegestaan (twee opleidingen tegelijk), maar niet
+        // twee keer dezelfde opleiding in hetzelfde studiejaar.
+        $bestaatAl = Inschrijving::where('student_id', $student->id)
+            ->where('periode_id', $data['periode_id'])
+            ->where('opleiding_id', $data['opleiding_id'])->exists();
+        if ($bestaatAl) {
+            return back()->withInput()->with('fout', 'De student is voor dit studiejaar al ingeschreven voor deze opleiding.');
         }
 
         // Nieuwe inschrijving; studentnummer en persoonsgegevens blijven gelijk.
