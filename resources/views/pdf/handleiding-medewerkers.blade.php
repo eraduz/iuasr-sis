@@ -57,7 +57,7 @@
     <tr><td><b>Studentenzaken</b></td><td>Studenten in-/uitschrijven, gegevens en documenten beheren, collegegeld, verklaringen, vrijstellingen registreren. <b>Geen</b> cijferinzage.</td></tr>
     <tr><td><b>Docent</b></td><td>Cijfers invoeren voor <b>uw eigen vakken</b> en indienen bij de examencommissie.</td></tr>
     <tr><td><b>Examencommissie</b></td><td>Cijferlijsten vaststellen, tentamenlijsten en cijferlijsten inzien, studievoortgang beoordelen.</td></tr>
-    <tr><td><b>Directie</b></td><td>Instellingsbrede cijfers en rapporten inzien.</td></tr>
+    <tr><td><b>Directie</b></td><td>Cijfers en rapporten inzien van <b>uitsluitend de eigen opleiding(en)</b>. Een directielid wordt door Beheer aan één of meer opleidingen gekoppeld en ziet alleen die studenten.</td></tr>
     <tr><td><b>Financiële Administratie</b></td><td>Collegegeldbetalingen registreren en achterstanden bewaken.</td></tr>
     <tr><td><b>Schoolbestuur</b></td><td>Kerncijfers en alle ondertekende documenten inzien.</td></tr>
     <tr><td><b>Beheerder</b></td><td>Gebruikers/rollen, referentietabellen, audit-log, back-ups en het volledig verwijderen van foutieve studentrecords.</td></tr>
@@ -66,6 +66,7 @@
   <h2>4. Uw dashboard</h2>
   <p>Na het inloggen ziet u uw dashboard met kerncijfers en grafieken die bij uw rol passen — bijvoorbeeld aantallen studenten, instroom, slaagpercentages of financiële cijfers. Signaleringen (zoals NT2-deadlines of nog aan te leveren documenten) staan er ook.</p>
   <p>Onderaan het dashboard staat een lijst <b>Studenten met vrijstelling</b>, met per student de vrijgestelde vakken. Deze is zichtbaar voor alle rollen behalve Beheer en de Financiële Administratie.</p>
+  <p>Daarnaast toont het dashboard (voor Studentenzaken, Directie en de Financiële Administratie) een lijst <b>Studenten met een dubbele inschrijving</b>: studenten die twee opleidingen tegelijk volgen, met beide opleidingen erbij. Directie ziet hierin alleen studenten van de eigen opleiding(en).</p>
 
   <h2>5. Werken met studenten (Studentenzaken)</h2>
   <h3>Student zoeken</h3>
@@ -78,6 +79,8 @@
   <p>Bij <b>Herinschrijven</b> maakt u een nieuwe inschrijving terwijl het studentnummer en de persoonsgegevens gelijk blijven. U kiest de <b>opleiding</b>: dezelfde opleiding (vervolg naar een volgend leerjaar of hetzelfde jaar overdoen) óf een <b>andere opleiding</b> (studiewissel — bijvoorbeeld van een cursus naar een bacheloropleiding). Kiest u een andere opleiding, dan wordt het leerjaar automatisch 1 en verschijnen alleen de klassen van die opleiding. De vakken worden op de gekozen opleiding en het gekozen leerjaar toegewezen; eerder behaalde resultaten blijven op de vorige inschrijving bewaard.</p>
   <h3>Twee opleidingen tegelijk (dubbele inschrijving)</h3>
   <p>Een student mag twee opleidingen tegelijk volgen. Kies op het dossier onder <b>Acties</b> de knop <b>Tweede opleiding</b>, selecteer een <b>andere</b> opleiding en (meestal) het huidige studiejaar. Er ontstaat een tweede actieve inschrijving; beide opleidingen staan bovenaan het dossier met de vermelding <b>dubbele inschrijving</b>. Dezelfde opleiding twee keer in hetzelfde studiejaar is niet mogelijk. Het <b>collegegeld wordt per studiejaar één keer</b> berekend, ook bij twee opleidingen.</p>
+  <h3>Interne notities</h3>
+  <p>Op het dossier staat een kaart met <b>interne notities</b> voor de onderlinge communicatie. <b>Studentenzaken</b> en <b>Beheer</b> kunnen notities <b>toevoegen en verwijderen</b>; <b>Directie</b> en <b>Schoolbestuur</b> kunnen ze <b>meelezen</b> (alleen-lezen). Directie ziet uiteraard alleen notities van studenten binnen de eigen opleiding(en).</p>
   <h3>Documenten</h3>
   <p>In het dossier uploadt u documenten (identiteitsbewijs, diploma, cijferlijst, pasfoto, overig). Ontbreekt iets nog, zet dan <b>“levert later aan”</b> aan — de student verschijnt dan als herinnering op het dashboard.</p>
   <h3>Landelijke kennistoetsen (PABO)</h3>
@@ -92,7 +95,7 @@
   <div class="tip">U ziet en wijzigt uitsluitend uw eigen vakken. Bij een vrijstelling vervallen de invoervelden en geldt “VR”.</div>
 
   <h2>7. Cijfers vaststellen &amp; lijsten (Examencommissie/Directie)</h2>
-  <p>In <b>Cijferoverzicht</b> ziet u alle vakken met status. Een ingediende lijst kunt u <b>vaststellen</b> of met een opmerking <b>terugsturen</b>. Per vak downloadt u een <b>tentamenlijst</b> (deelnemers + resultaten). Per student maakt u via <b>Cijferlijst</b> een officieel transcript. Beide zijn te printen en als ondertekende PDF te downloaden.</p>
+  <p>In <b>Cijferoverzicht</b> ziet u alle vakken met status. Een ingediende lijst kunt u <b>vaststellen</b> of met een opmerking <b>terugsturen</b>. Per vak downloadt u een <b>presentielijst</b>: een tentamenlijst om <b>tijdens het tentamen</b> te gebruiken, met per student een vak voor de <b>handtekening</b> (aanwezigheidsbevestiging). Deze lijst bevat bewust <b>geen cijfers of studiepunten</b> — die privé-informatie mag niet zichtbaar zijn voor medestudenten. Per student maakt u via <b>Cijferlijst</b> een officieel transcript (mét cijfers). Beide zijn te printen (knop <b>Printen</b>) en als ondertekende PDF te downloaden. Directie ziet hierbij alleen de vakken en studenten van de eigen opleiding(en).</p>
   <p><b>Vrijstelling voorstellen:</b> op het dossier van een student (tabblad <b>Inschrijving &amp; klas</b>) legt u een vrijstellingsbesluit vast en stuurt u het met <b>Naar Studentenzaken sturen</b> door. Studentenzaken verwerkt het; u ziet de status (openstaand/verwerkt) terug op het dossier en kunt een openstaand besluit annuleren.</p>
   <p><b>Resultaten mailen (einde blok):</b> in <b>Cijferlijst</b> kiest u onderaan een opleiding om alle studenten te zien. Met <b>Definitieve resultaten mailen</b> komt u op een controlescherm dat toont wie een e-mail krijgt en wie wordt overgeslagen (geen vastgestelde resultaten of geen e-mailadres). Na bevestiging ontvangt <b>elke student individueel</b> zijn/haar eigen officiële cijferlijst als PDF-bijlage. Alleen door de examencommissie vastgestelde resultaten worden verstuurd; de verzending wordt gelogd.</p>
 

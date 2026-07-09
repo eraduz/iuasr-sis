@@ -216,6 +216,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('rol:beheerder')->group(function () {
         Route::get('/gebruikers', [GebruikerController::class, 'index'])->name('gebruikers');
         Route::put('/gebruikers/{gebruiker}/rol', [GebruikerController::class, 'updateRol'])->name('gebruikers.rol');
+        // Opleidingtoewijzing voor directieleden (zichtbaarheid per opleiding).
+        Route::put('/gebruikers/{gebruiker}/opleidingen', [GebruikerController::class, 'updateOpleidingen'])->name('gebruikers.opleidingen');
 
         Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');
 

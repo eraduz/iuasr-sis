@@ -23,6 +23,10 @@ class DashboardController extends Controller
         $actievePeriodeId = Periode::where('actief', true)->value('id');
         $kern = Statistiek::kern();
 
+        // Directie is opleidinggebonden: alle aggregaties worden beperkt tot de
+        // eigen opleiding(en). null = geen beperking (overige rollen).
+        $eigenOpleidingIds = $rol === Rol::Directie ? auth()->user()->opleidingIds()->all() : null;
+
         $kpi = [
             'studenten' => $kern['studenten'],
             'inschrijvingen' => $kern['actief'],
@@ -34,14 +38,33 @@ class DashboardController extends Controller
             'ter_vaststelling' => Cijferlijst::where('status', 'ingediend')->where('periode_id', $actievePeriodeId)->count(),
         ];
 
+        // Directie: KPI-tegels tonen uitsluitend cijfers van de eigen opleiding(en).
+        if ($eigenOpleidingIds !== null) {
+            $statussen = \App\Models\Inschrijving::whereIn('opleiding_id', $eigenOpleidingIds)
+                ->selectRaw('status, count(*) as n')->groupBy('status')->pluck('n', 'status');
+            $kpi['studenten'] = Student::whereHas('inschrijvingen',
+                fn ($q) => $q->whereIn('opleiding_id', $eigenOpleidingIds))->count();
+            $kpi['inschrijvingen'] = (int) ($statussen['actief'] ?? 0);
+            $kpi['afgestudeerd'] = (int) ($statussen['afgestudeerd'] ?? 0);
+            $kpi['uitgeschreven'] = (int) ($statussen['uitgeschreven'] ?? 0);
+        }
+
         $stat = match ($rol) {
-            Rol::Directie, Rol::Bestuur => [
+            Rol::Bestuur => [
                 'perOpleiding' => Statistiek::perOpleiding(),
                 'instroom' => Statistiek::instroomPerStudiejaar(),
                 'status' => Statistiek::statusVerdeling(),
                 'overgang' => Statistiek::overgangVerdeling(),
                 'slaag' => Statistiek::slaagpercentage(),
                 'financieel' => Statistiek::financieel(),
+            ],
+            Rol::Directie => [
+                'perOpleiding' => Statistiek::perOpleiding($eigenOpleidingIds),
+                'instroom' => Statistiek::instroomPerStudiejaar($eigenOpleidingIds),
+                'status' => Statistiek::statusVerdeling($eigenOpleidingIds),
+                'overgang' => Statistiek::overgangVerdeling($eigenOpleidingIds),
+                'slaag' => Statistiek::slaagpercentage($eigenOpleidingIds),
+                'financieel' => Statistiek::financieel($eigenOpleidingIds),
             ],
             Rol::Examencommissie => [
                 'slaag' => Statistiek::slaagpercentage(),
@@ -75,6 +98,26 @@ class DashboardController extends Controller
         $vrijstellingLijst = collect();
         if (! in_array($rol, [Rol::Beheerder, Rol::Financien], true)) {
             $vrijstellingLijst = Statistiek::vrijstellingStudenten();
+        }
+
+        // Studenten met een dubbele inschrijving (twee opleidingen tegelijk) —
+        // relevant voor Studentenzaken, Directie en Financiële Administratie.
+        // Directie ziet alleen studenten binnen de eigen opleiding(en).
+        $dubbeleInschrijving = collect();
+        if (in_array($rol, [Rol::Studentenzaken, Rol::Directie, Rol::Financien], true)) {
+            $dubbeleInschrijving = Student::whereHas('inschrijvingen', fn ($q) => $q->where('status', 'actief'))
+                ->with(['inschrijvingen' => fn ($q) => $q->where('status', 'actief')->with('opleiding')])
+                ->get()
+                ->filter(fn (Student $s) => $s->heeftDubbeleInschrijving());
+
+            if ($rol === Rol::Directie) {
+                $eigen = auth()->user()->opleidingIds();
+                $dubbeleInschrijving = $dubbeleInschrijving->filter(
+                    fn (Student $s) => $s->actieveInschrijvingen()->pluck('opleiding_id')->intersect($eigen)->isNotEmpty()
+                );
+            }
+
+            $dubbeleInschrijving = $dubbeleInschrijving->sortBy('studentnummer')->values();
         }
 
         // Signaleringen voor Studentenzaken (lijsten onder de statistieken).
@@ -113,6 +156,6 @@ class DashboardController extends Controller
             $docLater = Student::where('documenten_later', true)->orderBy('achternaam')->get();
         }
 
-        return view('dashboard.index', compact('kpi', 'nt2', 'docLater', 'stat', 'openBesluiten', 'vrijstellingLijst', 'kennistoetsBewaking'));
+        return view('dashboard.index', compact('kpi', 'nt2', 'docLater', 'stat', 'openBesluiten', 'vrijstellingLijst', 'kennistoetsBewaking', 'dubbeleInschrijving'));
     }
 }

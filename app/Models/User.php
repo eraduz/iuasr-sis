@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\Enums\Rol;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 
 /**
  * Medewerker-account. Authenticatie verloopt via Microsoft Entra ID (SSO/OIDC);
@@ -46,6 +48,35 @@ class User extends Authenticatable
     public function docent()
     {
         return $this->belongsTo(Docent::class);
+    }
+
+    /**
+     * Opleidingen waaraan een directielid is toegewezen. Een directeur ziet
+     * uitsluitend studenten/cijfers/rapporten van deze opleiding(en).
+     */
+    public function opleidingen(): BelongsToMany
+    {
+        return $this->belongsToMany(Opleiding::class, 'directie_opleidingen');
+    }
+
+    /**
+     * Is de zichtbaarheid van deze gebruiker beperkt tot bepaalde opleidingen?
+     * Alleen de rol Directie is opleidinggebonden; overige rollen zien alles
+     * (binnen hun eigen rolrechten).
+     */
+    public function isOpleidingBeperkt(): bool
+    {
+        return $this->rol === Rol::Directie;
+    }
+
+    /**
+     * De opleiding-ids die deze gebruiker mag zien.
+     *
+     * @return \Illuminate\Support\Collection<int,int>
+     */
+    public function opleidingIds(): Collection
+    {
+        return $this->opleidingen->pluck('id');
     }
 
     /** Resultaten die deze gebruiker heeft ingevoerd (auditspoor). */

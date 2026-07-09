@@ -269,7 +269,7 @@
   <div class="iuasr-dash-vhead">
     <div>
       <h1>{{ $isBestuur ? 'Schoolbestuur' : 'Directie' }}</h1>
-      <div class="summary">Instellingsbrede kerncijfers: studiesucces, instroom en financiën</div>
+      <div class="summary">{{ $isBestuur ? 'Instellingsbrede kerncijfers' : 'Kerncijfers van uw opleiding(en)' }}: studiesucces, instroom en financiën</div>
     </div>
     <div class="iuasr-dash-vhead__actions">
       @if ($isBestuur)<a class="iuasr-dash-btn" href="{{ route('ondertekening') }}">Ondertekende documenten</a>@endif
@@ -358,6 +358,34 @@
       <h3>Gebruikers per rol</h3><p class="sub">Toegang &amp; rolscheiding</p>
       @include('partials.charts.bar', ['data' => $stat['gebruikersPerRol'] ?? [], 'kleur' => 'var(--priColor200)'])
     </div>
+  </div>
+@endif
+
+{{-- Studenten met een dubbele inschrijving (twee opleidingen tegelijk) --}}
+@if ($dubbeleInschrijving->isNotEmpty())
+  @php $magDossierDubbel = in_array($rol, [App\Enums\Rol::Studentenzaken, App\Enums\Rol::Directie], true); @endphp
+  <div class="sis-card" style="margin-top:16px;border-left:3px solid var(--heritage-groen,#285C4D);">
+    <div class="sis-card__hd"><h3>Studenten met een dubbele inschrijving</h3><span class="hint">{{ $dubbeleInschrijving->count() }} student(en)</span></div>
+    <div class="iuasr-dash-tbl-card" style="border:0;">
+      <table class="iuasr-dash-tbl">
+        <thead><tr><th style="width:110px;">Studentnr.</th><th style="width:220px;">Naam</th><th>Opleidingen</th></tr></thead>
+        <tbody>
+          @foreach ($dubbeleInschrijving as $s)
+            <tr>
+              <td class="tnum">{{ $s->studentnummer }}</td>
+              <td class="nm">
+                @if ($magDossierDubbel)<a href="{{ route('studenten.show', $s) }}">{{ $s->volledigeNaam() }}</a>
+                @else {{ $s->volledigeNaam() }}@endif
+              </td>
+              <td>
+                @foreach ($s->actieveInschrijvingen() as $ai)<span class="sis-pill-soft" style="margin:0 4px 4px 0;">{{ $ai->opleiding?->naam ?? '—' }}</span>@endforeach
+              </td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+    <p class="sis-tblnote" style="margin-top:6px;">Deze studenten volgen twee opleidingen tegelijk. Het collegegeld wordt per studiejaar één keer bepaald (de zwaarste opleiding is maatgevend).</p>
   </div>
 @endif
 

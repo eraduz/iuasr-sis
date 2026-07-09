@@ -47,6 +47,37 @@
   <p class="sis-tblnote">Cijfers zijn bewust <b>niet</b> zichtbaar voor Studentenzaken. Docenten zien alleen hun eigen vak. Directie en examencommissie hebben inzage; alleen de examencommissie stelt vast.</p>
 </div>
 
+<div class="sis-card" style="margin-bottom:18px;border-left:3px solid var(--heritage-groen,#285C4D);">
+  <div class="sis-card__hd"><h3>Directie — opleidingtoewijzing</h3><span class="hint">Een directielid ziet uitsluitend studenten, cijfers en rapporten van de toegewezen opleiding(en)</span></div>
+  @if ($directie->isEmpty())
+    <p class="sis-muted" style="font-size:13px;margin:0;">Er zijn geen gebruikers met de rol Directie.</p>
+  @else
+    @foreach ($directie as $d)
+      @php $toegewezen = $d->opleidingen->pluck('id'); @endphp
+      <form method="POST" action="{{ route('gebruikers.opleidingen', $d) }}"
+            style="display:flex;gap:16px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line,#e6e4ee);flex-wrap:wrap;">
+        @csrf @method('PUT')
+        <div style="min-width:180px;flex:0 0 auto;">
+          <b style="font-size:13px;">{{ $d->naam }}</b>
+          <div class="sis-muted" style="font-size:11.5px;">{{ $d->email }}</div>
+        </div>
+        <div style="flex:1 1 320px;">
+          <div style="display:flex;flex-wrap:wrap;gap:6px 14px;">
+            @foreach ($opleidingen as $o)
+              <label class="sis-check-inline" style="font-size:12px;">
+                <input type="checkbox" name="opleidingen[]" value="{{ $o->id }}" @checked($toegewezen->contains($o->id))> {{ $o->naam }}
+              </label>
+            @endforeach
+          </div>
+          @if ($toegewezen->isEmpty())<small style="color:var(--secColor100);display:block;margin-top:4px;">Nog geen toewijzing — dit directielid ziet momenteel geen studenten.</small>@endif
+        </div>
+        <button type="submit" class="iuasr-dash-btn iuasr-dash-btn--sm" style="flex:0 0 auto;">Opslaan</button>
+      </form>
+    @endforeach
+    <p class="sis-tblnote" style="margin-top:10px;">Een student met een dubbele inschrijving is zichtbaar voor de directie van elke opleiding waarin hij/zij actief is ingeschreven.</p>
+  @endif
+</div>
+
 <div class="sis-card">
   <div class="sis-card__hd"><h3>Gebruikers</h3></div>
   <div class="iuasr-dash-tbl-card" style="border:0;">

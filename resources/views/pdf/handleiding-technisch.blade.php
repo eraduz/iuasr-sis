@@ -129,6 +129,7 @@ MAIL_FROM_NAME="IUASR Studentenzaken"</span>
     <li>Echte productiedata alleen in de laatste fase, onder toezicht van de Functionaris Gegevensbescherming.</li>
     <li>Inzage/mutatie van cijfers en BSN wordt gelogd (audit-log, alleen-lezen voor Beheer).</li>
     <li>Rolscheiding wordt server-side afgedwongen; wijzig dit niet zonder reden.</li>
+    <li><b>Directie is opleidinggebonden.</b> De koppeltabel <code>directie_opleidingen</code> (user &harr; opleiding) bepaalt welke studenten, cijfers en rapporten een directielid ziet. Beheer wijst dit toe via <b>Gebruikers &amp; rollen &rarr; Directie — opleidingtoewijzing</b>. Zonder toewijzing ziet een directielid <b>niets</b> (need-to-know). Een dubbel ingeschreven student is zichtbaar voor de directie van elke opleiding waarin hij/zij actief is. De filtering loopt via <code>User::opleidingIds()</code>, <code>Student::scopeZichtbaarVoor()</code> en per-opleiding gefilterde statistieken.</li>
   </ul>
 
   <h2>7. Regulier onderhoud</h2>

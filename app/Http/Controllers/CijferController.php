@@ -354,7 +354,10 @@ class CijferController extends Controller
     {
         $zoek = trim((string) $request->query('q', ''));
         $periode = Periode::where('actief', true)->first();
+        $gebruiker = $request->user();
         $vakken = Vak::where('actief', true)
+            ->when($gebruiker->isOpleidingBeperkt(),
+                fn ($q) => $q->whereIn('opleiding_id', $gebruiker->opleidingIds()))
             ->with(['opleiding', 'docent', 'toetsonderdelen'])
             ->when($zoek !== '', function ($q) use ($zoek) {
                 $q->where(function ($w) use ($zoek) {
@@ -436,5 +439,11 @@ class CijferController extends Controller
         }
 
         abort_unless(in_array($user->rol, [Rol::Examencommissie, Rol::Directie], true), 403);
+
+        // Directie: alleen vakken van de eigen opleiding(en).
+        if ($user->isOpleidingBeperkt()) {
+            abort_unless($user->opleidingIds()->contains($vak->opleiding_id), 403,
+                'Dit vak valt buiten uw opleiding(en).');
+        }
     }
 }

@@ -63,11 +63,29 @@
     </thead>
     <tbody>
       @forelse ($studenten as $student)
-        @php $insch = $student->inschrijvingen->first(); @endphp
+        @php
+          $insch = $student->inschrijvingen->first();
+          $actieveInsch = $student->actieveInschrijvingen();
+          $dubbel = $actieveInsch->count() > 1;
+          $dubbelPill = $dubbel
+            ? '<span class="sis-pill-soft" style="color:var(--heritageGroen,#285C4D);background:rgba(40,92,77,0.10);margin-left:6px;" title="Volgt twee opleidingen tegelijk">dubbele inschrijving</span>'
+            : '';
+          $schuldPill = in_array($student->id, $schuldIds)
+            ? '<span class="sis-pill-soft" style="color:var(--secColor100);background:rgba(200,16,46,0.09);margin-left:6px;" title="Openstaande betalingsachterstand">schuld</span>'
+            : '';
+        @endphp
         <tr>
           <td class="tnum">{{ $student->studentnummer }}</td>
-          <td class="nm">{{ $student->volledigeNaam() }}@if(in_array($student->id, $schuldIds))<span class="sis-pill-soft" style="color:var(--secColor100);background:rgba(200,16,46,0.09);margin-left:6px;" title="Openstaande betalingsachterstand">schuld</span>@endif<small>{{ $student->email ?? '—' }}</small></td>
-          <td class="pg">{{ $insch?->opleiding?->naam ?? '—' }}</td>
+          <td class="nm">{{ $student->volledigeNaam() }}{!! $dubbelPill !!}{!! $schuldPill !!}<small>{{ $student->email ?? '—' }}</small></td>
+          <td class="pg">
+            @if ($dubbel)
+              @foreach ($actieveInsch as $ai)
+                <div>{{ $ai->opleiding?->naam ?? '—' }}</div>
+              @endforeach
+            @else
+              {{ $insch?->opleiding?->naam ?? '—' }}
+            @endif
+          </td>
           <td>{{ $insch?->klas?->code ?? '—' }}</td>
           <td class="tnum">{{ $insch?->inschrijfdatum?->format('Y') ?? '—' }}</td>
           <td>

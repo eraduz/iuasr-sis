@@ -44,11 +44,27 @@ class Statistiek
         ];
     }
 
-    /** Actieve studenten per opleiding (code). @return list<array{label:string,value:int}> */
-    public static function perOpleiding(): array
+    /**
+     * Normaliseert een opleidingfilter naar een array van ids of null (= alles).
+     * Directie geeft de eigen opleiding-ids mee; overige rollen null.
+     */
+    private static function ids($opleidingIds): ?array
     {
+        if ($opleidingIds === null) {
+            return null;
+        }
+
+        return collect($opleidingIds)->map(fn ($v) => (int) $v)->values()->all();
+    }
+
+    /** Actieve studenten per opleiding (code). @return list<array{label:string,value:int}> */
+    public static function perOpleiding($opleidingIds = null): array
+    {
+        $ids = self::ids($opleidingIds);
+
         return Inschrijving::where('inschrijvingen.status', 'actief')
             ->join('opleidingen', 'opleidingen.id', '=', 'inschrijvingen.opleiding_id')
+            ->when($ids !== null, fn ($q) => $q->whereIn('inschrijvingen.opleiding_id', $ids))
             ->selectRaw('opleidingen.code as label, count(*) as value')
             ->groupBy('opleidingen.code')->orderByDesc('value')
             ->get()->map(fn ($r) => ['label' => $r->label, 'value' => (int) $r->value])->all();
@@ -63,17 +79,21 @@ class Statistiek
     }
 
     /** Instroom (nieuwe inschrijvingen) per studiejaar. @return list<array{label:string,value:int}> */
-    public static function instroomPerStudiejaar(): array
+    public static function instroomPerStudiejaar($opleidingIds = null): array
     {
+        $ids = self::ids($opleidingIds);
+
         return Inschrijving::join('perioden', 'perioden.id', '=', 'inschrijvingen.periode_id')
+            ->when($ids !== null, fn ($q) => $q->whereIn('inschrijvingen.opleiding_id', $ids))
             ->selectRaw('perioden.naam as label, count(*) as value')
             ->groupBy('perioden.naam')->orderBy('perioden.naam')
             ->get()->map(fn ($r) => ['label' => $r->label, 'value' => (int) $r->value])->all();
     }
 
     /** Verdeling inschrijvingsstatussen met semantische kleuren. */
-    public static function statusVerdeling(): array
+    public static function statusVerdeling($opleidingIds = null): array
     {
+        $ids = self::ids($opleidingIds);
         $kleur = [
             'actief' => self::GROEN, 'afgestudeerd' => self::BLAUW,
             'uitgeschreven' => self::ROOD, 'geschorst' => self::GOUD,
@@ -84,16 +104,21 @@ class Statistiek
             'uitgeschreven' => 'Uitgeschreven', 'geschorst' => 'Geschorst', 'aangemeld' => 'Aangemeld',
         ];
 
-        return Inschrijving::selectRaw('status, count(*) as n')->groupBy('status')->pluck('n', 'status')
+        return Inschrijving::when($ids !== null, fn ($q) => $q->whereIn('opleiding_id', $ids))
+            ->selectRaw('status, count(*) as n')->groupBy('status')->pluck('n', 'status')
             ->map(fn ($n, $s) => ['label' => $labels[$s] ?? $s, 'value' => (int) $n, 'kleur' => $kleur[$s] ?? self::GRIJS])
             ->values()->all();
     }
 
     /** Overgangsadvies-verdeling over actieve inschrijvingen (BSA/doorstroom). */
-    public static function overgangVerdeling(): array
+    public static function overgangVerdeling($opleidingIds = null): array
     {
+        $ids = self::ids($opleidingIds);
         $telling = ['positief' => 0, 'voorwaardelijk' => 0, 'negatief' => 0, 'onbekend' => 0];
-        foreach (Inschrijving::where('status', 'actief')->with('opleiding')->get() as $insch) {
+        $q = Inschrijving::where('status', 'actief')
+            ->when($ids !== null, fn ($q) => $q->whereIn('opleiding_id', $ids))
+            ->with('opleiding');
+        foreach ($q->get() as $insch) {
             $telling[Overgangsbeoordeling::voor($insch)['status']]++;
         }
 
@@ -106,11 +131,15 @@ class Statistiek
     }
 
     /** Toets-slaagpercentage (o.b.v. beoordeelde resultaten) en aantallen. */
-    public static function slaagpercentage(): array
+    public static function slaagpercentage($opleidingIds = null): array
     {
-        $totaal = Resultaat::whereNotNull('cijfer')->count();
-        $voldoende = Resultaat::whereNotNull('cijfer')->where('voldoende', true)->count();
-        $vrijstelling = Resultaat::where('vrijstelling', true)->count();
+        $ids = self::ids($opleidingIds);
+        $scope = fn ($q) => $q->when($ids !== null,
+            fn ($q) => $q->whereHas('inschrijving', fn ($i) => $i->whereIn('opleiding_id', $ids)));
+
+        $totaal = Resultaat::whereNotNull('cijfer')->tap($scope)->count();
+        $voldoende = Resultaat::whereNotNull('cijfer')->where('voldoende', true)->tap($scope)->count();
+        $vrijstelling = Resultaat::where('vrijstelling', true)->tap($scope)->count();
 
         return [
             'totaal' => $totaal,
@@ -187,15 +216,17 @@ class Statistiek
     }
 
     /** Financieel totaaloverzicht over actieve studenten (synthetisch). */
-    public static function financieel(): array
+    public static function financieel($opleidingIds = null): array
     {
+        $ids = self::ids($opleidingIds);
         $verschuldigd = 0.0;
         $betaald = 0.0;
         $openstaand = 0.0;
         $achterstand = 0;
         $perOpleiding = [];
 
-        $studenten = Student::whereHas('inschrijvingen', fn ($q) => $q->where('status', 'actief'))
+        $studenten = Student::whereHas('inschrijvingen', fn ($q) => $q->where('status', 'actief')
+            ->when($ids !== null, fn ($q) => $q->whereIn('opleiding_id', $ids)))
             ->with('inschrijvingen.opleiding')->get();
 
         foreach ($studenten as $student) {

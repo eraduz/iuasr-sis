@@ -29,6 +29,7 @@ class ResultatenMailController extends Controller
     {
         $data = $request->validate(['opleiding_id' => ['required', 'exists:opleidingen,id']]);
         $opleiding = Opleiding::findOrFail($data['opleiding_id']);
+        $this->autoriseerOpleiding($request, $opleiding);
         [$teVersturen, $overgeslagen] = $this->bepaalOntvangers($opleiding);
 
         return view('rapporten.resultaten-mailen', compact('opleiding', 'teVersturen', 'overgeslagen'));
@@ -39,6 +40,7 @@ class ResultatenMailController extends Controller
     {
         $data = $request->validate(['opleiding_id' => ['required', 'exists:opleidingen,id']]);
         $opleiding = Opleiding::findOrFail($data['opleiding_id']);
+        $this->autoriseerOpleiding($request, $opleiding);
         [$teVersturen] = $this->bepaalOntvangers($opleiding);
 
         $aantal = 0;
@@ -75,6 +77,14 @@ class ResultatenMailController extends Controller
 
         return redirect()->route('cijferlijst', ['opleiding_id' => $opleiding->id])
             ->with('status', $aantal.' student(en) van '.$opleiding->code.' hebben hun cijferlijst per e-mail ontvangen.');
+    }
+
+    /** Directie mag alleen de eigen opleiding(en) mailen. */
+    private function autoriseerOpleiding(Request $request, Opleiding $opleiding): void
+    {
+        $gebruiker = $request->user();
+        abort_if($gebruiker->isOpleidingBeperkt() && ! $gebruiker->opleidingIds()->contains($opleiding->id),
+            403, 'Deze opleiding valt buiten uw opleiding(en).');
     }
 
     /**

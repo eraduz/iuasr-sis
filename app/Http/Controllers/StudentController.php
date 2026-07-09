@@ -31,6 +31,7 @@ class StudentController extends Controller
         );
 
         $studenten = Student::query()
+            ->zichtbaarVoor($request->user())
             ->with(['inschrijvingen' => fn ($q) => $q->latest('inschrijfdatum')->with(['opleiding', 'klas', 'periode'])])
             ->when($zoek !== '', function ($q) use ($zoek) {
                 $q->where(function ($sub) use ($zoek) {
@@ -69,6 +70,10 @@ class StudentController extends Controller
             'inschrijvingen.vaktoewijzingen.vak',
             'nationaliteit', 'land', 'notities.gebruiker',
         ]);
+
+        // Directie ziet alleen dossiers binnen de eigen opleiding(en).
+        abort_unless($student->zichtbaarVoor(auth()->user()), 403,
+            'Deze student valt buiten uw opleiding(en).');
         // Huidige inschrijving: bij voorkeur de ACTIEVE, anders de meest recente.
         // Deterministisch bij gelijke inschrijfdatum door te tie-breaken op id.
         $sorteerKey = fn ($i) => sprintf('%s-%010d', optional($i->inschrijfdatum)->format('Y-m-d') ?? '0000-00-00', $i->id);

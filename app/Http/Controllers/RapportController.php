@@ -121,11 +121,20 @@ class RapportController extends Controller
     public function cijferlijst(Request $request): View
     {
         $zoek = trim((string) $request->query('q', ''));
+        $gebruiker = $request->user();
         $student = $request->filled('student') ? Student::find($request->query('student')) : null;
+
+        // Directie: geen inzage in dossiers buiten de eigen opleiding(en).
+        if ($student) {
+            $student->load('inschrijvingen');
+            abort_unless($student->zichtbaarVoor($gebruiker), 403,
+                'Deze student valt buiten uw opleiding(en).');
+        }
 
         $resultaten = collect();
         if ($zoek !== '' && ! $student) {
             $resultaten = Student::query()
+                ->zichtbaarVoor($gebruiker)
                 ->where(function ($q) use ($zoek) {
                     $q->where('studentnummer', 'like', $zoek.'%')
                         ->orWhere('achternaam', 'like', '%'.$zoek.'%')
@@ -142,8 +151,12 @@ class RapportController extends Controller
         }
 
         // Tweede weergave: alle actieve studenten van een opleiding met behaalde EC.
-        $opleidingen = Opleiding::orderBy('naam')->get();
+        $opleidingen = $this->zichtbareOpleidingen($gebruiker);
         $opleidingId = $request->integer('opleiding_id') ?: null;
+        // Directie mag geen opleiding buiten de eigen scope kiezen.
+        if ($opleidingId && $gebruiker->isOpleidingBeperkt() && ! $gebruiker->opleidingIds()->contains($opleidingId)) {
+            $opleidingId = null;
+        }
         $perOpleiding = collect();
         if ($opleidingId && ! $student) {
             $perOpleiding = Inschrijving::where('status', 'actief')->where('opleiding_id', $opleidingId)
@@ -166,6 +179,10 @@ class RapportController extends Controller
     public function cijferlijstPdf(Request $request, Student $student): StreamedResponse
     {
         $data = $request->validate(['ontvanger' => ['required', 'string', 'max:255']]);
+
+        $student->load('inschrijvingen');
+        abort_unless($student->zichtbaarVoor($request->user()), 403,
+            'Deze student valt buiten uw opleiding(en).');
 
         $transcript = Transcript::voor($student);
         $html = view('pdf.cijferlijst', [
@@ -203,13 +220,19 @@ class RapportController extends Controller
             'klas_id' => ['nullable', 'exists:klassen,id'],
         ]);
         $zoek = trim((string) $request->query('q', ''));
+        $gebruiker = $request->user();
 
-        $opleidingen = Opleiding::orderBy('naam')->get();
-        $klassen = Klas::with('opleiding')->orderBy('code')->get();
+        $opleidingen = $this->zichtbareOpleidingen($gebruiker);
+        $klassen = Klas::with('opleiding')
+            ->when($gebruiker->isOpleidingBeperkt(),
+                fn ($q) => $q->whereIn('opleiding_id', $gebruiker->opleidingIds()))
+            ->orderBy('code')->get();
 
         $rijen = Inschrijving::query()
             ->with(['student', 'opleiding', 'klas'])
             ->where('status', 'actief')
+            ->when($gebruiker->isOpleidingBeperkt(),
+                fn ($q) => $q->whereIn('opleiding_id', $gebruiker->opleidingIds()))
             ->when($data['opleiding_id'] ?? null, fn ($q, $v) => $q->where('opleiding_id', $v))
             ->when($data['leerjaar'] ?? null, fn ($q, $v) => $q->where('leerjaar', $v))
             ->when($data['klas_id'] ?? null, fn ($q, $v) => $q->where('klas_id', $v))
@@ -236,6 +259,17 @@ class RapportController extends Controller
         ]);
     }
 
+    /**
+     * Opleidingen die deze gebruiker mag zien. Directie: alleen de eigen
+     * toegewezen opleiding(en); overige rollen: alle opleidingen.
+     */
+    private function zichtbareOpleidingen(\App\Models\User $gebruiker)
+    {
+        return Opleiding::when($gebruiker->isOpleidingBeperkt(),
+            fn ($q) => $q->whereIn('id', $gebruiker->opleidingIds()))
+            ->orderBy('naam')->get();
+    }
+
     /** Filtert een inschrijvingen-query op studentnummer (prefix) of naam. */
     private function zoekStudent($query, string $zoek)
     {
@@ -258,12 +292,15 @@ class RapportController extends Controller
             'leerjaar' => ['nullable', 'integer', 'min:1', 'max:10'],
         ]);
         $zoek = trim((string) $request->query('q', ''));
+        $gebruiker = $request->user();
 
-        $opleidingen = Opleiding::orderBy('naam')->get();
+        $opleidingen = $this->zichtbareOpleidingen($gebruiker);
 
         $rijen = Inschrijving::query()
             ->with(['student', 'opleiding'])
             ->where('status', 'actief')
+            ->when($gebruiker->isOpleidingBeperkt(),
+                fn ($q) => $q->whereIn('opleiding_id', $gebruiker->opleidingIds()))
             ->when($data['opleiding_id'] ?? null, fn ($q, $v) => $q->where('opleiding_id', $v))
             ->when($data['leerjaar'] ?? null, fn ($q, $v) => $q->where('leerjaar', $v))
             ->when($zoek !== '', fn ($q) => $this->zoekStudent($q, $zoek))
@@ -320,11 +357,14 @@ class RapportController extends Controller
     public function alumni(Request $request): View
     {
         $zoek = trim((string) $request->query('q', ''));
+        $gebruiker = $request->user();
 
         // Alleen studenten waarvan de MEEST RECENTE inschrijving 'afgestudeerd' is.
         $alumni = Inschrijving::query()
             ->with(['student', 'opleiding'])
             ->where('status', 'afgestudeerd')
+            ->when($gebruiker->isOpleidingBeperkt(),
+                fn ($q) => $q->whereIn('opleiding_id', $gebruiker->opleidingIds()))
             ->when($zoek !== '', fn ($q) => $this->zoekStudent($q, $zoek))
             ->whereRaw('inschrijvingen.inschrijfdatum = (select max(i2.inschrijfdatum) from inschrijvingen i2 where i2.student_id = inschrijvingen.student_id)')
             ->get()

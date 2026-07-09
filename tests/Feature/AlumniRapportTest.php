@@ -59,8 +59,19 @@ class AlumniRapportTest extends TestCase
     {
         $this->seedTwee();
         $directie = User::create(['naam' => 'Dir', 'email' => 'dir@iuasr.test', 'rol' => Rol::Directie]);
+        // Directie is opleidinggebonden: toewijzen aan de opleiding van de alumnus.
+        $directie->opleidingen()->attach(Opleiding::where('code', 'ISLTH')->value('id'));
 
         $this->actingAs($directie)->get(route('rapporten.alumni'))->assertOk()->assertSee('260001');
+    }
+
+    public function test_directie_zonder_toewijzing_ziet_geen_alumni(): void
+    {
+        $this->seedTwee();
+        $directie = User::create(['naam' => 'Dir2', 'email' => 'dir2@iuasr.test', 'rol' => Rol::Directie]);
+
+        // Geen opleidingtoewijzing -> geen studenten zichtbaar (restrictief, need-to-know).
+        $this->actingAs($directie)->get(route('rapporten.alumni'))->assertOk()->assertDontSee('260001');
     }
 
     public function test_examencommissie_mag_het_alumni_rapport_niet_zien(): void

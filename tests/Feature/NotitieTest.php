@@ -62,13 +62,26 @@ class NotitieTest extends TestCase
     {
         $sz = User::create(['naam' => 'SZ', 'email' => 'sz3@iuasr.test', 'rol' => Rol::Studentenzaken]);
         $student = $this->student();
+
+        // Directie is opleidinggebonden: de student krijgt een actieve inschrijving
+        // en het directielid wordt aan die opleiding toegewezen.
+        $faculteit = \App\Models\Faculteit::create(['code' => 'FTST', 'naam' => 'Testfaculteit']);
+        $opleiding = \App\Models\Opleiding::create(['faculteit_id' => $faculteit->id, 'code' => 'TST', 'naam' => 'Testopleiding', 'soort' => 'bachelor']);
+        $periode = \App\Models\Periode::create(['code' => '2099-2100', 'naam' => 'Studiejaar 2099 / 2100', 'actief' => true]);
+        \App\Models\Inschrijving::create([
+            'student_id' => $student->id, 'opleiding_id' => $opleiding->id, 'periode_id' => $periode->id,
+            'status' => \App\Enums\InschrijvingStatus::Actief, 'inschrijfdatum' => '2099-09-01',
+        ]);
+
         $this->actingAs($sz)->post(route('studenten.notities.store', $student), [
             'tekst' => 'Interne notitie voor toezicht.',
         ]);
 
-        foreach ([Rol::Directie, Rol::Bestuur] as $rol) {
-            $user = User::create(['naam' => $rol->value, 'email' => $rol->value.'@iuasr.test', 'rol' => $rol]);
+        $directie = User::create(['naam' => 'Dir', 'email' => 'dir@iuasr.test', 'rol' => Rol::Directie]);
+        $directie->opleidingen()->attach($opleiding->id);
+        $bestuur = User::create(['naam' => 'Bestuur', 'email' => 'bestuur@iuasr.test', 'rol' => Rol::Bestuur]);
 
+        foreach ([$directie, $bestuur] as $user) {
             // Mogen lezen (dossier + notitie).
             $this->actingAs($user)->get(route('studenten.show', $student))
                 ->assertOk()->assertSee('Interne notitie voor toezicht');
