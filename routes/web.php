@@ -68,9 +68,12 @@ Route::middleware('auth')->group(function () {
     });
 
     // --- Studenten inzien: SZ, Beheerder, Examencommissie, Directie ---
-    Route::middleware('rol:studentenzaken,beheerder,examencommissie,directie')->group(function () {
+    Route::middleware('rol:studentenzaken,beheerder,examencommissie,directie,bestuur')->group(function () {
         Route::get('/studenten', [StudentController::class, 'index'])->name('studenten.index');
         Route::get('/studenten/{student}', [StudentController::class, 'show'])->name('studenten.show');
+    });
+    // BSN-inzage NIET voor Schoolbestuur (extra gevoelig).
+    Route::middleware('rol:studentenzaken,beheerder,examencommissie,directie')->group(function () {
         Route::get('/studenten/{student}/bsn', [StudentController::class, 'bsn'])->name('studenten.bsn');
     });
 

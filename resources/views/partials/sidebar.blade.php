@@ -85,6 +85,7 @@
         ],
         Rol::Bestuur->value => [
             'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
+            'Studenten' => [['Alle studenten', 'studenten.index', 'students', 'studenten.*']],
             'Documenten' => [['Ondertekende documenten', 'ondertekening', 'cert', 'ondertekening*']],
             'Handleidingen' => [
                 ['Medewerkershandleiding', 'handleiding.medewerkers', 'report', 'handleiding.medewerkers'],

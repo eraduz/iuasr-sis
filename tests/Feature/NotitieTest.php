@@ -58,6 +58,27 @@ class NotitieTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_directie_en_bestuur_lezen_notities_maar_beheren_niet(): void
+    {
+        $sz = User::create(['naam' => 'SZ', 'email' => 'sz3@iuasr.test', 'rol' => Rol::Studentenzaken]);
+        $student = $this->student();
+        $this->actingAs($sz)->post(route('studenten.notities.store', $student), [
+            'tekst' => 'Interne notitie voor toezicht.',
+        ]);
+
+        foreach ([Rol::Directie, Rol::Bestuur] as $rol) {
+            $user = User::create(['naam' => $rol->value, 'email' => $rol->value.'@iuasr.test', 'rol' => $rol]);
+
+            // Mogen lezen (dossier + notitie).
+            $this->actingAs($user)->get(route('studenten.show', $student))
+                ->assertOk()->assertSee('Interne notitie voor toezicht');
+
+            // Mogen niet beheren (toevoegen).
+            $this->actingAs($user)->post(route('studenten.notities.store', $student), ['tekst' => 'x'])
+                ->assertForbidden();
+        }
+    }
+
     public function test_notitie_kan_verwijderd_worden(): void
     {
         $sz = User::create(['naam' => 'SZ', 'email' => 'sz3@iuasr.test', 'rol' => Rol::Studentenzaken]);

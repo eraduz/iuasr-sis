@@ -245,11 +245,16 @@
         </div>
       @endif
 
-      {{-- Interne notities — direct onder Contact, altijd zichtbaar (Studentenzaken/Beheer) --}}
-      @if (auth()->user()->magInschrijvingBeheren())
+      {{-- Interne notities — SZ/Beheer beheren; Directie/Bestuur lezen mee --}}
+      @php
+        $magNotitiesBeheren = auth()->user()->magInschrijvingBeheren();
+        $magNotitiesZien = $magNotitiesBeheren || in_array(auth()->user()->rol, [App\Enums\Rol::Directie, App\Enums\Rol::Bestuur], true);
+      @endphp
+      @if ($magNotitiesZien)
         <div class="sis-card" id="notities" style="margin-top:16px;">
-          <div class="sis-card__hd"><h3>Notities</h3><span class="hint">Intern · Studentenzaken &amp; Beheer</span></div>
+          <div class="sis-card__hd"><h3>Notities</h3><span class="hint">Intern · SZ &amp; Beheer beheren · Directie &amp; Bestuur lezen mee</span></div>
 
+          @if ($magNotitiesBeheren)
           <form method="POST" action="{{ route('studenten.notities.store', $student) }}" class="iuasr-dash-note-form" style="margin-bottom:12px;">
             @csrf
             <div class="iuasr-dash-note-form__hd">
@@ -261,6 +266,7 @@
               <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Notitie opslaan</button>
             </div>
           </form>
+          @endif
 
           <div class="iuasr-dash-note-list">
             @forelse ($student->notities as $n)
@@ -268,12 +274,14 @@
                 <small>{{ $n->created_at->format('d-m-Y · H:i') }} · {{ $n->gebruiker?->naam ?? 'onbekend' }}</small>
                 <div style="display:flex;gap:10px;align-items:flex-start;justify-content:space-between;">
                   <span style="white-space:pre-wrap;">{{ $n->tekst }}</span>
+                  @if ($magNotitiesBeheren)
                   <form method="POST" action="{{ route('studenten.notities.destroy', [$student, $n]) }}" onsubmit="return confirm('Deze notitie verwijderen?');" style="flex:none;">
                     @csrf @method('DELETE')
                     <button type="submit" title="Verwijderen" style="background:none;border:0;cursor:pointer;color:var(--blackAltText);padding:2px;line-height:0;">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                     </button>
                   </form>
+                  @endif
                 </div>
               </div>
             @empty
