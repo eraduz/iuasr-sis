@@ -205,8 +205,11 @@ class StudentController extends Controller
         ]);
         $data['nt2_examen_vereist'] = $request->boolean('nt2_examen_vereist');
 
-        $gewijzigd = array_keys(array_diff_assoc($data, $student->only(array_keys($data))));
-        $student->update($data);
+        // Gewijzigde velden bepalen via Eloquent-dirty-tracking; array_diff_assoc
+        // faalt op enum-casts (bv. TaalNiveau kan niet naar string).
+        $student->fill($data);
+        $gewijzigd = array_keys($student->getDirty());
+        $student->save();
 
         AuditLogger::log(AuditLogger::WIJZIGING, $student, veld: 'persoonsgegevens', context: [
             'velden' => $gewijzigd,

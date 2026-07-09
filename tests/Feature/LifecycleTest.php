@@ -126,6 +126,25 @@ class LifecycleTest extends TestCase
         $this->assertSame(1, $this->student->inschrijvingen()->count());
     }
 
+    public function test_muteren_werkt_met_ingevulde_taalniveaus(): void
+    {
+        // Reproductie: een student met TaalNiveau-enums moet muteerbaar blijven
+        // (array_diff_assoc faalde op de enum-cast).
+        $niveau = \App\Enums\TaalNiveau::cases()[0];
+        $this->student->update(['taal_nederlands' => $niveau, 'taal_arabisch' => $niveau]);
+
+        $this->actingAs($this->sz)->put(route('studenten.update', $this->student), [
+            'voornaam' => 'Test',
+            'achternaam' => 'Persoon',
+            'vooropleiding' => 'Havo',
+            'taal_nederlands' => $niveau->value,
+            'taal_arabisch' => $niveau->value,
+        ])->assertRedirect(route('studenten.show', $this->student));
+
+        $this->assertSame('Havo', $this->student->fresh()->vooropleiding);
+        $this->assertDatabaseHas('audit_logs', ['veld' => 'persoonsgegevens', 'actie' => 'wijziging']);
+    }
+
     public function test_muteren_werkt_bij_en_logt(): void
     {
         $this->actingAs($this->sz)->put(route('studenten.update', $this->student), [
