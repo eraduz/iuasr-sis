@@ -69,7 +69,12 @@ class StudentController extends Controller
             'inschrijvingen.vaktoewijzingen.vak',
             'nationaliteit', 'land', 'notities.gebruiker',
         ]);
-        $huidige = $student->inschrijvingen->sortByDesc('inschrijfdatum')->first();
+        // Huidige inschrijving: bij voorkeur de ACTIEVE, anders de meest recente.
+        // Deterministisch bij gelijke inschrijfdatum door te tie-breaken op id.
+        $sorteerKey = fn ($i) => sprintf('%s-%010d', optional($i->inschrijfdatum)->format('Y-m-d') ?? '0000-00-00', $i->id);
+        $actieve = $student->inschrijvingen->where('status', \App\Enums\InschrijvingStatus::Actief);
+        $huidige = ($actieve->isNotEmpty() ? $actieve : $student->inschrijvingen)
+            ->sortByDesc($sorteerKey)->first();
 
         // Vakhistorie: per studiejaar (inschrijving) de toegewezen vakken, gegroepeerd
         // per periode (blok). Blijft ook jaren later volledig raadpleegbaar.

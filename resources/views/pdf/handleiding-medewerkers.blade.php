@@ -74,6 +74,8 @@
   <p>Kies <b>Student inschrijven</b>, vul de gegevens in en bevestig. Het studentnummer wordt automatisch toegekend en de vakken van het studiejaar worden toegewezen. Voor grote aantallen bestaat <b>Bulk inschrijven</b> (CSV-export van het aanmeldportaal), met een controlestap vóór definitief importeren. In die controlestap <b>kiest u het studiejaar</b> waarin de studenten worden ingeschreven (bijvoorbeeld het komende jaar); bij een toekomstig studiejaar wordt de inschrijfdatum automatisch de startdatum (1 september).</p>
   <h3>Gegevens wijzigen</h3>
   <p>Open het dossier, tabblad <b>Persoonsgegevens</b>, en kies <b>Wijzig gegevens</b>. Onder <b>Acties</b> vindt u herinschrijven, uitschrijven en schorsen.</p>
+  <h3>Herinschrijven (met of zonder studiewissel)</h3>
+  <p>Bij <b>Herinschrijven</b> maakt u een nieuwe inschrijving terwijl het studentnummer en de persoonsgegevens gelijk blijven. U kiest de <b>opleiding</b>: dezelfde opleiding (vervolg naar een volgend leerjaar of hetzelfde jaar overdoen) óf een <b>andere opleiding</b> (studiewissel — bijvoorbeeld van een cursus naar een bacheloropleiding). Kiest u een andere opleiding, dan wordt het leerjaar automatisch 1 en verschijnen alleen de klassen van die opleiding. De vakken worden op de gekozen opleiding en het gekozen leerjaar toegewezen; eerder behaalde resultaten blijven op de vorige inschrijving bewaard.</p>
   <h3>Documenten</h3>
   <p>In het dossier uploadt u documenten (identiteitsbewijs, diploma, cijferlijst, pasfoto, overig). Ontbreekt iets nog, zet dan <b>“levert later aan”</b> aan — de student verschijnt dan als herinnering op het dashboard.</p>
   <h3>Landelijke kennistoetsen (PABO)</h3>

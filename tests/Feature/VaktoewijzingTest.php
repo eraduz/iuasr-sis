@@ -60,6 +60,7 @@ class VaktoewijzingTest extends TestCase
         ]);
 
         $this->actingAs($this->sz)->post(route('herinschrijven.store', $student), [
+            'opleiding_id' => Opleiding::where('code', 'ISLTH')->value('id'),
             'periode_id' => Periode::where('code', '2026-2027')->value('id'),
             'leerjaar' => 2,
             'inschrijfdatum' => '2027-09-01',

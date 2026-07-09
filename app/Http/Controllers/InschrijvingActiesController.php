@@ -138,9 +138,10 @@ class InschrijvingActiesController extends Controller
         $huidige = $this->huidige($student);
         $perioden = Periode::orderByDesc('code')->get();
         $klassen = Klas::with('opleiding')->orderBy('code')->get();
+        $opleidingen = \App\Models\Opleiding::where('actief', true)->orderBy('naam')->get();
         $financieel = \App\Support\Collegegeldstatus::voor($student);
 
-        return view('inschrijven.herinschrijven', compact('student', 'huidige', 'perioden', 'klassen', 'financieel'));
+        return view('inschrijven.herinschrijven', compact('student', 'huidige', 'perioden', 'klassen', 'opleidingen', 'financieel'));
     }
 
     public function herinschrijven(Request $request, Student $student): RedirectResponse
@@ -155,34 +156,48 @@ class InschrijvingActiesController extends Controller
         }
 
         $data = $request->validate([
+            'opleiding_id' => ['required', Rule::exists('opleidingen', 'id')],
             'periode_id' => ['required', Rule::exists('perioden', 'id')],
             'klas_id' => ['nullable', Rule::exists('klassen', 'id')],
-            'leerjaar' => ['nullable', 'integer', 'min:1', 'max:10'],
+            'leerjaar' => ['required', 'integer', 'min:1', 'max:10'],
             'inschrijfdatum' => ['required', 'date'],
         ]);
 
-        // Nieuwe inschrijving voor de nieuwe periode; opleiding en studentnummer
-        // blijven gelijk (dezelfde interne student).
+        // Gekozen klas moet bij de gekozen opleiding horen (studiewissel-veilig).
+        if (! empty($data['klas_id'])) {
+            $klas = Klas::find($data['klas_id']);
+            if ($klas && (int) $klas->opleiding_id !== (int) $data['opleiding_id']) {
+                return back()->withInput()->with('fout', 'De gekozen klas hoort niet bij de gekozen opleiding.');
+            }
+        }
+
+        // Nieuwe inschrijving; studentnummer en persoonsgegevens blijven gelijk.
+        // De opleiding kan wijzigen (studiewissel), bijvoorbeeld van een cursus
+        // naar een bacheloropleiding.
         $nieuw = Inschrijving::create([
             'student_id' => $student->id,
-            'opleiding_id' => $huidige->opleiding_id,
+            'opleiding_id' => $data['opleiding_id'],
             'klas_id' => $data['klas_id'] ?? null,
             'periode_id' => $data['periode_id'],
-            'leerjaar' => $data['leerjaar'] ?? (($huidige->leerjaar ?? 1) + 1),
+            'leerjaar' => $data['leerjaar'],
             'status' => InschrijvingStatus::Actief,
             'inschrijfdatum' => $data['inschrijfdatum'],
             'invoerdatum' => now()->toDateString(),
         ]);
 
-        // Vakken van het nieuwe studiejaar automatisch toewijzen.
+        // Vakken van de (nieuwe) opleiding + leerjaar automatisch toewijzen.
         \App\Support\Vaktoewijzer::wijsToe($nieuw);
 
+        $studiewissel = (int) $data['opleiding_id'] !== (int) $huidige->opleiding_id;
         AuditLogger::log(AuditLogger::AANMAAK, $student, veld: 'herinschrijving', context: [
             'periode_id' => $data['periode_id'],
+            'opleiding_id' => $data['opleiding_id'],
+            'studiewissel' => $studiewissel,
             'inschrijving_id' => $nieuw->id,
         ]);
 
-        return redirect()->route('studenten.show', $student)
-            ->with('status', 'Herinschrijving vastgelegd — studentnummer '.$student->studentnummer.' blijft gelijk.');
+        return redirect()->route('studenten.show', $student)->with('status',
+            ($studiewissel ? 'Herinschrijving met studiewissel vastgelegd' : 'Herinschrijving vastgelegd')
+            .' — studentnummer '.$student->studentnummer.' blijft gelijk.');
     }
 }

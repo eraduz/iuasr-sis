@@ -63,14 +63,35 @@ class LifecycleTest extends TestCase
     public function test_herinschrijven_behoudt_studentnummer_en_maakt_nieuwe_inschrijving(): void
     {
         $nieuwe = Periode::where('code', '2026-2027')->first();
+        $islth = Opleiding::where('code', 'ISLTH')->value('id');
 
         $this->actingAs($this->sz)->post(route('herinschrijven.store', $this->student), [
+            'opleiding_id' => $islth,
             'periode_id' => $nieuwe->id,
+            'leerjaar' => 2,
             'inschrijfdatum' => '2027-09-01',
         ])->assertRedirect(route('studenten.show', $this->student));
 
         $this->assertSame(2, $this->student->inschrijvingen()->count());
         $this->assertSame('260500', $this->student->fresh()->studentnummer); // ongewijzigd
+    }
+
+    public function test_herinschrijven_kan_van_opleiding_wisselen(): void
+    {
+        $nieuwe = Periode::where('code', '2026-2027')->first();
+        $pabo = Opleiding::where('code', 'PABO')->first(); // andere opleiding dan ISLTH
+
+        $this->actingAs($this->sz)->post(route('herinschrijven.store', $this->student), [
+            'opleiding_id' => $pabo->id,
+            'periode_id' => $nieuwe->id,
+            'leerjaar' => 1,
+            'inschrijfdatum' => '2026-09-01',
+        ])->assertRedirect(route('studenten.show', $this->student));
+
+        $nieuw = $this->student->inschrijvingen()->orderByDesc('id')->first();
+        $this->assertSame($pabo->id, $nieuw->opleiding_id); // opleiding gewijzigd (studiewissel)
+        $this->assertSame(1, $nieuw->leerjaar);
+        $this->assertDatabaseHas('audit_logs', ['veld' => 'herinschrijving', 'actie' => 'aanmaak']);
     }
 
     public function test_muteren_werkt_bij_en_logt(): void
