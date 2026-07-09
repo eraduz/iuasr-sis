@@ -48,9 +48,10 @@ class TentamenlijstTest extends TestCase
 
         $this->actingAs($this->docent)->get(route('vakken.tentamenlijst', $this->vak))
             ->assertOk()
-            ->assertSee('Tentamenlijst')
+            ->assertSee('Presentielijst')
             ->assertSee($deelnemer->volledigeNaam())
-            ->assertSee('Deelnemers');
+            ->assertSee('Handtekening')
+            ->assertDontSee('Eindcijfer'); // privacy: geen cijfers/EC op de presentielijst
     }
 
     public function test_ondertekende_tentamenlijst_pdf(): void

@@ -463,12 +463,14 @@
 .sis-toolbar .meta b { color: var(--priColor100); font-weight: 500; }
 
 @media print {
-  .iuasr-dash-header, .iuasr-dash-sidebar, .sis-toolbar, .sis-crumb, .iuasr-dash-vhead__actions { display: none !important; }
-  body { background: #FFFFFF !important; }
+  .iuasr-dash-header, .iuasr-dash-sidebar, .sis-toolbar, .sis-crumb,
+  .iuasr-dash-vhead, .iuasr-dash-alert, .sis-help-link { display: none !important; }
+  html, body { background: #FFFFFF !important; }
   .iuasr-dash-app { display: block !important; }
-  .iuasr-dash-main { padding: 0 !important; }
-  .sis-paper-stage { background: #FFFFFF !important; border: 0 !important; padding: 0 !important; }
-  .sis-a4 { box-shadow: none !important; width: auto !important; min-height: 0 !important; padding: 0 !important; }
+  .iuasr-dash-main { padding: 0 !important; margin: 0 !important; }
+  .sis-paper-stage { background: #FFFFFF !important; border: 0 !important; padding: 0 !important; box-shadow: none !important; }
+  .sis-a4 { box-shadow: none !important; width: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
+  @page { margin: 12mm; }
 }
 
 /* ============================================================

@@ -3,30 +3,26 @@
 @php
   $logoPad = public_path('assets/img/iuasr-logo.png');
   $logo = is_file($logoPad) ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPad)) : null;
-  $eindTekst = fn ($e) => match ($e['status']) {
-      'cijfer' => number_format($e['cijfer'], 1, ',', ''),
-      'vr' => 'VR', 'onvolledig' => 'onvolledig', default => '—',
-  };
 @endphp
 <head>
   <meta charset="utf-8">
   <style>
     @page { margin: 13mm 16mm; }
-    body { font-family: "DejaVu Sans", sans-serif; color: #1E1446; font-size: 9.5pt; line-height: 1.35; }
+    body { font-family: "DejaVu Sans", sans-serif; color: #1E1446; font-size: 10pt; line-height: 1.35; }
     .head { width: 100%; border-bottom: 2px solid #1E1446; padding-bottom: 8px; margin-bottom: 12px; }
     .head td { vertical-align: middle; }
     .head .org { text-align: right; font-size: 8pt; color: #666; line-height: 1.4; }
-    h1 { font-size: 16pt; font-weight: bold; margin: 0 0 3px; color: #1E1446; }
+    h1 { font-size: 17pt; font-weight: bold; margin: 0 0 3px; color: #1E1446; }
     .sub { font-size: 8.5pt; color: #666; margin: 0 0 10px; }
-    .sum { font-size: 8.5pt; color: #1E1446; margin: 0 0 10px; }
-    table.lijst { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
-    table.lijst th { text-align: left; font-size: 7pt; text-transform: uppercase; letter-spacing: 0.03em; color: #1E1446; border-bottom: 1.5px solid #1E1446; padding: 5px 5px; }
-    table.lijst td { padding: 4px 5px; border-bottom: 1px solid #eee; }
-    table.lijst td.c { text-align: center; }
-    table.lijst td.r { text-align: right; }
-    .fail { color: #C8102E; font-weight: bold; }
-    .pass { color: #285C4D; font-weight: bold; }
-    .foot { width: 100%; margin-top: 18px; padding-top: 8px; border-top: 1px solid #ddd; font-size: 7.5pt; color: #666; }
+    table.meta { width: 100%; border-collapse: collapse; font-size: 9pt; margin: 0 0 12px; }
+    table.meta td { padding: 3px 0; }
+    table.meta td.k { color: #666; width: 130px; }
+    table.lijst { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+    table.lijst th { text-align: left; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.03em; color: #1E1446; border-bottom: 1.5px solid #1E1446; padding: 6px 6px; }
+    table.lijst td { padding: 8px 6px; border-bottom: 1px solid #ccc; }
+    .sig { width: 100%; margin-top: 30px; }
+    .sig td { width: 50%; vertical-align: top; padding-top: 6px; border-top: 1px solid #1E1446; font-size: 8.5pt; color: #666; }
+    .foot { width: 100%; margin-top: 22px; padding-top: 8px; border-top: 1px solid #ddd; font-size: 7.5pt; color: #666; }
     .foot td.wm { text-align: right; text-transform: uppercase; letter-spacing: 3px; color: #C8102E; font-weight: bold; }
   </style>
 </head>
@@ -38,45 +34,43 @@
     </tr>
   </table>
 
-  <h1>Tentamenlijst</h1>
-  <p class="sub"><b>{{ $vak->code }} — {{ $vak->naam }}</b> &middot; {{ $vak->opleiding?->naam }} &middot; {{ $periode->naam }} &middot; docent: {{ $vak->docent?->achternaam ?? '—' }} &middot; Rotterdam, {{ now()->format('d-m-Y') }}</p>
-  <p class="sum">Deelnemers: {{ $samenvatting['aantal'] }} &middot; geslaagd: {{ $samenvatting['geslaagd'] }} &middot; gemiddeld eindcijfer: {{ $samenvatting['gemiddeld'] !== null ? number_format($samenvatting['gemiddeld'],1,',','') : '—' }} &middot; cesuur: {{ number_format($grens,1,',','') }}</p>
+  <h1>Presentielijst</h1>
+  <p class="sub"><b>{{ $vak->code }} — {{ $vak->naam }}</b> &middot; {{ $vak->opleiding?->naam }} &middot; {{ $periode->naam }} &middot; gegenereerd {{ now()->format('d-m-Y') }}</p>
+
+  <table class="meta">
+    <tr><td class="k">Docent</td><td>{{ $vak->docent?->achternaam ?? '—' }}</td><td class="k">Aantal deelnemers</td><td>{{ $samenvatting['aantal'] }}</td></tr>
+    <tr><td class="k">Datum tentamen</td><td>………………………</td><td class="k">Tijd / lokaal</td><td>………………………</td></tr>
+  </table>
 
   <table class="lijst">
     <thead>
-      <tr>
-        <th>Studentnr.</th>
-        <th>Naam</th>
-        @foreach ($vak->toetsonderdelen as $od)
-          <th style="text-align:center;">{{ $od->naam }}<br>{{ rtrim(rtrim(number_format($od->weging*100,0),'0'),'.') }}%</th>
-        @endforeach
-        <th style="text-align:right;">Eind</th>
-        <th style="text-align:center;">EC</th>
-        <th>Status</th>
-      </tr>
+      <tr><th style="width:24px;">#</th><th style="width:90px;">Studentnr.</th><th>Naam</th><th style="width:40%;">Handtekening</th></tr>
     </thead>
     <tbody>
-      @foreach ($rijen as $rij)
-        @php $eind = $rij['eind']; $ec = $rij['ec']; @endphp
+      @forelse ($rijen as $rij)
         <tr>
+          <td>{{ $loop->iteration }}</td>
           <td>{{ $rij['student']->studentnummer }}</td>
           <td>{{ $rij['student']->volledigeNaam() }}</td>
-          @foreach ($vak->toetsonderdelen as $od)
-            @php $res = $rij['perOnderdeel'][$od->id] ?? null; @endphp
-            <td class="c">@if($res && $res->vrijstelling)VR @elseif($res && $res->cijfer !== null)<span class="{{ (float)$res->cijfer < $grens ? 'fail' : '' }}">{{ number_format($res->cijfer,1,',','') }}</span>@else—@endif</td>
-          @endforeach
-          <td class="r">@if($eind['status']==='cijfer')<span class="{{ $eind['cijfer'] < $grens ? 'fail' : 'pass' }}">{{ $eindTekst($eind) }}</span>@else{{ $eindTekst($eind) }}@endif</td>
-          <td class="c">{{ $ec !== null ? $ec : '—' }}</td>
-          <td>@if($eind['status']==='vr')Vrijstelling @elseif(($ec ?? 0) > 0)Behaald @elseif($eind['status']==='cijfer')Niet behaald @else Open @endif</td>
+          <td></td>
         </tr>
-      @endforeach
+      @empty
+        <tr><td colspan="4" style="text-align:center;color:#666;padding:16px;">Geen deelnemers.</td></tr>
+      @endforelse
     </tbody>
+  </table>
+
+  <table class="sig">
+    <tr>
+      <td>Naam surveillant / docent</td>
+      <td>Handtekening surveillant</td>
+    </tr>
   </table>
 
   <table class="foot">
     <tr>
-      <td>Uitgegeven door {{ $ondertekenaar ?? 'IUASR' }} namens IUASR.</td>
-      <td class="wm">Officieel document</td>
+      <td>Presentielijst &middot; bevat geen cijfers of studiepunten (privacy) &middot; uitgegeven door {{ $ondertekenaar ?? 'IUASR' }}.</td>
+      <td class="wm">Aanwezigheid</td>
     </tr>
   </table>
 </body>
