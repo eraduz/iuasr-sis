@@ -35,4 +35,30 @@ class Cursus extends Model
     {
         return $this->hasMany(Cursusinschrijving::class);
     }
+
+    /**
+     * Beperk een query tot de cursussen die deze gebruiker mag zien. Een
+     * cursusdirecteur (cursusadministratie) ziet uitsluitend de eigen cursus(sen);
+     * Financiën, Beheer en Bestuur zien alle cursussen.
+     */
+    public function scopeZichtbaarVoor($query, User $gebruiker)
+    {
+        if (! $gebruiker->isCursusBeperkt()) {
+            return $query;
+        }
+
+        return $query->whereIn('id', $gebruiker->cursusIds());
+    }
+
+    /** Mag deze gebruiker deze cursus inzien? */
+    public function zichtbaarVoor(User $gebruiker): bool
+    {
+        return ! $gebruiker->isCursusBeperkt() || $this->directeur_id === $gebruiker->id;
+    }
+
+    /** Mag deze gebruiker deze cursus beheren (details wijzigen)? */
+    public function beheerbaarVoor(User $gebruiker): bool
+    {
+        return $gebruiker->magCursusBeheer() && $this->zichtbaarVoor($gebruiker);
+    }
 }

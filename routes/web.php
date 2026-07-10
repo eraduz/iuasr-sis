@@ -58,16 +58,20 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     | Module: Cursussen Administratie
     |--------------------------------------------------------------------------
-    | Beheer van cursussen/cursisten (Cursusadministratie + Beheer) en de
-    | cursusgelden/boekhouding (Financiële Administratie + Beheer). Het dashboard
-    | is voor alle betrokken rollen. Cursusdirecteuren volgen in een latere fase.
+    | Rolverdeling binnen de module:
+    |  - Cursusadministratie = cursusdirecteur, GESCOPED op de eigen cursus(sen):
+    |    ziet/beheert alleen die cursussen, cursisten en inschrijvingen.
+    |  - Financiële Administratie (boekhouding): cursusgelden van ALLE cursussen.
+    |  - Beheerder: alles, incl. cursus aanmaken/verwijderen en directeur toewijzen.
+    |  - Schoolbestuur: dashboard/statistieken en cursistinzage (alleen-lezen).
+    | De scoping wordt server-side afgedwongen in de controllers (zichtbaarVoor).
     */
-    // Dashboard: zichtbaar voor iedereen met toegang tot de module.
-    Route::middleware('rol:cursusadministratie,financien,beheerder')->prefix('cursussen')->group(function () {
+    // Dashboard: alle rollen met toegang tot de module.
+    Route::middleware('rol:cursusadministratie,financien,beheerder,bestuur')->prefix('cursussen')->group(function () {
         Route::get('/', [App\Http\Controllers\Cursus\CursusDashboardController::class, 'index'])->name('cursussen.dashboard');
     });
 
-    // Boekhouding: cursusgelden volgen en betalingen registreren/corrigeren.
+    // Boekhouding: cursusgelden volgen en betalingen registreren/corrigeren (alle cursussen).
     Route::middleware('rol:financien,beheerder')->prefix('cursussen')->group(function () {
         Route::get('/betalingen', [App\Http\Controllers\Cursus\CursusbetalingController::class, 'overzicht'])->name('cursussen.betalingen');
         Route::post('/inschrijvingen/{inschrijving}/betalingen', [App\Http\Controllers\Cursus\CursusbetalingController::class, 'registreer'])->name('cursussen.betaling.registreer');
@@ -75,30 +79,37 @@ Route::middleware('auth')->group(function () {
         Route::delete('/betalingen/{betaling}', [App\Http\Controllers\Cursus\CursusbetalingController::class, 'verwijderen'])->name('cursussen.betaling.verwijderen');
     });
 
-    // Beheer van cursussen, cursisten en inschrijvingen.
-    Route::middleware('rol:cursusadministratie,beheerder')->prefix('cursussen')->group(function () {
-        // Cursusbeheer
-        Route::get('/beheer', [App\Http\Controllers\Cursus\CursusController::class, 'index'])->name('cursussen.beheer');
+    // Cursus aanmaken, verwijderen en directeur toewijzen: uitsluitend de Beheerder.
+    Route::middleware('rol:beheerder')->prefix('cursussen')->group(function () {
         Route::get('/beheer/nieuw', [App\Http\Controllers\Cursus\CursusController::class, 'create'])->name('cursussen.create');
         Route::post('/beheer', [App\Http\Controllers\Cursus\CursusController::class, 'store'])->name('cursussen.store');
+        Route::delete('/beheer/{cursus}', [App\Http\Controllers\Cursus\CursusController::class, 'destroy'])->name('cursussen.destroy');
+    });
+
+    // Cursusbeheer (details) en cursisten/inschrijvingen beheren: cursusdirecteur
+    // (gescoped) en Beheer. De literal- en import-routes staan bewust vóór de
+    // {cursist}-route zodat 'nieuw' en 'import' niet als cursist worden gelezen.
+    Route::middleware('rol:cursusadministratie,beheerder')->prefix('cursussen')->group(function () {
+        Route::get('/beheer', [App\Http\Controllers\Cursus\CursusController::class, 'index'])->name('cursussen.beheer');
         Route::get('/beheer/{cursus}/bewerken', [App\Http\Controllers\Cursus\CursusController::class, 'edit'])->name('cursussen.edit');
         Route::put('/beheer/{cursus}', [App\Http\Controllers\Cursus\CursusController::class, 'update'])->name('cursussen.update');
-        Route::delete('/beheer/{cursus}', [App\Http\Controllers\Cursus\CursusController::class, 'destroy'])->name('cursussen.destroy');
 
-        // Cursisten (bulk-import vóór de {cursist}-route i.v.m. matching)
-        Route::get('/cursisten', [App\Http\Controllers\Cursus\CursistController::class, 'index'])->name('cursisten');
         Route::get('/cursisten/nieuw', [App\Http\Controllers\Cursus\CursistController::class, 'create'])->name('cursisten.create');
         Route::post('/cursisten', [App\Http\Controllers\Cursus\CursistController::class, 'store'])->name('cursisten.store');
         Route::get('/cursisten/import/sjabloon', [App\Http\Controllers\Cursus\CursistController::class, 'importSjabloon'])->name('cursisten.import.sjabloon');
         Route::post('/cursisten/import/controle', [App\Http\Controllers\Cursus\CursistController::class, 'importControle'])->name('cursisten.import.controle');
         Route::post('/cursisten/import', [App\Http\Controllers\Cursus\CursistController::class, 'import'])->name('cursisten.import');
-        Route::get('/cursisten/{cursist}', [App\Http\Controllers\Cursus\CursistController::class, 'show'])->name('cursisten.show');
         Route::get('/cursisten/{cursist}/bewerken', [App\Http\Controllers\Cursus\CursistController::class, 'edit'])->name('cursisten.edit');
         Route::put('/cursisten/{cursist}', [App\Http\Controllers\Cursus\CursistController::class, 'update'])->name('cursisten.update');
 
-        // Inschrijvingen
         Route::post('/cursisten/{cursist}/inschrijven', [App\Http\Controllers\Cursus\CursusinschrijvingController::class, 'store'])->name('cursisten.inschrijven');
         Route::put('/cursisten/{cursist}/inschrijvingen/{inschrijving}', [App\Http\Controllers\Cursus\CursusinschrijvingController::class, 'update'])->name('cursisten.inschrijving.update');
+    });
+
+    // Cursisteninzage: cursusdirecteur (gescoped), Beheer én Schoolbestuur (alleen-lezen).
+    Route::middleware('rol:cursusadministratie,beheerder,bestuur')->prefix('cursussen')->group(function () {
+        Route::get('/cursisten', [App\Http\Controllers\Cursus\CursistController::class, 'index'])->name('cursisten');
+        Route::get('/cursisten/{cursist}', [App\Http\Controllers\Cursus\CursistController::class, 'show'])->name('cursisten.show');
     });
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');

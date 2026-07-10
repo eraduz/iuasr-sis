@@ -136,6 +136,11 @@
             ['Alle cursisten', 'cursisten', 'students', 'cursisten,cursisten.show,cursisten.edit'],
             ['Cursist toevoegen', 'cursisten.create', 'plus', 'cursisten.create'],
         ];
+    } elseif ($gebruiker->magCursusInzien()) {
+        // Schoolbestuur: alleen-lezen cursistinzage.
+        $cursusMenu['Cursisten'] = [
+            ['Alle cursisten', 'cursisten', 'students', 'cursisten,cursisten.show'],
+        ];
     }
 
     if ($gebruiker->magCursusFinancien()) {

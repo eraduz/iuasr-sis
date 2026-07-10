@@ -28,6 +28,7 @@ class CursusinschrijvingController extends Controller
         ]);
 
         $cursus = Cursus::findOrFail($data['cursus_id']);
+        abort_unless($cursus->zichtbaarVoor($request->user()), 403, 'Deze cursus valt buiten uw beheer.');
 
         // Al een lopende inschrijving op deze cursus? Dan niet dubbel inschrijven.
         $bestaat = $cursist->inschrijvingen()
@@ -55,6 +56,7 @@ class CursusinschrijvingController extends Controller
     public function update(Request $request, Cursist $cursist, Cursusinschrijving $inschrijving): RedirectResponse
     {
         abort_unless($inschrijving->cursist_id === $cursist->id, 404);
+        abort_unless($inschrijving->cursus?->zichtbaarVoor($request->user()) ?? false, 403, 'Deze inschrijving valt buiten uw beheer.');
 
         $data = $request->validate([
             'status' => ['required', new Enum(CursusinschrijvingStatus::class)],

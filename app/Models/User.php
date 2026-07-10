@@ -85,6 +85,34 @@ class User extends Authenticatable
         return $this->hasMany(Resultaat::class, 'ingevoerd_door_id');
     }
 
+    /**
+     * Cursussen waarvan deze gebruiker de directeur is (module Cursussen). Een
+     * cursusdirecteur ziet en beheert uitsluitend deze cursus(sen).
+     */
+    public function gedirigeerdeCursussen(): HasMany
+    {
+        return $this->hasMany(Cursus::class, 'directeur_id');
+    }
+
+    /**
+     * Is de zichtbaarheid van deze gebruiker in de Cursussen-module beperkt tot
+     * de eigen cursus(sen)? Alleen de cursusadministratie (cursusdirecteur).
+     */
+    public function isCursusBeperkt(): bool
+    {
+        return $this->rol->isCursusBeperkt();
+    }
+
+    /**
+     * De cursus-ids die deze gebruiker mag zien/beheren.
+     *
+     * @return \Illuminate\Support\Collection<int,int>
+     */
+    public function cursusIds(): Collection
+    {
+        return $this->gedirigeerdeCursussen()->pluck('id');
+    }
+
     public function heeftRol(Rol $rol): bool
     {
         return $this->rol === $rol;
@@ -151,6 +179,11 @@ class User extends Authenticatable
     public function magCursusFinancien(): bool
     {
         return $this->rol->magCursusFinancien();
+    }
+
+    public function magCursusInzien(): bool
+    {
+        return $this->rol->magCursusInzien();
     }
 
     public function magFinancieelInzien(): bool

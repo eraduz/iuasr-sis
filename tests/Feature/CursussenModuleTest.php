@@ -59,11 +59,22 @@ class CursussenModuleTest extends TestCase
 
     public function test_nieuwe_cursus_toevoegen(): void
     {
-        $this->actingAs($this->cursusadmin)->post(route('cursussen.store'), [
+        // Cursussen aanmaken is voorbehouden aan de Beheerder (niet de cursusdirecteur).
+        $beheer = User::where('rol', Rol::Beheerder)->firstOrFail();
+        $this->actingAs($beheer)->post(route('cursussen.store'), [
             'code' => 'TAJWEED', 'naam' => 'Tajweed', 'cursusgeld' => '199.50', 'actief' => '1',
         ])->assertSessionHasNoErrors()->assertRedirect(route('cursussen.beheer'));
 
         $this->assertDatabaseHas('cursussen', ['code' => 'TAJWEED', 'cursusgeld' => 199.50]);
+    }
+
+    public function test_cursusdirecteur_mag_geen_cursus_aanmaken(): void
+    {
+        $this->actingAs($this->cursusadmin)->post(route('cursussen.store'), [
+            'code' => 'TAJWEED', 'naam' => 'Tajweed', 'cursusgeld' => '199.50', 'actief' => '1',
+        ])->assertForbidden();
+
+        $this->assertDatabaseMissing('cursussen', ['code' => 'TAJWEED']);
     }
 
     public function test_handmatig_cursist_toevoegen_krijgt_een_cursistnummer(): void

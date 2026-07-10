@@ -6,6 +6,7 @@ use App\Enums\CursusinschrijvingStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Cursist;
 use App\Models\Cursus;
+use App\Models\User;
 use App\Support\AuditLogger;
 use App\Support\CursistnummerGenerator;
 use App\Support\Tabellezer;
@@ -26,9 +27,13 @@ class CursistController extends Controller
     public function index(Request $request): View
     {
         $zoek = trim((string) $request->query('q', ''));
+        $gebruiker = $request->user();
+        $beperkt = $gebruiker->isCursusBeperkt();
+        $eigenCursusIds = $beperkt ? $gebruiker->cursusIds() : null;
 
         $cursisten = Cursist::query()
-            ->withCount('inschrijvingen')
+            ->zichtbaarVoor($gebruiker)
+            ->withCount(['inschrijvingen' => fn ($q) => $beperkt ? $q->whereIn('cursus_id', $eigenCursusIds) : $q])
             ->when($zoek !== '', function ($q) use ($zoek) {
                 $q->where(fn ($w) => $w->where('cursistnummer', 'like', $zoek.'%')
                     ->orWhere('achternaam', 'like', '%'.$zoek.'%')
@@ -41,9 +46,9 @@ class CursistController extends Controller
         return view('cursisten.index', compact('cursisten', 'zoek'));
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('cursisten.form', ['cursist' => new Cursist(['status' => 'actief']), 'cursussen' => $this->actieveCursussen()]);
+        return view('cursisten.form', ['cursist' => new Cursist(['status' => 'actief']), 'cursussen' => $this->actieveCursussen($request->user())]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -64,32 +69,49 @@ class CursistController extends Controller
 
         AuditLogger::log(AuditLogger::AANMAAK, $cursist, veld: 'cursist', context: ['cursistnummer' => $cursist->cursistnummer]);
 
-        // Optioneel meteen inschrijven op een cursus.
+        // Optioneel meteen inschrijven op een cursus. Een cursusdirecteur mag
+        // uitsluitend op de eigen cursus(sen) inschrijven.
         if ($request->filled('cursus_id')) {
-            $this->schrijfIn($cursist, (int) $request->input('cursus_id'), $request->user()->id);
+            $cursus = Cursus::find((int) $request->input('cursus_id'));
+            abort_unless($cursus && $cursus->zichtbaarVoor($request->user()), 403, 'Deze cursus valt buiten uw beheer.');
+            $this->schrijfIn($cursist, $cursus->id, $request->user()->id);
         }
 
         return redirect()->route('cursisten.show', $cursist)->with('status', 'Cursist toegevoegd.');
     }
 
-    public function show(Cursist $cursist): View
+    public function show(Request $request, Cursist $cursist): View
     {
-        $cursist->load(['inschrijvingen.cursus', 'inschrijvingen.ingeschrevenDoor', 'inschrijvingen.betalingen']);
+        $gebruiker = $request->user();
+        abort_unless($cursist->zichtbaarVoor($gebruiker), 403, 'Deze cursist valt buiten uw cursus(sen).');
+
+        // Een cursusdirecteur ziet op het dossier alleen de inschrijvingen op de
+        // eigen cursus(sen), niet die bij andere cursussen.
+        $beperkt = $gebruiker->isCursusBeperkt();
+        $eigenCursusIds = $beperkt ? $gebruiker->cursusIds() : null;
+        $cursist->load([
+            'inschrijvingen' => fn ($q) => $beperkt ? $q->whereIn('cursus_id', $eigenCursusIds) : $q,
+            'inschrijvingen.cursus', 'inschrijvingen.ingeschrevenDoor', 'inschrijvingen.betalingen',
+        ]);
 
         return view('cursisten.show', [
             'cursist' => $cursist,
-            'cursussen' => $this->actieveCursussen(),
+            'cursussen' => $this->actieveCursussen($gebruiker),
             'statussen' => CursusinschrijvingStatus::opties(),
         ]);
     }
 
-    public function edit(Cursist $cursist): View
+    public function edit(Request $request, Cursist $cursist): View
     {
-        return view('cursisten.form', ['cursist' => $cursist, 'cursussen' => $this->actieveCursussen()]);
+        abort_unless($cursist->zichtbaarVoor($request->user()), 403, 'Deze cursist valt buiten uw cursus(sen).');
+
+        return view('cursisten.form', ['cursist' => $cursist, 'cursussen' => $this->actieveCursussen($request->user())]);
     }
 
     public function update(Request $request, Cursist $cursist): RedirectResponse
     {
+        abort_unless($cursist->zichtbaarVoor($request->user()), 403, 'Deze cursist valt buiten uw cursus(sen).');
+
         $data = $this->valideer($request);
         $data['status'] = $request->input('status', $cursist->status);
         $cursist->update($data);
@@ -136,7 +158,7 @@ class CursistController extends Controller
             return back()->withErrors(['bestand' => 'Het bestand bevat geen gegevens.']);
         }
 
-        $cursusPerCode = $this->actieveCursussen()->keyBy(fn ($c) => strtolower($c->code));
+        $cursusPerCode = $this->actieveCursussen($request->user())->keyBy(fn ($c) => strtolower($c->code));
         $geldig = [];
         $fouten = [];
 
@@ -232,9 +254,9 @@ class CursistController extends Controller
 
     /* ------------------------------------------------------------- helpers */
 
-    private function actieveCursussen()
+    private function actieveCursussen(User $gebruiker)
     {
-        return Cursus::where('actief', true)->orderBy('naam')->get();
+        return Cursus::query()->zichtbaarVoor($gebruiker)->where('actief', true)->orderBy('naam')->get();
     }
 
     /** Schrijf een cursist in op een cursus met het cursusgeld als momentopname. */

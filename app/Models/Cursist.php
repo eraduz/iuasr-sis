@@ -32,4 +32,32 @@ class Cursist extends Model
     {
         return trim(implode(' ', array_filter([$this->voornaam, $this->tussenvoegsel, $this->achternaam])));
     }
+
+    /**
+     * Beperk een query tot de cursisten die deze gebruiker mag zien. Een
+     * cursusdirecteur ziet alleen cursisten met een inschrijving op de eigen
+     * cursus(sen); Beheer en Bestuur zien alle cursisten.
+     */
+    public function scopeZichtbaarVoor($query, User $gebruiker)
+    {
+        if (! $gebruiker->isCursusBeperkt()) {
+            return $query;
+        }
+
+        $ids = $gebruiker->cursusIds();
+
+        return $query->whereHas('inschrijvingen', fn ($iq) => $iq->whereIn('cursus_id', $ids));
+    }
+
+    /** Mag deze gebruiker dit cursistdossier openen? */
+    public function zichtbaarVoor(User $gebruiker): bool
+    {
+        if (! $gebruiker->isCursusBeperkt()) {
+            return true;
+        }
+
+        return $this->inschrijvingen->pluck('cursus_id')
+            ->intersect($gebruiker->cursusIds())
+            ->isNotEmpty();
+    }
 }

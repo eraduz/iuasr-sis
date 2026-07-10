@@ -205,8 +205,11 @@ enum Rol: string
             self::Beheerder => ['*'],
             self::Financien => ['studentenzaken', 'cursussen'],
             self::Cursusadministratie => ['cursussen'],
+            // Het Schoolbestuur heeft brede inzage en ziet naast Studentenzaken ook
+            // de Cursussen-module (dashboard/statistieken en cursisten, alleen-lezen).
+            self::Bestuur => ['studentenzaken', 'cursussen'],
             self::Studentenzaken, self::Docent, self::Examencommissie,
-            self::Directie, self::Bestuur => ['studentenzaken'],
+            self::Directie => ['studentenzaken'],
         };
     }
 
@@ -226,6 +229,29 @@ enum Rol: string
             self::Financien, self::Beheerder => true,
             default => false,
         };
+    }
+
+    /**
+     * Mag deze rol cursussen/cursisten inzien (dashboard, cursistenoverzicht)?
+     * De cursusadministratie en Beheer beheren; het Schoolbestuur kijkt mee
+     * (alleen-lezen, voor de statistieken en het cursistenbeeld).
+     */
+    public function magCursusInzien(): bool
+    {
+        return match ($this) {
+            self::Cursusadministratie, self::Beheerder, self::Bestuur => true,
+            default => false,
+        };
+    }
+
+    /**
+     * Is de zichtbaarheid binnen de Cursussen-module beperkt tot de eigen
+     * cursus(sen)? Alleen de cursusadministratie (cursusdirecteur) is
+     * cursusgebonden; Financiën, Beheer en Bestuur zien alle cursussen.
+     */
+    public function isCursusBeperkt(): bool
+    {
+        return $this === self::Cursusadministratie;
     }
 
     /** Mag deze rol de opgegeven module benaderen? */

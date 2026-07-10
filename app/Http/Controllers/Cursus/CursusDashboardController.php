@@ -8,24 +8,31 @@ use App\Models\Cursist;
 use App\Models\Cursus;
 use App\Models\Cursusinschrijving;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 
 /**
  * Startscherm van de module Cursussen Administratie: kerncijfers en de cursussen
- * met hun aantal actieve inschrijvingen.
+ * met hun aantal actieve inschrijvingen. Voor een cursusdirecteur is alles beperkt
+ * tot de eigen cursus(sen); Financiën, Beheer en Bestuur zien alle cursussen.
  */
 class CursusDashboardController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $cursussen = Cursus::withCount([
+        $gebruiker = $request->user();
+
+        $cursussen = Cursus::query()->zichtbaarVoor($gebruiker)->withCount([
             'inschrijvingen as actieve_inschrijvingen' => fn ($q) => $q->where('status', CursusinschrijvingStatus::Actief->value),
         ])->orderBy('naam')->get();
+
+        $cursusIds = $cursussen->pluck('id');
 
         return view('cursussen.dashboard', [
             'cursussen' => $cursussen,
             'aantalCursussen' => $cursussen->where('actief', true)->count(),
-            'aantalCursisten' => Cursist::count(),
-            'aantalInschrijvingen' => Cursusinschrijving::where('status', CursusinschrijvingStatus::Actief->value)->count(),
+            'aantalCursisten' => Cursist::query()->zichtbaarVoor($gebruiker)->count(),
+            'aantalInschrijvingen' => Cursusinschrijving::whereIn('cursus_id', $cursusIds)
+                ->where('status', CursusinschrijvingStatus::Actief->value)->count(),
         ]);
     }
 }

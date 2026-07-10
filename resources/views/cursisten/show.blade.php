@@ -5,6 +5,7 @@
 @php
     use App\Support\Cursusgeldstatus;
     $euro = fn ($b) => '€ '.number_format((float) $b, 2, ',', '.');
+    $magBeheren = auth()->user()->magCursusBeheer();
 @endphp
 
 @section('inhoud')
@@ -17,7 +18,9 @@
       <h2 class="iuasr-dash-candidate__name">{{ $cursist->volledigeNaam() }}</h2>
       <div class="iuasr-dash-candidate__meta"><span>Cursistnr. <b>{{ $cursist->cursistnummer }}</b></span></div>
     </div>
-    <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('cursisten.edit', $cursist) }}" style="align-self:flex-start;">Wijzig gegevens</a>
+    @if ($magBeheren)
+      <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('cursisten.edit', $cursist) }}" style="align-self:flex-start;">Wijzig gegevens</a>
+    @endif
   </div>
 </div>
 
@@ -41,15 +44,17 @@
                 </td>
                 <td style="text-align:center;"><span class="iuasr-dash-status {{ $i->status->badge() }}">{{ $i->status->label() }}</span></td>
                 <td class="row-act">
-                  <form method="POST" action="{{ route('cursisten.inschrijving.update', [$cursist, $i]) }}" style="display:flex;gap:6px;align-items:center;">
-                    @csrf @method('PUT')
-                    <select name="status" class="sis-grade-input" style="width:auto;height:30px;">
-                      @foreach ($statussen as $waarde => $label)
-                        <option value="{{ $waarde }}" @selected($i->status->value === $waarde)>{{ $label }}</option>
-                      @endforeach
-                    </select>
-                    <button class="iuasr-dash-btn iuasr-dash-btn--sm" type="submit">Opslaan</button>
-                  </form>
+                  @if ($magBeheren)
+                    <form method="POST" action="{{ route('cursisten.inschrijving.update', [$cursist, $i]) }}" style="display:flex;gap:6px;align-items:center;">
+                      @csrf @method('PUT')
+                      <select name="status" class="sis-grade-input" style="width:auto;height:30px;">
+                        @foreach ($statussen as $waarde => $label)
+                          <option value="{{ $waarde }}" @selected($i->status->value === $waarde)>{{ $label }}</option>
+                        @endforeach
+                      </select>
+                      <button class="iuasr-dash-btn iuasr-dash-btn--sm" type="submit">Opslaan</button>
+                    </form>
+                  @endif
                 </td>
               </tr>
             @empty
@@ -60,18 +65,20 @@
       </div>
 
       {{-- Inschrijven op een cursus --}}
-      <form method="POST" action="{{ route('cursisten.inschrijven', $cursist) }}" style="margin-top:12px;display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
-        @csrf
-        <div class="sis-fld" style="margin:0;"><label>Inschrijven op cursus</label>
-          <select name="cursus_id" required>
-            <option value="">— kies een cursus —</option>
-            @foreach ($cursussen as $cursus)
-              <option value="{{ $cursus->id }}">{{ $cursus->naam }} (€ {{ number_format($cursus->cursusgeld, 2, ',', '.') }})</option>
-            @endforeach
-          </select>
-        </div>
-        <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Inschrijven</button>
-      </form>
+      @if ($magBeheren)
+        <form method="POST" action="{{ route('cursisten.inschrijven', $cursist) }}" style="margin-top:12px;display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+          @csrf
+          <div class="sis-fld" style="margin:0;"><label>Inschrijven op cursus</label>
+            <select name="cursus_id" required>
+              <option value="">— kies een cursus —</option>
+              @foreach ($cursussen as $cursus)
+                <option value="{{ $cursus->id }}">{{ $cursus->naam }} (€ {{ number_format($cursus->cursusgeld, 2, ',', '.') }})</option>
+              @endforeach
+            </select>
+          </div>
+          <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Inschrijven</button>
+        </form>
+      @endif
     </div>
   </div>
 

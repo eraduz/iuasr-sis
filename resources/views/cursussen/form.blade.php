@@ -21,6 +21,18 @@
   </div>
   <div class="sis-fld"><label>Naam <span class="req">*</span></label><input type="text" name="naam" value="{{ old('naam', $cursus->naam) }}" maxlength="255" required></div>
   <div class="sis-fld"><label>Omschrijving</label><textarea name="omschrijving" placeholder="Optioneel">{{ old('omschrijving', $cursus->omschrijving) }}</textarea></div>
+  @if (auth()->user()->rolIs('beheerder'))
+    <div class="sis-fld">
+      <label>Cursusdirecteur</label>
+      <select name="directeur_id">
+        <option value="">— geen directeur —</option>
+        @foreach ($directeuren as $d)
+          <option value="{{ $d->id }}" @selected((int) old('directeur_id', $cursus->directeur_id) === $d->id)>{{ $d->naam }}</option>
+        @endforeach
+      </select>
+      <small class="sis-muted">De directeur ziet en beheert uitsluitend deze cursus. Alleen de Beheerder kan dit toewijzen.</small>
+    </div>
+  @endif
   <div class="sis-fld-row sis-fld-row--2">
     <div class="sis-fld"><label>Startdatum</label><input type="date" name="startdatum" value="{{ old('startdatum', $cursus->startdatum?->toDateString()) }}"></div>
     <div class="sis-fld"><label>Einddatum</label><input type="date" name="einddatum" value="{{ old('einddatum', $cursus->einddatum?->toDateString()) }}"></div>

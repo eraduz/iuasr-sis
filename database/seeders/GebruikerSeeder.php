@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\Rol;
+use App\Models\Cursus;
 use App\Models\Docent;
 use App\Models\Opleiding;
 use App\Models\User;
@@ -41,7 +42,14 @@ class GebruikerSeeder extends Seeder
 
         User::create(['naam' => 'mr. Nadia Öztürk', 'email' => 'n.ozturk@iuasr.nl', 'rol' => Rol::Bestuur]);
         User::create(['naam' => 'Ismail Kaya', 'email' => 'i.kaya@iuasr.nl', 'rol' => Rol::Beheerder]);
-        // Module Cursussen Administratie.
-        User::create(['naam' => 'Hafsa Bakkali', 'email' => 'h.bakkali@iuasr.nl', 'rol' => Rol::Cursusadministratie]);
+
+        // Module Cursussen Administratie: de cursusadministratie is per cursus
+        // afgeschermd. Elke cursusdirecteur ziet en beheert uitsluitend de eigen
+        // cursus(sen); Financiën (boekhouding), Beheer en Bestuur zien alle cursussen.
+        $hafsa = User::create(['naam' => 'Hafsa Bakkali', 'email' => 'h.bakkali@iuasr.nl', 'rol' => Rol::Cursusadministratie]);
+        $omar = User::create(['naam' => 'Omar Faruk', 'email' => 'o.faruk@iuasr.nl', 'rol' => Rol::Cursusadministratie]);
+
+        Cursus::whereIn('code', ['ARAB-TAAL', 'HIFZ'])->update(['directeur_id' => $hafsa->id]);
+        Cursus::where('code', 'IJAZA')->update(['directeur_id' => $omar->id]);
     }
 }
