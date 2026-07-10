@@ -160,6 +160,18 @@ class DashboardController extends Controller
                 ->values();
         }
 
+        // Venster 'Mijn taken': eigen taken plus de taken die aan niemand zijn
+        // toegewezen, op urgentie. Taken zonder vervaldatum blijven buiten beeld.
+        $mijnTaken = collect();
+        if (auth()->user()->magTakenBeheren()) {
+            $mijnTaken = \App\Models\Taak::openstaand()
+                ->voorGebruiker(auth()->user())
+                ->whereNotNull('vervaldatum')
+                ->whereDate('vervaldatum', '<=', now()->addDays(7)->toDateString())
+                ->with(['student', 'toegewezenAan'])
+                ->opUrgentie()->limit(10)->get();
+        }
+
         // Signaleringen voor Studentenzaken (lijsten onder de statistieken).
         $nt2 = collect();
         $docLater = collect();
@@ -198,7 +210,7 @@ class DashboardController extends Controller
 
         return view('dashboard.index', compact('kpi', 'nt2', 'docLater', 'stat', 'openBesluiten',
             'vrijstellingLijst', 'kennistoetsBewaking', 'dubbeleInschrijving',
-            'regelingLijst', 'presentieAchterstand'));
+            'regelingLijst', 'presentieAchterstand', 'mijnTaken'));
     }
 
     /**

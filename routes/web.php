@@ -18,6 +18,7 @@ use App\Http\Controllers\RapportController;
 use App\Http\Controllers\ReferentieController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentDocumentController;
+use App\Http\Controllers\TaakController;
 use App\Http\Controllers\VakstructuurController;
 use App\Http\Controllers\VaktoewijzingController;
 use App\Http\Controllers\VerklaringController;
@@ -158,6 +159,13 @@ Route::middleware('auth')->group(function () {
 
         // Betaalregeling: vijf termijnen of één factuur voor het volledige jaarbedrag.
         Route::post('/inschrijvingen/{inschrijving}/betaalregeling', [BetaalregelingController::class, 'bijwerken'])->name('inschrijving.betaalregeling');
+
+        // Gedeelde takenlijst van Studentenzaken (naar het model van Outlook Taken).
+        Route::get('/taken', [TaakController::class, 'index'])->name('taken');
+        Route::post('/taken', [TaakController::class, 'store'])->name('taken.store');
+        Route::put('/taken/{taak}', [TaakController::class, 'update'])->name('taken.update');
+        Route::post('/taken/{taak}/afronden', [TaakController::class, 'afronden'])->name('taken.afronden');
+        Route::delete('/taken/{taak}', [TaakController::class, 'destroy'])->name('taken.destroy');
     });
 
     // --- Financiële Administratie: betalingen & achterstanden ---

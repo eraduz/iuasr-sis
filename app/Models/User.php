@@ -138,6 +138,11 @@ class User extends Authenticatable
         return $this->rol->magAanwezigheidsregelingBeheren();
     }
 
+    public function magTakenBeheren(): bool
+    {
+        return $this->rol->magTakenBeheren();
+    }
+
     public function magFinancieelInzien(): bool
     {
         return $this->rol->magFinancieelInzien();

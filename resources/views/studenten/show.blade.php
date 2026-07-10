@@ -313,6 +313,59 @@
       @endif
 
       {{-- Interne notities — SZ/Beheer beheren; Directie/Bestuur lezen mee --}}
+      {{-- Taken die aan dit dossier hangen — alleen Studentenzaken/Beheer --}}
+      @if (auth()->user()->magTakenBeheren())
+        <div class="sis-card" id="taken" style="margin-top:16px;">
+          <div class="sis-card__hd">
+            <h3>Taken</h3>
+            <span class="hint">{{ $taken->where('status', '!=', App\Enums\TaakStatus::Afgerond)->count() }} openstaand · <a href="{{ route('taken') }}">takenlijst</a></span>
+          </div>
+
+          @forelse ($taken as $taak)
+            @php $laat = $taak->isTeLaat(); @endphp
+            <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--borderColor);">
+              <form method="POST" action="{{ route('taken.afronden', $taak) }}" style="display:inline;margin-top:2px;">
+                @csrf
+                <button class="sis-taak-vink {{ $taak->isAfgerond() ? 'is-af' : '' }}" type="submit" title="{{ $taak->isAfgerond() ? 'Heropenen' : 'Afronden' }}" aria-label="{{ $taak->isAfgerond() ? 'Heropenen' : 'Afronden' }}">
+                  @if ($taak->isAfgerond())
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                  @endif
+                </button>
+              </form>
+              <div style="flex:1;">
+                <div style="font-size:13.5px;{{ $taak->isAfgerond() ? 'text-decoration:line-through;opacity:.6;' : '' }}">
+                  {{ $taak->titel }}
+                  @if ($taak->prioriteit === App\Enums\TaakPrioriteit::Hoog && ! $taak->isAfgerond())<span class="sis-pill-prio">hoog</span>@endif
+                </div>
+                <div class="sis-muted" style="font-size:11.5px;">
+                  @if ($taak->vervaldatum)
+                    <span class="{{ $laat ? 'is-laat' : '' }}">{{ $taak->vervaldatum->format('d-m-Y') }} · {{ $taak->urgentie() }}</span>
+                  @else
+                    geen vervaldatum
+                  @endif
+                  · {{ $taak->toegewezenAan?->naam ?? 'niemand toegewezen' }}
+                </div>
+              </div>
+            </div>
+          @empty
+            <p class="sis-muted" style="font-size:13px;margin:0 0 10px;">Geen taken voor deze student.</p>
+          @endforelse
+
+          {{-- Snel een taak aanmaken, direct gekoppeld aan dit dossier --}}
+          <form method="POST" action="{{ route('taken.store') }}" style="margin-top:12px;">
+            @csrf
+            <input type="hidden" name="student_id" value="{{ $student->id }}">
+            <input type="hidden" name="prioriteit" value="normaal">
+            <input type="hidden" name="toegewezen_aan_id" value="{{ auth()->id() }}">
+            <div class="sis-fld-row sis-fld-row--2" style="margin-bottom:8px;">
+              <div class="sis-fld"><input type="text" name="titel" maxlength="200" placeholder="Nieuwe taak voor deze student" required></div>
+              <div class="sis-fld"><input type="date" name="vervaldatum" value="{{ now()->addWeek()->toDateString() }}"></div>
+            </div>
+            <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Taak toevoegen</button>
+          </form>
+        </div>
+      @endif
+
       @php
         $magNotitiesBeheren = auth()->user()->magInschrijvingBeheren();
         $magNotitiesZien = $magNotitiesBeheren || in_array(auth()->user()->rol, [App\Enums\Rol::Directie, App\Enums\Rol::Bestuur], true);

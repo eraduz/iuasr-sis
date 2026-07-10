@@ -397,6 +397,43 @@
   </div>
 @endif
 
+{{-- Mijn taken — eigen taken plus vrij op te pakken taken, binnen 7 dagen of te laat --}}
+@if ($mijnTaken->isNotEmpty())
+  <div class="sis-card" style="margin-top:16px;border-left:3px solid var(--priColor100);">
+    <div class="sis-card__hd">
+      <h3>Mijn taken</h3>
+      <span class="hint"><a href="{{ route('taken') }}">Volledige takenlijst</a></span>
+    </div>
+    <div class="iuasr-dash-tbl-card" style="border:0;">
+      <table class="iuasr-dash-tbl">
+        <thead><tr><th style="width:40px;"></th><th>Onderwerp</th><th>Student</th><th style="text-align:center;">Moet af op</th><th style="text-align:center;">Wanneer</th></tr></thead>
+        <tbody>
+          @foreach ($mijnTaken as $taak)
+            @php $laat = $taak->isTeLaat(); @endphp
+            <tr>
+              <td style="text-align:center;">
+                <form method="POST" action="{{ route('taken.afronden', $taak) }}" style="display:inline;">
+                  @csrf
+                  <button class="sis-taak-vink" type="submit" title="Afronden" aria-label="Taak afronden"></button>
+                </form>
+              </td>
+              <td class="nm">
+                {{ $taak->titel }}
+                @if ($taak->prioriteit === App\Enums\TaakPrioriteit::Hoog)<span class="sis-pill-prio">hoog</span>@endif
+                @unless ($taak->toegewezen_aan_id)<span class="sis-pill-soft" style="margin-left:6px;">vrij op te pakken</span>@endunless
+              </td>
+              <td>@if ($taak->student)<a href="{{ route('studenten.show', $taak->student) }}">{{ $taak->student->studentnummer }}</a>@else<span class="sis-muted">—</span>@endif</td>
+              <td class="dt" style="text-align:center;">{{ $taak->vervaldatum->format('d-m-Y') }}</td>
+              <td style="text-align:center;"><span class="{{ $laat ? 'is-laat' : 'sis-muted' }}" style="font-size:12px;">{{ $taak->urgentie() }}</span></td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+    <p class="sis-tblnote" style="margin-top:6px;">Uw eigen taken en de taken die nog aan niemand zijn toegewezen, met een vervaldatum binnen zeven dagen of al verstreken. Vink af met het rondje links.</p>
+  </div>
+@endif
+
 {{-- Presentieregistratie die achterloopt — registreren is voor de docent verplicht --}}
 @if ($presentieAchterstand->isNotEmpty())
   <div class="sis-card" style="margin-top:16px;border-left:3px solid var(--secColor100);">

@@ -577,6 +577,27 @@
 }
 
 /* ============================================================
+   TAKEN (gedeelde takenlijst Studentenzaken)
+   ============================================================ */
+.sis-taak-vink {
+  width: 20px; height: 20px; padding: 0; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1.6px solid var(--borderColor); border-radius: 50%;
+  background: #FFFFFF; color: #FFFFFF;
+}
+.sis-taak-vink:hover { border-color: var(--priColor100); }
+.sis-taak-vink.is-af { background: var(--heritage-groen, #285C4D); border-color: var(--heritage-groen, #285C4D); }
+/* Een afgeronde taak blijft leesbaar, maar treedt naar de achtergrond. */
+.iuasr-dash-tbl tr.taak-af td { opacity: .55; }
+.iuasr-dash-tbl tr.taak-af .nm { text-decoration: line-through; }
+.sis-pill-prio {
+  display: inline-block; margin-left: 6px; font-size: 10.5px; font-weight: 600;
+  color: #9a0c24; background: rgba(200, 16, 46, 0.12);
+  padding: 1px 7px; border-radius: 999px; text-transform: uppercase; letter-spacing: .03em;
+}
+.is-laat { color: var(--secColor100); font-weight: 600; }
+
+/* ============================================================
    COLLEGEGELD — termijnen (facturen sep/nov/jan/mrt/mei)
    ============================================================ */
 .sis-termijn-kop {

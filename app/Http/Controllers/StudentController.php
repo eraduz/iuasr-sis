@@ -138,12 +138,18 @@ class StudentController extends Controller
             ? \App\Support\Collegegeldtermijnen::voor($huidige->loadMissing('betalingen'))
             : collect();
 
+        // Taken die aan dit dossier hangen (alleen voor Studentenzaken/Beheer).
+        $taken = auth()->user()->magTakenBeheren()
+            ? \App\Models\Taak::where('student_id', $student->id)
+                ->with('toegewezenAan')->opUrgentie()->get()
+            : collect();
+
         $grondslagen = \App\Enums\VrijstellingGrondslag::opties();
         $besluiten = \App\Models\Vrijstellingsbesluit::where('student_id', $student->id)
             ->with(['vak', 'aangemaaktDoor', 'verwerktDoor'])->latest()->get();
         $kennistoetsen = \App\Support\Kennistoetsbewaking::voor($student);
 
-        return view('studenten.show', compact('student', 'huidige', 'actieveInschrijvingen', 'magCijfers', 'cijferVakken', 'financieel', 'termijnen', 'vakHistorie', 'grondslagen', 'besluiten', 'kennistoetsen'));
+        return view('studenten.show', compact('student', 'huidige', 'actieveInschrijvingen', 'magCijfers', 'cijferVakken', 'financieel', 'termijnen', 'vakHistorie', 'grondslagen', 'besluiten', 'kennistoetsen', 'taken'));
     }
 
     /**

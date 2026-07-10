@@ -22,6 +22,7 @@
             'money' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="12" cy="14.5" r="1.6"/></svg>',
             'euro' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 7a7 7 0 1 0 0 10"/><line x1="3" y1="10" x2="13" y2="10"/><line x1="3" y1="14" x2="13" y2="14"/></svg>',
             'check' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+            'taak' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>',
             default => '',
         };
     };
@@ -29,7 +30,10 @@
     // Menu per rol: [groepstitel => [ [label, routenaam, icoon, actief-patroon], ... ] ]
     $menus = [
         Rol::Studentenzaken->value => [
-            'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
+            'Overzicht' => [
+                ['Dashboard', 'dashboard', 'dash', 'dashboard'],
+                ['Taken', 'taken', 'taak', 'taken'],
+            ],
             'Studenten' => [
                 ['Alle studenten', 'studenten.index', 'students', 'studenten.*'],
                 ['Student inschrijven', 'inschrijven', 'plus', 'inschrijven'],

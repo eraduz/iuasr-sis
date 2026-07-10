@@ -160,6 +160,18 @@ enum Rol: string
         };
     }
 
+    /**
+     * Mag deze rol de takenlijst gebruiken? Deze is uitsluitend bedoeld voor de
+     * werkverdeling binnen Studentenzaken; Beheer heeft toegang voor onderhoud.
+     */
+    public function magTakenBeheren(): bool
+    {
+        return match ($this) {
+            self::Studentenzaken, self::Beheerder => true,
+            default => false,
+        };
+    }
+
     /** Mag deze rol het BSN inzien? (gelogd) */
     public function magBsnInzien(): bool
     {

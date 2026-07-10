@@ -93,6 +93,15 @@
   <div class="tip">De regeling hangt aan de <b>inschrijving</b>: zij geldt voor één opleiding in één studiejaar. Bij <b>herinschrijven</b> — of bij een tweede opleiding — moet de regeling dus <b>bewust opnieuw</b> worden toegekend. Zo blijft het een jaarlijks besluit van de directie en loopt zij niet stilzwijgend door.</div>
   <p>De regeling is zichtbaar voor Studentenzaken, Docenten, Examencommissie, Directie, Schoolbestuur en Beheer — op het studentdossier, op het dashboard en (voor de docent) op de aanwezigheidslijst, waar de student het label <b>50%</b> achter de naam krijgt.</p>
 
+  <h3>Taken (takenlijst Studentenzaken)</h3>
+  <p>Onder <b>Taken</b> staat de <b>gedeelde takenlijst</b> van de afdeling, opgezet naar het model van Outlook Taken. Alleen Studentenzaken en Beheer hebben er toegang toe.</p>
+  <p>Een taak heeft een <b>onderwerp</b> (het enige verplichte veld), een optionele <b>begindatum</b>, een <b>vervaldatum</b> (“moet af op”), een <b>prioriteit</b> (laag, normaal, hoog) en een <b>status</b>: Open, Bezig of Afgerond. Klik op <b>Nieuwe taak</b> om er een toe te voegen.</p>
+  <p>De lijst is <b>gedeeld</b>: iedereen ziet alle taken. Een taak kunt u aan uzelf of aan een collega toewijzen, of aan niemand — dan is zij vrij op te pakken. Met het vinkje <b>Alleen mijn taken</b> filtert u de lijst.</p>
+  <div class="tip"><b>Te laat</b> is geen status die u zelf zet. Een taak wordt automatisch als te laat gemarkeerd zodra de vervaldatum is verstreken en zij nog niet is afgerond. Een taak <b>zonder</b> vervaldatum staat onderaan de lijst en verschijnt niet in de signalering.</div>
+  <p>Vinkt u een taak af met het <b>rondje links</b>, dan wordt zij afgerond en wordt het moment vastgelegd. Nogmaals klikken heropent haar.</p>
+  <p><b>Koppeling met een student:</b> geef bij een taak een student op, dan verschijnt de taak ook op het dossier van die student (kaart <b>Taken</b>), waar u met één regel een nieuwe taak kunt toevoegen. Wordt een student later verwijderd, dan blijft de taak bestaan zonder koppeling.</p>
+  <p><b>Op uw dashboard</b> staat het venster <b>Mijn taken</b>: uw eigen taken en de taken die aan niemand zijn toegewezen, met een vervaldatum binnen zeven dagen of al verstreken, op urgentie gesorteerd. U kunt ze daar direct afvinken.</p>
+
   <h3>Vakstructuur: het curriculum</h3>
   <p>Onder <b>Vakstructuur</b> legt u per opleiding, per studiejaar en per blok de vakken vast. Het IUASR-curriculum staat er al in: Bachelor Islamitische Theologie, Pre-Master GV en Master GV (PABO volgt later).</p>
   <p>Drie dingen om te weten:</p>

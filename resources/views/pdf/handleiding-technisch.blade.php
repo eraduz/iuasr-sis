@@ -168,7 +168,12 @@ MAIL_FROM_NAME="IUASR Studentenzaken"</span>
   <div class="let"><b>Synthetische vakken horen niet naast het echte curriculum.</b> De voorbeeldvakken met code <code>ISLTH-*</code> zijn verplaatst naar <code>SynthetischVakSeeder</code>, die alleen door de testsuite wordt gebruikt en bewust NIET in <code>DatabaseSeeder</code> staat. Stonden zij actief naast het echte curriculum, dan telden zij mee in de EC-totalen per leerjaar (jaar 1 werd 94 i.p.v. 60 EC) en werden zij automatisch aan elke ISLTH-student toegewezen.</div>
   <p>Nog te doen: de nieuwe vakken hebben <b>geen docent</b> gekoppeld (<code>vakken.docent_id</code> is leeg) en krijgen elk één standaard toetsonderdeel ('Tentamen', weging 100%). Koppel de docenten en verfijn de toetsopbouw via <b>Vakstructuur</b> voordat docenten cijfers gaan invoeren; zonder docentkoppeling blijft 'Mijn vakken' leeg.</p>
 
-  <h2>10. Regulier onderhoud</h2>
+  <h2>10. Takenlijst (Studentenzaken)</h2>
+  <p>Tabel <code>taken</code>, model naar Outlook Taken / Microsoft Graph <code>todoTask</code>: <code>titel</code>, <code>omschrijving</code>, <code>startdatum</code>, <code>vervaldatum</code>, <code>status</code> (open | bezig | afgerond), <code>prioriteit</code> (laag | normaal | hoog), <code>afgerond_op</code>. Optionele koppelingen: <code>student_id</code>, <code>toegewezen_aan_id</code>, <code>aangemaakt_door_id</code> — alle drie <code>nullOnDelete</code>, zodat een taak blijft bestaan als een student of medewerker verdwijnt.</p>
+  <div class="let"><b>'Te laat' is geen kolom.</b> De status wordt afgeleid uit <code>vervaldatum &lt; vandaag</code> én <code>status != afgerond</code> (<code>Taak::isTeLaat()</code>). Sla dit nooit op: anders kan een afgeronde taak in de database als 'te laat' blijven staan.</div>
+  <p>Toegang uitsluitend voor Studentenzaken en Beheer (<code>Rol::magTakenBeheren()</code>, routegroep <code>rol:studentenzaken,beheerder</code>). Er is bewust <b>geen audit-logging</b>: een taak is werkverdeling, geen gevoelig persoonsgegeven. Wel blijft zichtbaar wie de taak aanmaakte en aan wie zij is toegewezen.</p>
+
+  <h2>11. Regulier onderhoud</h2>
   <ul>
     <li><b>Migraties:</b> <code>php artisan migrate</code> na een update (reversible; maak eerst een back-up).</li>
     <li><b>Cache:</b> <code>php artisan optimize:clear</code> bij onverwacht gedrag na wijzigingen.</li>
