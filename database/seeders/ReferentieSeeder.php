@@ -53,8 +53,12 @@ class ReferentieSeeder extends Seeder
             Nationaliteit::firstOrCreate(['naam' => $n]);
         }
 
-        // Studiejaar loopt van 1 september t/m 31 juli. Het huidige studiejaar
-        // (2025-2026) is actief; 2026-2027 is het komende jaar.
+        // Studiejaar loopt van 1 september t/m 31 juli. De seeder legt 2025-2026 als
+        // actief vast (referentie-/testbasislijn met 2026-2027 als "komend jaar").
+        // De daadwerkelijke jaarovergang naar 2026-2027 gebeurt op de draaiende
+        // database via de datamigratie 'activeer_studiejaar_2026_2027' én is daarna
+        // door Beheer te sturen via Opzoektabellen → Studiejaren (vinkje 'Huidig
+        // studiejaar'), dat automatisch het vorige jaar deactiveert.
         Periode::create([
             'code' => '2025-2026', 'naam' => 'Studiejaar 2025 / 2026',
             'startdatum' => '2025-09-01', 'einddatum' => '2026-07-31', 'actief' => true,
