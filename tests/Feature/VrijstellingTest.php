@@ -11,6 +11,7 @@ use App\Support\Overgangsbeoordeling;
 use App\Support\Transcript;
 use Database\Seeders\GebruikerSeeder;
 use Database\Seeders\ReferentieSeeder;
+use Database\Seeders\SynthetischVakSeeder;
 use Database\Seeders\SynthetischeStudentSeeder;
 use Database\Seeders\VaktoewijzingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -27,7 +28,7 @@ class VrijstellingTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed([ReferentieSeeder::class, GebruikerSeeder::class, SynthetischeStudentSeeder::class, VaktoewijzingSeeder::class]);
+        $this->seed([ReferentieSeeder::class, SynthetischVakSeeder::class, GebruikerSeeder::class, SynthetischeStudentSeeder::class, VaktoewijzingSeeder::class]);
         $this->student = Student::where('studentnummer', '261001')->first();
         // Neem een toewijzing die (nog) niet vrijgesteld is.
         $this->toewijzing = $this->student->inschrijvingen()->first()
@@ -52,7 +53,7 @@ class VrijstellingTest extends TestCase
 
         $this->toewijzing->refresh();
         $this->assertTrue($this->toewijzing->vrijgesteld);
-        $this->assertSame((int) $this->vak->ec, $this->toewijzing->vrijstelling_ec);
+        $this->assertSame((float) $this->vak->ec, $this->toewijzing->vrijstelling_ec);
         $this->assertSame('EC-2026-099', $this->toewijzing->vrijstelling_besluit);
         $this->assertDatabaseHas('audit_logs', ['veld' => 'vrijstelling', 'actie' => 'wijziging']);
     }
@@ -76,9 +77,9 @@ class VrijstellingTest extends TestCase
             ->firstWhere('vak.id', $this->vak->id);
 
         $this->assertSame('vr', $regel['eind']['status']);
-        $this->assertSame((int) $this->vak->ec, $regel['ec']);
+        $this->assertSame((float) $this->vak->ec, $regel['ec']);
         $this->assertGreaterThanOrEqual(
-            (int) $this->vak->ec,
+            (float) $this->vak->ec,
             Overgangsbeoordeling::behaaldeEc($this->student->inschrijvingen()->first())
         );
     }

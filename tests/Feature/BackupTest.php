@@ -8,6 +8,7 @@ use App\Support\Backup;
 use App\Support\DatabaseDump;
 use Database\Seeders\GebruikerSeeder;
 use Database\Seeders\ReferentieSeeder;
+use Database\Seeders\SynthetischVakSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use ZipArchive;
@@ -19,7 +20,7 @@ class BackupTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed([ReferentieSeeder::class, GebruikerSeeder::class]);
+        $this->seed([ReferentieSeeder::class, SynthetischVakSeeder::class, GebruikerSeeder::class]);
     }
 
     public function test_databasedump_bevat_structuur_en_data(): void

@@ -14,6 +14,7 @@ use App\Support\Collegegeldstatus;
 use Illuminate\Http\UploadedFile;
 use Database\Seeders\GebruikerSeeder;
 use Database\Seeders\ReferentieSeeder;
+use Database\Seeders\SynthetischVakSeeder;
 use Database\Seeders\SynthetischeStudentSeeder;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -29,7 +30,7 @@ class FinancienTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed([ReferentieSeeder::class, GebruikerSeeder::class, SynthetischeStudentSeeder::class]);
+        $this->seed([ReferentieSeeder::class, SynthetischVakSeeder::class, GebruikerSeeder::class, SynthetischeStudentSeeder::class]);
         $this->sz = User::where('rol', Rol::Studentenzaken)->first();
         $this->fin = User::where('rol', Rol::Financien)->first();
         // Vast peilmoment binnen het studiejaar (jan 2026 = 5e maand) voor

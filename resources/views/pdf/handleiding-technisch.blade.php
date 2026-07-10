@@ -156,7 +156,19 @@ MAIL_FROM_NAME="IUASR Studentenzaken"</span>
   <p>De kolom <code>inschrijvingen.betaalwijze</code> is <b>vervallen</b> (zij mengde regeling en betaalwijze) en blijft alleen voor de historie bestaan. De betaalwijze hoort bij een betaling, niet bij de inschrijving.</p>
   <p>Bij een beëindigde inschrijving wordt het totaal herrekend naar het pro rata bedrag; termijnen met een vervaldatum ná het einde worden <code>vervallen</code> en de laatste geldende termijn vangt het verschil op. De CSV-import herkent kolommen op <b>naam</b> uit de kopregel, met terugval op de klassieke volgorde (<code>studentnummer;bedrag;datum;betaalwijze;opmerking</code>) voor oudere bestanden.</p>
 
-  <h2>9. Regulier onderhoud</h2>
+  <h2>9. Curriculum (vakken)</h2>
+  <table class="kv">
+    <tr><td class="k">Bron</td><td><code>database/data/curriculum.csv</code> (uit 'vakkenlijst update.xlsx', 2026-07-10), geladen door <code>CurriculumSeeder</code>. Referentiedata, geen persoonsgegevens: hoort in Git.</td></tr>
+    <tr><td class="k">Herladen</td><td><code>php artisan db:seed --class=CurriculumSeeder</code> — idempotent: matcht op (opleiding, code) en werkt bij. Vakken die niet in de CSV staan blijven ongemoeid.</td></tr>
+    <tr><td class="k">EC</td><td><code>vakken.ec</code> is <code>decimal(4,1)</code>: halve studiepunten (2,5) komen voor. Nooit naar <code>int</code> casten. Gebruik <code>App\Support\Ec::toon()</code> voor weergave (Nederlandse komma).</td></tr>
+    <tr><td class="k">Vakcode</td><td>Uniek per opleiding: <code>unique(opleiding_id, code)</code>. Elf codes bestaan in zowel ISLTH als PMGV.</td></tr>
+    <tr><td class="k">Blok</td><td><code>null</code> = het vak loopt het hele studiejaar (stage, scriptie). Views die over blok 1..4 itereren moeten blok <code>null</code> apart tonen.</td></tr>
+    <tr><td class="k">Keuzevak</td><td><code>vakken.keuzevak</code>. <code>Vaktoewijzer</code> slaat keuzevakken over; <code>Overgangsbeoordeling</code> telt alleen de keuzevakken mee die aan de inschrijving zijn toegewezen.</td></tr>
+  </table>
+  <div class="let"><b>Synthetische vakken horen niet naast het echte curriculum.</b> De voorbeeldvakken met code <code>ISLTH-*</code> zijn verplaatst naar <code>SynthetischVakSeeder</code>, die alleen door de testsuite wordt gebruikt en bewust NIET in <code>DatabaseSeeder</code> staat. Stonden zij actief naast het echte curriculum, dan telden zij mee in de EC-totalen per leerjaar (jaar 1 werd 94 i.p.v. 60 EC) en werden zij automatisch aan elke ISLTH-student toegewezen.</div>
+  <p>Nog te doen: de nieuwe vakken hebben <b>geen docent</b> gekoppeld (<code>vakken.docent_id</code> is leeg) en krijgen elk één standaard toetsonderdeel ('Tentamen', weging 100%). Koppel de docenten en verfijn de toetsopbouw via <b>Vakstructuur</b> voordat docenten cijfers gaan invoeren; zonder docentkoppeling blijft 'Mijn vakken' leeg.</p>
+
+  <h2>10. Regulier onderhoud</h2>
   <ul>
     <li><b>Migraties:</b> <code>php artisan migrate</code> na een update (reversible; maak eerst een back-up).</li>
     <li><b>Cache:</b> <code>php artisan optimize:clear</code> bij onverwacht gedrag na wijzigingen.</li>

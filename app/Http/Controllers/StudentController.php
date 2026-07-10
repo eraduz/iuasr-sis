@@ -120,7 +120,7 @@ class StudentController extends Controller
                     $cijferVakken->push([
                         'vak' => $vt->vak,
                         'eind' => ['status' => 'vr', 'cijfer' => null],
-                        'ec' => (int) $vt->vak->ec,
+                        'ec' => (float) $vt->vak->ec,
                     ]);
                 }
             }

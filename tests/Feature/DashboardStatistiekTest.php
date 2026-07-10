@@ -9,6 +9,7 @@ use Database\Seeders\CollegegeldSeeder;
 use Database\Seeders\DocentSeeder;
 use Database\Seeders\GebruikerSeeder;
 use Database\Seeders\ReferentieSeeder;
+use Database\Seeders\SynthetischVakSeeder;
 use Database\Seeders\ResultatenSeeder;
 use Database\Seeders\SynthetischeStudentSeeder;
 use Database\Seeders\VaktoewijzingSeeder;
@@ -23,7 +24,7 @@ class DashboardStatistiekTest extends TestCase
     {
         parent::setUp();
         $this->seed([
-            ReferentieSeeder::class, DocentSeeder::class, GebruikerSeeder::class,
+            ReferentieSeeder::class, SynthetischVakSeeder::class, DocentSeeder::class, GebruikerSeeder::class,
             SynthetischeStudentSeeder::class, VaktoewijzingSeeder::class,
             ResultatenSeeder::class, CollegegeldSeeder::class,
         ]);

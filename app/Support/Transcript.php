@@ -55,8 +55,8 @@ class Transcript
                 return [
                     'inschrijving' => $insch,
                     'regels' => $regels,
-                    'behaaldeEc' => (int) $regels->sum(fn ($r) => $r['ec'] ?? 0),
-                    'mogelijkeEc' => (int) $vakken->sum('ec'),
+                    'behaaldeEc' => round((float) $regels->sum(fn ($r) => $r['ec'] ?? 0), 1),
+                    'mogelijkeEc' => round((float) $vakken->sum('ec'), 1),
                 ];
             })->values();
 

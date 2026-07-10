@@ -40,7 +40,7 @@ class VrijstellingController extends Controller
             'vrijstelling_besluit' => $data['besluit'],
             'vrijstelling_besluit_datum' => $data['besluit_datum'],
             'vrijstelling_toelichting' => $data['toelichting'] ?? null,
-            'vrijstelling_ec' => (int) $vt->vak->ec,
+            'vrijstelling_ec' => (float) $vt->vak->ec,
             'vrijgesteld_door_id' => auth()->id(),
             'vrijgesteld_op' => now(),
         ]);

@@ -7,6 +7,7 @@ use App\Models\Faculteit;
 use App\Models\Opleiding;
 use App\Models\User;
 use Database\Seeders\ReferentieSeeder;
+use Database\Seeders\SynthetischVakSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

@@ -10,6 +10,7 @@ use App\Models\Vak;
 use App\Support\Cijferberekening;
 use Database\Seeders\GebruikerSeeder;
 use Database\Seeders\ReferentieSeeder;
+use Database\Seeders\SynthetischVakSeeder;
 use Database\Seeders\SynthetischeStudentSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -24,7 +25,7 @@ class CijferTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed([ReferentieSeeder::class, GebruikerSeeder::class, SynthetischeStudentSeeder::class]);
+        $this->seed([ReferentieSeeder::class, SynthetischVakSeeder::class, GebruikerSeeder::class, SynthetischeStudentSeeder::class]);
         $this->vak = Vak::where('code', 'ISLTH-ARA-101')->first();
         $this->docent = User::where('rol', Rol::Docent)->first();
     }
@@ -67,7 +68,7 @@ class CijferTest extends TestCase
         $rs = Resultaat::where('inschrijving_id', $insch->id)->get();
         $this->assertCount($onderdelen->count(), $rs);
         $this->assertTrue($rs->every(fn ($r) => $r->voldoende === true));
-        $this->assertSame(6, Cijferberekening::ec($this->vak->load('toetsonderdelen', 'opleiding'), $rs));
+        $this->assertSame(6.0, Cijferberekening::ec($this->vak->load('toetsonderdelen', 'opleiding'), $rs));
 
         // Elke cijfermutatie wordt gelogd.
         $this->assertDatabaseHas('audit_logs', ['veld' => 'cijfer', 'actie' => 'wijziging']);
@@ -86,7 +87,7 @@ class CijferTest extends TestCase
         $this->actingAs($this->docent)->post(route('vakken.cijfers.opslaan', $this->vak), $payload);
 
         $rs = Resultaat::where('inschrijving_id', $insch->id)->get();
-        $this->assertSame(0, Cijferberekening::ec($this->vak->load('toetsonderdelen', 'opleiding'), $rs));
+        $this->assertSame(0.0, Cijferberekening::ec($this->vak->load('toetsonderdelen', 'opleiding'), $rs));
     }
 
     public function test_examencommissie_heeft_inzage_maar_voert_niet_in(): void

@@ -62,7 +62,7 @@ class ReferentieController extends Controller
                     'naam' => ['label' => 'Naam', 'type' => 'text', 'rules' => 'required|string|max:255'],
                     'opleiding_id' => ['label' => 'Opleiding', 'type' => 'belongsto', 'model' => Opleiding::class, 'toon' => 'naam', 'rules' => 'required|exists:opleidingen,id'],
                     'docent_id' => ['label' => 'Docent', 'type' => 'belongsto', 'model' => Docent::class, 'toon' => 'achternaam', 'rules' => 'nullable|exists:docenten,id', 'leeg' => '— geen —'],
-                    'ec' => ['label' => 'EC', 'type' => 'number', 'rules' => 'required|integer|min:0'],
+                    'ec' => ['label' => 'EC', 'type' => 'number', 'rules' => 'required|numeric|min:0'],
                     'leerjaar' => ['label' => 'Leerjaar', 'type' => 'number', 'rules' => 'nullable|integer|min:1|max:10'],
                     'blok' => ['label' => 'Blok', 'type' => 'number', 'rules' => 'nullable|integer|min:1|max:4'],
                     'actief' => ['label' => 'Actief', 'type' => 'checkbox'],

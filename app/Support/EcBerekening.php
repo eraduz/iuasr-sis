@@ -18,9 +18,9 @@ class EcBerekening
 {
     /**
      * @param  iterable<Resultaat>  $resultaten  resultaten van deze student voor dit vak/periode
-     * @return int|null  toegekende EC, of null als de voldoende-grens niet is vastgesteld
+     * @return float|null  toegekende EC (kan 2,5 zijn), of null als de voldoende-grens niet is vastgesteld
      */
-    public static function bepaalEc(Vak $vak, iterable $resultaten, ?float $voldoendeGrens): ?int
+    public static function bepaalEc(Vak $vak, iterable $resultaten, ?float $voldoendeGrens): ?float
     {
         // Zonder vastgestelde grens kan niet worden bepaald wat 'voldoende' is.
         if ($voldoendeGrens === null) {
@@ -29,7 +29,7 @@ class EcBerekening
 
         $meetellend = $vak->toetsonderdelen->where('telt_mee', true);
         if ($meetellend->isEmpty()) {
-            return 0;
+            return 0.0;
         }
 
         foreach ($meetellend as $onderdeel) {
@@ -37,17 +37,17 @@ class EcBerekening
 
             // Geen (geldig) resultaat, of onder de grens → geen EC voor het vak.
             if ($besteGeldige === null) {
-                return 0;
+                return 0.0;
             }
             if ($besteGeldige->vrijstelling) {
                 continue; // vrijstelling telt als behaald
             }
             if ($besteGeldige->cijfer === null || (float) $besteGeldige->cijfer < $voldoendeGrens) {
-                return 0;
+                return 0.0;
             }
         }
 
-        return (int) $vak->ec;
+        return (float) $vak->ec;
     }
 
     /**

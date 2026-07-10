@@ -533,7 +533,7 @@
                     <thead><tr><th>Code</th><th>Vak</th><th>EC</th><th>Docent</th></tr></thead>
                     <tbody>
                       @foreach ($vakken as $vak)
-                        <tr><td class="tnum">{{ $vak->code }}</td><td class="nm">{{ $vak->naam }}</td><td class="tnum">{{ $vak->ec }}</td><td>{{ $vak->docent?->achternaam ?? '—' }}</td></tr>
+                        <tr><td class="tnum">{{ $vak->code }}</td><td class="nm">{{ $vak->naam }}</td><td class="tnum">{{ \App\Support\Ec::toon($vak->ec) }}</td><td>{{ $vak->docent?->achternaam ?? '—' }}</td></tr>
                       @endforeach
                     </tbody>
                   </table>
@@ -571,7 +571,7 @@
                 <tr>
                   <td class="tnum">{{ $t->vak?->code }}</td>
                   <td class="nm">{{ $t->vak?->naam }} <span class="iuasr-dash-status s-approved">VR</span></td>
-                  <td class="tnum">{{ $t->vrijstelling_ec ?? $t->vak?->ec }}</td>
+                  <td class="tnum">{{ \App\Support\Ec::toon($t->vrijstelling_ec ?? $t->vak?->ec) }}</td>
                   <td>{{ $t->vrijstelling_grondslag?->label() ?? '—' }}</td>
                   <td>{{ $t->vrijstelling_besluit }}<br><small class="sis-muted">{{ $t->vrijstelling_besluit_datum?->format('d-m-Y') }}</small></td>
                   <td><small class="sis-muted">{{ $t->vrijgesteldDoor?->naam ?? '—' }}<br>{{ $t->vrijgesteld_op?->format('d-m-Y') }}</small></td>
@@ -599,7 +599,7 @@
               <select name="vaktoewijzing_id" required>
                 <option value="">Kies een toegewezen vak…</option>
                 @foreach ($nietVrij as $t)
-                  <option value="{{ $t->id }}" @selected(old('vaktoewijzing_id') == $t->id)>{{ $t->vak->code }} · {{ $t->vak->naam }} ({{ $t->vak->ec }} EC)</option>
+                  <option value="{{ $t->id }}" @selected(old('vaktoewijzing_id') == $t->id)>{{ $t->vak->code }} · {{ $t->vak->naam }} ({{ \App\Support\Ec::toon($t->vak->ec) }} EC)</option>
                 @endforeach
               </select>
               @error('vaktoewijzing_id')<small style="color:var(--secColor100);">{{ $message }}</small>@enderror
@@ -667,7 +667,7 @@
                 <div class="sis-fld"><label>Vak</label>
                   <select name="vak_id" required>
                     <option value="">Kies een toegewezen vak…</option>
-                    @foreach ($besluitBaar as $t)<option value="{{ $t->vak_id }}">{{ $t->vak->code }} · {{ $t->vak->naam }} ({{ $t->vak->ec }} EC)</option>@endforeach
+                    @foreach ($besluitBaar as $t)<option value="{{ $t->vak_id }}">{{ $t->vak->code }} · {{ $t->vak->naam }} ({{ \App\Support\Ec::toon($t->vak->ec) }} EC)</option>@endforeach
                   </select>
                 </div>
                 <div class="sis-fld"><label>Grondslag</label>
@@ -737,14 +737,14 @@
               <tr>
                 <td class="nm">{{ $vak->naam }}</td>
                 <td class="tnum">{{ $vak->code }}</td>
-                <td class="tnum">{{ $vak->ec }}</td>
+                <td class="tnum">{{ \App\Support\Ec::toon($vak->ec) }}</td>
                 <td>
                   @if ($eind['status']==='vr')<span class="sis-pill-soft">VR</span>
                   @elseif ($eind['status']==='cijfer')<b class="tnum">{{ number_format($eind['cijfer'],1,',','') }}</b>
                   @elseif ($eind['status']==='onvolledig')<span class="sis-muted">onvolledig</span>
                   @else<span class="sis-muted">—</span>@endif
                 </td>
-                <td class="tnum">{{ $c['ec'] === null ? '—' : $c['ec'] }}</td>
+                <td class="tnum">{{ \App\Support\Ec::toon($c['ec']) }}</td>
               </tr>
             @empty
               <tr><td colspan="5" style="padding:24px;text-align:center;color:var(--blackAltText);">Nog geen resultaten geregistreerd voor deze student.</td></tr>

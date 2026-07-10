@@ -24,6 +24,7 @@ class Vaktoewijzing extends Model
             'automatisch' => 'boolean',
             'vrijgesteld' => 'boolean',
             'vrijstelling_grondslag' => VrijstellingGrondslag::class,
+            'vrijstelling_ec' => 'float',
             'vrijstelling_besluit_datum' => 'date',
             'vrijgesteld_op' => 'datetime',
         ];

@@ -18,8 +18,22 @@
   </div>
   <div class="sis-fld-row sis-fld-row--3">
     <div class="sis-fld"><label>Studiejaar</label><select name="leerjaar">@for($j=1;$j<=10;$j++)<option value="{{ $j }}" @selected($vak->leerjaar===$j)>Jaar {{ $j }}</option>@endfor</select></div>
-    <div class="sis-fld"><label>Periode (blok)</label><select name="blok">@for($b=1;$b<=4;$b++)<option value="{{ $b }}" @selected($vak->blok===$b)>Blok {{ $b }}</option>@endfor</select></div>
-    <div class="sis-fld"><label>EC</label><input type="number" name="ec" min="0" max="60" value="{{ old('ec', $vak->ec) }}"></div>
+    <div class="sis-fld"><label>Periode (blok)</label>
+      <select name="blok">
+        <option value="" @selected($vak->blok === null)>Hele studiejaar (stage/scriptie)</option>
+        @for($b=1;$b<=4;$b++)<option value="{{ $b }}" @selected($vak->blok===$b)>Blok {{ $b }}</option>@endfor
+      </select>
+    </div>
+    <div class="sis-fld"><label>EC</label><input type="number" name="ec" step="0.5" min="0" max="60" value="{{ old('ec', $vak->ec) }}">
+      <span class="sis-muted" style="font-size:11px;">Halve punten toegestaan (bv. 2,5).</span>
+    </div>
+    <div class="sis-fld">
+      <label class="sis-check-inline" style="margin-top:26px;">
+        <input type="checkbox" name="keuzevak" value="1" @checked(old('keuzevak', $vak->keuzevak))>
+        Keuzevak (keuzeruimte)
+      </label>
+      <span class="sis-muted" style="font-size:11px;">Wordt niet automatisch toegewezen bij inschrijving.</span>
+    </div>
   </div>
   <div class="sis-fld-row sis-fld-row--21">
     <div class="sis-fld"><label>Vaknaam <span class="req">*</span></label><input type="text" name="naam" value="{{ old('naam', $vak->naam) }}" required></div>

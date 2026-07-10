@@ -36,7 +36,10 @@
         <select name="leerjaar">@for ($j=1;$j<=$maxLeerjaar;$j++)<option value="{{ $j }}">Jaar {{ $j }}</option>@endfor</select>
       </div>
       <div class="sis-fld"><label>Periode (blok)</label>
-        <select name="blok">@for ($b=1;$b<=4;$b++)<option value="{{ $b }}">Blok {{ $b }}</option>@endfor</select>
+        <select name="blok">
+          @for ($b=1;$b<=4;$b++)<option value="{{ $b }}">Blok {{ $b }}</option>@endfor
+          <option value="">Hele studiejaar</option>
+        </select>
       </div>
       <div class="sis-fld"><label>EC</label><input type="number" name="ec" min="0" max="60" value="6"></div>
     </div>
@@ -62,22 +65,28 @@
 
   @for ($j=1;$j<=$maxLeerjaar;$j++)
     <div class="vs-panel" id="lj{{ $j }}" data-panel="lj{{ $j }}" @if($j!==1) hidden @endif>
-      @for ($b=1;$b<=4;$b++)
-        @php $vakken = $structuur[$j][$b] ?? collect(); @endphp
+      {{-- Blok 0 = geen vast blok: het vak loopt het hele studiejaar (stage, scriptie). --}}
+      @foreach ([1, 2, 3, 4, 0] as $b)
+        @php
+          $vakken = $structuur[$j][$b] ?? collect();
+          $blokTitel = $b === 0 ? 'Hele studiejaar' : 'Periode · Blok '.$b;
+        @endphp
+        @continue($b === 0 && $vakken->isEmpty())
         <div class="sis-card" style="margin-bottom:12px;">
-          <div class="sis-card__hd"><h3>Periode · Blok {{ $b }}</h3><span class="hint">{{ $vakken->count() }} vak(ken)</span></div>
+          <div class="sis-card__hd"><h3>{{ $blokTitel }}</h3><span class="hint">{{ $vakken->count() }} vak(ken)</span></div>
           @if ($vakken->isEmpty())
             <p class="sis-muted" style="font-size:13px;margin:0;">Geen vakken in dit blok.</p>
           @else
             <div class="iuasr-dash-tbl-card" style="border:0;">
               <table class="iuasr-dash-tbl">
-                <thead><tr><th>Code</th><th>Vak</th><th>EC</th><th>Docent</th><th class="row-act"></th></tr></thead>
+                <thead><tr><th>Code</th><th>Vak</th><th>EC</th><th>Soort</th><th>Docent</th><th class="row-act"></th></tr></thead>
                 <tbody>
                   @foreach ($vakken as $vak)
                     <tr>
                       <td class="tnum">{{ $vak->code }}</td>
                       <td class="nm">{{ $vak->naam }}</td>
-                      <td class="tnum">{{ $vak->ec }}</td>
+                      <td class="tnum">{{ \App\Support\Ec::toon($vak->ec) }}</td>
+                      <td>@if ($vak->keuzevak)<span class="sis-pill-soft">keuzevak</span>@else<span class="sis-muted" style="font-size:12px;">verplicht</span>@endif</td>
                       <td>{{ $vak->docent?->achternaam ?? '—' }}</td>
                       <td class="row-act" style="white-space:nowrap;">
                         <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('vakstructuur.edit', $vak) }}">Bewerken</a>
@@ -93,7 +102,7 @@
             </div>
           @endif
         </div>
-      @endfor
+      @endforeach
     </div>
   @endfor
 

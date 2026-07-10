@@ -10,6 +10,7 @@ use App\Models\Periode;
 use App\Models\Student;
 use App\Models\User;
 use Database\Seeders\ReferentieSeeder;
+use Database\Seeders\SynthetischVakSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

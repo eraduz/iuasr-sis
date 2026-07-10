@@ -24,15 +24,18 @@ class Vak extends Model
         'ec',
         'leerjaar',
         'blok',
+        'keuzevak',
         'actief',
     ];
 
     protected function casts(): array
     {
         return [
-            'ec' => 'integer',
+            // EC kan een halve punt zijn (2,5); nooit als integer casten.
+            'ec' => 'float',
             'leerjaar' => 'integer',
             'blok' => 'integer',
+            'keuzevak' => 'boolean',
             'actief' => 'boolean',
         ];
     }

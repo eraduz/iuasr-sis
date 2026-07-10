@@ -12,6 +12,7 @@ use App\Models\Vrijstellingsbesluit;
 use Database\Seeders\DocentSeeder;
 use Database\Seeders\GebruikerSeeder;
 use Database\Seeders\ReferentieSeeder;
+use Database\Seeders\SynthetischVakSeeder;
 use Database\Seeders\SynthetischeStudentSeeder;
 use Database\Seeders\VaktoewijzingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -27,7 +28,7 @@ class VrijstellingsbesluitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed([ReferentieSeeder::class, DocentSeeder::class, GebruikerSeeder::class,
+        $this->seed([ReferentieSeeder::class, SynthetischVakSeeder::class, DocentSeeder::class, GebruikerSeeder::class,
             SynthetischeStudentSeeder::class, VaktoewijzingSeeder::class]);
         $this->student = Student::where('studentnummer', '261001')->first();
         $this->toewijzing = $this->student->inschrijvingen()->first()

@@ -217,6 +217,37 @@ opleverpunt aantoonbaar klaar is.
   - `inschrijvingen.betaalwijze` is vervallen (mengde regeling en betaalwijze);
     kolom blijft voor historie, wordt niet meer geschreven.
   - 19 nieuwe tests + 2 importtests; 189 tests groen.
+- [x] **Echt curriculum ingeladen** (2026-07-10, bron 'vakkenlijst update.xlsx')
+  - 91 vakken: ISLTH (60), PMGV (12), MGV (19). **PABO volgt later.**
+  - Bron in Git: `database/data/curriculum.csv` + `CurriculumSeeder` (idempotent,
+    matcht op opleiding+code). Geen persoonsgegevens, dus AVG-veilig in de repo.
+  - Schema-wijzigingen die hiervoor nodig waren:
+    * `vakken.ec` smallint → **decimal(4,1)**: 28 vakken hebben 2,5 EC.
+      Ook `vaktoewijzingen.vrijstelling_ec`. Alle `(int)`-casts op EC vervangen;
+      nieuwe helper `App\Support\Ec::toon()` (Nederlandse komma: "2,5", "5").
+    * `vakken.code` uniek per opleiding: **unique(opleiding_id, code)**. Elf codes
+      (o.a. B-QR02, B-KL01) bestaan in zowel ISLTH als PMGV — aparte vakken met
+      eigen cijferlijst, docent en presentielijst.
+    * Nieuwe kolom `vakken.keuzevak`: keuzeruimte wordt NIET automatisch
+      toegewezen (`Vaktoewijzer` slaat ze over). Bachelor jaar 4 = 40 EC verplicht
+      + 55 EC keuzeruimte (student kiest 20 EC). `Overgangsbeoordeling` telt
+      alleen de keuzevakken mee die daadwerkelijk zijn toegewezen.
+    * `blok` mag leeg zijn = het vak loopt het **hele studiejaar** (stages,
+      scripties, M-GV16a/b). Vakstructuur en vaktoewijzing tonen dat nu apart;
+      voorheen liepen die views hard van blok 1 t/m 4 en waren jaarvakken onzichtbaar.
+  - Beslissingen bronlijst: tekstkolom 'Blok' is leidend bij tegenstrijdigheid
+    (B-SC07 → blok 4, B-AR06-15 → blok 2); `B-FQ02-B-FQ03` blijft één vak zonder
+    vast blok. PMGV telt 50 EC terwijl `opleidingen.ec_totaal` 60 zegt — te controleren.
+  - **9 synthetische vakken (ISLTH-*) definitief verwijderd** uit de database, incl.
+    90 vaktoewijzingen, 15 resultaten, 94 presenties, 5 cijferlijsten en 3
+    vrijstellingsbesluiten (op verzoek opdrachtgever). Ze stonden actief naast het
+    echte curriculum en maakten van jaar 1 94 EC i.p.v. 60. Ze zijn verhuisd van
+    `ReferentieSeeder` naar `SynthetischVakSeeder` — uitsluitend testfixture, niet
+    in `DatabaseSeeder`. Alle betrokken tests seeden die fixture nu expliciet.
+  - **Nog te doen:** docenten koppelen aan de 91 vakken (`docent_id` is leeg, dus
+    'Mijn vakken' is voor docenten leeg) en de toetsopbouw verfijnen — elk vak
+    kreeg één standaard toetsonderdeel 'Tentamen' (weging 100%).
+  - 13 nieuwe tests (`CurriculumTest`); 202 tests groen.
 - [ ] **Fase 6 — Portaalkoppeling**
   - Koppeling met publiek aanmeldportaal (gescheiden regime).
 - [ ] **Fase 7 — Migratie**
@@ -305,6 +336,7 @@ Deze zijn nog niet vastgesteld. Vraag de opdrachtgever; verzin geen waarden.
 | 2026-07-09 | **Directie per opleiding (opleidinggebonden zichtbaarheid).** Nieuwe koppeltabel `directie_opleidingen` (user ↔ opleiding, echte FK's, cascade). Een directielid ziet uitsluitend studenten, cijfers en rapporten van de toegewezen opleiding(en); zonder toewijzing niets (need-to-know). Toegepast op studentenlijst/-dossier, cijferoverzicht, cijferlijst, EC-rapport, overgang, alumni, resultaten-mailen én de dashboardstatistieken (per-opleiding gefilterd) + KPI-tegels. Beheer wijst toe via **Gebruikers & rollen → Directie — opleidingtoewijzing**. Seed: PABO-directeur (PABO), GV-directeur (PMGV+MGV), Theologie-directeur (ISLTH+cursussen). Een **dubbel ingeschreven** student is zichtbaar voor de directie van elke opleiding waarin hij/zij actief is. Helpers `User::opleidingIds()`, `Student::scopeZichtbaarVoor()`/`zichtbaarVoor()`. |
 | 2026-07-09 | **Dubbele inschrijving overal zichtbaar gemaakt.** Studentenlijst: opleidingkolom toont twee regels + label 'dubbele inschrijving' bij de naam. Dashboards van Studentenzaken, Directie en Financiële Administratie tonen een lijst 'Studenten met een dubbele inschrijving' (met beide opleidingen). Studentpagina toonde dit al (kop met '+' en pill). Financiën-dossier toont per inschrijving al de opleiding. |
 | 2026-07-09 | **50%-aanwezigheidsregeling.** Vastgelegd als vinkje "50% Aanwezigheidsregeling" op de studentpagina (tabblad Inschrijving & klas). Keuze opdrachtgever: ALLEEN een vinkje — geen besluitreferentie in de UI; de toestemming van de directie loopt buiten het systeem, de mutatie wordt wel gelogd (wie/wanneer/welke inschrijving). Reikwijdte: **per inschrijving** (= per opleiding én per studiejaar), dus bij herinschrijven of een tweede opleiding bewust opnieuw toe te kennen. Zetten: Studentenzaken/Beheer. Zien: SZ, Docent, Examencommissie, Directie, Bestuur, Beheer (niet Financiën). Dashboardvenster met de studenten, opleiding en studiejaar; docent ziet alleen studenten uit eigen vakken, directie alleen eigen opleiding(en). |
+| 2026-07-10 | **Echt curriculum ingeladen (91 vakken).** Bron: 'vakkenlijst update.xlsx' → `database/data/curriculum.csv` + `CurriculumSeeder`. Keuzes opdrachtgever: (1) `vakken.ec` wordt **decimal(4,1)** want 28 vakken hebben 2,5 EC — afronden zou de jaartotalen 11 EC laten afwijken; (2) vakcode is **uniek per opleiding**, want elf codes bestaan in zowel ISLTH als PMGV (aparte vakken, eigen cijferlijst/docent/presentielijst); (3) de keuzeruimte krijgt `vakken.keuzevak` en wordt **niet automatisch toegewezen** — anders telt bachelor jaar 4 95 EC i.p.v. 40 verplicht; (4) de 9 synthetische vakken (ISLTH-*) zijn **definitief verwijderd** met hun 90 toewijzingen, 15 cijfers, 94 presenties, 5 cijferlijsten en 3 vrijstellingsbesluiten, omdat zij naast het echte curriculum meetelden (jaar 1 werd 94 i.p.v. 60 EC) en automatisch aan elke ISLTH-student werden toegewezen. Bij tegenstrijdigheid in de bronlijst is de tekstkolom 'Blok' leidend (B-SC07 → 4, B-AR06-15 → 2); `B-FQ02-B-FQ03` blijft één vak. Vakken zonder blok lopen het hele studiejaar (stage, scriptie). De synthetische vakken zijn verhuisd naar `SynthetischVakSeeder` (uitsluitend testfixture, niet in `DatabaseSeeder`). PABO volgt later. |
 | 2026-07-10 | **Collegegeld in termijnen.** Facturering elke twee maanden: september, november, januari, maart en mei. Keuzes opdrachtgever: (1) termijnbedrag = **jaarbedrag ÷ 5**, afrondingsrestje op de laatste termijn; (2) **achterstand = onbetaalde VERVALLEN termijn** — een nog niet vervallen termijn is geen achterstand (vervangt de oude maand-pro-rata als achterstandsmaatstaf en stuurt de blokkades op herinschrijven/verklaringen); (3) bij tussentijdse uitschrijving worden de termijnen **pro rata herrekend**: termijnen ná de uitschrijfdatum vervallen, de laatste geldende termijn wordt bijgesteld; (4) de **betaalregeling** (vijf termijnen óf één factuur voor het volledige jaarbedrag) wordt door **Studentenzaken** op het dossier vastgelegd, per inschrijving en dus per studiejaar, en gelogd. Geen facturentabel: het schema is afgeleid uit jaartarief + regeling + inschrijvingsduur (`Collegegeldtermijnen`), zodat het nooit veroudert. `betalingen.termijn` (nullable) koppelt een betaling aan een termijn; leeg = FIFO naar de oudste openstaande termijn. Financiën boekt met één klik per termijn; CSV-import kreeg een optionele termijnkolom en herkent kolommen op naam (oude bestanden blijven werken). De kolom `inschrijvingen.betaalwijze` is vervallen (mengde regeling en betaalwijze) en blijft alleen voor historie. |
 | 2026-07-09 | **Presentieregistratie per college (verplicht voor de docent).** Genormaliseerd: tabel `presenties` = één regel per inschrijving × vak × onderwijsweek; nooit vaste weekkolommen. Keuze opdrachtgever: **8 weken per blok, één college per week**; norm **80%**, of **50%** bij de aanwezigheidsregeling. Docent voert per week 1 (aanwezig) of 0 (afwezig) in; een lege cel = nog niet geregistreerd en telt NIET als afwezigheid (anders wordt nalatigheid van de docent op de student afgewenteld). Een week geldt pas als geregistreerd wanneer álle presentieplichtige deelnemers een waarde hebben. **Vrijgestelde** studenten volgen het vak niet: geen invoer, server-side overgeslagen. De docent ziet op de lijst het label **50%** achter de naam en de geldende norm per student. Rolscheiding: registreren alleen docent van het eigen vak (Gate `presentie-registreren`); inzage docent/examencommissie/directie (eigen opleiding)/bestuur (Gate `presentie-inzien`); Studentenzaken, Financiën en Beheer hebben GEEN presentie-inzage — aanwezigheid is onderwijsinhoudelijke procesinformatie. Inzage en mutatie gelogd. Statistiek (gemiddelde aanwezigheid, verdeling 0–50/50–80/80–100%, per opleiding resp. per vak) op de dashboards van docent, directie en bestuur, opleidinggebonden gefilterd. UI-term is "Aanwezigheid"; *presentielijst* blijft de tentamenlijst met handtekening. |
 

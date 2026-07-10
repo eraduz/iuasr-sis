@@ -24,12 +24,12 @@
       <div class="sis-card__hd"><h3>Jaar {{ $leerjaar }}</h3></div>
       @foreach ($blokken as $blok => $vakken)
         <div style="margin-bottom:10px;">
-          <div class="sis-fieldset"><legend style="padding-bottom:6px;">Blok {{ $blok }}</legend></div>
+          <div class="sis-fieldset"><legend style="padding-bottom:6px;">{{ $blok ? 'Blok '.$blok : 'Hele studiejaar' }}</legend></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;">
             @foreach ($vakken as $vak)
               <label class="iuasr-dash-check">
                 <input type="checkbox" name="vak_ids[]" value="{{ $vak->id }}" @checked(in_array($vak->id, $toegewezen))>
-                <span>{{ $vak->naam }} <small style="color:var(--blackAltText);">· {{ $vak->code }} · {{ $vak->ec }} EC</small></span>
+                <span>{{ $vak->naam }} <small style="color:var(--blackAltText);">· {{ $vak->code }} · {{ \App\Support\Ec::toon($vak->ec) }} EC</small></span>
               </label>
             @endforeach
           </div>

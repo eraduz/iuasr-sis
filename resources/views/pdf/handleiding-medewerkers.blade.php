@@ -93,6 +93,16 @@
   <div class="tip">De regeling hangt aan de <b>inschrijving</b>: zij geldt voor één opleiding in één studiejaar. Bij <b>herinschrijven</b> — of bij een tweede opleiding — moet de regeling dus <b>bewust opnieuw</b> worden toegekend. Zo blijft het een jaarlijks besluit van de directie en loopt zij niet stilzwijgend door.</div>
   <p>De regeling is zichtbaar voor Studentenzaken, Docenten, Examencommissie, Directie, Schoolbestuur en Beheer — op het studentdossier, op het dashboard en (voor de docent) op de aanwezigheidslijst, waar de student het label <b>50%</b> achter de naam krijgt.</p>
 
+  <h3>Vakstructuur: het curriculum</h3>
+  <p>Onder <b>Vakstructuur</b> legt u per opleiding, per studiejaar en per blok de vakken vast. Het IUASR-curriculum staat er al in: Bachelor Islamitische Theologie, Pre-Master GV en Master GV (PABO volgt later).</p>
+  <p>Drie dingen om te weten:</p>
+  <ul>
+    <li><b>Halve studiepunten</b> zijn toegestaan. Vakken als Standaard Arabisch en Qoranrecitatie tellen 2,5 EC.</li>
+    <li>Een vak zonder blok loopt het <b>hele studiejaar</b>. Dat geldt voor de stages, de bachelorscriptie en de masterthesis. In de vakstructuur staan zij onder het kopje <b>Hele studiejaar</b>.</li>
+    <li>Vakken uit de <b>keuzeruimte</b> zijn gemarkeerd als <b>keuzevak</b>. Zij worden bij inschrijving <b>niet automatisch</b> toegewezen: de student kiest, en u legt die keuze vast via <b>Vakken aanpassen</b> op het dossier (tabblad Inschrijving &amp; klas). Bachelor jaar 4 bestaat daardoor uit 40 EC verplicht plus 20 EC uit de keuzeruimte.</li>
+  </ul>
+  <div class="tip">Dezelfde vakcode mag in twee opleidingen voorkomen. Zo wordt <b>B-QR02</b> zowel in de bachelor als in de pre-master aangeboden; het zijn aparte vakken met een eigen cijferlijst, docent en aanwezigheidslijst.</div>
+
   <h3>Vrijstellingen (workflow examencommissie &rarr; Studentenzaken)</h3>
   <p>Een vrijstelling wordt <b>verleend door de examencommissie</b>. De examencommissie legt het besluit vast en stuurt het intern naar Studentenzaken; het verschijnt dan als taak op uw dashboard onder <b>Vrijstellingsbesluiten van de examencommissie</b>. Klik op <b>Verwerken</b> en de vrijstelling wordt automatisch op het vak van de student vastgelegd — u hoeft niets over te typen. Is het vak nog niet toegewezen, dan krijgt u een melding om het eerst toe te wijzen.</p>
   <p>U kunt een vrijstelling ook <b>handmatig</b> vastleggen onder <b>Inschrijving &amp; klas</b> (bijvoorbeeld bij een papieren besluit), altijd met de <b>referentie van het examencommissie-besluit</b>. Een vrijstelling levert de volledige studiepunten (EC) op zonder cijfer (vermelding “VR”).</p>

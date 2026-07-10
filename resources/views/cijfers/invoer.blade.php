@@ -18,7 +18,7 @@
 <div class="iuasr-dash-vhead">
   <div>
     <h1>{{ $vak->naam }}</h1>
-    <div class="summary"><b>{{ $vak->code }}</b> · {{ $vak->opleiding?->naam }} · {{ $vak->ec }} EC · {{ $rijen->count() }} studenten</div>
+    <div class="summary"><b>{{ $vak->code }}</b> · {{ $vak->opleiding?->naam }} · {{ \App\Support\Ec::toon($vak->ec) }} EC · {{ $rijen->count() }} studenten</div>
   </div>
   <div class="iuasr-dash-vhead__actions" style="gap:8px;align-items:center;">
     <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('vakken.tentamenlijst', $vak) }}">Tentamenlijst</a>

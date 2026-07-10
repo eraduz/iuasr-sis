@@ -133,7 +133,7 @@
                   @if ($eind['status']==='cijfer')<span class="{{ $eind['cijfer'] < $grens ? '' : '' }}" style="font-weight:600;color:{{ $eind['cijfer'] < $grens ? 'var(--secColor100)' : 'var(--heritage-groen,#285C4D)' }};">{{ $eindTekst($eind) }}</span>
                   @else <span class="sis-muted">{{ $eindTekst($eind) }}</span>@endif
                 </td>
-                <td class="tnum" style="text-align:center;">{{ $ec !== null ? $ec : '—' }}</td>
+                <td class="tnum" style="text-align:center;">{{ \App\Support\Ec::toon($ec) }}</td>
                 <td>
                   @if ($eind['status']==='vr')<span class="iuasr-dash-status s-approved">Vrijstelling</span>
                   @elseif (($ec ?? 0) > 0)<span class="iuasr-dash-status s-approved">Behaald</span>

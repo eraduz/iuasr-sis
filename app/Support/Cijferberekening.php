@@ -78,11 +78,11 @@ class Cijferberekening
     }
 
     /** EC toegekend voor een student/vak (0 of vak.ec; null als grens ontbreekt). */
-    public static function ec(Vak $vak, Collection $resultaten, bool $vrijgesteld = false): ?int
+    public static function ec(Vak $vak, Collection $resultaten, bool $vrijgesteld = false): ?float
     {
         // Vrijstelling kent de volledige vak-EC toe, onafhankelijk van de cesuur.
         if ($vrijgesteld) {
-            return (int) $vak->ec;
+            return (float) $vak->ec;
         }
 
         return EcBerekening::bepaalEc($vak, $resultaten, self::voldoendeGrens($vak));

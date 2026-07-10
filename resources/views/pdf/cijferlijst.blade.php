@@ -66,7 +66,7 @@
             <td>{{ $r['vak']->code }}</td>
             <td>{{ $r['vak']->naam }}</td>
             <td class="r">@if($e['status']==='cijfer')<span class="{{ $e['cijfer'] < $grens ? 'fail' : 'pass' }}">{{ $eindTekst($e) }}</span>@else{{ $eindTekst($e) }}@endif</td>
-            <td class="c">{{ $ec !== null ? $ec : '—' }}</td>
+            <td class="c">{{ \App\Support\Ec::toon($ec) }}</td>
             <td>@if($e['status']==='vr')Vrijstelling @elseif(($ec ?? 0) > 0)Behaald @elseif($e['status']==='cijfer')Niet behaald @else Open @endif</td>
           </tr>
         @endforeach

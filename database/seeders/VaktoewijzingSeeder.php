@@ -36,7 +36,7 @@ class VaktoewijzingSeeder extends Seeder
                 'vrijstelling_besluit' => 'EC-2026-014',
                 'vrijstelling_besluit_datum' => '2026-09-15',
                 'vrijstelling_toelichting' => 'Vrijstelling o.b.v. eerder behaald vergelijkbaar vak (synthetisch voorbeeld).',
-                'vrijstelling_ec' => (int) $vt->vak->ec,
+                'vrijstelling_ec' => (float) $vt->vak->ec,
                 'vrijgesteld_door_id' => $sz->id,
                 'vrijgesteld_op' => now(),
             ]);

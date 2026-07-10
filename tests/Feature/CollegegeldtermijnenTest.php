@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Database\Seeders\DocentSeeder;
 use Database\Seeders\GebruikerSeeder;
 use Database\Seeders\ReferentieSeeder;
+use Database\Seeders\SynthetischVakSeeder;
 use Database\Seeders\SynthetischeStudentSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -27,7 +28,7 @@ class CollegegeldtermijnenTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed([ReferentieSeeder::class, DocentSeeder::class, GebruikerSeeder::class,
+        $this->seed([ReferentieSeeder::class, SynthetischVakSeeder::class, DocentSeeder::class, GebruikerSeeder::class,
             SynthetischeStudentSeeder::class]);
 
         // Vast jaartarief van € 4.000 voor de actieve periode (2025-2026).

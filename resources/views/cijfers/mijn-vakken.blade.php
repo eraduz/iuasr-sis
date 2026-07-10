@@ -41,7 +41,7 @@
           <td class="nm">{{ $vak->naam }}</td>
           <td class="tnum">{{ $vak->code }}</td>
           <td class="pg">{{ $vak->opleiding?->naam }}</td>
-          <td class="tnum">{{ $vak->ec }}</td>
+          <td class="tnum">{{ \App\Support\Ec::toon($vak->ec) }}</td>
           <td class="tnum">{{ $r['aantal'] }}</td>
           <td class="tnum">{{ $r['onderdelen'] }}</td>
           <td><span class="iuasr-dash-status {{ $badge }}">{{ $tekst }}</span></td>

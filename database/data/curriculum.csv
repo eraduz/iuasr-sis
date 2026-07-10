@@ -1,0 +1,92 @@
+opleiding;code;naam;ec;leerjaar;blok;keuzevak
+ISLTH;B-AR01-15;"Standaard Arabisch I";2.5;1;1;nee
+ISLTH;B-MT01;"Toegepast Academische Vaardigheden";5;1;1;nee
+ISLTH;B-QR01;"Inleiding in de Qor'an";5;1;1;nee
+ISLTH;B-AR02-15;"Standaard Arabisch II";2.5;1;2;nee
+ISLTH;B-HD01;"Inleiding in de Hadith";5;1;2;nee
+ISLTH;B-KL01;"Inleiding in de Geloofsleer";5;1;2;nee
+ISLTH;B-SG01;Sirah;5;1;2;nee
+ISLTH;B-AR03-15;"Standaard Arabisch III";2.5;1;3;nee
+ISLTH;B-FQ01;"Inleiding in de Fiqh";5;1;3;nee
+ISLTH;B-MT03;Studieloopbaanbegeleiding;5;1;3;nee
+ISLTH;B-SG04-15;"Geschiedenis van de islam I";2.5;1;3;nee
+ISLTH;B-AR04-15;"Standaard Arabisch IV";2.5;1;4;nee
+ISLTH;B-FQ02;"Fiqh van Aanbidding I";5;1;4;nee
+ISLTH;B-QR06;"Tafsir v.d. Qor'an I";5;1;4;nee
+ISLTH;B-SG05-15;"Geschiedenis van de islam II";2.5;1;4;nee
+ISLTH;B-AR05-15;"Standaard Arabisch V";2.5;2;1;nee
+ISLTH;B-FQ03;"Fiqh van Aanbidding II";5;2;1;nee
+ISLTH;B-QR02;"Qoranrecitatie & Tadjwied I";2.5;2;1;nee
+ISLTH;B-ST01;"Verkennende stage";5;2;;nee
+ISLTH;B-GF01;Godsdienstfilosofie;5;2;2;nee
+ISLTH;B-AR06-15;"Standaard Arabisch VI";2.5;2;2;nee
+ISLTH;B-KL02;"Geloofsrichtingen binnen de Kalaam";5;2;2;nee
+ISLTH;B-MT02;"Sociale en communicatievaardigheden";5;2;2;nee
+ISLTH;B-QR03;"Qoranrecitatie & Tadjwied II";2.5;2;2;nee
+ISLTH;B-AR07-15;"Standaard Arabisch VII";2.5;2;3;nee
+ISLTH;B-HD02;"Belangrijke Teksten uit de Hadith 2,5";5;2;3;nee
+ISLTH;B-QR04;"Qoranrecitatie & Tadjwied III";2.5;2;3;nee
+ISLTH;B-AR08-15;"Standaard Arabisch VIII";2.5;2;4;nee
+ISLTH;B-FQ04;"Methodes van de Fiqh";5;2;4;nee
+ISLTH;B-QR05;"Qoranrecitatie & Tadjwied IV";2.5;2;4;nee
+ISLTH;B-QR07;"Tafsir v.d. Qor'an II";5;2;4;nee
+ISLTH;B-SC07;"Antropologie en sociologie van religie";2.5;2;4;nee
+ISLTH;B-FQ05;"Fiqh betreffende Familiezaken";5;3;1;nee
+ISLTH;B-MT04-A;"Methodes en Technieken I";2.5;3;1;nee
+ISLTH;B-QR08-15;"Qoranrecitatie & Tadjwied V";2.5;3;1;nee
+ISLTH;B-ST02;"Grote Stage I";10;3;;nee
+ISLTH;B-FQ06;"Voorschriften van de islam";5;3;2;nee
+ISLTH;B-MT04-B;"Methodes en Technieken II";2.5;3;2;nee
+ISLTH;B-QR09-15;"Qoranrecitatie & Tadjwied VI";2.5;3;2;nee
+ISLTH;B-SC02;Psychologie;2.5;3;2;nee
+ISLTH;B-SG03;"Inleiding in de Vergelijkende Theologie";5;3;2;nee
+ISLTH;B-CD01;"Islam en Burgerschap";5;3;3;nee
+ISLTH;B-SC04;Pedagogie;5;3;3;nee
+ISLTH;B-KL03;"Soefisme: Leer en Praktijken";5;3;4;nee
+ISLTH;B-SC03;Gesprekstraining;5;3;4;nee
+ISLTH;B-KL04;"Hedendaagse Islamitische Stromingen";5;4;1;nee
+ISLTH;B-BR01;Bachelorscriptie;15;4;;nee
+ISLTH;B-ST04;"Grote Stage II";20;4;;nee
+ISLTH;B-SC05-15;"Ethiek in de islam I";2.5;4;1;ja
+ISLTH;B-SC06-15;"Ethiek in de islam II";2.5;4;2;ja
+ISLTH;B-FQ07c;Erfrecht;5;4;3;ja
+ISLTH;B-FQ07a;"Fiqh betreffende Contractuele Zaken";5;4;4;ja
+ISLTH;B-KV01-16;"KEUZEVAK ELDERS 1";5;4;4;ja
+ISLTH;B-KV01-17;"KEUZEVAK 1";5;4;4;ja
+ISLTH;B-KV02-16;"KEUZEVAK ELDERS 2_";5;4;4;ja
+ISLTH;B-KV02-17;"KEUZEVAK 2";5;4;4;ja
+ISLTH;B-KV03-16;"KEUZEVAK ELDERS 3_";5;4;4;ja
+ISLTH;B-KV03-17;"KEUZEVAK 3";5;4;4;ja
+ISLTH;B-KV04-16;"KEUZEVAK ELDERS 4_";5;4;4;ja
+ISLTH;B-KV04-17;"KEUZEVAK 4";5;4;4;ja
+PMGV;B-QR02;"Qoranrecitatie & Tadjwied I";2.5;1;1;nee
+PMGV;B-QR03;"Qoranrecitatie & Tadjwied II";2.5;1;2;nee
+PMGV;B-QR04;"Qoranrecitatie & Tadjwied III";2.5;1;3;nee
+PMGV;B-QR05;"Qoranrecitatie & Tadjwied IV";2.5;1;4;nee
+PMGV;B-KL01;"Inleiding in de geloofsleer";5;1;2;nee
+PMGV;B-HD02;"Belangrijke Teksten uit de Hadith";5;1;3;nee
+PMGV;B-SG01;Sirah;5;1;2;nee
+PMGV;B-SG03;"Inleiding in de vergelijkende Theologie";5;1;2;nee
+PMGV;B-FQ02-B-FQ03;"Fiqh voor aanbidding (I of II)";5;1;;nee
+PMGV;B-QR06;"Tafsir van de Qur'an";5;1;4;nee
+PMGV;B-FQ06;"Voorschriften van de islam";5;1;2;nee
+PMGV;B-KL03;"Soefisme: Doctrines en Praktijken";5;1;4;nee
+MGV;M-GV01;"Geestelijke verzorging als beroep";5;1;1;nee
+MGV;M-GV02;"Grondslagen van islamitische geestelijke verzorging";5;1;2;nee
+MGV;M-GV03;"Psychologieleer (voor geestelijk verzorgers)";5;1;1;nee
+MGV;M-GV04;Persoonlijkheidspsychologie;5;1;3;nee
+MGV;M-GV05;Psychopathologie;5;1;4;nee
+MGV;M-GV06;"Islam en ethiek in de gezondheidszorg";5;1;2;nee
+MGV;M-GV07;"Ethiek in de gezondheidszorg b. o.";5;1;3;nee
+MGV;M-GV08;Bemiddeling;5;1;4;nee
+MGV;M-GV09;"Geestelijke verzorging in justitiële inrichtingen";5;1;3;nee
+MGV;M-GV10;"Geestelijke verzorging in zorginstellingen";5;1;4;nee
+MGV;M-GV11;"Competenties van geestelijk verzorgers";5;1;1;nee
+MGV;M-GV12;"Communicatieve vaardigheden voor geestelijk verzorgers";5;1;2;nee
+MGV;M-GV13;Counseling;5;2;2;nee
+MGV;M-GV14;"Samenleving en geestelijke verzorging";5;2;4;nee
+MGV;M-GV15;"Zorgethiek en rechtsstaat";5;2;3;nee
+MGV;M-GV16a;"Methodes en technieken I";2.5;2;;nee
+MGV;M-GV16b;"Methodes en technieken II";2.5;2;;nee
+MGV;M-GV17;"Masterscriptie (Master Thesis)";20;2;;nee
+MGV;M-GV18;"Stage en supervisie";20;2;;nee

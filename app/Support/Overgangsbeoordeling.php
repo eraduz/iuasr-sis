@@ -22,7 +22,7 @@ class Overgangsbeoordeling
     private const VOORWAARDELIJK_FRACTIE = 0.75;
 
     /**
-     * @return array{status: string, behaald: int, drempel: int|null, mogelijk: int}
+     * @return array{status: string, behaald: float, drempel: int|null, mogelijk: float}
      *   status: positief | voorwaardelijk | negatief | onbekend
      */
     public static function voor(Inschrijving $inschrijving): array
@@ -42,11 +42,11 @@ class Overgangsbeoordeling
     }
 
     /** In dit studiejaar/leerjaar daadwerkelijk behaalde EC (vakken volledig gehaald). */
-    public static function behaaldeEc(Inschrijving $inschrijving): int
+    public static function behaaldeEc(Inschrijving $inschrijving): float
     {
         $vakken = self::leerjaarVakken($inschrijving);
         if ($vakken->isEmpty()) {
-            return 0;
+            return 0.0;
         }
 
         $resultaten = Resultaat::where('inschrijving_id', $inschrijving->id)
@@ -56,30 +56,40 @@ class Overgangsbeoordeling
         $vrijVakIds = \App\Models\Vaktoewijzing::where('inschrijving_id', $inschrijving->id)
             ->where('vrijgesteld', true)->pluck('vak_id')->flip();
 
-        $totaal = 0;
+        $totaal = 0.0;
         foreach ($vakken as $vak) {
             if (isset($vrijVakIds[$vak->id])) {
-                $totaal += (int) $vak->ec; // vrijstelling: volledige EC
+                $totaal += (float) $vak->ec; // vrijstelling: volledige EC
                 continue;
             }
             $eigen = $resultaten->whereIn('toetsonderdeel_id', $vak->toetsonderdelen->pluck('id'));
-            $totaal += EcBerekening::bepaalEc($vak, $eigen, Cijferberekening::voldoendeGrens($vak)) ?? 0;
+            $totaal += EcBerekening::bepaalEc($vak, $eigen, Cijferberekening::voldoendeGrens($vak)) ?? 0.0;
         }
 
-        return $totaal;
+        return round($totaal, 1);
     }
 
     /** Totaal haalbare EC in dit leerjaar (som van de vak-EC). */
-    public static function mogelijkeEc(Inschrijving $inschrijving): int
+    public static function mogelijkeEc(Inschrijving $inschrijving): float
     {
-        return (int) self::leerjaarVakken($inschrijving)->sum('ec');
+        return round((float) self::leerjaarVakken($inschrijving)->sum('ec'), 1);
     }
 
+    /**
+     * De vakken die voor DEZE student in dit leerjaar meetellen: alle verplichte
+     * vakken, plus de keuzevakken die daadwerkelijk aan zijn inschrijving zijn
+     * toegewezen. Zou de hele keuzeruimte meetellen, dan lijkt elk leerjaar
+     * onhaalbaar; zouden keuzevakken helemaal wegvallen, dan verdwijnen behaalde
+     * punten uit het overgangsadvies.
+     */
     private static function leerjaarVakken(Inschrijving $inschrijving)
     {
+        $gekozen = \App\Models\Vaktoewijzing::where('inschrijving_id', $inschrijving->id)->pluck('vak_id');
+
         return Vak::where('opleiding_id', $inschrijving->opleiding_id)
             ->where('leerjaar', $inschrijving->leerjaar)
             ->where('actief', true)
+            ->where(fn ($q) => $q->where('keuzevak', false)->orWhereIn('id', $gekozen))
             ->with('toetsonderdelen')
             ->get();
     }

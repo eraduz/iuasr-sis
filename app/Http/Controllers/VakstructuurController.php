@@ -90,14 +90,26 @@ class VakstructuurController extends Controller
 
     private function valideer(Request $request, ?int $negeerId = null): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'opleiding_id' => ['required', Rule::exists('opleidingen', 'id')],
-            'code' => ['required', 'string', 'max:40', Rule::unique('vakken', 'code')->ignore($negeerId)],
+            // De code is uniek BINNEN een opleiding: dezelfde code mag in twee
+            // opleidingen voorkomen (bv. B-QR02 in de bachelor én de pre-master).
+            'code' => ['required', 'string', 'max:40',
+                Rule::unique('vakken', 'code')
+                    ->where(fn ($q) => $q->where('opleiding_id', $request->input('opleiding_id')))
+                    ->ignore($negeerId)],
             'naam' => ['required', 'string', 'max:255'],
-            'ec' => ['required', 'integer', 'min:0', 'max:60'],
+            // Halve studiepunten komen voor (2,5 EC).
+            'ec' => ['required', 'numeric', 'min:0', 'max:60'],
             'leerjaar' => ['required', 'integer', 'min:1', 'max:10'],
-            'blok' => ['required', 'integer', 'min:1', 'max:4'],
+            // Leeg blok = het vak loopt het hele studiejaar (stage, scriptie).
+            'blok' => ['nullable', 'integer', 'min:1', 'max:4'],
             'docent_id' => ['nullable', Rule::exists('docenten', 'id')],
         ]);
+
+        // Keuzevakken worden niet automatisch aan een inschrijving toegewezen.
+        $data['keuzevak'] = $request->boolean('keuzevak');
+
+        return $data;
     }
 }
