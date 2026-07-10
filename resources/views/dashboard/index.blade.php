@@ -518,7 +518,7 @@
         </tbody>
       </table>
     </div>
-    <p class="sis-tblnote" style="margin-top:6px;">Deze studenten volgen twee opleidingen tegelijk. Het collegegeld wordt per studiejaar één keer bepaald (de zwaarste opleiding is maatgevend).</p>
+    <p class="sis-tblnote" style="margin-top:6px;">Deze studenten volgen twee opleidingen tegelijk. Het collegegeld wordt <b>per opleiding</b> geheven; op de tweede opleiding kan Studentenzaken een korting vastleggen.</p>
   </div>
 @endif
 

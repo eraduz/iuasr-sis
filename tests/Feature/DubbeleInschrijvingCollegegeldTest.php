@@ -20,17 +20,17 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Collegegeld is per STUDIEJAAR eenmaal verschuldigd. Bij een dubbele
- * inschrijving hangt het termijnschema aan de maatgevende inschrijving (het
- * hoogste jaartarief) en tellen betalingen op beide inschrijvingen mee.
+ * Collegegeld wordt PER OPLEIDING geheven (opdrachtgever, 2026-07-10). Elke
+ * inschrijving heeft een eigen termijnschema en een eigen rekening; op de tweede
+ * opleiding legt Studentenzaken een korting vast.
  */
 class DubbeleInschrijvingCollegegeldTest extends TestCase
 {
     use RefreshDatabase;
 
     private Student $student;
-    private Inschrijving $duur;    // ISLTH, € 4.000 — maatgevend
-    private Inschrijving $goedkoop; // PABO,  € 2.530
+    private Inschrijving $eerste;  // ISLTH, € 4.000, geen korting
+    private Inschrijving $tweede;  // PABO,  € 2.530, 50% korting
 
     protected function setUp(): void
     {
@@ -50,16 +50,15 @@ class DubbeleInschrijvingCollegegeldTest extends TestCase
             'geboortedatum' => '2000-01-01',
         ]);
 
-        $maak = fn (int $opleidingId) => Inschrijving::create([
+        $maak = fn (int $opleidingId, float $korting = 0, ?string $reden = null) => Inschrijving::create([
             'student_id' => $this->student->id, 'opleiding_id' => $opleidingId,
             'periode_id' => $periode->id, 'leerjaar' => 1, 'status' => 'actief',
             'inschrijfdatum' => '2025-09-01',
+            'korting_percentage' => $korting, 'korting_reden' => $reden,
         ]);
 
-        // Bewust de goedkope opleiding EERST aanmaken: het maatgevende is het
-        // hoogste tarief, niet de eerste of laatste inschrijving.
-        $this->goedkoop = $maak($pabo);
-        $this->duur = $maak($islth);
+        $this->eerste = $maak($islth);
+        $this->tweede = $maak($pabo, 50, 'Tweede opleiding');
     }
 
     protected function tearDown(): void
@@ -73,97 +72,148 @@ class DubbeleInschrijvingCollegegeldTest extends TestCase
         return Collegegeldstatus::voor($this->student->fresh());
     }
 
-    public function test_de_opleiding_met_het_hoogste_tarief_is_maatgevend(): void
+    public function test_elke_opleiding_heeft_een_eigen_termijnschema(): void
     {
-        $this->assertTrue(Collegegeldtermijnen::isMaatgevend($this->duur));
-        $this->assertFalse(Collegegeldtermijnen::isMaatgevend($this->goedkoop));
-
-        $this->assertSame($this->duur->id, Collegegeldtermijnen::maatgevende($this->goedkoop)->id);
-        $this->assertNull(Collegegeldtermijnen::verrekendBij($this->duur));
-        $this->assertSame($this->duur->id, Collegegeldtermijnen::verrekendBij($this->goedkoop)->id);
+        $this->assertCount(5, Collegegeldtermijnen::voor($this->eerste));
+        $this->assertCount(5, Collegegeldtermijnen::voor($this->tweede));
     }
 
-    public function test_alleen_de_maatgevende_inschrijving_heeft_termijnen(): void
+    public function test_korting_verlaagt_het_jaarbedrag_van_die_opleiding(): void
     {
-        $this->assertCount(5, Collegegeldtermijnen::voor($this->duur));
-        $this->assertTrue(Collegegeldtermijnen::voor($this->goedkoop)->isEmpty());
+        $this->assertSame(4000.0, Collegegeldstatus::tarief($this->eerste));
+        $this->assertSame(4000.0, Collegegeldstatus::jaarbedrag($this->eerste));
 
-        $this->assertSame(4000.0, Collegegeldtermijnen::totaal($this->duur));
-        $this->assertSame(0.0, Collegegeldtermijnen::totaal($this->goedkoop));
+        // PABO: € 2.530 minus 50% = € 1.265.
+        $this->assertSame(2530.0, Collegegeldstatus::tarief($this->tweede));
+        $this->assertSame(1265.0, Collegegeldstatus::jaarbedrag($this->tweede));
+        $this->assertSame(1265.0, Collegegeldtermijnen::kortingsbedrag($this->tweede));
+        $this->assertTrue(Collegegeldtermijnen::heeftKorting($this->tweede));
+        $this->assertFalse(Collegegeldtermijnen::heeftKorting($this->eerste));
     }
 
-    public function test_collegegeld_wordt_niet_verdubbeld(): void
+    public function test_termijnen_volgen_het_bedrag_na_korting(): void
     {
-        $this->assertSame(4000.0, $this->geldstatus()['verschuldigd']);
+        $termijnen = Collegegeldtermijnen::voor($this->tweede);
+
+        $this->assertSame(253.0, $termijnen[0]['bedrag']);            // 1265 / 5
+        $this->assertSame(1265.0, round($termijnen->sum('bedrag'), 2));
     }
 
-    /** De kern: geld dat op de ándere inschrijving is geboekt telt gewoon mee. */
-    public function test_betaling_op_de_niet_maatgevende_inschrijving_telt_mee(): void
+    /** De student betaalt voor BEIDE opleidingen; niet meer één keer per studiejaar. */
+    public function test_collegegeld_wordt_per_opleiding_opgeteld(): void
     {
-        $this->assertSame(1600.0, $this->geldstatus()['achterstallig']); // sep + nov
+        $this->assertSame(5265.0, $this->geldstatus()['verschuldigd']); // 4000 + 1265
+        $this->assertSame(5265.0, $this->geldstatus()['jaarbedrag']);
+    }
 
+    public function test_betaling_hoort_bij_de_opleiding_waarop_zij_is_geboekt(): void
+    {
+        // Volledig betalen op ISLTH raakt de rekening van PABO niet.
         Betaling::create([
-            'student_id' => $this->student->id, 'inschrijving_id' => $this->goedkoop->id,
-            'bedrag' => 1600, 'datum' => '2025-09-05',
-        ]);
-
-        $status = $this->geldstatus();
-        $this->assertSame(0.0, $status['achterstallig']);
-        $this->assertFalse($status['achterstand']);
-
-        $termijnen = Collegegeldtermijnen::voor($this->duur->fresh());
-        $this->assertSame(Collegegeldtermijnen::BETAALD, $termijnen[0]['status']);
-        $this->assertSame(Collegegeldtermijnen::BETAALD, $termijnen[1]['status']);
-    }
-
-    public function test_student_die_alles_betaalde_wordt_niet_geblokkeerd(): void
-    {
-        Betaling::create([
-            'student_id' => $this->student->id, 'inschrijving_id' => $this->goedkoop->id,
+            'student_id' => $this->student->id, 'inschrijving_id' => $this->eerste->id,
             'bedrag' => 4000, 'datum' => '2025-09-05',
         ]);
 
+        $this->assertSame(0.0, Collegegeldtermijnen::achterstallig($this->eerste->fresh()->load('betalingen')));
+        $this->assertSame(506.0, Collegegeldtermijnen::achterstallig($this->tweede->fresh()->load('betalingen'))); // 2 x 253
+        $this->assertTrue($this->geldstatus()['achterstand']);
+    }
+
+    /** Een achterstand bij één opleiding blokkeert herinschrijven en verklaringen. */
+    public function test_achterstand_bij_een_van_beide_blokkeert(): void
+    {
+        Betaling::create([
+            'student_id' => $this->student->id, 'inschrijving_id' => $this->eerste->id,
+            'bedrag' => 4000, 'datum' => '2025-09-05',
+        ]);
+
+        $this->assertTrue(Collegegeldstatus::heeftAchterstand($this->student->fresh()));
+
+        // Ook PABO voldoen -> geen blokkade meer.
+        Betaling::create([
+            'student_id' => $this->student->id, 'inschrijving_id' => $this->tweede->id,
+            'bedrag' => 1265, 'datum' => '2025-09-05',
+        ]);
         $this->assertFalse(Collegegeldstatus::heeftAchterstand($this->student->fresh()));
     }
 
-    public function test_een_termijn_op_de_niet_maatgevende_inschrijving_wordt_op_de_maatgevende_geboekt(): void
+    public function test_honderd_procent_korting_geeft_geen_facturen(): void
     {
-        $this->actingAs(User::where('rol', Rol::Financien)->first())
-            ->post(route('financien.betaling', $this->student), [
-                'inschrijving_id' => (string) $this->goedkoop->id, 'termijn' => '1',
-                'bedrag' => '800.00', 'datum' => '2025-09-05',
-            ])->assertSessionHasNoErrors()->assertRedirect();
+        $this->tweede->update(['korting_percentage' => 100, 'korting_reden' => 'Volledige vrijstelling']);
 
-        // De betaling landt op de inschrijving waar de facturen aan hangen.
-        $this->assertDatabaseHas('betalingen', ['inschrijving_id' => $this->duur->id, 'termijn' => 1]);
-        $this->assertDatabaseMissing('betalingen', ['inschrijving_id' => $this->goedkoop->id]);
+        $this->assertTrue(Collegegeldtermijnen::voor($this->tweede->fresh())->isEmpty());
+        $this->assertSame(4000.0, $this->geldstatus()['verschuldigd']);
     }
 
-    public function test_financienscherm_markeert_de_niet_maatgevende_inschrijving(): void
+    public function test_studentenzaken_legt_korting_vast_met_reden_en_dit_wordt_gelogd(): void
+    {
+        $this->actingAs(User::where('rol', Rol::Studentenzaken)->first())
+            ->post(route('inschrijving.korting', $this->eerste), [
+                'korting_percentage' => '25', 'korting_reden' => 'Medewerkerskorting',
+            ])->assertSessionHasNoErrors()->assertRedirect();
+
+        $this->assertSame(25.0, $this->eerste->fresh()->korting_percentage);
+        $this->assertSame(3000.0, Collegegeldstatus::jaarbedrag($this->eerste->fresh()));
+        $this->assertDatabaseHas('audit_logs', ['veld' => 'korting_collegegeld', 'actie' => 'wijziging']);
+    }
+
+    public function test_korting_zonder_reden_wordt_geweigerd(): void
+    {
+        $this->actingAs(User::where('rol', Rol::Studentenzaken)->first())
+            ->post(route('inschrijving.korting', $this->eerste), ['korting_percentage' => '25'])
+            ->assertSessionHasErrors('korting_reden');
+
+        $this->assertSame(0.0, $this->eerste->fresh()->korting_percentage);
+    }
+
+    public function test_korting_intrekken_mag_zonder_reden(): void
+    {
+        $this->actingAs(User::where('rol', Rol::Studentenzaken)->first())
+            ->post(route('inschrijving.korting', $this->tweede), ['korting_percentage' => '0'])
+            ->assertSessionHasNoErrors();
+
+        $this->tweede->refresh();
+        $this->assertSame(0.0, $this->tweede->korting_percentage);
+        $this->assertNull($this->tweede->korting_reden);
+        $this->assertSame(2530.0, Collegegeldstatus::jaarbedrag($this->tweede));
+    }
+
+    public function test_alleen_studentenzaken_en_beheer_stellen_korting_in(): void
+    {
+        $body = ['korting_percentage' => '10', 'korting_reden' => 'Test'];
+
+        foreach ([Rol::Studentenzaken, Rol::Beheerder] as $rol) {
+            $this->actingAs(User::where('rol', $rol)->first())
+                ->post(route('inschrijving.korting', $this->eerste), $body)->assertRedirect();
+        }
+
+        // De Financiële Administratie boekt betalingen, maar verleent geen korting.
+        foreach ([Rol::Financien, Rol::Directie, Rol::Docent] as $rol) {
+            $this->actingAs(User::where('rol', $rol)->first())
+                ->post(route('inschrijving.korting', $this->eerste), $body)->assertForbidden();
+        }
+    }
+
+    public function test_financienscherm_toont_beide_opleidingen_met_korting(): void
     {
         $this->actingAs(User::where('rol', Rol::Financien)->first())
             ->get(route('financien.student', $this->student))
             ->assertOk()
-            ->assertSee('Geen collegegeld verschuldigd voor deze inschrijving.')
-            ->assertSee('maatgevend · dubbele inschrijving');
+            ->assertSee('korting 50%')
+            ->assertSee('Tweede opleiding')
+            ->assertSee('ISLTH')
+            ->assertSee('PABO');
     }
 
-    public function test_studentdossier_wijst_naar_de_maatgevende_opleiding(): void
+    public function test_boeken_op_de_tweede_opleiding_landt_daar_ook(): void
     {
-        $this->actingAs(User::where('rol', Rol::Studentenzaken)->first())
-            ->get(route('studenten.show', $this->student))
-            ->assertOk()
-            ->assertSee('Dubbele inschrijving.')
-            ->assertSee('het hoogste jaartarief is maatgevend');
-    }
+        $this->actingAs(User::where('rol', Rol::Financien)->first())
+            ->post(route('financien.betaling', $this->student), [
+                'inschrijving_id' => (string) $this->tweede->id, 'termijn' => '1',
+                'bedrag' => '253.00', 'datum' => '2025-09-05',
+            ])->assertSessionHasNoErrors()->assertRedirect();
 
-    /** Zonder dubbele inschrijving verandert er niets aan het bestaande gedrag. */
-    public function test_enkele_inschrijving_blijft_ongewijzigd(): void
-    {
-        $this->goedkoop->delete();
-
-        $this->assertTrue(Collegegeldtermijnen::isMaatgevend($this->duur->fresh()));
-        $this->assertCount(5, Collegegeldtermijnen::voor($this->duur->fresh()));
-        $this->assertSame(4000.0, $this->geldstatus()['verschuldigd']);
+        $this->assertDatabaseHas('betalingen', ['inschrijving_id' => $this->tweede->id, 'termijn' => 1]);
+        $this->assertDatabaseMissing('betalingen', ['inschrijving_id' => $this->eerste->id]);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Betaling;
 use App\Models\Student;
+use App\Support\AuditLogger;
 use App\Support\Collegegeldstatus;
 use App\Support\Collegegeldtermijnen;
 use Illuminate\Contracts\View\View;
@@ -58,23 +59,22 @@ class BetalingController extends Controller
     {
         $student->load([
             'inschrijvingen.opleiding', 'inschrijvingen.periode', 'inschrijvingen.betalingen',
-            'betalingen.geregistreerdDoor',
+            'betalingen.geregistreerdDoor', 'betalingen.inschrijving.opleiding',
         ]);
         $status = Collegegeldstatus::voor($student);
 
-        // Per inschrijving het termijnschema. Bij een dubbele inschrijving levert
-        // alleen de MAATGEVENDE inschrijving facturen op; de andere krijgt een
-        // toelichting in plaats van een tabel met knoppen waar niets te boeken valt.
+        // Elke opleiding heeft een eigen termijnschema, met een eventuele korting.
         $regels = $student->inschrijvingen->sortByDesc('inschrijfdatum')->map(fn ($i) => [
             'inschrijving' => $i,
             'tarief' => Collegegeldstatus::tarief($i),
+            'jaarbedrag' => Collegegeldstatus::jaarbedrag($i),
+            'kortingsbedrag' => Collegegeldtermijnen::kortingsbedrag($i),
+            'heeftKorting' => Collegegeldtermijnen::heeftKorting($i),
             'maanden' => Collegegeldstatus::maanden($i),
             'regeling' => Collegegeldtermijnen::regeling($i),
             'termijnen' => Collegegeldtermijnen::voor($i),
             'verschuldigd' => Collegegeldtermijnen::totaal($i),
-            'maatgevend' => Collegegeldtermijnen::isMaatgevend($i),
-            'verrekendBij' => Collegegeldtermijnen::verrekendBij($i),
-            'dubbelInStudiejaar' => Collegegeldtermijnen::inschrijvingenVanStudiejaar($i)->count() > 1,
+            'achterstallig' => Collegegeldtermijnen::achterstallig($i),
         ]);
 
         return view('financien.student', compact('student', 'status', 'regels'));
@@ -152,8 +152,6 @@ class BetalingController extends Controller
 
                 continue;
             }
-            // Bij een dubbele inschrijving boeken op de maatgevende inschrijving.
-            $insch = Collegegeldtermijnen::maatgevende($insch);
 
             $bedrag = $this->parseBedrag($veld($kolommen, 'bedrag'));
             if ($bedrag === null || $bedrag <= 0) {
@@ -174,10 +172,7 @@ class BetalingController extends Controller
                 }
                 $termijn = (int) $termijnRaw;
 
-                $bestaat = Collegegeldtermijnen::voor($insch)
-                    ->reject(fn ($t) => $t['vervallen'])
-                    ->contains(fn ($t) => $t['nr'] === $termijn);
-                if (! $bestaat) {
+                if (! $this->termijnBestaat($insch, $termijn)) {
                     $fouten[] = "Regel {$regelnr}: termijn {$termijn} bestaat niet voor de inschrijving van {$nr}.";
 
                     continue;
@@ -350,12 +345,9 @@ class BetalingController extends Controller
             'opmerking' => ['nullable', 'string', 'max:500'],
         ]);
 
-        // Het collegegeld hangt aan het STUDIEJAAR: bij een dubbele inschrijving
-        // wordt de betaling geboekt op de maatgevende inschrijving, waar de
-        // facturen staan. Zo kan er nooit geld op een schemaloze inschrijving
-        // belanden.
-        $gekozen = $student->inschrijvingen()->findOrFail($data['inschrijving_id']);
-        $inschrijving = Collegegeldtermijnen::maatgevende($gekozen);
+        // Elke opleiding heeft een eigen rekening: de betaling wordt geboekt op de
+        // inschrijving die de boekhouding kiest.
+        $inschrijving = $student->inschrijvingen()->findOrFail($data['inschrijving_id']);
 
         // Uit een formulier komt de termijn als string binnen; het schema werkt
         // met integers. Zonder deze cast faalt de vergelijking hieronder altijd.
@@ -363,16 +355,10 @@ class BetalingController extends Controller
 
         // Boeken op een termijn die in dit schema niet bestaat (of vervallen is)
         // zou een onvindbaar bedrag opleveren; weiger dat expliciet.
-        if ($termijn !== null) {
-            $bestaat = Collegegeldtermijnen::voor($inschrijving)
-                ->reject(fn ($t) => $t['vervallen'])
-                ->contains(fn ($t) => $t['nr'] === $termijn);
-
-            if (! $bestaat) {
-                return back()->withInput()->withErrors([
-                    'termijn' => 'Deze termijn bestaat niet (meer) voor de gekozen inschrijving.',
-                ]);
-            }
+        if ($termijn !== null && ! $this->termijnBestaat($inschrijving, $termijn)) {
+            return back()->withInput()->withErrors([
+                'termijn' => 'Deze termijn bestaat niet (meer) voor de gekozen inschrijving.',
+            ]);
         }
 
         $student->betalingen()->create([
@@ -389,5 +375,79 @@ class BetalingController extends Controller
             ->with('status', $termijn !== null
                 ? "Betaling geboekt op termijn {$termijn}."
                 : 'Betaling geregistreerd en toegerekend aan de oudste openstaande termijn.');
+    }
+
+    /**
+     * Een geregistreerde betaling corrigeren. Alleen de Financiële Administratie
+     * en Beheer; de oude en nieuwe waarden gaan naar de audit-log, zodat elke
+     * mutatie op een geldbedrag herleidbaar blijft.
+     */
+    public function bijwerken(Request $request, Student $student, Betaling $betaling): RedirectResponse
+    {
+        abort_unless($betaling->student_id === $student->id, 404);
+
+        $data = $request->validate([
+            'inschrijving_id' => ['required', Rule::exists('inschrijvingen', 'id')->where('student_id', $student->id)],
+            'termijn' => ['nullable', 'integer', 'min:1', 'max:5'],
+            'bedrag' => ['required', 'numeric', 'min:0.01', 'max:100000'],
+            'datum' => ['required', 'date'],
+            'betaalwijze' => ['nullable', 'string', 'max:40'],
+            'opmerking' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $inschrijving = $student->inschrijvingen()->findOrFail($data['inschrijving_id']);
+        $termijn = ($data['termijn'] ?? null) !== null && $data['termijn'] !== ''
+            ? (int) $data['termijn'] : null;
+
+        if ($termijn !== null && ! $this->termijnBestaat($inschrijving, $termijn)) {
+            return back()->withInput()->withErrors([
+                'termijn' => 'Deze termijn bestaat niet (meer) voor de gekozen inschrijving.',
+            ]);
+        }
+
+        $oud = $betaling->only(['inschrijving_id', 'termijn', 'bedrag', 'datum', 'betaalwijze', 'opmerking']);
+
+        $betaling->update([
+            'inschrijving_id' => $inschrijving->id,
+            'termijn' => $termijn,
+            'bedrag' => $data['bedrag'],
+            'datum' => $data['datum'],
+            'betaalwijze' => $data['betaalwijze'] ?? null,
+            'opmerking' => $data['opmerking'] ?? null,
+        ]);
+
+        AuditLogger::log(AuditLogger::WIJZIGING, $student, veld: 'betaling', context: [
+            'betaling_id' => $betaling->id,
+            'oud' => $oud,
+            'nieuw' => $betaling->only(['inschrijving_id', 'termijn', 'bedrag', 'datum', 'betaalwijze', 'opmerking']),
+        ]);
+
+        return redirect()->route('financien.student', $student)->with('status', 'Betaling gewijzigd en gelogd.');
+    }
+
+    /** Een geregistreerde betaling verwijderen (gelogd, met de oorspronkelijke waarden). */
+    public function verwijderen(Student $student, Betaling $betaling): RedirectResponse
+    {
+        abort_unless($betaling->student_id === $student->id, 404);
+
+        AuditLogger::log(AuditLogger::VERWIJDERING, $student, veld: 'betaling', context: [
+            'betaling_id' => $betaling->id,
+            'bedrag' => (float) $betaling->bedrag,
+            'datum' => $betaling->datum?->toDateString(),
+            'termijn' => $betaling->termijn,
+            'inschrijving_id' => $betaling->inschrijving_id,
+        ]);
+
+        $betaling->delete();
+
+        return redirect()->route('financien.student', $student)->with('status', 'Betaling verwijderd en gelogd.');
+    }
+
+    /** Bestaat deze termijn in het (niet-vervallen) schema van de inschrijving? */
+    private function termijnBestaat(\App\Models\Inschrijving $inschrijving, int $termijn): bool
+    {
+        return Collegegeldtermijnen::voor($inschrijving)
+            ->reject(fn ($t) => $t['vervallen'])
+            ->contains(fn ($t) => $t['nr'] === $termijn);
     }
 }

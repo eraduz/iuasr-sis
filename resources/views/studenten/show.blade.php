@@ -210,39 +210,62 @@
       @if (auth()->user()->magFinancieelInzien())
         @php
           $euro = fn ($b) => '€ '.number_format($b, 2, ',', '.');
-          // Bij een dubbele inschrijving hangen de facturen aan de maatgevende
-          // inschrijving; die kan een andere opleiding zijn dan de hier getoonde.
+          // Collegegeld wordt per opleiding geheven: dit schema hoort bij DEZE inschrijving.
           $cgi = $collegegeldInschrijving;
           $regeling = $cgi ? \App\Support\Collegegeldtermijnen::regeling($cgi) : null;
+          $tarief = $cgi ? \App\Support\Collegegeldstatus::tarief($cgi) : null;
+          $eigenJaarbedrag = $cgi ? \App\Support\Collegegeldstatus::jaarbedrag($cgi) : null;
+          $kortingBedrag = $cgi ? \App\Support\Collegegeldtermijnen::kortingsbedrag($cgi) : 0.0;
+          $heeftKorting = $cgi && \App\Support\Collegegeldtermijnen::heeftKorting($cgi);
+          $pct = fn ($p) => rtrim(rtrim(number_format((float) $p, 2, ',', ''), '0'), ',');
         @endphp
         <div class="sis-card" style="margin-top:16px;">
           <div class="sis-card__hd">
-            <h3>Collegegeld</h3>
+            <h3>Collegegeld @if ($cgi)<span class="sis-muted" style="font-weight:400;font-size:12px;">· {{ $cgi->opleiding?->code }}</span>@endif</h3>
             <span class="hint">{{ $regeling?->label() ?? 'geen inschrijving' }}</span>
           </div>
 
-          @if ($collegegeldDubbel && $cgi)
+          @if ($andereOpleidingen->isNotEmpty())
             <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin:0 0 12px;">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-              <span><b>Dubbele inschrijving.</b> Collegegeld wordt per studiejaar éénmaal berekend; het loopt via
-                <b>{{ $cgi->opleiding?->naam ?? $cgi->opleiding?->code }}</b> (het hoogste jaartarief is maatgevend).
-                Betalingen op de andere inschrijving worden hier gewoon verrekend.</span>
+              <span><b>Dubbele inschrijving.</b> Collegegeld wordt <b>per opleiding</b> geheven. Deze kaart toont de rekening van
+                <b>{{ $cgi?->opleiding?->code }}</b>;
+                @foreach ($andereOpleidingen as $ander)<b>{{ $ander->opleiding?->code }}</b>@if(!$loop->last), @endif @endforeach
+                {{ $andereOpleidingen->count() === 1 ? 'heeft een eigen rekening' : 'hebben een eigen rekening' }}.
+                De totalen bovenaan het dossier tellen alle opleidingen bij elkaar op.</span>
             </div>
           @endif
 
-          @if ($financieel['jaarbedrag'] === null || $termijnen->isEmpty())
+          @if ($eigenJaarbedrag === null || $termijnen->isEmpty())
             <p class="sis-muted" style="font-size:13px;margin:0;">
-              {{ $financieel['jaarbedrag'] === null
+              {{ $eigenJaarbedrag === null
                   ? 'Geen collegegeldtarief ingesteld voor dit studiejaar.'
-                  : 'Nog geen termijnen: de student is aangemeld maar nog niet ingeschreven.' }}
+                  : 'Geen facturen: 100% korting, of de student is aangemeld maar nog niet ingeschreven.' }}
             </p>
           @else
+            {{-- Deze cijfers horen bij DEZE opleiding; de totalen over alle
+                 opleidingen staan eronder wanneer de student er meer volgt. --}}
+            @php $eigenAchterstallig = \App\Support\Collegegeldtermijnen::achterstallig($cgi); @endphp
             <div class="sis-termijn-kop">
-              <div><span class="lbl">Jaarcollegegeld</span><b>{{ $euro($financieel['jaarbedrag']) }}</b></div>
-              <div><span class="lbl">Verschuldigd</span><b>{{ $euro($financieel['verschuldigd']) }}</b></div>
-              <div><span class="lbl">Betaald</span><b>{{ $euro($financieel['betaald']) }}</b></div>
-              <div><span class="lbl">Achterstallig</span><b class="{{ $financieel['achterstallig'] > 0 ? 'is-fail' : '' }}">{{ $euro($financieel['achterstallig']) }}</b></div>
+              <div>
+                <span class="lbl">Jaarcollegegeld</span>
+                <b>{{ $euro($eigenJaarbedrag) }}</b>
+                @if ($heeftKorting)
+                  <span class="sis-muted" style="display:block;font-size:11px;">{{ $euro($tarief) }} − {{ $pct($cgi->korting_percentage) }}% korting</span>
+                @endif
+              </div>
+              <div><span class="lbl">Verschuldigd</span><b>{{ $euro($termijnen->reject(fn ($t) => $t['vervallen'])->sum('bedrag')) }}</b></div>
+              <div><span class="lbl">Betaald</span><b>{{ $euro($termijnen->sum('betaald')) }}</b></div>
+              <div><span class="lbl">Achterstallig</span><b class="{{ $eigenAchterstallig > 0 ? 'is-fail' : '' }}">{{ $euro($eigenAchterstallig) }}</b></div>
             </div>
+
+            @if ($andereOpleidingen->isNotEmpty())
+              <p class="sis-muted" style="font-size:12px;margin:8px 0 0;">
+                Totaal over <b>alle opleidingen</b>: verschuldigd {{ $euro($financieel['verschuldigd']) }} ·
+                betaald {{ $euro($financieel['betaald']) }} ·
+                achterstallig <b class="{{ $financieel['achterstallig'] > 0 ? 'is-fail' : '' }}">{{ $euro($financieel['achterstallig']) }}</b>.
+              </p>
+            @endif
 
             <div class="iuasr-dash-tbl-card" style="border:0;margin-top:10px;">
               <table class="iuasr-dash-tbl sis-termijn-tbl">
@@ -308,8 +331,28 @@
           @endif
 
           @if ($cgi && auth()->user()->magCollegegeldBeheren())
-            {{-- De regeling geldt per studiejaar en hoort bij de inschrijving waar
-                 de facturen aan hangen (de maatgevende bij dubbele inschrijving). --}}
+            {{-- Korting op het collegegeld van DEZE opleiding (bv. tweede opleiding). --}}
+            <form method="POST" action="{{ route('inschrijving.korting', $cgi) }}" style="margin-top:14px;border-top:1px solid var(--borderColor);padding-top:12px;">
+              @csrf
+              <label style="display:block;font-size:12px;font-weight:600;color:var(--priColor100);margin-bottom:6px;">Korting op {{ $cgi->opleiding?->code }}</label>
+              @error('korting_reden')<p class="sis-muted" style="color:var(--secColor100);font-size:12px;margin:0 0 6px;">{{ $message }}</p>@enderror
+              <div class="sis-fld-row sis-fld-row--2">
+                <div class="sis-fld">
+                  <label>Percentage</label>
+                  <div class="sis-inputwrap"><input type="number" step="0.01" min="0" max="100" name="korting_percentage" value="{{ old('korting_percentage', $pct($cgi->korting_percentage)) }}"></div>
+                </div>
+                <div class="sis-fld">
+                  <label>Reden <span class="sis-muted" style="font-size:11px;">(verplicht bij korting)</span></label>
+                  <input type="text" name="korting_reden" maxlength="120" value="{{ old('korting_reden', $cgi->korting_reden) }}" placeholder="Bijv. tweede opleiding">
+                </div>
+              </div>
+              <p class="sis-muted" style="font-size:11.5px;margin:0 0 8px;">
+                Geldt alleen voor <b>{{ $cgi->opleiding?->code }}</b> in {{ $cgi->periode?->naam ?? 'dit studiejaar' }}. Elke opleiding heeft een eigen rekening; de wijziging wordt gelogd.
+              </p>
+              <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Korting opslaan</button>
+            </form>
+
+            {{-- De betaalregeling hoort bij dezelfde inschrijving als de facturen. --}}
             <form method="POST" action="{{ route('inschrijving.betaalregeling', $cgi) }}" style="margin-top:14px;border-top:1px solid var(--borderColor);padding-top:12px;">
               @csrf
               <label style="display:block;font-size:12px;font-weight:600;color:var(--priColor100);margin-bottom:6px;">Betaalregeling</label>

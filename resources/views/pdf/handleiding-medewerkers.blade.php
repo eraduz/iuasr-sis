@@ -166,9 +166,20 @@
   <p>Op het financiële scherm van een student staat per studiejaar hetzelfde termijnoverzicht, met achter elke openstaande termijn de knop <b>Boek € …</b>. Eén klik boekt die termijn volledig op de datum van vandaag. Voor een deelbetaling of een afwijkend bedrag gebruikt u het formulier <b>Betaling registreren</b>; daar kiest u de termijn, of laat u <b>automatisch</b> staan — dan gaat de betaling naar de <b>oudste openstaande</b> termijn.</p>
   <p>Bij de <b>bulk-import</b> (CSV) is er een extra, optionele kolom <b>termijn</b> (1 t/m 5). Laat u die leeg, dan wordt de betaling automatisch toegerekend. Bestaande bestanden zonder termijnkolom blijven gewoon werken: de kolommen worden op naam herkend.</p>
 
-  <h3>Dubbele inschrijving</h3>
-  <p>Volgt een student twee opleidingen in hetzelfde studiejaar, dan is het collegegeld <b>éénmaal</b> verschuldigd. Het systeem kiest de opleiding met het <b>hoogste jaartarief</b> als maatgevend; daar hangt de termijntabel aan. De tweede inschrijving toont geen tabel maar de melding <b>“Geen collegegeld verschuldigd voor deze inschrijving”</b>, met de opleiding waar het wél via loopt.</p>
-  <div class="tip">Boek betalingen op het studiejaar dat in de keuzelijst staat; dat is altijd de maatgevende inschrijving. Is er in het verleden geld op de andere inschrijving geboekt, dan telt dat gewoon mee — het systeem verrekent alle betalingen van dat studiejaar in dezelfde termijnen. Ook de bulk-import boekt automatisch op de juiste inschrijving.</div>
+  <h3>Twee opleidingen: elk een eigen rekening</h3>
+  <p>Collegegeld wordt <b>per opleiding</b> geheven. Volgt een student twee opleidingen, dan heeft <b>elke inschrijving</b> een eigen jaartarief, een eigen termijnschema en eigen facturen. De bedragen tellen op; het totaal ziet u bovenaan het financiële scherm en op het studentdossier.</p>
+  <p>Op de tweede opleiding kan <b>Studentenzaken</b> een <b>korting</b> vastleggen. Dat gebeurt op het dossier, in de kaart <b>Collegegeld</b>, onder <b>Korting op &lt;opleiding&gt;</b>: vul het percentage in (0 t/m 100) en een <b>reden</b> — die is verplicht zodra u korting geeft, want er wordt minder gefactureerd dan het tarief. Alle wijzigingen worden gelogd. Het systeem beslist nooit zelf welke opleiding “de tweede” is; wat u invult, is wat er gefactureerd wordt.</p>
+  <table class="rol">
+    <tr><th>Voorbeeld</th><th>Bedrag</th></tr>
+    <tr><td>ISLTH, jaartarief</td><td>&euro; 4.000,00</td></tr>
+    <tr><td>PABO, jaartarief &euro; 2.530,00 met 50% korting</td><td>&euro; 1.265,00</td></tr>
+    <tr><td><b>Totaal verschuldigd dit studiejaar</b></td><td><b>&euro; 5.265,00</b></td></tr>
+  </table>
+  <div class="tip">Bij 100% korting ontstaan er geen facturen voor die opleiding. Een <b>achterstand bij één van de twee</b> opleidingen blokkeert herinschrijven en verklaringen: de student heeft dan een schuld aan de instelling. De boekhouding boekt elke betaling op de opleiding waar zij bij hoort; geld wordt nooit tussen opleidingen verschoven.</div>
+
+  <h3>Een betaling corrigeren of verwijderen</h3>
+  <p>Staat er een betaling verkeerd geboekt, dan herstelt de <b>Financiële Administratie</b> dat zelf. Klik in de lijst <b>Geregistreerde betalingen</b> op <b>Wijzigen</b>: u past opleiding, termijn, bedrag, datum, betaalwijze en opmerking aan. Met <b>Verwijderen</b> haalt u een betaling helemaal weg, na een bevestiging.</p>
+  <div class="let">Beide handelingen worden <b>gelogd</b> in de audit-log, met de <b>oude én de nieuwe waarden</b> en de naam van degene die het deed. Zo blijft elke mutatie op een geldbedrag herleidbaar. Alleen de Financiële Administratie en Beheer kunnen dit; Studentenzaken niet.</div>
 
   <h3>Tussentijdse uitschrijving</h3>
   <p>Schrijft een student zich halverwege uit, dan is hij alleen de verstreken maanden verschuldigd (jaarbedrag ÷ 12 × maanden, t/m het einde van de uitschrijfmaand). De termijnen ná de uitschrijfdatum krijgen de status <b>Vervallen</b> en de laatste nog geldende termijn wordt naar beneden bijgesteld. Is er meer betaald dan verschuldigd, dan verschijnt de student op het Financiën-overzicht onder <b>terugbetalingen</b>.</p>

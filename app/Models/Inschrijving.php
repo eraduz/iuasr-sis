@@ -33,6 +33,8 @@ class Inschrijving extends Model
         'afstudeerdatum',
         'betaalwijze',         // VERVALLEN: mengde regeling en betaalwijze; zie betaalregeling
         'betaalregeling',      // termijnen (5 facturen) | volledig (1 factuur)
+        'korting_percentage',  // korting op het jaartarief van DEZE opleiding
+        'korting_reden',
         'aanwezigheidsregeling_50',
         'opmerkingen',
     ];
@@ -42,6 +44,7 @@ class Inschrijving extends Model
         return [
             'status' => InschrijvingStatus::class,
             'betaalregeling' => Betaalregeling::class,
+            'korting_percentage' => 'float',
             'aanwezigheidsregeling_50' => 'boolean',
             'leerjaar' => 'integer',
             'inschrijfdatum' => 'date',

@@ -166,7 +166,12 @@ class FinancienTest extends TestCase
         $this->assertFalse($status['achterstand']);
     }
 
-    public function test_collegegeld_wordt_eenmaal_per_studiejaar_berekend_bij_dubbele_inschrijving(): void
+    /**
+     * BELEIDSWIJZIGING (2026-07-10): collegegeld wordt PER OPLEIDING geheven.
+     * Een tweede opleiding kost dus extra; Studentenzaken legt daar doorgaans
+     * een korting op vast. Zie DubbeleInschrijvingCollegegeldTest.
+     */
+    public function test_collegegeld_wordt_per_opleiding_geheven_bij_dubbele_inschrijving(): void
     {
         $this->tarief(4000);
         $student = Student::where('studentnummer', '261011')->first(); // actief ISLTH
@@ -183,9 +188,16 @@ class FinancienTest extends TestCase
             'leerjaar' => 1, 'status' => 'actief', 'inschrijfdatum' => $insch->inschrijfdatum,
         ]);
 
+        // Elke opleiding heeft een eigen rekening: het bedrag telt op.
         $dubbel = Collegegeldstatus::voor($student->fresh())['verschuldigd'];
-        // Niet verdubbeld: collegegeld is per studiejaar één keer verschuldigd.
-        $this->assertEqualsWithDelta($enkel, $dubbel, 0.01);
+        $this->assertEqualsWithDelta($enkel * 2, $dubbel, 0.01);
+
+        // Met 50% korting op de tweede opleiding: anderhalf keer het tarief.
+        $student->inschrijvingen()->latest('id')->first()
+            ->update(['korting_percentage' => 50, 'korting_reden' => 'Tweede opleiding']);
+
+        $metKorting = Collegegeldstatus::voor($student->fresh())['verschuldigd'];
+        $this->assertEqualsWithDelta($enkel * 1.5, $metKorting, 0.01);
     }
 
     public function test_overzicht_toont_vooruitbetaalde_student(): void

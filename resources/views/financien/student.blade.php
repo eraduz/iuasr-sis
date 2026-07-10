@@ -51,37 +51,35 @@
 {{-- Termijnschema per studiejaar: één klik per termijn om te boeken --}}
 @forelse ($regels as $r)
   @php $insch = $r['inschrijving']; $termijnen = $r['termijnen']; @endphp
-  <div class="sis-card" style="margin-bottom:16px;{{ $r['maatgevend'] ? '' : 'opacity:.75;' }}">
+  <div class="sis-card" style="margin-bottom:16px;">
     <div class="sis-card__hd">
       <h3>
         {{ $insch->periode?->naam ?? 'Studiejaar' }} · {{ $insch->opleiding?->code }}
-        @if ($r['maatgevend'] && $r['dubbelInStudiejaar'])
-          <span class="sis-pill-soft" style="margin-left:6px;">maatgevend · dubbele inschrijving</span>
+        @if ($r['heeftKorting'])
+          <span class="sis-pill-prio" style="background:rgba(40,92,77,.14);color:#1d453a;">korting {{ rtrim(rtrim(number_format($insch->korting_percentage, 2, ',', ''), '0'), ',') }}%</span>
         @endif
       </h3>
       <span class="hint">
-        @if ($r['maatgevend'])
-          {{ $r['regeling']->label() }} · jaartarief {{ $r['tarief'] !== null ? $euro($r['tarief']) : 'niet ingesteld' }} · {{ $insch->status->label() }}
+        {{ $r['regeling']->label() }} ·
+        @if ($r['tarief'] === null)
+          jaartarief niet ingesteld
+        @elseif ($r['heeftKorting'])
+          {{ $euro($r['tarief']) }} − {{ $euro($r['kortingsbedrag']) }} = <b>{{ $euro($r['jaarbedrag']) }}</b>
         @else
-          {{ $insch->status->label() }} · geen eigen facturen
+          jaartarief {{ $euro($r['tarief']) }}
         @endif
+        · {{ $insch->status->label() }}
       </span>
     </div>
 
-    @if (! $r['maatgevend'])
-      {{-- Dubbele inschrijving: collegegeld is per studiejaar eenmaal verschuldigd. --}}
-      <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin:0;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-        <span>
-          <b>Geen collegegeld verschuldigd voor deze inschrijving.</b>
-          Collegegeld wordt per studiejaar <b>éénmaal</b> berekend; bij deze <b>dubbele inschrijving</b> loopt het
-          via <b>{{ $r['verrekendBij']?->opleiding?->code ?? 'de andere opleiding' }}</b>
-          @if ($r['tarief'] !== null)<span class="sis-muted" style="font-size:11px;">(jaartarief hier zou {{ $euro($r['tarief']) }} zijn — het hoogste tarief is maatgevend)</span>@endif.
-          Boek betalingen op het schema hierboven; betalingen die per abuis op déze inschrijving zijn geboekt, worden gewoon meegeteld.
-        </span>
-      </div>
-    @elseif ($termijnen->isEmpty())
-      <p class="sis-muted" style="font-size:13px;margin:0;">Geen termijnen: geen tarief ingesteld, of de student is aangemeld maar nog niet ingeschreven.</p>
+    @if ($r['heeftKorting'] && $insch->korting_reden)
+      <p class="sis-muted" style="font-size:12px;margin:0 0 10px;">Reden korting: <b>{{ $insch->korting_reden }}</b> (vastgelegd door Studentenzaken).</p>
+    @endif
+
+    @if ($termijnen->isEmpty())
+      <p class="sis-muted" style="font-size:13px;margin:0;">
+        Geen facturen voor deze opleiding: geen tarief ingesteld, 100% korting, of de student is aangemeld maar nog niet ingeschreven.
+      </p>
     @else
       <div class="iuasr-dash-tbl-card" style="border:0;">
         <table class="iuasr-dash-tbl sis-termijn-tbl">
@@ -143,21 +141,70 @@
 
 <div class="sis-grid-2">
   <div class="sis-card">
-    <div class="sis-card__hd"><h3>Geregistreerde betalingen</h3></div>
+    <div class="sis-card__hd"><h3>Geregistreerde betalingen</h3><span class="hint">corrigeren en verwijderen wordt gelogd</span></div>
     <div class="iuasr-dash-tbl-card" style="border:0;">
       <table class="iuasr-dash-tbl">
-        <thead><tr><th>Datum</th><th style="text-align:right;">Bedrag</th><th style="text-align:center;">Termijn</th><th>Wijze</th><th>Door</th></tr></thead>
+        <thead><tr><th>Datum</th><th>Opleiding</th><th style="text-align:right;">Bedrag</th><th style="text-align:center;">Termijn</th><th>Wijze</th><th>Door</th><th class="row-act"></th></tr></thead>
         <tbody>
           @forelse ($student->betalingen->sortByDesc('datum') as $b)
             <tr>
               <td class="dt">{{ $b->datum?->format('d-m-Y') }}</td>
+              <td>{{ $b->inschrijving?->opleiding?->code ?? '—' }}</td>
               <td class="tnum" style="text-align:right;">{{ $euro($b->bedrag) }}</td>
               <td style="text-align:center;">{{ $b->termijn ? 'Termijn '.$b->termijn : '— automatisch' }}</td>
               <td>{{ $b->betaalwijze ?? '—' }}</td>
               <td class="dt">{{ $b->geregistreerdDoor?->naam ?? '—' }}</td>
+              <td class="row-act" style="white-space:nowrap;">
+                <button class="iuasr-dash-btn iuasr-dash-btn--sm bet-bewerk" type="button" data-bet="{{ $b->id }}">Wijzigen</button>
+                <form method="POST" action="{{ route('financien.betaling.verwijderen', [$student, $b]) }}" onsubmit="return confirm('Betaling van {{ $euro($b->bedrag) }} definitief verwijderen? Dit wordt gelogd.');" style="display:inline;">
+                  @csrf @method('DELETE')
+                  <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" type="submit">Verwijderen</button>
+                </form>
+              </td>
+            </tr>
+            <tr class="bet-edit" data-edit="{{ $b->id }}" hidden>
+              <td colspan="7" style="background:var(--priColor102);">
+                <form method="POST" action="{{ route('financien.betaling.bijwerken', [$student, $b]) }}" class="sis-form" style="padding:6px 2px;">
+                  @csrf @method('PUT')
+                  <div class="sis-fld-row sis-fld-row--2">
+                    <div class="sis-fld"><label>Opleiding / studiejaar</label>
+                      <select name="inschrijving_id" required>
+                        @foreach ($regels as $rr)
+                          <option value="{{ $rr['inschrijving']->id }}" @selected($b->inschrijving_id === $rr['inschrijving']->id)>{{ $rr['inschrijving']->periode?->naam }} · {{ $rr['inschrijving']->opleiding?->code }}</option>
+                        @endforeach
+                      </select>
+                    </div>
+                    <div class="sis-fld"><label>Termijn</label>
+                      <select name="termijn">
+                        <option value="">— automatisch —</option>
+                        @for ($nr = 1; $nr <= 5; $nr++)<option value="{{ $nr }}" @selected($b->termijn === $nr)>Termijn {{ $nr }}</option>@endfor
+                      </select>
+                    </div>
+                  </div>
+                  <div class="sis-fld-row sis-fld-row--2">
+                    <div class="sis-fld"><label>Bedrag (€)</label><input type="number" step="0.01" min="0.01" name="bedrag" value="{{ number_format($b->bedrag, 2, '.', '') }}" required></div>
+                    <div class="sis-fld"><label>Datum</label><input type="date" name="datum" value="{{ $b->datum?->toDateString() }}" required></div>
+                  </div>
+                  <div class="sis-fld-row sis-fld-row--2">
+                    <div class="sis-fld"><label>Betaalwijze</label>
+                      <select name="betaalwijze">
+                        <option value="">— n.v.t. —</option>
+                        @foreach (['overboeking', 'incasso', 'contant'] as $wijze)
+                          <option value="{{ $wijze }}" @selected($b->betaalwijze === $wijze)>{{ ucfirst($wijze) }}</option>
+                        @endforeach
+                      </select>
+                    </div>
+                    <div class="sis-fld"><label>Opmerking</label><input type="text" name="opmerking" value="{{ $b->opmerking }}" maxlength="500"></div>
+                  </div>
+                  <div class="sis-form__actions">
+                    <button class="iuasr-dash-btn bet-sluit" type="button" data-bet="{{ $b->id }}">Sluiten</button>
+                    <div class="right"><button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit">Wijziging opslaan</button></div>
+                  </div>
+                </form>
+              </td>
             </tr>
           @empty
-            <tr><td colspan="5" style="color:var(--blackAltText);padding:14px;">Nog geen betalingen geregistreerd.</td></tr>
+            <tr><td colspan="7" style="color:var(--blackAltText);padding:14px;">Nog geen betalingen geregistreerd.</td></tr>
           @endforelse
         </tbody>
       </table>
@@ -169,12 +216,12 @@
       @csrf
       <div class="sis-card__hd"><h3>Betaling registreren</h3><span class="hint">deelbetaling of afwijkend bedrag</span></div>
       <div class="sis-fld">
-        <label>Studiejaar <span class="req">*</span></label>
-        {{-- Alleen de maatgevende inschrijving per studiejaar: daar hangen de facturen. --}}
+        <label>Opleiding / studiejaar <span class="req">*</span></label>
+        {{-- Elke opleiding heeft een eigen rekening; kies de juiste. --}}
         <select name="inschrijving_id" required>
-          @foreach ($regels->where('maatgevend', true) as $r)
+          @foreach ($regels as $r)
             <option value="{{ $r['inschrijving']->id }}">
-              {{ $r['inschrijving']->periode?->naam }} · {{ $r['inschrijving']->opleiding?->code }}@if ($r['dubbelInStudiejaar']) (dubbele inschrijving)@endif
+              {{ $r['inschrijving']->periode?->naam }} · {{ $r['inschrijving']->opleiding?->code }}@if ($r['heeftKorting']) (met korting)@endif
             </option>
           @endforeach
         </select>
@@ -209,5 +256,22 @@
   </div>
 </div>
 
-<p class="sis-tblnote">Er wordt gefactureerd in <b>september, november, januari, maart en mei</b>; kiest de student voor één factuur, dan vervalt het volledige jaarbedrag in september. Een termijn is <b>achterstallig</b> zodra de vervaldatum is verstreken en zij niet volledig is voldaan — de som daarvan is de betalingsachterstand. Schrijft een student zich tussentijds uit, dan <b>vervallen</b> de termijnen ná de uitschrijfdatum en wordt de laatste geldende termijn pro rata bijgesteld. Een betaling zonder termijnnummer wordt toegerekend aan de <b>oudste openstaande</b> termijn.</p>
+<p class="sis-tblnote">Collegegeld wordt <b>per opleiding</b> geheven: volgt een student twee opleidingen, dan heeft elke inschrijving een eigen rekening en eigen facturen. Studentenzaken kan op een opleiding een <b>korting</b> vastleggen (doorgaans op de tweede opleiding); u ziet die hierboven terug in het jaarbedrag. Er wordt gefactureerd in <b>september, november, januari, maart en mei</b>; kiest de student voor één factuur, dan vervalt het volledige jaarbedrag in september. Een termijn is <b>achterstallig</b> zodra de vervaldatum is verstreken en zij niet volledig is voldaan. Schrijft een student zich tussentijds uit, dan <b>vervallen</b> de termijnen ná de uitschrijfdatum en wordt de laatste geldende termijn pro rata bijgesteld. Een betaling zonder termijnnummer wordt toegerekend aan de <b>oudste openstaande</b> termijn van díé opleiding. Betalingen kunt u <b>wijzigen of verwijderen</b>; beide worden met de oude en nieuwe waarden in de audit-log vastgelegd.</p>
+
+@push('scripts')
+<script>
+  (function () {
+    function toon(id, aan) {
+      var rij = document.querySelector('.bet-edit[data-edit="' + id + '"]');
+      if (rij) rij.hidden = !aan;
+    }
+    document.querySelectorAll('.bet-bewerk').forEach(function (b) {
+      b.addEventListener('click', function () { toon(b.dataset.bet, true); });
+    });
+    document.querySelectorAll('.bet-sluit').forEach(function (b) {
+      b.addEventListener('click', function () { toon(b.dataset.bet, false); });
+    });
+  })();
+</script>
+@endpush
 @endsection

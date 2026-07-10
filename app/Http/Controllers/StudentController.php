@@ -133,19 +133,19 @@ class StudentController extends Controller
         // Financiële status (betalingsachterstand) — stuurt de waarschuwing en blokkades.
         $financieel = \App\Support\Collegegeldstatus::voor($student);
 
-        // Termijnschema van het huidige STUDIEJAAR. Bij een dubbele inschrijving
-        // hangen de facturen aan de maatgevende inschrijving; die kan een andere
-        // zijn dan de hier getoonde 'huidige'.
-        $collegegeldInschrijving = $huidige
-            ? \App\Support\Collegegeldtermijnen::maatgevende($huidige)->loadMissing(['betalingen', 'opleiding'])
-            : null;
+        // Collegegeld wordt per opleiding geheven: het termijnschema hoort bij DEZE
+        // inschrijving. Volgt de student nog een opleiding, dan heeft die een eigen
+        // rekening — dat wordt op de kaart benoemd.
+        $collegegeldInschrijving = $huidige?->loadMissing(['betalingen', 'opleiding', 'periode']);
         $termijnen = $collegegeldInschrijving
             ? \App\Support\Collegegeldtermijnen::voor($collegegeldInschrijving)
             : collect();
-        // Volgt de student dit studiejaar twee opleidingen? Dan hoort er uitleg bij,
-        // ook als de getoonde inschrijving toevallig de maatgevende is.
-        $collegegeldDubbel = $huidige
-            && \App\Support\Collegegeldtermijnen::inschrijvingenVanStudiejaar($huidige)->count() > 1;
+        $andereOpleidingen = $huidige
+            ? $student->inschrijvingen
+                ->where('periode_id', $huidige->periode_id)
+                ->where('id', '!=', $huidige->id)
+                ->values()
+            : collect();
 
         // Taken die aan dit dossier hangen (alleen voor Studentenzaken/Beheer).
         $taken = auth()->user()->magTakenBeheren()
@@ -158,7 +158,7 @@ class StudentController extends Controller
             ->with(['vak', 'aangemaaktDoor', 'verwerktDoor'])->latest()->get();
         $kennistoetsen = \App\Support\Kennistoetsbewaking::voor($student);
 
-        return view('studenten.show', compact('student', 'huidige', 'actieveInschrijvingen', 'magCijfers', 'cijferVakken', 'financieel', 'termijnen', 'collegegeldInschrijving', 'collegegeldDubbel', 'vakHistorie', 'grondslagen', 'besluiten', 'kennistoetsen', 'taken'));
+        return view('studenten.show', compact('student', 'huidige', 'actieveInschrijvingen', 'magCijfers', 'cijferVakken', 'financieel', 'termijnen', 'collegegeldInschrijving', 'andereOpleidingen', 'vakHistorie', 'grondslagen', 'besluiten', 'kennistoetsen', 'taken'));
     }
 
     /**

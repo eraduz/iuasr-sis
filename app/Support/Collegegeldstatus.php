@@ -11,9 +11,15 @@ use Carbon\Carbon;
 /**
  * Berekent de financiële status van een student.
  *
- * Het collegegeld wordt gefactureerd in TERMIJNEN (september, november,
- * januari, maart en mei), of in één factuur wanneer de student daarvoor kiest.
- * Zie {@see Collegegeldtermijnen} voor het schema.
+ * Het collegegeld wordt PER OPLEIDING geheven en gefactureerd in TERMIJNEN
+ * (september, november, januari, maart en mei), of in één factuur wanneer de
+ * student daarvoor kiest. Zie {@see Collegegeldtermijnen} voor het schema.
+ *
+ * Volgt een student twee opleidingen, dan heeft elke inschrijving een eigen
+ * rekening. Op de tweede opleiding legt Studentenzaken doorgaans een korting
+ * vast (`inschrijvingen.korting_percentage`). Een achterstand bij één van de
+ * opleidingen blokkeert herinschrijven en verklaringen: de student heeft dan
+ * een schuld aan de instelling.
  *
  *   verschuldigd  = som van de niet-vervallen termijnen van dit studiejaar
  *   achterstallig = het openstaande deel van de termijnen waarvan de
@@ -46,18 +52,24 @@ class Collegegeldstatus
         $verschuldigd = 0.0;
         $achterstallig = 0.0;
         $maanden = 0;
-        $jaarbedrag = null;
-        // Per STUDIEJAAR wordt collegegeld één keer berekend, ook wanneer de
-        // student in datzelfde jaar twee opleidingen volgt (dubbele inschrijving).
-        // De inschrijving met het hoogste verschuldigde bedrag is maatgevend.
-        foreach ($student->inschrijvingen->groupBy('periode_id') as $perStudiejaar) {
-            // Bij een dubbele inschrijving telt alleen de maatgevende inschrijving:
-            // collegegeld is per studiejaar eenmaal verschuldigd.
-            $maatgevend = Collegegeldtermijnen::maatgevende($perStudiejaar->first(), $peildatum);
-            $verschuldigd += Collegegeldtermijnen::totaal($maatgevend, $peildatum);
-            $achterstallig += Collegegeldtermijnen::achterstallig($maatgevend, $peildatum);
-            $maanden += self::maanden($maatgevend, $peildatum);
-            $jaarbedrag ??= self::tarief($maatgevend);
+        $jaarbedrag = 0.0;
+        $heeftTarief = false;
+
+        // Collegegeld wordt PER OPLEIDING geheven: elke inschrijving telt mee,
+        // elk met een eigen termijnschema en een eventuele korting. Volgt een
+        // student twee opleidingen, dan betaalt hij voor beide.
+        foreach ($student->inschrijvingen as $inschrijving) {
+            $verschuldigd += Collegegeldtermijnen::totaal($inschrijving, $peildatum);
+            $achterstallig += Collegegeldtermijnen::achterstallig($inschrijving, $peildatum);
+
+            $eigenJaarbedrag = self::jaarbedrag($inschrijving);
+            if ($eigenJaarbedrag !== null) {
+                $heeftTarief = true;
+                $jaarbedrag += $eigenJaarbedrag;
+            }
+            // 'maanden' beschrijft de inschrijvingsduur, niet een geldbedrag:
+            // bij twee gelijktijdige opleidingen is dat de langste, niet de som.
+            $maanden = max($maanden, self::maanden($inschrijving, $peildatum));
         }
 
         $betaald = (float) $student->betalingen->sum('bedrag');
@@ -76,8 +88,9 @@ class Collegegeldstatus
         ], true));
 
         return [
-            'jaarbedrag' => $jaarbedrag !== null ? round($jaarbedrag, 2) : null,
-            'maandbedrag' => $jaarbedrag !== null ? round($jaarbedrag / self::MAANDEN_PER_JAAR, 2) : null,
+            // Som van de jaarbedragen ná korting, over alle opleidingen.
+            'jaarbedrag' => $heeftTarief ? round($jaarbedrag, 2) : null,
+            'maandbedrag' => $heeftTarief ? round($jaarbedrag / self::MAANDEN_PER_JAAR, 2) : null,
             'maanden' => $maanden,
             'verschuldigd' => round($verschuldigd, 2),
             'betaald' => round($betaald, 2),
@@ -99,10 +112,26 @@ class Collegegeldstatus
         return self::voor($student)['achterstand'];
     }
 
-    /** Verschuldigd collegegeld voor één inschrijving (pro rata). */
+    /**
+     * Het jaarbedrag van één inschrijving NA korting. Dit is wat deze opleiding
+     * de student dit studiejaar kost; het brutotarief staat in {@see tarief()}.
+     */
+    public static function jaarbedrag(Inschrijving $inschrijving): ?float
+    {
+        $tarief = self::tarief($inschrijving);
+        if ($tarief === null) {
+            return null;
+        }
+
+        $korting = min(100.0, max(0.0, (float) ($inschrijving->korting_percentage ?? 0)));
+
+        return round($tarief * (1 - $korting / 100), 2);
+    }
+
+    /** Verschuldigd collegegeld voor één inschrijving (pro rata, ná korting). */
     public static function verschuldigd(Inschrijving $inschrijving, ?Carbon $peildatum = null): float
     {
-        $jaarbedrag = self::tarief($inschrijving);
+        $jaarbedrag = self::jaarbedrag($inschrijving);
         if ($jaarbedrag === null) {
             return 0.0;
         }

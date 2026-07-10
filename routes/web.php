@@ -12,6 +12,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GebruikerController;
 use App\Http\Controllers\InschrijvingActiesController;
 use App\Http\Controllers\InschrijvingController;
+use App\Http\Controllers\KortingController;
 use App\Http\Controllers\OndertekeningController;
 use App\Http\Controllers\PresentieController;
 use App\Http\Controllers\RapportController;
@@ -160,6 +161,9 @@ Route::middleware('auth')->group(function () {
         // Betaalregeling: vijf termijnen of één factuur voor het volledige jaarbedrag.
         Route::post('/inschrijvingen/{inschrijving}/betaalregeling', [BetaalregelingController::class, 'bijwerken'])->name('inschrijving.betaalregeling');
 
+        // Korting op het collegegeld van deze opleiding (bv. tweede opleiding).
+        Route::post('/inschrijvingen/{inschrijving}/korting', [KortingController::class, 'bijwerken'])->name('inschrijving.korting');
+
         // Gedeelde takenlijst van Studentenzaken (naar het model van Outlook Taken).
         Route::get('/taken', [TaakController::class, 'index'])->name('taken');
         Route::post('/taken', [TaakController::class, 'store'])->name('taken.store');
@@ -177,6 +181,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/financien/import', [BetalingController::class, 'import'])->name('financien.import');
         Route::get('/financien/{student}', [BetalingController::class, 'student'])->name('financien.student');
         Route::post('/financien/{student}/betaling', [BetalingController::class, 'registreer'])->name('financien.betaling');
+        // Corrigeren en verwijderen van een geboekte betaling (beide gelogd).
+        Route::put('/financien/{student}/betaling/{betaling}', [BetalingController::class, 'bijwerken'])->name('financien.betaling.bijwerken');
+        Route::delete('/financien/{student}/betaling/{betaling}', [BetalingController::class, 'verwijderen'])->name('financien.betaling.verwijderen');
     });
 
     // --- Docent — eigen vak ---
