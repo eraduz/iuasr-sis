@@ -2,7 +2,10 @@
 
 @section('titel', 'Cursist · '.$cursist->cursistnummer)
 
-@php $euro = fn ($b) => '€ '.number_format((float) $b, 2, ',', '.'); @endphp
+@php
+    use App\Support\Cursusgeldstatus;
+    $euro = fn ($b) => '€ '.number_format((float) $b, 2, ',', '.');
+@endphp
 
 @section('inhoud')
 <div class="sis-crumb"><a href="{{ route('cursussen.dashboard') }}">Cursussen</a><span class="sep">›</span><a href="{{ route('cursisten') }}">Cursisten</a><span class="sep">›</span><b>{{ $cursist->cursistnummer }}</b></div>
@@ -24,13 +27,18 @@
       <div class="sis-card__hd"><h3>Inschrijvingen</h3></div>
       <div class="iuasr-dash-tbl-card" style="border:0;">
         <table class="iuasr-dash-tbl">
-          <thead><tr><th>Cursus</th><th>Ingeschreven</th><th style="text-align:right;">Bedrag</th><th style="text-align:center;">Status</th><th class="row-act"></th></tr></thead>
+          <thead><tr><th>Cursus</th><th>Ingeschreven</th><th style="text-align:right;">Bedrag</th><th style="text-align:center;">Betaling</th><th style="text-align:center;">Status</th><th class="row-act"></th></tr></thead>
           <tbody>
             @forelse ($cursist->inschrijvingen->sortByDesc('inschrijfdatum') as $i)
+              @php $g = Cursusgeldstatus::voor($i); @endphp
               <tr>
                 <td class="nm">{{ $i->cursus?->naam ?? '—' }}<small>{{ $i->cursus?->code }}</small></td>
                 <td class="dt">{{ $i->inschrijfdatum?->format('d-m-Y') }}</td>
                 <td class="tnum" style="text-align:right;">{{ $euro($i->totaalbedrag) }}</td>
+                <td style="text-align:center;">
+                  <span class="iuasr-dash-status {{ Cursusgeldstatus::statusBadge($g['status']) }}">{{ Cursusgeldstatus::statusLabel($g['status']) }}</span>
+                  @if ($g['openstaand'] > 0)<small style="display:block;color:var(--blackAltText);">open: {{ $euro($g['openstaand']) }}</small>@endif
+                </td>
                 <td style="text-align:center;"><span class="iuasr-dash-status {{ $i->status->badge() }}">{{ $i->status->label() }}</span></td>
                 <td class="row-act">
                   <form method="POST" action="{{ route('cursisten.inschrijving.update', [$cursist, $i]) }}" style="display:flex;gap:6px;align-items:center;">
@@ -45,7 +53,7 @@
                 </td>
               </tr>
             @empty
-              <tr><td colspan="5" style="color:var(--blackAltText);padding:14px;">Nog niet ingeschreven op een cursus.</td></tr>
+              <tr><td colspan="6" style="color:var(--blackAltText);padding:14px;">Nog niet ingeschreven op een cursus.</td></tr>
             @endforelse
           </tbody>
         </table>

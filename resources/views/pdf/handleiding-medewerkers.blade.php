@@ -51,7 +51,7 @@
   <p>U logt in via uw IUASR-account (Microsoft-account, Single Sign-On). Na het inloggen verschijnt het <b>modulekeuzescherm</b>: het systeem groeit uit tot een platform met meerdere onderdelen. Kies met welke module u wilt werken.</p>
   <ul>
     <li><b>Studentenzaken</b> — het huidige systeem (inschrijving, cijfers, collegegeld, documenten).</li>
-    <li><b>Cursussen Administratie</b> — cursusbeheer en cursusgelden. <i>In aanbouw.</i></li>
+    <li><b>Cursussen Administratie</b> — cursusbeheer, cursisten en cursusgelden (boekhouding).</li>
     <li><b>Stage</b>, <b>Scriptie</b> en <b>HR / Personeelszaken</b> — later te ontwikkelen; nu zichtbaar als "Binnenkort".</li>
   </ul>
   <p>Welke modules u kunt openen, hangt af van uw <b>rol</b>. De meeste medewerkers zien alleen Studentenzaken; de Financiële Administratie en de Beheerder zien meerdere modules. Nog niet gebouwde modules staan grijs met de melding <b>Binnenkort</b>. Rechtsboven in elk scherm brengt de knop <b>Modules</b> u terug naar het keuzescherm.</p>
@@ -212,14 +212,18 @@
   <p>Het <b>alumni-rapport</b> (afgestudeerde studenten met hun contactgegevens) is toegankelijk voor <b>Studentenzaken</b>, <b>Directie</b> en het <b>Schoolbestuur</b>. Het bevat geen cijfers en geen BSN. Directie ziet alleen de alumni van de eigen opleiding(en); Studentenzaken en het Schoolbestuur zien ze allemaal. Het Schoolbestuur vindt de lijst in het menu onder <b>Rapporten &rarr; Alumni</b>.</p>
 
   <h2>11. Cursussen Administratie (aparte module)</h2>
-  <p>Naast Studentenzaken is er de module <b>Cursussen Administratie</b> voor de cursussen die buiten Studentenzaken vallen. U opent haar via het <b>modulekeuzescherm</b> (rechtsboven <b>Modules</b>). Toegang hebben de rol <b>Cursusadministratie</b> en de Beheerder; de Financiële Administratie krijgt hier later de betalingen.</p>
+  <p>Naast Studentenzaken is er de module <b>Cursussen Administratie</b> voor de cursussen die buiten Studentenzaken vallen. U opent haar via het <b>modulekeuzescherm</b> (rechtsboven <b>Modules</b>). De rol <b>Cursusadministratie</b> beheert cursussen, cursisten en inschrijvingen; de <b>Financiële Administratie</b> (boekhouding) doet de cursusgelden; de Beheerder ziet alles.</p>
   <h3>Cursussen</h3>
   <p>Onder <b>Cursusbeheer</b> staan de cursussen met hun cursusgeld. De huidige cursussen zijn <b>Arabische Taal</b> (€ 265), <b>Hifz Programma</b> (€ 330) en <b>Certificaatprogramma / Ijaaza</b> (€ 430). Nieuwe cursussen en tarieven voegt u hier gewoon toe; een cursus met inschrijvingen kunt u niet verwijderen (historie) maar wel op inactief zetten.</p>
   <h3>Cursisten</h3>
   <p>Cursisten staan los van de studenten en krijgen een eigen <b>cursistnummer</b> (bijv. C260001). U voegt ze <b>handmatig</b> toe of in <b>bulk</b> via een Excel- of CSV-bestand. Bij de bulk-import mag u een kolom <b>cursuscode</b> meegeven; staat daar een geldige code, dan wordt de cursist meteen op die cursus ingeschreven. Zoals altijd ziet u eerst een controlescherm voordat er iets wordt opgeslagen.</p>
   <h3>Inschrijven</h3>
   <p>Op het dossier van een cursist schrijft u hem in op een cursus. Het <b>cursusgeld</b> wordt als momentopname vastgelegd, zodat een latere tariefwijziging bestaande inschrijvingen niet verandert. De status van een inschrijving (aangemeld, actief, afgerond, geannuleerd) past u daar ook aan.</p>
-  <div class="tip">De cursusadministratie is een aparte administratie met een lichter regime: geen BSN of DUO-gegevens. Belangrijke acties (cursus/cursist aanmaken, inschrijven, importeren) worden gelogd.</div>
+  <h3>Cursusgelden (boekhouding)</h3>
+  <p>De <b>Financiële Administratie</b> opent binnen de module de pagina <b>Cursusgelden</b>. Daar staat per inschrijving het cursusgeld, het reeds betaalde bedrag en het openstaande saldo, met een status <b>Voldaan</b>, <b>Deels betaald</b> of <b>Openstaand</b>. U kunt filteren op cursus, op status en zoeken op cursistnummer of naam.</p>
+  <p>Via <b>Beheer</b> bij een inschrijving registreert u een betaling: <b>bedrag</b>, <b>datum</b>, <b>betaalmethode</b> (iDEAL/online, bankoverschrijving of contant) en <b>status</b>. Alleen betalingen met status <b>Betaald</b> tellen mee voor het voldane bedrag; een betaling <i>in afwachting</i>, <i>mislukt</i> of <i>terugbetaald</i> telt niet mee. Bestaande betalingen kunt u <b>wijzigen</b> of <b>verwijderen</b>; elke wijziging en verwijdering wordt gelogd. Een cursist mag het cursusgeld ook in delen betalen — de deelbetalingen worden bij elkaar opgeteld.</p>
+  <p>De cursusadministratie ziet de betaalstatus op het cursistdossier alleen ter informatie; het registreren en corrigeren van betalingen is voorbehouden aan de boekhouding.</p>
+  <div class="tip">De cursusadministratie is een aparte administratie met een lichter regime: geen BSN of DUO-gegevens. Belangrijke acties (cursus/cursist aanmaken, inschrijven, importeren, betaling registreren/wijzigen/verwijderen) worden gelogd.</div>
 
   <h2>12. Vragen of problemen?</h2>
   <p>Neem bij vragen contact op met de systeembeheerder of Studentenzaken (szaken@iuasr.nl). Werkt iets niet zoals verwacht, meld dan wat u deed en wat u zag.</p>

@@ -118,19 +118,31 @@
         ],
     ];
 
-    // Binnen de module Cursussen Administratie geldt een eigen menu, ongeacht de
-    // rol (Cursusadministratie werkt uitsluitend hier). Het actief-patroon per
-    // item mag een wildcard zijn zodat sub-schermen de juiste regel oplichten.
+    // Binnen de module Cursussen Administratie geldt een eigen menu. Het is
+    // rolbewust: de cursusadministratie beheert cursussen/cursisten, de
+    // Financiële Administratie (boekhouding) doet de cursusgelden, en Beheer
+    // ziet alles. Het actief-patroon per item mag een wildcard zijn zodat
+    // sub-schermen de juiste regel oplichten.
+    $gebruiker = auth()->user();
     $cursusMenu = [
         'Cursussen' => [
             ['Overzicht', 'cursussen.dashboard', 'dash', 'cursussen.dashboard'],
-            ['Cursusbeheer', 'cursussen.beheer', 'book', 'cursussen.beheer,cursussen.create,cursussen.edit'],
-        ],
-        'Cursisten' => [
-            ['Alle cursisten', 'cursisten', 'students', 'cursisten,cursisten.show,cursisten.edit'],
-            ['Cursist toevoegen', 'cursisten.create', 'plus', 'cursisten.create'],
         ],
     ];
+
+    if ($gebruiker->magCursusBeheer()) {
+        $cursusMenu['Cursussen'][] = ['Cursusbeheer', 'cursussen.beheer', 'book', 'cursussen.beheer,cursussen.create,cursussen.edit'];
+        $cursusMenu['Cursisten'] = [
+            ['Alle cursisten', 'cursisten', 'students', 'cursisten,cursisten.show,cursisten.edit'],
+            ['Cursist toevoegen', 'cursisten.create', 'plus', 'cursisten.create'],
+        ];
+    }
+
+    if ($gebruiker->magCursusFinancien()) {
+        $cursusMenu['Boekhouding'] = [
+            ['Cursusgelden', 'cursussen.betalingen', 'euro', 'cursussen.betalingen'],
+        ];
+    }
 
     $inCursusmodule = request()->routeIs('cursussen.*') || request()->routeIs('cursisten*');
     $menu = $inCursusmodule

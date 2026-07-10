@@ -13,8 +13,13 @@
     <div class="summary">Cursusbeheer, cursisten en cursusgelden</div>
   </div>
   <div class="iuasr-dash-vhead__actions">
-    <a class="iuasr-dash-btn" href="{{ route('cursisten.create') }}">Cursist toevoegen</a>
-    <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('cursussen.beheer') }}">Cursusbeheer</a>
+    @if (auth()->user()->magCursusBeheer())
+      <a class="iuasr-dash-btn" href="{{ route('cursisten.create') }}">Cursist toevoegen</a>
+      <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('cursussen.beheer') }}">Cursusbeheer</a>
+    @endif
+    @if (auth()->user()->magCursusFinancien())
+      <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('cursussen.betalingen') }}">Cursusgelden</a>
+    @endif
   </div>
 </div>
 

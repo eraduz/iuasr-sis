@@ -58,13 +58,25 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     | Module: Cursussen Administratie
     |--------------------------------------------------------------------------
-    | Beheer van cursussen, cursisten en inschrijvingen. Toegang: Cursusadmini-
-    | stratie en Beheer; de Financiële Administratie krijgt in een latere fase
-    | de betalingen. Cursusdirecteuren (met toegangsbeperking) volgen later.
+    | Beheer van cursussen/cursisten (Cursusadministratie + Beheer) en de
+    | cursusgelden/boekhouding (Financiële Administratie + Beheer). Het dashboard
+    | is voor alle betrokken rollen. Cursusdirecteuren volgen in een latere fase.
     */
-    Route::middleware('rol:cursusadministratie,beheerder')->prefix('cursussen')->group(function () {
+    // Dashboard: zichtbaar voor iedereen met toegang tot de module.
+    Route::middleware('rol:cursusadministratie,financien,beheerder')->prefix('cursussen')->group(function () {
         Route::get('/', [App\Http\Controllers\Cursus\CursusDashboardController::class, 'index'])->name('cursussen.dashboard');
+    });
 
+    // Boekhouding: cursusgelden volgen en betalingen registreren/corrigeren.
+    Route::middleware('rol:financien,beheerder')->prefix('cursussen')->group(function () {
+        Route::get('/betalingen', [App\Http\Controllers\Cursus\CursusbetalingController::class, 'overzicht'])->name('cursussen.betalingen');
+        Route::post('/inschrijvingen/{inschrijving}/betalingen', [App\Http\Controllers\Cursus\CursusbetalingController::class, 'registreer'])->name('cursussen.betaling.registreer');
+        Route::put('/betalingen/{betaling}', [App\Http\Controllers\Cursus\CursusbetalingController::class, 'bijwerken'])->name('cursussen.betaling.bijwerken');
+        Route::delete('/betalingen/{betaling}', [App\Http\Controllers\Cursus\CursusbetalingController::class, 'verwijderen'])->name('cursussen.betaling.verwijderen');
+    });
+
+    // Beheer van cursussen, cursisten en inschrijvingen.
+    Route::middleware('rol:cursusadministratie,beheerder')->prefix('cursussen')->group(function () {
         // Cursusbeheer
         Route::get('/beheer', [App\Http\Controllers\Cursus\CursusController::class, 'index'])->name('cursussen.beheer');
         Route::get('/beheer/nieuw', [App\Http\Controllers\Cursus\CursusController::class, 'create'])->name('cursussen.create');

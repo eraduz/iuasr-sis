@@ -210,6 +210,24 @@ enum Rol: string
         };
     }
 
+    /** Mag deze rol cursussen en cursisten beheren (module Cursussen)? */
+    public function magCursusBeheer(): bool
+    {
+        return match ($this) {
+            self::Cursusadministratie, self::Beheerder => true,
+            default => false,
+        };
+    }
+
+    /** Mag deze rol de cursusgelden/boekhouding van de module Cursussen doen? */
+    public function magCursusFinancien(): bool
+    {
+        return match ($this) {
+            self::Financien, self::Beheerder => true,
+            default => false,
+        };
+    }
+
     /** Mag deze rol de opgegeven module benaderen? */
     public function magModule(string $sleutel): bool
     {

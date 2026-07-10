@@ -74,7 +74,7 @@ class CursistController extends Controller
 
     public function show(Cursist $cursist): View
     {
-        $cursist->load(['inschrijvingen.cursus', 'inschrijvingen.ingeschrevenDoor']);
+        $cursist->load(['inschrijvingen.cursus', 'inschrijvingen.ingeschrevenDoor', 'inschrijvingen.betalingen']);
 
         return view('cursisten.show', [
             'cursist' => $cursist,
