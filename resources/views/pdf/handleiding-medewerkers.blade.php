@@ -55,6 +55,9 @@
     <li><b>Stage</b>, <b>Scriptie</b> en <b>HR / Personeelszaken</b> — later te ontwikkelen; nu zichtbaar als "Binnenkort".</li>
   </ul>
   <p>Welke modules u kunt openen, hangt af van uw <b>rol</b>. De meeste medewerkers zien alleen Studentenzaken; de Financiële Administratie en de Beheerder zien meerdere modules. Nog niet gebouwde modules staan grijs met de melding <b>Binnenkort</b>. Rechtsboven in elk scherm brengt de knop <b>Modules</b> u terug naar het keuzescherm.</p>
+  <p>Op het keuzescherm staan naast de modules twee <b>snelkoppelingen</b>: het <b>Schoolbestuur</b> vindt er de knop <b>Bestuur — globaal overzicht</b> (zie hieronder), en de <b>Beheerder</b> vindt er een blok <b>Systeembeheer</b> met directe toegang tot Gebruikers &amp; rollen, Opzoektabellen, het Audit-log, Back-up &amp; herstel en de technische handleiding. Zo hoeft de Beheerder voor die taken niet meer eerst de module Studentenzaken te openen.</p>
+  <h3>Bestuurspagina (globaal overzicht)</h3>
+  <p>Het <b>Schoolbestuur</b> heeft een eigen, instellingsbrede <b>Bestuurspagina</b> met kerncijfers en grafieken over studenten, onderwijs (studiesucces), aanwezigheid, collegegeld én de cursussen — alles op één scherm en <b>alleen-lezen</b>. U opent haar via de tegel <b>Bestuur</b> op het keuzescherm of via <b>Bestuur</b> in het menu. Voor detailrapporten leiden knoppen door naar het alumni-rapport, de aanwezigheid en de Cursussen-module. De Beheerder kan dezelfde pagina bekijken.</p>
 
   <h2>3. Rollen: wie mag wat</h2>
   <p>Het systeem kent een strikte rolscheiding. Deze wordt aan de serverkant afgedwongen — u ziet alleen de schermen die bij uw rol horen.</p>

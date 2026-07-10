@@ -92,7 +92,10 @@
             'Documenten' => [['Ondertekende documenten', 'ondertekening', 'cert', 'ondertekening*']],
         ],
         Rol::Bestuur->value => [
-            'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
+            'Overzicht' => [
+                ['Bestuur', 'bestuur', 'dash', 'bestuur'],
+                ['Dashboard', 'dashboard', 'dash', 'dashboard'],
+            ],
             'Studenten' => [['Alle studenten', 'studenten.index', 'students', 'studenten.*']],
             'Onderwijs' => [['Aanwezigheid', 'presentieoverzicht', 'check', 'presentieoverzicht']],
             'Rapporten' => [['Alumni', 'rapporten.alumni', 'cert', 'rapporten.alumni']],
@@ -103,7 +106,10 @@
             ],
         ],
         Rol::Beheerder->value => [
-            'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
+            'Overzicht' => [
+                ['Dashboard', 'dashboard', 'dash', 'dashboard'],
+                ['Bestuursoverzicht', 'bestuur', 'dash', 'bestuur'],
+            ],
             'Studenten' => [['Alle studenten', 'studenten.index', 'students', 'studenten.*']],
             'Beheer' => [
                 ['Gebruikers & rollen', 'gebruikers', 'users', 'gebruikers'],

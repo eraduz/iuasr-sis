@@ -114,6 +114,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Globale bestuurspagina — instellingsbreed overzicht (Schoolbestuur en Beheer).
+    Route::middleware('rol:bestuur,beheerder')->group(function () {
+        Route::get('/bestuur', [App\Http\Controllers\BestuurController::class, 'index'])->name('bestuur');
+    });
+
     // PDF-handleidingen: medewerkers (iedereen) en technisch/herstel (Beheerder).
     Route::get('/handleiding', [App\Http\Controllers\HandleidingController::class, 'medewerkers'])->name('handleiding.medewerkers');
     Route::get('/handleiding/technisch', [App\Http\Controllers\HandleidingController::class, 'technisch'])->name('handleiding.technisch');
