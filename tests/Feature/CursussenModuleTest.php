@@ -165,4 +165,14 @@ class CursussenModuleTest extends TestCase
         $beheer = User::where('rol', Rol::Beheerder)->first();
         $this->actingAs($beheer)->get(route('cursussen.dashboard'))->assertOk();
     }
+
+    public function test_cursusbeheer_pagina_rendert(): void
+    {
+        // Regressie: de beheerpagina moet voor zowel een cursusdirecteur als de
+        // Beheerder foutloos renderen (Blade-compilatie).
+        $this->actingAs($this->cursusadmin)->get(route('cursussen.beheer'))->assertOk()->assertSee('Cursusbeheer');
+
+        $beheer = User::where('rol', Rol::Beheerder)->firstOrFail();
+        $this->actingAs($beheer)->get(route('cursussen.beheer'))->assertOk()->assertSee('Directeur');
+    }
 }

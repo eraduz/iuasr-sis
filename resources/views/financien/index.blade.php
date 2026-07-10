@@ -25,7 +25,7 @@
 @if (session('import_resultaat'))
   @php $imp = session('import_resultaat'); @endphp
   <div class="iuasr-dash-alert {{ $imp['fouten'] ? 'iuasr-dash-alert--warn' : 'iuasr-dash-alert--info' }}" style="margin-bottom:16px;display:block;">
-    <div style="display:flex;gap:8px;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>{{ $imp['aantal'] }} betaling(en) geïmporteerd@if($imp['fouten']), {{ count($imp['fouten']) }} regel(s) overgeslagen@endif.</b></div>
+    <div style="display:flex;gap:8px;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>{{ $imp['aantal'] }} betaling(en) geïmporteerd{{ $imp['fouten'] ? ', '.count($imp['fouten']).' regel(s) overgeslagen' : '' }}.</b></div>
     @if ($imp['fouten'])
       <ul style="margin:8px 0 0 24px;font-size:13px;">
         @foreach (array_slice($imp['fouten'], 0, 25) as $f)<li>{{ $f }}</li>@endforeach

@@ -11,7 +11,7 @@
 <div class="iuasr-dash-vhead">
   <div>
     <h1>Cursusbeheer</h1>
-    <div class="summary">{{ $cursussen->count() }} {{ $cursussen->count() === 1 ? 'cursus' : 'cursussen' }}@unless($magBeheerder) onder uw beheer@endunless</div>
+    <div class="summary">{{ $cursussen->count() }} {{ $cursussen->count() === 1 ? 'cursus' : 'cursussen' }}{{ $magBeheerder ? '' : ' onder uw beheer' }}</div>
   </div>
   @if ($magBeheerder)
     <div class="iuasr-dash-vhead__actions">
