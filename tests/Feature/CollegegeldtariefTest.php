@@ -31,6 +31,7 @@ class CollegegeldtariefTest extends TestCase
     public static function tarieven(): array
     {
         return [
+            'Bachelor Theologie (ISLTH)' => ['ISLTH', 3500.0],
             'Pre-Master GV (PMGV)' => ['PMGV', 3500.0],
             'Master GV / IGV (MGV)' => ['MGV', 4000.0],
             'PABO' => ['PABO', 3500.0],

@@ -140,7 +140,7 @@ class ReferentieSeeder extends Seeder
         // verse migrate:fresh --seed, waar de migratie op een lege DB draaide.
         $sj2627 = Periode::where('code', '2026-2027')->first();
         if ($sj2627) {
-            foreach (['PMGV' => 3500.00, 'MGV' => 4000.00, 'PABO' => 3500.00] as $code => $bedrag) {
+            foreach (['ISLTH' => 3500.00, 'PMGV' => 3500.00, 'MGV' => 4000.00, 'PABO' => 3500.00] as $code => $bedrag) {
                 $opleiding = Opleiding::where('code', $code)->first();
                 if ($opleiding) {
                     \App\Models\CollegegeldTarief::firstOrCreate(
