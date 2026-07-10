@@ -57,15 +57,22 @@
       <form method="POST" action="{{ route('gebruikers.opleidingen', $d) }}"
             style="display:flex;gap:16px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line,#e6e4ee);flex-wrap:wrap;">
         @csrf @method('PUT')
-        <div style="min-width:180px;flex:0 0 auto;">
+        <div style="min-width:200px;flex:0 0 auto;">
           <b style="font-size:13px;">{{ $d->naam }}</b>
           <div class="sis-muted" style="font-size:11.5px;">{{ $d->email }}</div>
+          @if ($d->opleidingen->isNotEmpty())
+            <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:4px;">
+              @foreach ($d->opleidingen->sortBy('code') as $o)
+                <span class="sis-pill-soft" style="font-size:10px;letter-spacing:.02em;" title="{{ $o->naam }}">{{ $o->code }}</span>
+              @endforeach
+            </div>
+          @endif
         </div>
         <div style="flex:1 1 320px;">
           <div style="display:flex;flex-wrap:wrap;gap:6px 14px;">
             @foreach ($opleidingen as $o)
               <label class="sis-check-inline" style="font-size:12px;">
-                <input type="checkbox" name="opleidingen[]" value="{{ $o->id }}" @checked($toegewezen->contains($o->id))> {{ $o->naam }}
+                <input type="checkbox" name="opleidingen[]" value="{{ $o->id }}" @checked($toegewezen->contains($o->id))> {{ $o->naam }} <span class="sis-muted">({{ $o->code }})</span>
               </label>
             @endforeach
           </div>
@@ -88,7 +95,18 @@
           <tr>
             <td class="nm">{{ $g->naam }}</td>
             <td class="dt">{{ $g->email }}</td>
-            <td><span class="sis-rolebadge r-{{ $g->rol->value }}">{{ $g->rol->label() }}</span></td>
+            <td>
+              <span class="sis-rolebadge r-{{ $g->rol->value }}">{{ $g->rol->label() }}</span>
+              @if ($g->rol === App\Enums\Rol::Directie && $g->opleidingen->isNotEmpty())
+                <span style="display:inline-flex;flex-wrap:wrap;gap:3px;margin-left:4px;vertical-align:middle;">
+                  @foreach ($g->opleidingen->sortBy('code') as $o)<span class="sis-pill-soft" style="font-size:10px;letter-spacing:.02em;" title="{{ $o->naam }}">{{ $o->code }}</span>@endforeach
+                </span>
+              @elseif ($g->rol === App\Enums\Rol::Cursusadministratie && $g->gedirigeerdeCursussen->isNotEmpty())
+                <span style="display:inline-flex;flex-wrap:wrap;gap:3px;margin-left:4px;vertical-align:middle;">
+                  @foreach ($g->gedirigeerdeCursussen->sortBy('code') as $c)<span class="sis-pill-soft" style="font-size:10px;letter-spacing:.02em;" title="{{ $c->naam }}">{{ $c->code }}</span>@endforeach
+                </span>
+              @endif
+            </td>
             <td class="dt">{{ $g->laatst_ingelogd_op?->diffForHumans() ?? 'nooit' }}</td>
             <td>@if($g->actief)<span class="iuasr-dash-status s-approved">Actief</span>@else<span class="iuasr-dash-status s-draft">Inactief</span>@endif</td>
             <td class="row-act">

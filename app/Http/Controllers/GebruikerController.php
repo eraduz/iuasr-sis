@@ -19,7 +19,7 @@ class GebruikerController extends Controller
 {
     public function index(): View
     {
-        $gebruikers = User::with('opleidingen')->orderBy('rol')->orderBy('naam')->get();
+        $gebruikers = User::with(['opleidingen', 'gedirigeerdeCursussen'])->orderBy('rol')->orderBy('naam')->get();
         $rollen = Rol::cases();
 
         // Directieleden krijgen per opleiding toegewezen wat zij mogen zien.
