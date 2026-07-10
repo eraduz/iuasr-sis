@@ -47,8 +47,14 @@
   <p>Het Studentbeheersysteem (SIS) is de interne administratie voor Studentenzaken en de opleidingen. U beheert er studenten, inschrijvingen, cijfers, collegegeld, documenten en rapporten. Het systeem draait uitsluitend op het interne netwerk en is gescheiden van het publieke aanmeldportaal.</p>
   <div class="let">Alle gegevens in de ontwikkel-/testomgeving zijn <b>synthetisch</b> (verzonnen). Ga zorgvuldig om met echte persoonsgegevens; deze vallen onder de AVG.</div>
 
-  <h2>2. Inloggen</h2>
-  <p>U logt in via uw IUASR-account (Microsoft-account, Single Sign-On). Kies uw account en u komt op uw persoonlijke dashboard. Elk personeelslid heeft een <b>rol</b> die bepaalt wat u kunt zien en doen.</p>
+  <h2>2. Inloggen &amp; een module kiezen</h2>
+  <p>U logt in via uw IUASR-account (Microsoft-account, Single Sign-On). Na het inloggen verschijnt het <b>modulekeuzescherm</b>: het systeem groeit uit tot een platform met meerdere onderdelen. Kies met welke module u wilt werken.</p>
+  <ul>
+    <li><b>Studentenzaken</b> — het huidige systeem (inschrijving, cijfers, collegegeld, documenten).</li>
+    <li><b>Cursussen Administratie</b> — cursusbeheer en cursusgelden. <i>In aanbouw.</i></li>
+    <li><b>Stage</b>, <b>Scriptie</b> en <b>HR / Personeelszaken</b> — later te ontwikkelen; nu zichtbaar als "Binnenkort".</li>
+  </ul>
+  <p>Welke modules u kunt openen, hangt af van uw <b>rol</b>. De meeste medewerkers zien alleen Studentenzaken; de Financiële Administratie en de Beheerder zien meerdere modules. Nog niet gebouwde modules staan grijs met de melding <b>Binnenkort</b>. Rechtsboven in elk scherm brengt de knop <b>Modules</b> u terug naar het keuzescherm.</p>
 
   <h2>3. Rollen: wie mag wat</h2>
   <p>Het systeem kent een strikte rolscheiding. Deze wordt aan de serverkant afgedwongen — u ziet alleen de schermen die bij uw rol horen.</p>

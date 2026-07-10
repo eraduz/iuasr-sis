@@ -37,7 +37,8 @@ class DevLoginController extends Controller
         $request->session()->regenerate();
         $user->forceFill(['laatst_ingelogd_op' => now()])->save();
 
-        return redirect()->intended(route('dashboard'));
+        // Na de login komt eerst het modulekeuzescherm.
+        return redirect()->intended(route('modules.kiezen'));
     }
 
     public function destroy(Request $request): RedirectResponse

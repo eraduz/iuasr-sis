@@ -51,6 +51,9 @@ Route::match(['get', 'post'], '/verificatie', [OndertekeningController::class, '
 
 Route::middleware('auth')->group(function () {
 
+    // Keuzescherm na de login: welke module wil de gebruiker gebruiken?
+    Route::get('/modules', [App\Http\Controllers\ModuleController::class, 'index'])->name('modules.kiezen');
+
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     // PDF-handleidingen: medewerkers (iedereen) en technisch/herstel (Beheerder).

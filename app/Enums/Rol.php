@@ -182,6 +182,35 @@ enum Rol: string
         };
     }
 
+    /**
+     * Tot welke platform-modules geeft deze rol toegang? Sterretje = alle modules
+     * (Beheerder). De Financiële Administratie behandelt zowel het collegegeld
+     * (Studentenzaken) als de cursusgelden (Cursussen). De onderwijsrollen werken
+     * binnen Studentenzaken.
+     *
+     * De cursus-specifieke rollen worden in een latere fase toegevoegd, samen met
+     * de Cursussen-module zelf.
+     *
+     * @return array<int, string> moduleSleutels, of ['*'] voor alle modules
+     */
+    public function moduleSleutels(): array
+    {
+        return match ($this) {
+            self::Beheerder => ['*'],
+            self::Financien => ['studentenzaken', 'cursussen'],
+            self::Studentenzaken, self::Docent, self::Examencommissie,
+            self::Directie, self::Bestuur => ['studentenzaken'],
+        };
+    }
+
+    /** Mag deze rol de opgegeven module benaderen? */
+    public function magModule(string $sleutel): bool
+    {
+        $toegestaan = $this->moduleSleutels();
+
+        return in_array('*', $toegestaan, true) || in_array($sleutel, $toegestaan, true);
+    }
+
     /** @return array<int, string> */
     public static function waarden(): array
     {

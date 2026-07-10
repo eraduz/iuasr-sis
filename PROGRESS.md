@@ -266,6 +266,29 @@ opleverpunt aantoonbaar klaar is.
     datum en **wie de taak heeft afgevinkt** (`afgerond_door_id`). Dat is niet per
     se degene aan wie de taak was toegewezen. Bij heropenen vervallen beide velden.
   - 20 nieuwe tests (`TakenTest`); 222 tests groen.
+- [~] **Multi-module platform** (nieuwe richting, opdrachtgever 2026-07-10:
+  "Prompt voor Ai tweede ronde.docx"). Het systeem groeit van een
+  Studentenzaken-app naar een platform met meerdere modules (Studentenzaken,
+  Cursussen Administratie, en later Stage, Scriptie, HR). Beslissingen: bestaande
+  rol-enum uitbreiden (geen RBAC-herbouw); cursisten in een EIGEN tabel;
+  moduletoegang afgeleid uit de rol; iDEAL nu alleen als betaalmethode/-status,
+  geen live provider.
+  - [x] **Fase A — Platformfundament.** Tabel `modules` (registry, 5 modules;
+    alleen Studentenzaken actief). Keuzescherm na de login (`/modules`,
+    `modules.kiezen`); dev-login redirect daarheen. `Rol::moduleSleutels()` +
+    `Module::toegankelijkVoor()/bruikbaarVoor()/startRoute()`. Financiën en Beheer
+    zien meerdere modules; onderwijsrollen alleen Studentenzaken. Nog niet
+    gebouwde modules = 'Binnenkort' (grijs). Terugknop 'Modules' in de header.
+    8 tests (`ModulekeuzeTest`); 274 groen. Handleidingen bijgewerkt.
+  - [ ] **Fase B — Cursussen & cursisten.** Cursusbeheer (Arabische Taal € 265,
+    Hifz € 330, Certificaat/Ijaaza € 430; uitbreidbaar), cursisten handmatig +
+    Excel-bulkimport, inschrijvingen. Rollen Cursusadministratie + Cursusdirecteur
+    toevoegen; Cursussen-module op actief.
+  - [ ] **Fase C — Cursusgelden & boekhouding.** Betalingen registreren,
+    betaalstatus/openstaand, methoden (iDEAL/overboeking/contant), historie.
+  - [ ] **Fase D — Cursusdirecteuren.** Koppeling cursus↔directeur, toegang
+    beperkt tot eigen cursus(sen).
+  - [ ] **Fase E — Rapporten & dashboards** voor Schoolbestuur en directeuren.
 - [ ] **Fase 6 — Portaalkoppeling**
   - Koppeling met publiek aanmeldportaal (gescheiden regime).
 - [ ] **Fase 7 — Migratie**

@@ -48,6 +48,10 @@
 
   <div class="let">Dit document is bestemd voor <b>technisch personeel/beheerders</b>. Het beschrijft de architectuur, het maken van back-ups en de <b>herstelprocedure</b>. Bewaar het vertrouwelijk.</div>
 
+  <h2>0. Platform: modules</h2>
+  <p>Het systeem is een multi-module platform. Na de login (route <code>modules.kiezen</code>, <code>/modules</code>) kiest de gebruiker een module. Tabel <code>modules</code> (<code>sleutel</code>, <code>naam</code>, <code>actief</code>, <code>volgorde</code>) is de registry; de vijf modules worden in de create-migratie ingevoegd. Nieuwe module toevoegen = één rij plus haar schermen, geen ingreep in de kern.</p>
+  <p>Moduletoegang volgt uit de rol: <code>Rol::moduleSleutels()</code> geeft de toegestane modulesleutels (<code>['*']</code> voor Beheerder). <code>Module::toegankelijkVoor()</code> toetst toegang, <code>bruikbaarVoor()</code> = toegankelijk én <code>actief</code>. Een module opent op <code>Module::startRoute()</code> (nu alleen Studentenzaken → <code>dashboard</code>). Nog niet gebouwde modules staan op <code>actief=false</code> en worden als 'Binnenkort' getoond. De rollen blijven de bestaande enum <code>App\Enums\Rol</code>; de cursus-specifieke rollen komen bij de Cursussen-module.</p>
+
   <h2>1. Architectuur &amp; stack</h2>
   <ul>
     <li><b>Applicatie:</b> PHP + Laravel (server-gerenderd; geen kale PHP/WordPress).</li>
