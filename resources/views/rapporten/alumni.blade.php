@@ -2,8 +2,21 @@
 
 @section('titel', 'Alumni')
 
+@php
+  // Terugverwijzing naar een rapportenpagina die deze rol ook mág openen:
+  // Directie heeft 'rapporten.inzage', Studentenzaken 'rapporten'. Het
+  // Schoolbestuur heeft geen rapportenoverzicht en gaat terug naar het dashboard.
+  $u = auth()->user();
+  $terug = match (true) {
+    $u->rolIs('directie') => route('rapporten.inzage'),
+    $u->rolIs('bestuur') => route('dashboard'),
+    default => route('rapporten'),
+  };
+  $terugLabel = $u->rolIs('bestuur') ? 'Dashboard' : 'Rapporten';
+@endphp
+
 @section('inhoud')
-<div class="sis-crumb"><a href="{{ route('dashboard') }}">Dashboard</a><span class="sep">›</span><a href="{{ auth()->user()->rolIs('directie') ? route('rapporten.inzage') : route('rapporten') }}">Rapporten</a><span class="sep">›</span><b>Alumni</b></div>
+<div class="sis-crumb"><a href="{{ route('dashboard') }}">Dashboard</a>@unless ($u->rolIs('bestuur'))<span class="sep">›</span><a href="{{ $terug }}">Rapporten</a>@endunless<span class="sep">›</span><b>Alumni</b></div>
 
 <div class="sis-toolbar">
   <span class="meta"><b>Alumni-rapport</b> · afgestudeerde studenten · contactgegevens</span>
@@ -11,7 +24,7 @@
     <input type="search" name="q" value="{{ $zoek }}" placeholder="Zoek op studentnummer of naam…" style="padding:7px 11px;border:1px solid var(--borderColor,#cfcfd6);border-radius:6px;font-size:13px;min-width:220px;">
   </form>
   <span class="grow"></span>
-  <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ auth()->user()->rolIs('directie') ? route('rapporten.inzage') : route('rapporten') }}">Terug</a>
+  <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ $terug }}" title="Terug naar {{ $terugLabel }}">Terug</a>
   <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="button" onclick="window.print()">Printen / PDF</button>
 </div>
 

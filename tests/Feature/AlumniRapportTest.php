@@ -75,11 +75,55 @@ class AlumniRapportTest extends TestCase
         $this->actingAs($directie)->get(route('rapporten.alumni'))->assertOk()->assertDontSee('260001');
     }
 
+    /** Het Schoolbestuur ziet alle alumni: het is niet opleidinggebonden. */
+    public function test_schoolbestuur_mag_het_alumni_rapport_zien(): void
+    {
+        $this->seedTwee();
+        $bestuur = User::create(['naam' => 'Bestuur', 'email' => 'bestuur@iuasr.test', 'rol' => Rol::Bestuur]);
+
+        $this->actingAs($bestuur)->get(route('rapporten.alumni'))
+            ->assertOk()
+            ->assertSee('260001')
+            ->assertSee('alumnus@student.iuasr.nl')
+            ->assertDontSee('260002');
+    }
+
+    /**
+     * Het bestuur heeft geen rapportenoverzicht; de 'Terug'-link mag dus niet naar
+     * de SZ-route `rapporten` wijzen, want daar krijgt het bestuur een 403.
+     */
+    public function test_schoolbestuur_krijgt_geen_link_naar_een_verboden_rapportenpagina(): void
+    {
+        $this->seedTwee();
+        $bestuur = User::create(['naam' => 'Bestuur2', 'email' => 'bestuur2@iuasr.test', 'rol' => Rol::Bestuur]);
+
+        // Exact op de href toetsen: route('rapporten.alumni') bevat '/rapporten'
+        // als deelreeks, dus een losse tekstvergelijking zou altijd raak zijn.
+        $this->actingAs($bestuur)->get(route('rapporten.alumni'))
+            ->assertOk()
+            ->assertDontSee('href="'.route('rapporten').'"', false);
+
+        // En die pagina blijft ook echt afgeschermd.
+        $this->actingAs($bestuur)->get(route('rapporten'))->assertForbidden();
+    }
+
     public function test_examencommissie_mag_het_alumni_rapport_niet_zien(): void
     {
         $this->seedTwee();
         $ec = User::create(['naam' => 'EC', 'email' => 'ec@iuasr.test', 'rol' => Rol::Examencommissie]);
 
         $this->actingAs($ec)->get(route('rapporten.alumni'))->assertForbidden();
+    }
+
+    public function test_docent_en_financien_mogen_het_alumni_rapport_niet_zien(): void
+    {
+        $this->seedTwee();
+
+        foreach ([Rol::Docent, Rol::Financien] as $rol) {
+            $gebruiker = User::create([
+                'naam' => $rol->value, 'email' => $rol->value.'@iuasr.test', 'rol' => $rol,
+            ]);
+            $this->actingAs($gebruiker)->get(route('rapporten.alumni'))->assertForbidden();
+        }
     }
 }

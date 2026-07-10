@@ -59,7 +59,7 @@
     <tr><td><b>Examencommissie</b></td><td>Cijferlijsten vaststellen, tentamenlijsten en cijferlijsten inzien, studievoortgang en aanwezigheid beoordelen.</td></tr>
     <tr><td><b>Directie</b></td><td>Cijfers, aanwezigheid en rapporten inzien van <b>uitsluitend de eigen opleiding(en)</b>. Een directielid wordt door Beheer aan één of meer opleidingen gekoppeld en ziet alleen die studenten.</td></tr>
     <tr><td><b>Financiële Administratie</b></td><td>Collegegeldbetalingen registreren en achterstanden bewaken.</td></tr>
-    <tr><td><b>Schoolbestuur</b></td><td>Kerncijfers, aanwezigheidsstatistiek en alle ondertekende documenten inzien.</td></tr>
+    <tr><td><b>Schoolbestuur</b></td><td>Kerncijfers, aanwezigheidsstatistiek, het <b>alumni-rapport</b> en alle ondertekende documenten inzien. <b>Geen</b> cijferinzage.</td></tr>
     <tr><td><b>Beheerder</b></td><td>Gebruikers/rollen, referentietabellen, audit-log, back-ups en het volledig verwijderen van foutieve studentrecords.</td></tr>
   </table>
 
@@ -174,6 +174,7 @@
 
   <h2>10. Rapporten</h2>
   <p>Onder <b>Rapporten</b> maakt u o.a. de klassenlijst, het alumni-rapport, een Excel-export van actieve studenten (met IBAN, zonder BSN), het EC-rapport, het overgangsadvies en de cijfer-/tentamenlijsten. Elke lijst heeft een zoekbalk.</p>
+  <p>Het <b>alumni-rapport</b> (afgestudeerde studenten met hun contactgegevens) is toegankelijk voor <b>Studentenzaken</b>, <b>Directie</b> en het <b>Schoolbestuur</b>. Het bevat geen cijfers en geen BSN. Directie ziet alleen de alumni van de eigen opleiding(en); Studentenzaken en het Schoolbestuur zien ze allemaal. Het Schoolbestuur vindt de lijst in het menu onder <b>Rapporten &rarr; Alumni</b>.</p>
 
   <h2>11. Vragen of problemen?</h2>
   <p>Neem bij vragen contact op met de systeembeheerder of Studentenzaken (szaken@iuasr.nl). Werkt iets niet zoals verwacht, meld dan wat u deed en wat u zag.</p>

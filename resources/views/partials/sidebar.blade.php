@@ -95,6 +95,7 @@
             'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
             'Studenten' => [['Alle studenten', 'studenten.index', 'students', 'studenten.*']],
             'Onderwijs' => [['Aanwezigheid', 'presentieoverzicht', 'check', 'presentieoverzicht']],
+            'Rapporten' => [['Alumni', 'rapporten.alumni', 'cert', 'rapporten.alumni']],
             'Documenten' => [['Ondertekende documenten', 'ondertekening', 'cert', 'ondertekening*']],
             'Handleidingen' => [
                 ['Medewerkershandleiding', 'handleiding.medewerkers', 'report', 'handleiding.medewerkers'],
