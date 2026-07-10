@@ -22,13 +22,14 @@
     <div class="sis-card__hd"><h3>Te importeren betalingen</h3><span class="hint">{{ count($geldig) }} regel(s)</span></div>
     <div class="iuasr-dash-tbl-card" style="border:0;max-height:420px;overflow:auto;">
       <table class="iuasr-dash-tbl">
-        <thead><tr><th>Studentnr.</th><th>Naam</th><th style="text-align:right;">Bedrag</th><th>Datum</th><th>Betaalwijze</th><th>Opmerking</th></tr></thead>
+        <thead><tr><th>Studentnr.</th><th>Naam</th><th style="text-align:right;">Bedrag</th><th style="text-align:center;">Termijn</th><th>Datum</th><th>Betaalwijze</th><th>Opmerking</th></tr></thead>
         <tbody>
           @foreach ($geldig as $r)
             <tr>
               <td class="tnum">{{ $r['studentnummer'] }}</td>
               <td class="nm">{{ $r['naam'] }}</td>
               <td class="tnum" style="text-align:right;">€ {{ number_format($r['bedrag'], 2, ',', '.') }}</td>
+              <td style="text-align:center;">{{ ($r['termijn'] ?? null) ? 'Termijn '.$r['termijn'] : '— automatisch' }}</td>
               <td class="dt">{{ \Carbon\Carbon::parse($r['datum'])->format('d-m-Y') }}</td>
               <td>{{ $r['betaalwijze'] ?? '—' }}</td>
               <td>{{ $r['opmerking'] ?? '—' }}</td>

@@ -48,6 +48,12 @@ class CollegegeldSeeder extends Seeder
             '261010' => 0.00,    // aangemeld -> nog niets verschuldigd/betaald
         ];
 
+        // Eén synthetische student betaalt het jaarbedrag in één factuur; de rest
+        // volgt de standaardregeling van vijf termijnen.
+        Inschrijving::whereHas('student', fn ($q) => $q->where('studentnummer', '261001'))
+            ->where('periode_id', $periode->id)
+            ->update(['betaalregeling' => \App\Enums\Betaalregeling::Volledig->value]);
+
         foreach (Inschrijving::with('student')->where('periode_id', $periode->id)->get() as $insch) {
             $nr = $insch->student->studentnummer;
             $betaald = $afwijkend[$nr] ?? $bijgewerkt;

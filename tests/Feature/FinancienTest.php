@@ -75,24 +75,32 @@ class FinancienTest extends TestCase
         $student = Student::where('studentnummer', '261011')->first();
         $insch = $student->inschrijvingen()->first();
 
-        // Pro rata t/m januari (5 maanden): 2530 / 12 * 5.
-        $verschuldigd = Collegegeldstatus::voor($student->fresh())['verschuldigd'];
-        $this->assertEqualsWithDelta(round(2530 / 12 * 5, 2), $verschuldigd, 0.01);
+        // Verschuldigd is het VOLLEDIGE jaarbedrag; de achterstand betreft alleen
+        // de termijnen die al vervallen zijn. Op 15 januari zijn dat september,
+        // november en januari: 3 x 506,00.
+        $status = Collegegeldstatus::voor($student->fresh());
+        $this->assertEqualsWithDelta(2530.00, $status['verschuldigd'], 0.01);
+        $this->assertEqualsWithDelta(1518.00, $status['achterstallig'], 0.01);
 
-        // Deelbetaling onder het verschuldigde bedrag -> achterstand.
+        // Deelbetaling op de vervallen termijnen -> nog steeds achterstand.
         $this->actingAs($this->fin)->post(route('financien.betaling', $student), [
             'inschrijving_id' => $insch->id, 'bedrag' => '500', 'datum' => '2026-01-15',
         ])->assertRedirect(route('financien.student', $student));
 
         $status = Collegegeldstatus::voor($student->fresh());
         $this->assertTrue($status['achterstand']);
-        $this->assertEqualsWithDelta($verschuldigd - 500, $status['openstaand'], 0.01);
+        $this->assertEqualsWithDelta(1018.00, $status['achterstallig'], 0.01);
 
-        // Restant voldoen -> geen achterstand meer.
+        // De vervallen termijnen volledig voldoen -> geen achterstand meer,
+        // ook al staan de termijnen van maart en mei nog open.
         $this->actingAs($this->fin)->post(route('financien.betaling', $student), [
-            'inschrijving_id' => $insch->id, 'bedrag' => (string) round($verschuldigd - 500, 2), 'datum' => '2026-01-20',
+            'inschrijving_id' => $insch->id, 'bedrag' => '1018.00', 'datum' => '2026-01-20',
         ]);
-        $this->assertFalse(Collegegeldstatus::voor($student->fresh())['achterstand']);
+
+        $status = Collegegeldstatus::voor($student->fresh());
+        $this->assertFalse($status['achterstand']);
+        $this->assertSame(0.0, $status['achterstallig']);
+        $this->assertEqualsWithDelta(1012.00, $status['openstaand'], 0.01); // maart + mei
     }
 
     public function test_uitschrijven_rekent_collegegeld_pro_rata(): void
@@ -121,20 +129,39 @@ class FinancienTest extends TestCase
         $this->assertEqualsWithDelta(2000 - round(4000 / 12 * 4, 2), $status['terugbetaling'], 0.01);
     }
 
-    public function test_actieve_student_die_vooruit_betaalt_krijgt_geen_terugbetaling(): void
+    public function test_hele_jaarbedrag_vooruit_betalen_geeft_geen_achterstand_en_geen_tegoed(): void
     {
         $this->tarief(4000);
         $student = Student::where('studentnummer', '261011')->first(); // actief
         $insch = $student->inschrijvingen()->first();
 
-        // Volledig jaarbedrag vooruit betaald terwijl de student nog is ingeschreven.
+        // Volledig jaarbedrag in september voldaan: alle termijnen zijn betaald.
         $student->betalingen()->create([
             'inschrijving_id' => $insch->id, 'bedrag' => 4000, 'datum' => '2025-09-15',
         ]);
 
         $status = Collegegeldstatus::voor($student->fresh());
+        $this->assertFalse($status['achterstand']);
+        $this->assertSame(0.0, $status['openstaand']);
+        // Vooruit betalen van het jaarbedrag is geen tegoed: het is gewoon voldaan.
+        $this->assertSame(0.0, $status['vooruitbetaald']);
+        $this->assertSame(0.0, $status['terugbetaling']);
+    }
+
+    public function test_actieve_student_die_teveel_betaalt_krijgt_een_tegoed_geen_terugbetaling(): void
+    {
+        $this->tarief(4000);
+        $student = Student::where('studentnummer', '261011')->first(); // actief
+        $insch = $student->inschrijvingen()->first();
+
+        // Meer dan het jaarbedrag betaald terwijl de student nog is ingeschreven.
+        $student->betalingen()->create([
+            'inschrijving_id' => $insch->id, 'bedrag' => 4500, 'datum' => '2025-09-15',
+        ]);
+
+        $status = Collegegeldstatus::voor($student->fresh());
         $this->assertSame(0.0, $status['terugbetaling']); // geen terugbetaling: nog ingeschreven
-        $this->assertGreaterThan(0, $status['vooruitbetaald']); // maar wel een tegoed
+        $this->assertEqualsWithDelta(500.0, $status['vooruitbetaald'], 0.01); // wel een tegoed
         $this->assertFalse($status['achterstand']);
     }
 
@@ -166,7 +193,7 @@ class FinancienTest extends TestCase
         $student = Student::where('studentnummer', '261011')->first(); // actief
         $insch = $student->inschrijvingen()->first();
         $student->betalingen()->create([
-            'inschrijving_id' => $insch->id, 'bedrag' => 4000, 'datum' => '2025-09-15',
+            'inschrijving_id' => $insch->id, 'bedrag' => 4500, 'datum' => '2025-09-15',
         ]);
 
         $this->actingAs($this->fin)->get(route('financien'))
@@ -205,6 +232,37 @@ class FinancienTest extends TestCase
 
         $this->assertSame(2, Betaling::count());
         $this->assertEqualsWithDelta(1000.00, (float) Student::where('studentnummer', '261013')->first()->betalingen()->sum('bedrag'), 0.01);
+        $this->assertCount(1, session('import_resultaat')['fouten']);
+    }
+
+    /** Bestanden van vóór de termijnmodule (zonder termijnkolom) blijven werken. */
+    public function test_bulk_import_accepteert_csv_zonder_termijnkolom(): void
+    {
+        $csv = "studentnummer;bedrag;datum;betaalwijze;opmerking\r\n"
+            ."261013;1000,00;15-09-2025;overboeking;jaarbetaling\r\n";
+
+        $this->actingAs($this->fin)->post(route('financien.import.controle'), [
+            'bestand' => UploadedFile::fake()->createWithContent('oud.csv', $csv),
+        ])->assertOk();
+        $this->actingAs($this->fin)->post(route('financien.import'))->assertRedirect();
+
+        $this->assertDatabaseHas('betalingen', ['bedrag' => 1000.00, 'termijn' => null]);
+    }
+
+    public function test_bulk_import_leest_de_termijnkolom(): void
+    {
+        $this->tarief(4000);
+        $csv = "studentnummer;bedrag;termijn;datum;betaalwijze;opmerking\r\n"
+            ."261013;800,00;2;03-11-2025;overboeking;termijn november\r\n"
+            ."261013;800,00;9;03-11-2025;overboeking;bestaat niet\r\n";
+
+        $this->actingAs($this->fin)->post(route('financien.import.controle'), [
+            'bestand' => UploadedFile::fake()->createWithContent('nieuw.csv', $csv),
+        ])->assertOk();
+        $this->actingAs($this->fin)->post(route('financien.import'))->assertRedirect();
+
+        $this->assertDatabaseHas('betalingen', ['bedrag' => 800.00, 'termijn' => 2]);
+        $this->assertSame(1, Betaling::count()); // regel met termijn 9 is overgeslagen
         $this->assertCount(1, session('import_resultaat')['fouten']);
     }
 

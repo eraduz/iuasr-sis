@@ -116,12 +116,13 @@
           </div>
           <div class="sis-fld-row sis-fld-row--2">
             <div class="sis-fld"><label>Inschrijfdatum <span class="req">*</span></label><input type="date" name="inschrijfdatum" value="{{ old('inschrijfdatum', $actievePeriode?->startdatum?->format('Y-m-d')) }}" required></div>
-            <div class="sis-fld"><label>Betaalwijze</label>
-              <select name="betaalwijze">
-                <option value="">— n.v.t. —</option>
-                <option value="termijnen" @selected(old('betaalwijze')==='termijnen')>Termijnen</option>
-                <option value="contant" @selected(old('betaalwijze')==='contant')>Contant</option>
+            <div class="sis-fld"><label>Betaalregeling</label>
+              <select name="betaalregeling">
+                @foreach (App\Enums\Betaalregeling::cases() as $optie)
+                  <option value="{{ $optie->value }}" @selected(old('betaalregeling', 'termijnen') === $optie->value)>{{ $optie->label() }}</option>
+                @endforeach
               </select>
+              <span class="sis-muted" style="font-size:11px;">Termijnen: september, november, januari, maart en mei.</span>
             </div>
           </div>
         </fieldset>

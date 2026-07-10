@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Betaling;
 use App\Models\Student;
 use App\Support\Collegegeldstatus;
+use App\Support\Collegegeldtermijnen;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,13 +22,14 @@ class BetalingController extends Controller
     {
         $zoek = trim((string) $request->query('q', ''));
 
-        $alle = Student::with(['inschrijvingen.periode', 'betalingen'])->get()
+        $alle = Student::with(['inschrijvingen.periode', 'inschrijvingen.betalingen', 'betalingen'])->get()
             ->map(fn (Student $s) => ['student' => $s, 'status' => Collegegeldstatus::voor($s)]);
 
-        // Studenten met een openstaande schuld.
+        // Studenten met een ACHTERSTAND: een vervallen termijn die niet is voldaan.
+        // Een nog niet vervallen termijn is géén achterstand.
         $achterstanden = $alle
-            ->filter(fn ($r) => $r['status']['openstaand'] > 0)
-            ->sortByDesc(fn ($r) => $r['status']['openstaand'])
+            ->filter(fn ($r) => $r['status']['achterstallig'] > 0)
+            ->sortByDesc(fn ($r) => $r['status']['achterstallig'])
             ->values();
 
         // Studenten die teveel hebben betaald (terugbetaling) — inschrijving beëindigd.
@@ -54,15 +56,20 @@ class BetalingController extends Controller
 
     public function student(Student $student): View
     {
-        $student->load(['inschrijvingen.opleiding', 'inschrijvingen.periode', 'betalingen.geregistreerdDoor']);
+        $student->load([
+            'inschrijvingen.opleiding', 'inschrijvingen.periode', 'inschrijvingen.betalingen',
+            'betalingen.geregistreerdDoor',
+        ]);
         $status = Collegegeldstatus::voor($student);
 
-        // Per inschrijving het (pro rata) verschuldigde bedrag tonen.
+        // Per inschrijving het termijnschema (de facturen) met betaalstand.
         $regels = $student->inschrijvingen->sortByDesc('inschrijfdatum')->map(fn ($i) => [
             'inschrijving' => $i,
             'tarief' => Collegegeldstatus::tarief($i),
             'maanden' => Collegegeldstatus::maanden($i),
-            'verschuldigd' => Collegegeldstatus::verschuldigd($i),
+            'regeling' => Collegegeldtermijnen::regeling($i),
+            'termijnen' => Collegegeldtermijnen::voor($i),
+            'verschuldigd' => Collegegeldtermijnen::totaal($i),
         ]);
 
         return view('financien.student', compact('student', 'status', 'regels'));
@@ -72,9 +79,10 @@ class BetalingController extends Controller
     public function importSjabloon(): \Symfony\Component\HttpFoundation\StreamedResponse
     {
         $rijen = [
-            ['studentnummer', 'bedrag', 'datum', 'betaalwijze', 'opmerking'],
-            ['261001', '4000,00', '15-09-2025', 'overboeking', 'Jaarbetaling'],
-            ['261011', '2000,00', '15-09-2025', 'termijn', '1e termijn'],
+            ['studentnummer', 'bedrag', 'termijn', 'datum', 'betaalwijze', 'opmerking'],
+            ['261001', '4000,00', '', '15-09-2025', 'overboeking', 'Volledig jaarbedrag'],
+            ['261011', '800,00', '1', '15-09-2025', 'overboeking', 'Termijn september'],
+            ['261011', '800,00', '2', '03-11-2025', 'overboeking', 'Termijn november'],
         ];
 
         return response()->streamDownload(function () use ($rijen) {
@@ -106,7 +114,7 @@ class BetalingController extends Controller
             ]);
         }
 
-        $regels = $this->leesCsv($bestand->getRealPath());
+        [$regels, $kolom] = $this->leesCsv($bestand->getRealPath());
         if ($regels === []) {
             return back()->withErrors(['bestand' => 'Het bestand bevat geen gegevens.']);
         }
@@ -114,9 +122,14 @@ class BetalingController extends Controller
         $geldig = [];
         $fouten = [];
 
+        // $kolom bevat per veldnaam de kolomindex; zo blijven oudere bestanden
+        // zonder termijnkolom gewoon werken.
+        $veld = fn (array $rij, string $naam) => $kolom[$naam] !== null
+            ? trim((string) ($rij[$kolom[$naam]] ?? '')) : '';
+
         foreach ($regels as $index => $kolommen) {
             $regelnr = $index + 1;
-            $nr = trim((string) ($kolommen[0] ?? ''));
+            $nr = $veld($kolommen, 'studentnummer');
             if ($nr === '') {
                 continue; // lege regel overslaan
             }
@@ -135,16 +148,38 @@ class BetalingController extends Controller
                 continue;
             }
 
-            $bedrag = $this->parseBedrag($kolommen[1] ?? '');
+            $bedrag = $this->parseBedrag($veld($kolommen, 'bedrag'));
             if ($bedrag === null || $bedrag <= 0) {
-                $fouten[] = "Regel {$regelnr}: ongeldig bedrag '".($kolommen[1] ?? '')."'.";
+                $fouten[] = "Regel {$regelnr}: ongeldig bedrag '".$veld($kolommen, 'bedrag')."'.";
 
                 continue;
             }
 
-            $datum = $this->parseDatum($kolommen[2] ?? '');
+            // Termijn is optioneel: leeg = automatisch toerekenen aan de oudste
+            // openstaande termijn.
+            $termijnRaw = $veld($kolommen, 'termijn');
+            $termijn = null;
+            if ($termijnRaw !== '') {
+                if (! ctype_digit($termijnRaw) || (int) $termijnRaw < 1 || (int) $termijnRaw > 5) {
+                    $fouten[] = "Regel {$regelnr}: ongeldige termijn '{$termijnRaw}' (verwacht 1 t/m 5, of leeg).";
+
+                    continue;
+                }
+                $termijn = (int) $termijnRaw;
+
+                $bestaat = Collegegeldtermijnen::voor($insch)
+                    ->reject(fn ($t) => $t['vervallen'])
+                    ->contains(fn ($t) => $t['nr'] === $termijn);
+                if (! $bestaat) {
+                    $fouten[] = "Regel {$regelnr}: termijn {$termijn} bestaat niet voor de inschrijving van {$nr}.";
+
+                    continue;
+                }
+            }
+
+            $datum = $this->parseDatum($veld($kolommen, 'datum'));
             if ($datum === null) {
-                $fouten[] = "Regel {$regelnr}: ongeldige datum '".($kolommen[2] ?? '')."'.";
+                $fouten[] = "Regel {$regelnr}: ongeldige datum '".$veld($kolommen, 'datum')."'.";
 
                 continue;
             }
@@ -155,9 +190,10 @@ class BetalingController extends Controller
                 'studentnummer' => $student->studentnummer,
                 'naam' => $student->volledigeNaam(),
                 'bedrag' => $bedrag,
+                'termijn' => $termijn,
                 'datum' => $datum,
-                'betaalwijze' => trim((string) ($kolommen[3] ?? '')) ?: null,
-                'opmerking' => trim((string) ($kolommen[4] ?? '')) ?: null,
+                'betaalwijze' => $veld($kolommen, 'betaalwijze') ?: null,
+                'opmerking' => $veld($kolommen, 'opmerking') ?: null,
             ];
         }
 
@@ -190,6 +226,7 @@ class BetalingController extends Controller
                 'student_id' => $r['student_id'],
                 'inschrijving_id' => $r['inschrijving_id'],
                 'bedrag' => $r['bedrag'],
+                'termijn' => $r['termijn'] ?? null,
                 'datum' => $r['datum'],
                 'betaalwijze' => $r['betaalwijze'],
                 'opmerking' => $r['opmerking'],
@@ -207,12 +244,20 @@ class BetalingController extends Controller
         ]);
     }
 
-    /** Leest een CSV in, detecteert het scheidingsteken en slaat de kopregel over. */
+    /**
+     * Leest een CSV in, detecteert het scheidingsteken en herkent de kolommen
+     * op NAAM uit de kopregel. Zo blijven bestanden zonder termijnkolom — en
+     * bestanden met een afwijkende kolomvolgorde — gewoon werken. Zonder
+     * kopregel geldt de klassieke volgorde: studentnummer, bedrag, datum,
+     * betaalwijze, opmerking.
+     *
+     * @return array{0: list<array>, 1: array<string, int|null>}
+     */
     private function leesCsv(string $pad): array
     {
         $handle = fopen($pad, 'r');
         if ($handle === false) {
-            return [];
+            return [[], []];
         }
 
         $eerste = fgets($handle);
@@ -230,12 +275,27 @@ class BetalingController extends Controller
             $regels[0][0] = ltrim($regels[0][0], "\xEF\xBB\xBF");
         }
 
-        // Kopregel overslaan als de eerste cel geen studentnummer is.
-        if (isset($regels[0][0]) && ! ctype_digit(trim((string) $regels[0][0]))) {
-            array_shift($regels);
+        // Klassieke volgorde zonder termijnkolom (bestanden van vóór de termijnmodule).
+        $kolom = ['studentnummer' => 0, 'bedrag' => 1, 'termijn' => null,
+            'datum' => 2, 'betaalwijze' => 3, 'opmerking' => 4];
+
+        $heeftKop = isset($regels[0][0]) && ! ctype_digit(trim((string) $regels[0][0]));
+        if ($heeftKop) {
+            $kop = array_shift($regels);
+            $gevonden = [];
+            foreach ($kop as $index => $naam) {
+                $sleutel = strtolower(trim((string) $naam));
+                if (array_key_exists($sleutel, $kolom)) {
+                    $gevonden[$sleutel] = $index;
+                }
+            }
+            // Alleen vertrouwen op de kopregel als de verplichte velden erin staan.
+            if (isset($gevonden['studentnummer'], $gevonden['bedrag'], $gevonden['datum'])) {
+                $kolom = array_merge(['termijn' => null, 'betaalwijze' => null, 'opmerking' => null], $gevonden);
+            }
         }
 
-        return $regels;
+        return [$regels, $kolom];
     }
 
     /** Normaliseert een bedrag: verwerkt Nederlandse notatie (1.234,56) en eurotekens. */
@@ -276,14 +336,35 @@ class BetalingController extends Controller
     {
         $data = $request->validate([
             'inschrijving_id' => ['required', Rule::exists('inschrijvingen', 'id')->where('student_id', $student->id)],
+            'termijn' => ['nullable', 'integer', 'min:1', 'max:5'],
             'bedrag' => ['required', 'numeric', 'min:0.01', 'max:100000'],
             'datum' => ['required', 'date'],
             'betaalwijze' => ['nullable', 'string', 'max:40'],
             'opmerking' => ['nullable', 'string', 'max:500'],
         ]);
 
+        $inschrijving = $student->inschrijvingen()->findOrFail($data['inschrijving_id']);
+        // Uit een formulier komt de termijn als string binnen; het schema werkt
+        // met integers. Zonder deze cast faalt de vergelijking hieronder altijd.
+        $termijn = ($data['termijn'] ?? null) !== null ? (int) $data['termijn'] : null;
+
+        // Boeken op een termijn die in dit schema niet bestaat (of vervallen is)
+        // zou een onvindbaar bedrag opleveren; weiger dat expliciet.
+        if ($termijn !== null) {
+            $bestaat = Collegegeldtermijnen::voor($inschrijving)
+                ->reject(fn ($t) => $t['vervallen'])
+                ->contains(fn ($t) => $t['nr'] === $termijn);
+
+            if (! $bestaat) {
+                return back()->withInput()->withErrors([
+                    'termijn' => 'Deze termijn bestaat niet (meer) voor de gekozen inschrijving.',
+                ]);
+            }
+        }
+
         $student->betalingen()->create([
-            'inschrijving_id' => $data['inschrijving_id'],
+            'inschrijving_id' => $inschrijving->id,
+            'termijn' => $termijn,
             'bedrag' => $data['bedrag'],
             'datum' => $data['datum'],
             'betaalwijze' => $data['betaalwijze'] ?? null,
@@ -292,6 +373,8 @@ class BetalingController extends Controller
         ]);
 
         return redirect()->route('financien.student', $student)
-            ->with('status', 'Betaling geregistreerd.');
+            ->with('status', $termijn !== null
+                ? "Betaling geboekt op termijn {$termijn}."
+                : 'Betaling geregistreerd en toegerekend aan de oudste openstaande termijn.');
     }
 }

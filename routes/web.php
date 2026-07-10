@@ -3,6 +3,7 @@
 use App\Http\Controllers\AanwezigheidsregelingController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\DevLoginController;
+use App\Http\Controllers\BetaalregelingController;
 use App\Http\Controllers\BetalingController;
 use App\Http\Controllers\BulkInschrijvingController;
 use App\Http\Controllers\CijferController;
@@ -154,6 +155,9 @@ Route::middleware('auth')->group(function () {
 
         // 50%-aanwezigheidsregeling toekennen/intrekken (met toestemming directie).
         Route::post('/inschrijvingen/{inschrijving}/aanwezigheidsregeling', [AanwezigheidsregelingController::class, 'bijwerken'])->name('inschrijving.aanwezigheidsregeling');
+
+        // Betaalregeling: vijf termijnen of één factuur voor het volledige jaarbedrag.
+        Route::post('/inschrijvingen/{inschrijving}/betaalregeling', [BetaalregelingController::class, 'bijwerken'])->name('inschrijving.betaalregeling');
     });
 
     // --- Financiële Administratie: betalingen & achterstanden ---

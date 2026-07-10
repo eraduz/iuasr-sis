@@ -52,7 +52,7 @@ class InschrijvingController extends Controller
             'periode_id' => ['required', Rule::exists('perioden', 'id')],
             'leerjaar' => ['nullable', 'integer', 'min:1', 'max:10'],
             'inschrijfdatum' => ['required', 'date'],
-            'betaalwijze' => ['nullable', 'string', 'max:40'],
+            'betaalregeling' => ['nullable', new \Illuminate\Validation\Rules\Enum(\App\Enums\Betaalregeling::class)],
         ]);
         $data['nt2_examen_vereist'] = $request->boolean('nt2_examen_vereist');
 
@@ -100,7 +100,7 @@ class InschrijvingController extends Controller
                 'status' => 'actief',
                 'inschrijfdatum' => $data['inschrijfdatum'],
                 'invoerdatum' => now()->toDateString(),
-                'betaalwijze' => $data['betaalwijze'] ?? null,
+                'betaalregeling' => $data['betaalregeling'] ?? \App\Enums\Betaalregeling::Termijnen->value,
             ]);
 
             // Vakken van dit studiejaar automatisch toewijzen.

@@ -126,7 +126,28 @@
   <p><b>Resultaten mailen (einde blok):</b> in <b>Cijferlijst</b> kiest u onderaan een opleiding om alle studenten te zien. Met <b>Definitieve resultaten mailen</b> komt u op een controlescherm dat toont wie een e-mail krijgt en wie wordt overgeslagen (geen vastgestelde resultaten of geen e-mailadres). Na bevestiging ontvangt <b>elke student individueel</b> zijn/haar eigen officiële cijferlijst als PDF-bijlage. Alleen door de examencommissie vastgestelde resultaten worden verstuurd; de verzending wordt gelogd.</p>
 
   <h2>8. Collegegeld &amp; betalingen</h2>
-  <p>Studentenzaken ziet per student de status verschuldigd/betaald/saldo (pro rata over de inschrijvingsmaanden). De <b>Financiële Administratie</b> registreert betalingen (ook via een Excel-import) en bewaakt achterstanden; bij een schuld worden herinschrijven en verklaringen geblokkeerd.</p>
+  <h3>Termijnen: vijf facturen per jaar</h3>
+  <p>Het collegegeld wordt elke twee maanden gefactureerd: in <b>september, november, januari, maart en mei</b>. Elke termijn is het jaarbedrag gedeeld door vijf; een afrondingsverschil van enkele centen komt op de laatste termijn, zodat de som exact het jaarbedrag is.</p>
+  <p>Op het studentdossier (kaart <b>Collegegeld</b>) staat een tabel met alle termijnen: vervaldatum, bedrag, betaald, openstaand en de status. Zo ziet u in één oogopslag welke termijn wel en niet is voldaan.</p>
+  <table class="rol">
+    <tr><th>Status</th><th>Betekenis</th></tr>
+    <tr><td><b>Betaald</b></td><td>De termijn is volledig voldaan.</td></tr>
+    <tr><td><b>Achterstallig</b></td><td>De vervaldatum is verstreken en de termijn is niet (volledig) betaald. Dit bepaalt de betalingsachterstand.</td></tr>
+    <tr><td><b>Deels betaald</b></td><td>Er is een deelbetaling gedaan, maar de vervaldatum is nog niet verstreken.</td></tr>
+    <tr><td><b>Nog niet vervallen</b></td><td>De vervaldatum ligt in de toekomst. Dit is <b>geen</b> achterstand.</td></tr>
+    <tr><td><b>Vervallen</b></td><td>De student is uitgeschreven vóór deze vervaldatum; er wordt niet meer gefactureerd.</td></tr>
+  </table>
+  <div class="tip">Een student heeft pas een <b>betalingsachterstand</b> wanneer een <b>vervallen</b> termijn niet is voldaan. Dat een student in oktober nog € 3.200 openstaan heeft voor de rest van het jaar is dus geen achterstand — die termijnen moeten immers nog vervallen. Bij een echte achterstand worden herinschrijven en verklaringen geblokkeerd.</div>
+
+  <h3>Eén factuur voor het hele jaar</h3>
+  <p>Wil een student het volledige jaarbedrag in één keer betalen, dan legt <b>Studentenzaken</b> dat vast op het dossier onder <b>Collegegeld &rarr; Betaalregeling</b>: kies <b>Eén factuur (volledig)</b> en klik op <b>Opslaan</b>. Er ontstaat dan één termijn die op 1 september vervalt. De keuze staat ook in het inschrijfformulier. De regeling hangt aan de <b>inschrijving</b> en geldt dus per studiejaar: bij herinschrijving stelt u haar opnieuw vast. Elke wijziging wordt gelogd.</p>
+
+  <h3>Betalingen boeken (Financiële Administratie)</h3>
+  <p>Op het financiële scherm van een student staat per studiejaar hetzelfde termijnoverzicht, met achter elke openstaande termijn de knop <b>Boek € …</b>. Eén klik boekt die termijn volledig op de datum van vandaag. Voor een deelbetaling of een afwijkend bedrag gebruikt u het formulier <b>Betaling registreren</b>; daar kiest u de termijn, of laat u <b>automatisch</b> staan — dan gaat de betaling naar de <b>oudste openstaande</b> termijn.</p>
+  <p>Bij de <b>bulk-import</b> (CSV) is er een extra, optionele kolom <b>termijn</b> (1 t/m 5). Laat u die leeg, dan wordt de betaling automatisch toegerekend. Bestaande bestanden zonder termijnkolom blijven gewoon werken: de kolommen worden op naam herkend.</p>
+
+  <h3>Tussentijdse uitschrijving</h3>
+  <p>Schrijft een student zich halverwege uit, dan is hij alleen de verstreken maanden verschuldigd (jaarbedrag ÷ 12 × maanden, t/m het einde van de uitschrijfmaand). De termijnen ná de uitschrijfdatum krijgen de status <b>Vervallen</b> en de laatste nog geldende termijn wordt naar beneden bijgesteld. Is er meer betaald dan verschuldigd, dan verschijnt de student op het Financiën-overzicht onder <b>terugbetalingen</b>.</p>
 
   <h2>9. Verklaringen &amp; ondertekende documenten</h2>
   <p>Bij <b>Verklaring opstellen</b> genereert u bewijzen (bv. bewijs van inschrijving) op officieel briefpapier, digitaal gewaarmerkt met een verificatiecode. In <b>Ondertekende documenten</b> vindt u uw eigen gewaarmerkte documenten terug; u kunt ook zelf een PDF uploaden en laten waarmerken. Echtheid is te controleren op de publieke verificatiepagina.</p>

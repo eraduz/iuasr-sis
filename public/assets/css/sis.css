@@ -577,6 +577,27 @@
 }
 
 /* ============================================================
+   COLLEGEGELD — termijnen (facturen sep/nov/jan/mrt/mei)
+   ============================================================ */
+.sis-termijn-kop {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  padding: 10px 12px; border: 1px solid var(--borderColor); border-radius: 6px;
+  background: var(--priColor102);
+}
+.sis-termijn-kop .lbl {
+  display: block; font-size: 11px; color: var(--blackAltText);
+  text-transform: uppercase; letter-spacing: .03em; margin-bottom: 2px;
+}
+.sis-termijn-kop b { font-size: 15px; color: var(--priColor100); font-variant-numeric: tabular-nums; }
+.sis-termijn-kop b.is-fail { color: var(--secColor100); }
+.sis-termijn-tbl tfoot td { border-top: 2px solid var(--borderColor); background: var(--priColor102); }
+/* Een vervallen termijn is geen factuur meer: gedempt weergeven. */
+.sis-termijn-tbl tr.is-vervallen td { opacity: .55; }
+@media (max-width: 720px) {
+  .sis-termijn-kop { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ============================================================
    PRESENTIE (aanwezigheidsregistratie per college)
    ============================================================ */
 .sis-pres-select {

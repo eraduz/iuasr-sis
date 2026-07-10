@@ -7,9 +7,9 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
 
 ## Projectstatus
 
-- **Huidige fase:** Fase 5 afgerond; aanwezigheidsmodule opgeleverd (buiten de
-  oorspronkelijke fasering, op verzoek van de opdrachtgever)
-- **Laatst bijgewerkt:** 2026-07-09
+- **Huidige fase:** Fase 5 afgerond; aanwezigheids- en collegegeldtermijnmodule
+  opgeleverd (buiten de oorspronkelijke fasering, op verzoek van de opdrachtgever)
+- **Laatst bijgewerkt:** 2026-07-10
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 
 ---
@@ -188,6 +188,35 @@ opleverpunt aantoonbaar klaar is.
     Inzage en mutatie gelogd. 18 nieuwe tests; 167 tests groen.
   - Naamgeving: UI zegt "Aanwezigheid"; de bestaande term *presentielijst* blijft
     gereserveerd voor de tentamenlijst met handtekening.
+- [x] **Collegegeldtermijnen** (extra, op verzoek opdrachtgever 2026-07-10)
+  - Facturering elke twee maanden: **september, november, januari, maart, mei**.
+    Termijnbedrag = jaarbedrag ÷ 5, afrondingsrestje op de laatste termijn.
+  - **Betaalregeling** per inschrijving (`inschrijvingen.betaalregeling`):
+    `termijnen` (5 facturen) of `volledig` (1 factuur, vervalt 1 september) —
+    voor studenten die alles in één keer willen betalen. Studentenzaken legt dit
+    vast op het dossier en in het inschrijfformulier; gelogd.
+  - **Geen facturentabel**: het schema wordt afgeleid uit jaartarief +
+    betaalregeling + inschrijvingsduur (`App\Support\Collegegeldtermijnen`), zodat
+    het nooit veroudert t.o.v. de inschrijving. Een betaling verwijst met
+    `betalingen.termijn` (1..5, nullable) naar het termijnnummer; leeg = FIFO naar
+    de oudste openstaande termijn.
+  - **Achterstand herdefinieerd**: alleen het openstaande deel van termijnen
+    waarvan de VERVALDATUM verstreken is (`achterstallig`). Nog niet vervallen
+    termijnen zijn géén achterstand. Dit stuurt de blokkades op herinschrijven en
+    verklaringen. `verschuldigd` = som niet-vervallen termijnen (lopend = heel
+    jaarbedrag); `openstaand` = verschuldigd − betaald.
+  - **Tussentijdse uitschrijving**: termijnen na de uitschrijfdatum worden
+    `vervallen`; het totaal wordt herrekend naar pro rata en de laatste geldende
+    termijn bijgesteld (keuze opdrachtgever).
+  - Schermen: termijntabel op het studentdossier (kaart Collegegeld) en op het
+    Financiën-scherm, daar met een **"Boek € …"-knop per openstaande termijn**;
+    betalingsformulier met termijnkeuze; Financiën-overzicht toont achterstallig.
+  - CSV-import: extra optionele kolom `termijn`; kolommen worden nu op **naam**
+    herkend met terugval op de oude volgorde, zodat bestaande bestanden blijven
+    werken (getest).
+  - `inschrijvingen.betaalwijze` is vervallen (mengde regeling en betaalwijze);
+    kolom blijft voor historie, wordt niet meer geschreven.
+  - 19 nieuwe tests + 2 importtests; 189 tests groen.
 - [ ] **Fase 6 — Portaalkoppeling**
   - Koppeling met publiek aanmeldportaal (gescheiden regime).
 - [ ] **Fase 7 — Migratie**
@@ -276,6 +305,7 @@ Deze zijn nog niet vastgesteld. Vraag de opdrachtgever; verzin geen waarden.
 | 2026-07-09 | **Directie per opleiding (opleidinggebonden zichtbaarheid).** Nieuwe koppeltabel `directie_opleidingen` (user ↔ opleiding, echte FK's, cascade). Een directielid ziet uitsluitend studenten, cijfers en rapporten van de toegewezen opleiding(en); zonder toewijzing niets (need-to-know). Toegepast op studentenlijst/-dossier, cijferoverzicht, cijferlijst, EC-rapport, overgang, alumni, resultaten-mailen én de dashboardstatistieken (per-opleiding gefilterd) + KPI-tegels. Beheer wijst toe via **Gebruikers & rollen → Directie — opleidingtoewijzing**. Seed: PABO-directeur (PABO), GV-directeur (PMGV+MGV), Theologie-directeur (ISLTH+cursussen). Een **dubbel ingeschreven** student is zichtbaar voor de directie van elke opleiding waarin hij/zij actief is. Helpers `User::opleidingIds()`, `Student::scopeZichtbaarVoor()`/`zichtbaarVoor()`. |
 | 2026-07-09 | **Dubbele inschrijving overal zichtbaar gemaakt.** Studentenlijst: opleidingkolom toont twee regels + label 'dubbele inschrijving' bij de naam. Dashboards van Studentenzaken, Directie en Financiële Administratie tonen een lijst 'Studenten met een dubbele inschrijving' (met beide opleidingen). Studentpagina toonde dit al (kop met '+' en pill). Financiën-dossier toont per inschrijving al de opleiding. |
 | 2026-07-09 | **50%-aanwezigheidsregeling.** Vastgelegd als vinkje "50% Aanwezigheidsregeling" op de studentpagina (tabblad Inschrijving & klas). Keuze opdrachtgever: ALLEEN een vinkje — geen besluitreferentie in de UI; de toestemming van de directie loopt buiten het systeem, de mutatie wordt wel gelogd (wie/wanneer/welke inschrijving). Reikwijdte: **per inschrijving** (= per opleiding én per studiejaar), dus bij herinschrijven of een tweede opleiding bewust opnieuw toe te kennen. Zetten: Studentenzaken/Beheer. Zien: SZ, Docent, Examencommissie, Directie, Bestuur, Beheer (niet Financiën). Dashboardvenster met de studenten, opleiding en studiejaar; docent ziet alleen studenten uit eigen vakken, directie alleen eigen opleiding(en). |
+| 2026-07-10 | **Collegegeld in termijnen.** Facturering elke twee maanden: september, november, januari, maart en mei. Keuzes opdrachtgever: (1) termijnbedrag = **jaarbedrag ÷ 5**, afrondingsrestje op de laatste termijn; (2) **achterstand = onbetaalde VERVALLEN termijn** — een nog niet vervallen termijn is geen achterstand (vervangt de oude maand-pro-rata als achterstandsmaatstaf en stuurt de blokkades op herinschrijven/verklaringen); (3) bij tussentijdse uitschrijving worden de termijnen **pro rata herrekend**: termijnen ná de uitschrijfdatum vervallen, de laatste geldende termijn wordt bijgesteld; (4) de **betaalregeling** (vijf termijnen óf één factuur voor het volledige jaarbedrag) wordt door **Studentenzaken** op het dossier vastgelegd, per inschrijving en dus per studiejaar, en gelogd. Geen facturentabel: het schema is afgeleid uit jaartarief + regeling + inschrijvingsduur (`Collegegeldtermijnen`), zodat het nooit veroudert. `betalingen.termijn` (nullable) koppelt een betaling aan een termijn; leeg = FIFO naar de oudste openstaande termijn. Financiën boekt met één klik per termijn; CSV-import kreeg een optionele termijnkolom en herkent kolommen op naam (oude bestanden blijven werken). De kolom `inschrijvingen.betaalwijze` is vervallen (mengde regeling en betaalwijze) en blijft alleen voor historie. |
 | 2026-07-09 | **Presentieregistratie per college (verplicht voor de docent).** Genormaliseerd: tabel `presenties` = één regel per inschrijving × vak × onderwijsweek; nooit vaste weekkolommen. Keuze opdrachtgever: **8 weken per blok, één college per week**; norm **80%**, of **50%** bij de aanwezigheidsregeling. Docent voert per week 1 (aanwezig) of 0 (afwezig) in; een lege cel = nog niet geregistreerd en telt NIET als afwezigheid (anders wordt nalatigheid van de docent op de student afgewenteld). Een week geldt pas als geregistreerd wanneer álle presentieplichtige deelnemers een waarde hebben. **Vrijgestelde** studenten volgen het vak niet: geen invoer, server-side overgeslagen. De docent ziet op de lijst het label **50%** achter de naam en de geldende norm per student. Rolscheiding: registreren alleen docent van het eigen vak (Gate `presentie-registreren`); inzage docent/examencommissie/directie (eigen opleiding)/bestuur (Gate `presentie-inzien`); Studentenzaken, Financiën en Beheer hebben GEEN presentie-inzage — aanwezigheid is onderwijsinhoudelijke procesinformatie. Inzage en mutatie gelogd. Statistiek (gemiddelde aanwezigheid, verdeling 0–50/50–80/80–100%, per opleiding resp. per vak) op de dashboards van docent, directie en bestuur, opleidinggebonden gefilterd. UI-term is "Aanwezigheid"; *presentielijst* blijft de tentamenlijst met handtekening. |
 
 ---

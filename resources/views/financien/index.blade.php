@@ -8,7 +8,7 @@
 <div class="iuasr-dash-vhead">
   <div>
     <h1>Betalingen &amp; achterstand</h1>
-    <div class="summary">Registreer betalingen en zie welke studenten een openstaande schuld hebben</div>
+    <div class="summary">Registreer betalingen per termijn en zie welke studenten een vervallen termijn niet hebben voldaan</div>
   </div>
   <div class="iuasr-dash-vhead__actions">
     <a class="iuasr-dash-btn" href="{{ route('rapporten.actieve-studenten') }}">Studenten-export (Excel, incl. IBAN)</a>
@@ -16,7 +16,7 @@
 </div>
 
 <div class="iuasr-dash-stats" style="grid-template-columns:repeat(4,1fr);">
-  <div class="iuasr-dash-stat iuasr-dash-stat--alert"><span class="lbl">Studenten met achterstand</span><span class="val">{{ $achterstanden->count() }}</span><span class="delta">€ {{ number_format($achterstanden->sum(fn($r)=>$r['status']['openstaand']), 0, ',', '.') }} openstaand</span></div>
+  <div class="iuasr-dash-stat iuasr-dash-stat--alert"><span class="lbl">Studenten met achterstand</span><span class="val">{{ $achterstanden->count() }}</span><span class="delta">€ {{ number_format($achterstanden->sum(fn($r)=>$r['status']['achterstallig']), 0, ',', '.') }} achterstallig</span></div>
   <div class="iuasr-dash-stat"><span class="lbl">Tegoed (vooruitbetaald)</span><span class="val">{{ $vooruitbetalingen->count() }}</span><span class="delta">€ {{ number_format($vooruitbetalingen->sum(fn($r)=>$r['status']['vooruitbetaald']), 0, ',', '.') }} teveel betaald · nog ingeschreven</span></div>
   <div class="iuasr-dash-stat"><span class="lbl">Terugbetalingen</span><span class="val">{{ $terugbetalingen->count() }}</span><span class="delta">€ {{ number_format($terugbetalingen->sum(fn($r)=>$r['status']['terugbetaling']), 0, ',', '.') }} · inschrijving beëindigd</span></div>
   <div class="iuasr-dash-stat iuasr-dash-stat--ok"><span class="lbl">Berekening</span><span class="val" style="font-size:15px;line-height:2;">Pro rata</span><span class="delta">jaartarief ÷ 12 × maanden</span></div>
@@ -46,7 +46,7 @@
     <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit">Controleren</button>
     <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('financien.import.sjabloon') }}">Sjabloon downloaden</a>
   </form>
-  <p class="sis-tblnote" style="margin-top:10px;">Kolommen: <b>studentnummer; bedrag; datum; betaalwijze; opmerking</b>. Datum bijv. 15-09-2025, bedrag bijv. 4000,00. Na <b>Controleren</b> ziet u eerst een overzicht; daarna kunt u definitief importeren.</p>
+  <p class="sis-tblnote" style="margin-top:10px;">Kolommen: <b>studentnummer; bedrag; termijn; datum; betaalwijze; opmerking</b>. Datum bijv. 15-09-2025, bedrag bijv. 800,00. De kolom <b>termijn</b> (1 t/m 5) is optioneel: laat u haar leeg, dan wordt de betaling toegerekend aan de oudste openstaande termijn. Na <b>Controleren</b> ziet u eerst een overzicht; daarna kunt u definitief importeren.</p>
 </div>
 
 <form method="GET" action="{{ route('financien') }}" class="iuasr-dash-filters">
@@ -84,7 +84,7 @@
             <td class="nm">{{ $s->volledigeNaam() }}</td>
             <td class="tnum">€ {{ number_format($st['verschuldigd'], 2, ',', '.') }}</td>
             <td class="tnum">€ {{ number_format($st['betaald'], 2, ',', '.') }}</td>
-            <td><span class="iuasr-dash-status s-rejected">€ {{ number_format($st['openstaand'], 2, ',', '.') }}</span></td>
+            <td><span class="iuasr-dash-status s-rejected">€ {{ number_format($st['achterstallig'], 2, ',', '.') }}</span></td>
             <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('financien.student', $s) }}">Openen</a></td>
           </tr>
         @empty

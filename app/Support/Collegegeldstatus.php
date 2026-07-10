@@ -9,21 +9,25 @@ use App\Models\Student;
 use Carbon\Carbon;
 
 /**
- * Berekent de financiële status van een student op basis van de
- * INSCHRIJVINGSDUUR (pro rata):
+ * Berekent de financiële status van een student.
  *
- *   maandbedrag  = jaarlijks collegegeld ÷ 12
- *   verschuldigd = maandbedrag × aantal maanden ingeschreven
+ * Het collegegeld wordt gefactureerd in TERMIJNEN (september, november,
+ * januari, maart en mei), of in één factuur wanneer de student daarvoor kiest.
+ * Zie {@see Collegegeldtermijnen} voor het schema.
  *
- * Het studiejaar loopt van 1 september t/m 31 juli. De uitschrijfdatum wordt
- * altijd tot het einde van de uitschrijfmaand gerekend (zie
- * InschrijvingActiesController); wie zich in januari uitschrijft telt t/m 31 jan.
- * Voor een lopende (actieve) inschrijving telt het aantal maanden tot en met de
- * huidige maand, zodat het verschuldigde bedrag altijd actueel is.
+ *   verschuldigd  = som van de niet-vervallen termijnen van dit studiejaar
+ *   achterstallig = het openstaande deel van de termijnen waarvan de
+ *                   VERVALDATUM verstreken is
  *
- * Het saldo toont het verschil tussen verschuldigd en betaald: een positief
- * saldo betekent teveel betaald (terugbetaling), een negatief saldo betekent een
- * nog openstaand bedrag.
+ * Een student heeft dus pas een betalingsACHTERSTAND wanneer een vervallen
+ * termijn niet (volledig) is voldaan — niet zodra het pro rata bedrag van de
+ * lopende maand nog niet binnen is. Dat is hoe een factuuradministratie werkt
+ * en het is navolgbaar voor student, Studentenzaken en boekhouding.
+ *
+ * Onderliggend blijft het pro rata beginsel gelden: het studiejaar loopt van
+ * 1 september t/m 31 juli, maandbedrag = jaarbedrag ÷ 12, en wie zich
+ * tussentijds uitschrijft is alleen de verstreken maanden verschuldigd
+ * (t/m het einde van de uitschrijfmaand). De termijnen worden dan herrekend.
  */
 class Collegegeldstatus
 {
@@ -31,29 +35,33 @@ class Collegegeldstatus
 
     /**
      * @return array{jaarbedrag: float|null, maandbedrag: float|null, maanden: int,
-     *   verschuldigd: float, betaald: float, openstaand: float, terugbetaling: float,
-     *   saldo: float, achterstand: bool}
+     *   verschuldigd: float, betaald: float, openstaand: float, achterstallig: float,
+     *   terugbetaling: float, saldo: float, achterstand: bool}
      */
     public static function voor(Student $student, ?Carbon $peildatum = null): array
     {
-        $student->loadMissing(['inschrijvingen.periode', 'betalingen']);
+        $student->loadMissing(['inschrijvingen.periode', 'inschrijvingen.betalingen', 'betalingen']);
         $peildatum ??= Carbon::now();
 
         $verschuldigd = 0.0;
+        $achterstallig = 0.0;
         $maanden = 0;
         $jaarbedrag = null;
         // Per STUDIEJAAR wordt collegegeld één keer berekend, ook wanneer de
         // student in datzelfde jaar twee opleidingen volgt (dubbele inschrijving).
         // De inschrijving met het hoogste verschuldigde bedrag is maatgevend.
         foreach ($student->inschrijvingen->groupBy('periode_id') as $perStudiejaar) {
-            $maatgevend = $perStudiejaar->sortByDesc(fn ($i) => self::verschuldigd($i, $peildatum))->first();
-            $verschuldigd += self::verschuldigd($maatgevend, $peildatum);
+            $maatgevend = $perStudiejaar
+                ->sortByDesc(fn ($i) => Collegegeldtermijnen::totaal($i, $peildatum))->first();
+            $verschuldigd += Collegegeldtermijnen::totaal($maatgevend, $peildatum);
+            $achterstallig += Collegegeldtermijnen::achterstallig($maatgevend, $peildatum);
             $maanden += self::maanden($maatgevend, $peildatum);
             $jaarbedrag ??= self::tarief($maatgevend);
         }
 
         $betaald = (float) $student->betalingen->sum('bedrag');
         $openstaand = round(max(0, $verschuldigd - $betaald), 2);
+        $achterstallig = round($achterstallig, 2);
         $teveel = round(max(0, $betaald - $verschuldigd), 2);
 
         // Een lopende (nog niet beëindigde) inschrijving is het volledige jaar
@@ -72,12 +80,16 @@ class Collegegeldstatus
             'maanden' => $maanden,
             'verschuldigd' => round($verschuldigd, 2),
             'betaald' => round($betaald, 2),
+            // Nog te betalen over het hele studiejaar (ook termijnen die nog moeten vervallen).
             'openstaand' => $openstaand,
+            // Direct opeisbaar: vervallen termijnen die nog niet zijn voldaan.
+            'achterstallig' => $achterstallig,
             'terugbetaling' => $lopend ? 0.0 : $teveel,
             'vooruitbetaald' => $lopend ? $teveel : 0.0,
             'lopend' => $lopend,
             'saldo' => round($betaald - $verschuldigd, 2),
-            'achterstand' => $openstaand > 0,
+            // Een achterstand bestaat pas bij een onbetaalde VERVALLEN termijn.
+            'achterstand' => $achterstallig > 0,
         ];
     }
 
@@ -146,7 +158,7 @@ class Collegegeldstatus
         return $tarief ? (float) $tarief->bedrag : null;
     }
 
-    private static function studiejaarStart(Inschrijving $inschrijving): ?Carbon
+    public static function studiejaarStart(Inschrijving $inschrijving): ?Carbon
     {
         $periode = $inschrijving->periode;
         if ($periode?->startdatum) {

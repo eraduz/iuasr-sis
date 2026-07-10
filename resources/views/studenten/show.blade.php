@@ -206,41 +206,108 @@
         </dl>
       </div>
 
-      {{-- Collegegeld — pro rata o.b.v. inschrijvingsduur, altijd actueel --}}
+      {{-- Collegegeld — termijntabel: per factuur direct zichtbaar wat betaald is --}}
       @if (auth()->user()->magFinancieelInzien())
+        @php
+          $euro = fn ($b) => '€ '.number_format($b, 2, ',', '.');
+          $regeling = $huidige ? \App\Support\Collegegeldtermijnen::regeling($huidige) : null;
+        @endphp
         <div class="sis-card" style="margin-top:16px;">
-          <div class="sis-card__hd"><h3>Collegegeld</h3><span class="hint">pro rata · studiejaar 1 sep – 31 jul</span></div>
-          @if ($financieel['jaarbedrag'] === null)
-            <p class="sis-muted" style="font-size:13px;margin:0;">Geen collegegeldtarief ingesteld voor dit studiejaar.</p>
+          <div class="sis-card__hd">
+            <h3>Collegegeld</h3>
+            <span class="hint">{{ $regeling?->label() ?? 'geen inschrijving' }}</span>
+          </div>
+
+          @if ($financieel['jaarbedrag'] === null || $termijnen->isEmpty())
+            <p class="sis-muted" style="font-size:13px;margin:0;">
+              {{ $financieel['jaarbedrag'] === null
+                  ? 'Geen collegegeldtarief ingesteld voor dit studiejaar.'
+                  : 'Nog geen termijnen: de student is aangemeld maar nog niet ingeschreven.' }}
+            </p>
           @else
-            <dl class="sis-dl">
-              <dt>Jaarcollegegeld</dt><dd>€ {{ number_format($financieel['jaarbedrag'], 2, ',', '.') }}</dd>
-              <dt>Maandbedrag</dt><dd>€ {{ number_format($financieel['maandbedrag'], 2, ',', '.') }} <span class="sis-muted" style="font-size:11px;">· ÷ 12</span></dd>
-              <dt>Ingeschreven</dt><dd>{{ $financieel['maanden'] }} {{ $financieel['maanden'] === 1 ? 'maand' : 'maanden' }}</dd>
-              <dt>Verschuldigd</dt><dd><b>€ {{ number_format($financieel['verschuldigd'], 2, ',', '.') }}</b> <span class="sis-muted" style="font-size:11px;">o.b.v. huidige maand</span></dd>
-              <dt>Betaald</dt><dd>€ {{ number_format($financieel['betaald'], 2, ',', '.') }}</dd>
-            </dl>
-            @if ($financieel['openstaand'] > 0)
+            <div class="sis-termijn-kop">
+              <div><span class="lbl">Jaarcollegegeld</span><b>{{ $euro($financieel['jaarbedrag']) }}</b></div>
+              <div><span class="lbl">Verschuldigd</span><b>{{ $euro($financieel['verschuldigd']) }}</b></div>
+              <div><span class="lbl">Betaald</span><b>{{ $euro($financieel['betaald']) }}</b></div>
+              <div><span class="lbl">Achterstallig</span><b class="{{ $financieel['achterstallig'] > 0 ? 'is-fail' : '' }}">{{ $euro($financieel['achterstallig']) }}</b></div>
+            </div>
+
+            <div class="iuasr-dash-tbl-card" style="border:0;margin-top:10px;">
+              <table class="iuasr-dash-tbl sis-termijn-tbl">
+                <thead>
+                  <tr>
+                    <th style="width:34px;">#</th>
+                    <th>Termijn</th>
+                    <th style="text-align:center;">Vervaldatum</th>
+                    <th style="text-align:right;">Bedrag</th>
+                    <th style="text-align:right;">Betaald</th>
+                    <th style="text-align:right;">Open</th>
+                    <th style="text-align:center;">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach ($termijnen as $t)
+                    <tr class="{{ $t['status'] === \App\Support\Collegegeldtermijnen::VERVALLEN ? 'is-vervallen' : '' }}">
+                      <td class="tnum">{{ $t['nr'] }}</td>
+                      <td class="nm">{{ $t['naam'] }}</td>
+                      <td class="dt" style="text-align:center;">{{ $t['vervaldatum']->format('d-m-Y') }}</td>
+                      <td class="tnum" style="text-align:right;">{{ $t['vervallen'] ? '—' : $euro($t['bedrag']) }}</td>
+                      <td class="tnum" style="text-align:right;">{{ $t['betaald'] > 0 ? $euro($t['betaald']) : '—' }}</td>
+                      <td class="tnum" style="text-align:right;">{{ $t['open'] > 0 ? $euro($t['open']) : '—' }}</td>
+                      <td style="text-align:center;">
+                        <span class="iuasr-dash-status {{ \App\Support\Collegegeldtermijnen::statusBadge($t['status']) }}">{{ \App\Support\Collegegeldtermijnen::statusLabel($t['status']) }}</span>
+                      </td>
+                    </tr>
+                  @endforeach
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="3"><b>Totaal</b></td>
+                    <td class="tnum" style="text-align:right;"><b>{{ $euro($termijnen->sum('bedrag')) }}</b></td>
+                    <td class="tnum" style="text-align:right;"><b>{{ $euro($termijnen->sum('betaald')) }}</b></td>
+                    <td class="tnum" style="text-align:right;"><b>{{ $euro($termijnen->sum('open')) }}</b></td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            @if ($financieel['achterstallig'] > 0)
               <div class="iuasr-dash-alert iuasr-dash-alert--danger" style="margin-top:12px;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                <span>Nog te betalen: <b>€ {{ number_format($financieel['openstaand'], 2, ',', '.') }}</b></span>
+                <span>Betalingsachterstand: <b>{{ $euro($financieel['achterstallig']) }}</b> <span class="sis-muted" style="font-size:11px;">· vervallen termijnen die nog niet zijn voldaan</span></span>
               </div>
             @elseif ($financieel['terugbetaling'] > 0)
               <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-top:12px;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-                <span>Terug te betalen aan student: <b>€ {{ number_format($financieel['terugbetaling'], 2, ',', '.') }}</b></span>
+                <span>Terug te betalen aan student: <b>{{ $euro($financieel['terugbetaling']) }}</b></span>
               </div>
-            @elseif ($financieel['vooruitbetaald'] > 0)
-              <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-top:12px;">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                <span>Vooruitbetaald (tegoed): <b>€ {{ number_format($financieel['vooruitbetaald'], 2, ',', '.') }}</b> <span class="sis-muted" style="font-size:11px;">· nog ingeschreven, verrekend met resterende maanden</span></span>
+            @elseif ($financieel['openstaand'] > 0)
+              <div class="iuasr-dash-alert iuasr-dash-alert--ok" style="margin-top:12px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                <span>Geen achterstand. Nog te factureren dit studiejaar: <b>{{ $euro($financieel['openstaand']) }}</b></span>
               </div>
             @else
-              <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-top:12px;">
+              <div class="iuasr-dash-alert iuasr-dash-alert--ok" style="margin-top:12px;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                 <span>Collegegeld volledig voldaan.</span>
               </div>
             @endif
+          @endif
+
+          @if ($huidige && auth()->user()->magCollegegeldBeheren())
+            {{-- De regeling geldt per studiejaar; bij herinschrijving opnieuw vast te stellen. --}}
+            <form method="POST" action="{{ route('inschrijving.betaalregeling', $huidige) }}" style="margin-top:14px;border-top:1px solid var(--borderColor);padding-top:12px;">
+              @csrf
+              <label style="display:block;font-size:12px;font-weight:600;color:var(--priColor100);margin-bottom:6px;">Betaalregeling</label>
+              @foreach (App\Enums\Betaalregeling::cases() as $optie)
+                <label class="sis-check-inline" style="display:flex;margin-bottom:4px;">
+                  <input type="radio" name="betaalregeling" value="{{ $optie->value }}" @checked($regeling === $optie)>
+                  <span>{{ $optie->label() }} <span class="sis-muted" style="font-size:11px;">— {{ $optie->omschrijving() }}</span></span>
+                </label>
+              @endforeach
+              <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit" style="margin-top:8px;">Opslaan</button>
+            </form>
           @endif
         </div>
       @endif

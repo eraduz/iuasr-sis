@@ -14,6 +14,7 @@ class Betaling extends Model
         'inschrijving_id',
         'student_id',
         'bedrag',
+        'termijn',
         'datum',
         'betaalwijze',
         'opmerking',
@@ -24,6 +25,7 @@ class Betaling extends Model
     {
         return [
             'bedrag' => 'decimal:2',
+            'termijn' => 'integer',
             'datum' => 'date',
         ];
     }

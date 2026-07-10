@@ -133,12 +133,17 @@ class StudentController extends Controller
         // Financiële status (betalingsachterstand) — stuurt de waarschuwing en blokkades.
         $financieel = \App\Support\Collegegeldstatus::voor($student);
 
+        // Termijnschema van de huidige inschrijving: welke facturen zijn voldaan?
+        $termijnen = $huidige
+            ? \App\Support\Collegegeldtermijnen::voor($huidige->loadMissing('betalingen'))
+            : collect();
+
         $grondslagen = \App\Enums\VrijstellingGrondslag::opties();
         $besluiten = \App\Models\Vrijstellingsbesluit::where('student_id', $student->id)
             ->with(['vak', 'aangemaaktDoor', 'verwerktDoor'])->latest()->get();
         $kennistoetsen = \App\Support\Kennistoetsbewaking::voor($student);
 
-        return view('studenten.show', compact('student', 'huidige', 'actieveInschrijvingen', 'magCijfers', 'cijferVakken', 'financieel', 'vakHistorie', 'grondslagen', 'besluiten', 'kennistoetsen'));
+        return view('studenten.show', compact('student', 'huidige', 'actieveInschrijvingen', 'magCijfers', 'cijferVakken', 'financieel', 'termijnen', 'vakHistorie', 'grondslagen', 'besluiten', 'kennistoetsen'));
     }
 
     /**

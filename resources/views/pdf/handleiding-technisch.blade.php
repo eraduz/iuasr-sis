@@ -144,7 +144,19 @@ MAIL_FROM_NAME="IUASR Studentenzaken"</span>
   <div class="let"><b>Ontbrekende registratie is geen afwezigheid.</b> Het percentage wordt berekend over de <b>geregistreerde</b> weken. Een week zonder regel telt niet mee — anders zou nalatigheid van de docent op de student worden afgewenteld. Een week geldt pas als “geregistreerd” wanneer álle presentieplichtige deelnemers een waarde hebben.</div>
   <p>Vrijgestelde studenten (<code>vaktoewijzingen.vrijgesteld</code>) volgen het vak niet en worden bij het opslaan overgeslagen, óók als het formulier voor hen een waarde meestuurt. Wijzigt u <code>weken_per_blok</code>, dan blijven bestaande registraties met een hoger weeknummer in de database staan maar verdwijnen zij uit het scherm; ruim ze in dat geval expliciet op.</p>
 
-  <h2>8. Regulier onderhoud</h2>
+  <h2>8. Collegegeld: termijnen</h2>
+  <p>Er is bewust <b>geen facturentabel</b>. Het termijnschema wordt volledig afgeleid uit het jaartarief, de betaalregeling en de inschrijvingsduur, zodat het nooit kan verouderen ten opzichte van de inschrijving (bijvoorbeeld na een gewijzigde uitschrijfdatum).</p>
+  <table class="kv">
+    <tr><td class="k">Schema</td><td><code>App\Support\Collegegeldtermijnen</code> — vervalmaanden 9, 11, 1, 3, 5; bedrag = jaarbedrag ÷ n, restje op de laatste termijn.</td></tr>
+    <tr><td class="k">Regeling</td><td><code>inschrijvingen.betaalregeling</code>: <code>termijnen</code> (5 facturen) of <code>volledig</code> (1 factuur, vervalt 1 september).</td></tr>
+    <tr><td class="k">Betaling &rarr; termijn</td><td><code>betalingen.termijn</code> (1..5, nullable). Leeg = automatisch toerekenen aan de oudste openstaande termijn (FIFO).</td></tr>
+    <tr><td class="k">Achterstand</td><td>Som van het openstaande deel van de termijnen waarvan de <b>vervaldatum verstreken</b> is. Dit stuurt de blokkades op herinschrijven en verklaringen.</td></tr>
+  </table>
+  <div class="let"><b>Let op de betekenis van de velden</b> in <code>Collegegeldstatus::voor()</code>: <code>verschuldigd</code> is het totaal van de niet-vervallen termijnen (bij een lopende inschrijving dus het volle jaarbedrag), <code>openstaand</code> is verschuldigd − betaald (inclusief termijnen die nog moeten vervallen), en <code>achterstallig</code> is het direct opeisbare bedrag. Alleen <code>achterstallig</code> bepaalt <code>achterstand</code>.</div>
+  <p>De kolom <code>inschrijvingen.betaalwijze</code> is <b>vervallen</b> (zij mengde regeling en betaalwijze) en blijft alleen voor de historie bestaan. De betaalwijze hoort bij een betaling, niet bij de inschrijving.</p>
+  <p>Bij een beëindigde inschrijving wordt het totaal herrekend naar het pro rata bedrag; termijnen met een vervaldatum ná het einde worden <code>vervallen</code> en de laatste geldende termijn vangt het verschil op. De CSV-import herkent kolommen op <b>naam</b> uit de kopregel, met terugval op de klassieke volgorde (<code>studentnummer;bedrag;datum;betaalwijze;opmerking</code>) voor oudere bestanden.</p>
+
+  <h2>9. Regulier onderhoud</h2>
   <ul>
     <li><b>Migraties:</b> <code>php artisan migrate</code> na een update (reversible; maak eerst een back-up).</li>
     <li><b>Cache:</b> <code>php artisan optimize:clear</code> bij onverwacht gedrag na wijzigingen.</li>

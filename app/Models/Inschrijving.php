@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Betaalregeling;
 use App\Enums\InschrijvingStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -30,7 +31,8 @@ class Inschrijving extends Model
         'invoerdatum',
         'uitschrijfdatum',
         'afstudeerdatum',
-        'betaalwijze',         // termijnen | contant (informatief; geen betaalmodule)
+        'betaalwijze',         // VERVALLEN: mengde regeling en betaalwijze; zie betaalregeling
+        'betaalregeling',      // termijnen (5 facturen) | volledig (1 factuur)
         'aanwezigheidsregeling_50',
         'opmerkingen',
     ];
@@ -39,6 +41,7 @@ class Inschrijving extends Model
     {
         return [
             'status' => InschrijvingStatus::class,
+            'betaalregeling' => Betaalregeling::class,
             'aanwezigheidsregeling_50' => 'boolean',
             'leerjaar' => 'integer',
             'inschrijfdatum' => 'date',
