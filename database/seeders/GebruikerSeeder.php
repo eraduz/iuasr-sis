@@ -25,20 +25,22 @@ class GebruikerSeeder extends Seeder
 
         User::create(['naam' => 'prof. Karima Nassar', 'email' => 'k.nassar@iuasr.nl', 'rol' => Rol::Examencommissie]);
 
-        // Directie is opleidinggebonden: elk directielid ziet uitsluitend de eigen
-        // opleiding(en). Zo ziet de PABO-directie geen theologie- of GV-studenten
-        // en omgekeerd. Een dubbel ingeschreven student is voor beide zichtbaar.
+        // Directie is opleidinggebonden: elk directielid ziet en beheert uitsluitend
+        // de eigen opleiding(en). Verdeling (opdrachtgever): één directeur voor de
+        // Bachelor Islamitische Theologie + de Pre-Master GV, een eigen directeur
+        // voor de Master GV en een eigen directeur voor de PABO. Een dubbel
+        // ingeschreven student is voor beide betrokken directies zichtbaar.
         $theologieDir = User::create(['naam' => 'drs. Bram de Wit', 'email' => 'b.dewit@iuasr.nl', 'rol' => Rol::Directie]);
         $paboDir = User::create(['naam' => 'drs. Mariëlle Groen', 'email' => 'm.groen@iuasr.nl', 'rol' => Rol::Directie]);
         $gvDir = User::create(['naam' => 'dr. Yasin Demir', 'email' => 'y.demir@iuasr.nl', 'rol' => Rol::Directie]);
 
         $opl = fn (array $codes) => Opleiding::whereIn('code', $codes)->pluck('id')->all();
-        // Islamitische Theologie + cursussen (Faculteit Islamitische Wetenschappen).
-        $theologieDir->opleidingen()->sync($opl(['ISLTH', 'KRN', 'ARAB']));
-        // PABO (Faculteit Onderwijs & Opvoeding).
+        // Bachelor Islamitische Theologie + Pre-Master Islamitische Geestelijke Verzorging.
+        $theologieDir->opleidingen()->sync($opl(['ISLTH', 'PMGV']));
+        // PABO — Leraar Basisonderwijs (Faculteit Onderwijs & Opvoeding).
         $paboDir->opleidingen()->sync($opl(['PABO']));
-        // Islamitische Geestelijke Verzorging (pre-master + master).
-        $gvDir->opleidingen()->sync($opl(['PMGV', 'MGV']));
+        // Master Islamitische Geestelijke Verzorging (eigen directeur).
+        $gvDir->opleidingen()->sync($opl(['MGV']));
 
         User::create(['naam' => 'mr. Nadia Öztürk', 'email' => 'n.ozturk@iuasr.nl', 'rol' => Rol::Bestuur]);
         User::create(['naam' => 'Ismail Kaya', 'email' => 'i.kaya@iuasr.nl', 'rol' => Rol::Beheerder]);
