@@ -66,9 +66,12 @@ Route::middleware('auth')->group(function () {
     |  - Schoolbestuur: dashboard/statistieken en cursistinzage (alleen-lezen).
     | De scoping wordt server-side afgedwongen in de controllers (zichtbaarVoor).
     */
-    // Dashboard: alle rollen met toegang tot de module.
+    // Dashboard en rapportage: alle rollen met toegang tot de module. De
+    // cursusdirecteur ziet uitsluitend de eigen cursus(sen) (server-side gescoped).
     Route::middleware('rol:cursusadministratie,financien,beheerder,bestuur')->prefix('cursussen')->group(function () {
         Route::get('/', [App\Http\Controllers\Cursus\CursusDashboardController::class, 'index'])->name('cursussen.dashboard');
+        Route::get('/rapport', [App\Http\Controllers\Cursus\CursusrapportController::class, 'index'])->name('cursussen.rapport');
+        Route::get('/rapport/export.csv', [App\Http\Controllers\Cursus\CursusrapportController::class, 'export'])->name('cursussen.rapport.export');
     });
 
     // Boekhouding: cursusgelden volgen en betalingen registreren/corrigeren (alle cursussen).

@@ -13,6 +13,7 @@
     <div class="summary">Cursusbeheer, cursisten en cursusgelden</div>
   </div>
   <div class="iuasr-dash-vhead__actions">
+    <a class="iuasr-dash-btn" href="{{ route('cursussen.rapport') }}">Rapportage</a>
     @if (auth()->user()->magCursusBeheer())
       <a class="iuasr-dash-btn" href="{{ route('cursisten.create') }}">Cursist toevoegen</a>
       <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('cursussen.beheer') }}">Cursusbeheer</a>
@@ -23,10 +24,12 @@
   </div>
 </div>
 
-<div class="iuasr-dash-stats" style="margin-bottom:16px;">
+<div class="iuasr-dash-stats" style="grid-template-columns:repeat(5,1fr);margin-bottom:16px;">
   <div class="iuasr-dash-stat"><span class="lbl">Actieve cursussen</span><span class="val">{{ $aantalCursussen }}</span></div>
   <div class="iuasr-dash-stat"><span class="lbl">Cursisten</span><span class="val">{{ $aantalCursisten }}</span></div>
   <div class="iuasr-dash-stat iuasr-dash-stat--ok"><span class="lbl">Actieve inschrijvingen</span><span class="val">{{ $aantalInschrijvingen }}</span></div>
+  <div class="iuasr-dash-stat"><span class="lbl">Cursusgeld voldaan</span><span class="val">{{ $financieel['betaalgraad'] }}%</span></div>
+  <div class="iuasr-dash-stat {{ $financieel['openstaand'] > 0 ? 'iuasr-dash-stat--alert' : '' }}"><span class="lbl">Openstaand</span><span class="val" style="font-size:20px;">{{ $euro($financieel['openstaand']) }}</span></div>
 </div>
 
 <div class="iuasr-dash-tbl-card">

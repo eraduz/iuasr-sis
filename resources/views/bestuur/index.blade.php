@@ -18,6 +18,7 @@
   <div class="iuasr-dash-vhead__actions">
     <a class="iuasr-dash-btn" href="{{ route('rapporten.alumni') }}">Alumni</a>
     <a class="iuasr-dash-btn" href="{{ route('presentieoverzicht') }}">Aanwezigheid</a>
+    <a class="iuasr-dash-btn" href="{{ route('cursussen.rapport') }}">Cursusrapport</a>
     <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('cursussen.dashboard') }}">Cursussen</a>
   </div>
 </div>

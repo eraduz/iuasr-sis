@@ -133,6 +133,7 @@
     $cursusMenu = [
         'Cursussen' => [
             ['Overzicht', 'cursussen.dashboard', 'dash', 'cursussen.dashboard'],
+            ['Rapportage', 'cursussen.rapport', 'report', 'cursussen.rapport'],
         ],
     ];
 
