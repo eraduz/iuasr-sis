@@ -107,6 +107,36 @@ class CurriculumTest extends TestCase
         $this->assertSame(40.0, $verplicht(4)); // zonder keuzeruimte
     }
 
+    /** De pre-master telt 50 EC (12 vakken), niet de 60 die er eerder stond. */
+    public function test_premaster_telt_vijftig_ec(): void
+    {
+        $pmgv = Opleiding::where('code', 'PMGV')->firstOrFail();
+
+        $this->assertSame(50, $pmgv->ec_totaal);
+        $this->assertSame(50.0, round((float) Vak::where('opleiding_id', $pmgv->id)->sum('ec'), 1));
+    }
+
+    /**
+     * Het nominale totaal van een opleiding moet overeenkomen met het curriculum.
+     * Bij de bachelor telt de keuzeruimte niet volledig mee: 220 EC verplicht plus
+     * 20 EC die de student uit de keuzeruimte kiest.
+     */
+    public function test_nominale_ec_totalen_kloppen_met_het_curriculum(): void
+    {
+        $verplicht = fn (string $code) => round((float) Vak::whereHas('opleiding', fn ($q) => $q->where('code', $code))
+            ->where('keuzevak', false)->sum('ec'), 1);
+
+        $this->assertSame(50.0, $verplicht('PMGV'));
+        $this->assertSame(50, Opleiding::where('code', 'PMGV')->value('ec_totaal'));
+
+        $this->assertSame(120.0, $verplicht('MGV'));
+        $this->assertSame(120, Opleiding::where('code', 'MGV')->value('ec_totaal'));
+
+        // Bachelor: 220 verplicht + 20 uit de keuzeruimte = 240.
+        $this->assertSame(220.0, $verplicht('ISLTH'));
+        $this->assertSame(240, Opleiding::where('code', 'ISLTH')->value('ec_totaal'));
+    }
+
     public function test_elk_vak_heeft_een_toetsonderdeel(): void
     {
         // Zonder toetsonderdeel kan de docent geen cijfer invoeren.

@@ -99,7 +99,9 @@ class ReferentieSeeder extends Seeder
         ]);
         Opleiding::create([
             'faculteit_id' => $fiw->id, 'code' => 'PMGV', 'naam' => 'Pre-Master Islamitische Geestelijke Verzorging',
-            'soort' => 'premaster', 'nominale_jaren' => 1, 'ec_totaal' => 60,
+            // BEVESTIGD (opdrachtgever, 2026-07-10): de pre-master telt 50 EC,
+            // conform het curriculum (12 vakken, samen 50 EC) — geen 60.
+            'soort' => 'premaster', 'nominale_jaren' => 1, 'ec_totaal' => 50,
             'actief' => true,
         ]);
         Opleiding::create([
