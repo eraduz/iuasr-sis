@@ -17,9 +17,15 @@ class DashboardController extends Controller
      * de relevante (en niet te zware) aggregaties berekend; cijfergebonden
      * statistieken zijn voorbehouden aan rollen met cijferinzage.
      */
-    public function index(): View
+    public function index(): View|\Illuminate\Http\RedirectResponse
     {
         $rol = auth()->user()->rol;
+
+        // Het Studentenzaken-dashboard is niet voor rollen buiten die module
+        // (bijv. Cursusadministratie); stuur hen naar hun eigen module.
+        if (! $rol->magModule('studentenzaken')) {
+            return redirect()->route('cursussen.dashboard');
+        }
         $actievePeriodeId = Periode::where('actief', true)->value('id');
         $kern = Statistiek::kern();
 

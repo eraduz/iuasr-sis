@@ -280,10 +280,15 @@ opleverpunt aantoonbaar klaar is.
     zien meerdere modules; onderwijsrollen alleen Studentenzaken. Nog niet
     gebouwde modules = 'Binnenkort' (grijs). Terugknop 'Modules' in de header.
     8 tests (`ModulekeuzeTest`); 274 groen. Handleidingen bijgewerkt.
-  - [ ] **Fase B — Cursussen & cursisten.** Cursusbeheer (Arabische Taal € 265,
-    Hifz € 330, Certificaat/Ijaaza € 430; uitbreidbaar), cursisten handmatig +
-    Excel-bulkimport, inschrijvingen. Rollen Cursusadministratie + Cursusdirecteur
-    toevoegen; Cursussen-module op actief.
+  - [x] **Fase B — Cursussen & cursisten.** Rol **Cursusadministratie** toegevoegd
+    (enum + ALTER); Cursussen-module op actief. Tabellen `cursussen` (3 cursussen:
+    Arabische Taal € 265, Hifz € 330, Ijaaza € 430; uitbreidbaar), `cursisten`
+    (lichtere kopie van studenten, eigen cursistnummer C+jaar+volgnr) en
+    `cursusinschrijvingen` (totaalbedrag = momentopname cursusgeld). Cursusbeheer-CRUD,
+    cursisten handmatig + **bulk-import (.xlsx/.csv via Tabellezer)**, inschrijven met
+    statusbeheer. Eigen cursus-sidebar; cursus-only rollen worden van / naar de module
+    gestuurd. Rolscheiding: alleen Cursusadministratie + Beheer. Alles gelogd. 13 tests
+    (`CursussenModuleTest`); 287 groen. Cursusdirecteur-rol volgt in Fase D.
   - [ ] **Fase C — Cursusgelden & boekhouding.** Betalingen registreren,
     betaalstatus/openstaand, methoden (iDEAL/overboeking/contant), historie.
   - [ ] **Fase D — Cursusdirecteuren.** Koppeling cursus↔directeur, toegang

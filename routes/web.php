@@ -54,6 +54,41 @@ Route::middleware('auth')->group(function () {
     // Keuzescherm na de login: welke module wil de gebruiker gebruiken?
     Route::get('/modules', [App\Http\Controllers\ModuleController::class, 'index'])->name('modules.kiezen');
 
+    /*
+    |--------------------------------------------------------------------------
+    | Module: Cursussen Administratie
+    |--------------------------------------------------------------------------
+    | Beheer van cursussen, cursisten en inschrijvingen. Toegang: Cursusadmini-
+    | stratie en Beheer; de Financiële Administratie krijgt in een latere fase
+    | de betalingen. Cursusdirecteuren (met toegangsbeperking) volgen later.
+    */
+    Route::middleware('rol:cursusadministratie,beheerder')->prefix('cursussen')->group(function () {
+        Route::get('/', [App\Http\Controllers\Cursus\CursusDashboardController::class, 'index'])->name('cursussen.dashboard');
+
+        // Cursusbeheer
+        Route::get('/beheer', [App\Http\Controllers\Cursus\CursusController::class, 'index'])->name('cursussen.beheer');
+        Route::get('/beheer/nieuw', [App\Http\Controllers\Cursus\CursusController::class, 'create'])->name('cursussen.create');
+        Route::post('/beheer', [App\Http\Controllers\Cursus\CursusController::class, 'store'])->name('cursussen.store');
+        Route::get('/beheer/{cursus}/bewerken', [App\Http\Controllers\Cursus\CursusController::class, 'edit'])->name('cursussen.edit');
+        Route::put('/beheer/{cursus}', [App\Http\Controllers\Cursus\CursusController::class, 'update'])->name('cursussen.update');
+        Route::delete('/beheer/{cursus}', [App\Http\Controllers\Cursus\CursusController::class, 'destroy'])->name('cursussen.destroy');
+
+        // Cursisten (bulk-import vóór de {cursist}-route i.v.m. matching)
+        Route::get('/cursisten', [App\Http\Controllers\Cursus\CursistController::class, 'index'])->name('cursisten');
+        Route::get('/cursisten/nieuw', [App\Http\Controllers\Cursus\CursistController::class, 'create'])->name('cursisten.create');
+        Route::post('/cursisten', [App\Http\Controllers\Cursus\CursistController::class, 'store'])->name('cursisten.store');
+        Route::get('/cursisten/import/sjabloon', [App\Http\Controllers\Cursus\CursistController::class, 'importSjabloon'])->name('cursisten.import.sjabloon');
+        Route::post('/cursisten/import/controle', [App\Http\Controllers\Cursus\CursistController::class, 'importControle'])->name('cursisten.import.controle');
+        Route::post('/cursisten/import', [App\Http\Controllers\Cursus\CursistController::class, 'import'])->name('cursisten.import');
+        Route::get('/cursisten/{cursist}', [App\Http\Controllers\Cursus\CursistController::class, 'show'])->name('cursisten.show');
+        Route::get('/cursisten/{cursist}/bewerken', [App\Http\Controllers\Cursus\CursistController::class, 'edit'])->name('cursisten.edit');
+        Route::put('/cursisten/{cursist}', [App\Http\Controllers\Cursus\CursistController::class, 'update'])->name('cursisten.update');
+
+        // Inschrijvingen
+        Route::post('/cursisten/{cursist}/inschrijven', [App\Http\Controllers\Cursus\CursusinschrijvingController::class, 'store'])->name('cursisten.inschrijven');
+        Route::put('/cursisten/{cursist}/inschrijvingen/{inschrijving}', [App\Http\Controllers\Cursus\CursusinschrijvingController::class, 'update'])->name('cursisten.inschrijving.update');
+    });
+
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     // PDF-handleidingen: medewerkers (iedereen) en technisch/herstel (Beheerder).

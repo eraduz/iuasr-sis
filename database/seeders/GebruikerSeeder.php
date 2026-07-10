@@ -41,5 +41,7 @@ class GebruikerSeeder extends Seeder
 
         User::create(['naam' => 'mr. Nadia Öztürk', 'email' => 'n.ozturk@iuasr.nl', 'rol' => Rol::Bestuur]);
         User::create(['naam' => 'Ismail Kaya', 'email' => 'i.kaya@iuasr.nl', 'rol' => Rol::Beheerder]);
+        // Module Cursussen Administratie.
+        User::create(['naam' => 'Hafsa Bakkali', 'email' => 'h.bakkali@iuasr.nl', 'rol' => Rol::Cursusadministratie]);
     }
 }

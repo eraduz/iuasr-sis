@@ -211,7 +211,17 @@
   <p>Onder <b>Rapporten</b> maakt u o.a. de klassenlijst, het alumni-rapport, een Excel-export van actieve studenten (met IBAN, zonder BSN), het EC-rapport, het overgangsadvies en de cijfer-/tentamenlijsten. Elke lijst heeft een zoekbalk.</p>
   <p>Het <b>alumni-rapport</b> (afgestudeerde studenten met hun contactgegevens) is toegankelijk voor <b>Studentenzaken</b>, <b>Directie</b> en het <b>Schoolbestuur</b>. Het bevat geen cijfers en geen BSN. Directie ziet alleen de alumni van de eigen opleiding(en); Studentenzaken en het Schoolbestuur zien ze allemaal. Het Schoolbestuur vindt de lijst in het menu onder <b>Rapporten &rarr; Alumni</b>.</p>
 
-  <h2>11. Vragen of problemen?</h2>
+  <h2>11. Cursussen Administratie (aparte module)</h2>
+  <p>Naast Studentenzaken is er de module <b>Cursussen Administratie</b> voor de cursussen die buiten Studentenzaken vallen. U opent haar via het <b>modulekeuzescherm</b> (rechtsboven <b>Modules</b>). Toegang hebben de rol <b>Cursusadministratie</b> en de Beheerder; de Financiële Administratie krijgt hier later de betalingen.</p>
+  <h3>Cursussen</h3>
+  <p>Onder <b>Cursusbeheer</b> staan de cursussen met hun cursusgeld. De huidige cursussen zijn <b>Arabische Taal</b> (€ 265), <b>Hifz Programma</b> (€ 330) en <b>Certificaatprogramma / Ijaaza</b> (€ 430). Nieuwe cursussen en tarieven voegt u hier gewoon toe; een cursus met inschrijvingen kunt u niet verwijderen (historie) maar wel op inactief zetten.</p>
+  <h3>Cursisten</h3>
+  <p>Cursisten staan los van de studenten en krijgen een eigen <b>cursistnummer</b> (bijv. C260001). U voegt ze <b>handmatig</b> toe of in <b>bulk</b> via een Excel- of CSV-bestand. Bij de bulk-import mag u een kolom <b>cursuscode</b> meegeven; staat daar een geldige code, dan wordt de cursist meteen op die cursus ingeschreven. Zoals altijd ziet u eerst een controlescherm voordat er iets wordt opgeslagen.</p>
+  <h3>Inschrijven</h3>
+  <p>Op het dossier van een cursist schrijft u hem in op een cursus. Het <b>cursusgeld</b> wordt als momentopname vastgelegd, zodat een latere tariefwijziging bestaande inschrijvingen niet verandert. De status van een inschrijving (aangemeld, actief, afgerond, geannuleerd) past u daar ook aan.</p>
+  <div class="tip">De cursusadministratie is een aparte administratie met een lichter regime: geen BSN of DUO-gegevens. Belangrijke acties (cursus/cursist aanmaken, inschrijven, importeren) worden gelogd.</div>
+
+  <h2>12. Vragen of problemen?</h2>
   <p>Neem bij vragen contact op met de systeembeheerder of Studentenzaken (szaken@iuasr.nl). Werkt iets niet zoals verwacht, meld dan wat u deed en wat u zag.</p>
 
   <div class="tip">Deze handleiding wordt bijgewerkt zodra er nieuwe functies bij komen. Kijk bij twijfel of u de meest recente versie hebt (zie de datum onderaan).</div>

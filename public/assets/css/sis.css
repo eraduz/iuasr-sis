@@ -41,6 +41,8 @@
 .role--examencommissie{ color: #6B4FB0; }
 .role--directie       { color: var(--priColor300); }
 .role--beheerder      { color: var(--priColor100); }
+.role--bestuur        { color: #8a5a00; }
+.role--cursusadministratie { color: #1d6f5c; }
 
 .sis-roleswitch {
   display: inline-flex; align-items: center; gap: 8px;

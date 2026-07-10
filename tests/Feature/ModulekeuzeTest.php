@@ -30,9 +30,10 @@ class ModulekeuzeTest extends TestCase
             ['studentenzaken', 'cursussen', 'stage', 'scriptie', 'hr'],
             Module::geordend()->pluck('sleutel')->all(),
         );
-        // Alleen Studentenzaken is in deze fase gebouwd.
+        // Studentenzaken en (sinds Fase B) Cursussen zijn gebouwd; de rest nog niet.
         $this->assertTrue(Module::where('sleutel', 'studentenzaken')->value('actief'));
-        $this->assertFalse(Module::where('sleutel', 'cursussen')->value('actief'));
+        $this->assertTrue(Module::where('sleutel', 'cursussen')->value('actief'));
+        $this->assertFalse(Module::where('sleutel', 'stage')->value('actief'));
     }
 
     public function test_dev_login_leidt_naar_het_keuzescherm(): void
@@ -60,8 +61,8 @@ class ModulekeuzeTest extends TestCase
 
         $this->assertTrue(Module::where('sleutel', 'studentenzaken')->first()->toegankelijkVoor($gebruiker));
         $this->assertTrue(Module::where('sleutel', 'cursussen')->first()->toegankelijkVoor($gebruiker));
-        // Cursussen is toegankelijk maar nog niet gebouwd: nog niet bruikbaar.
-        $this->assertFalse(Module::where('sleutel', 'cursussen')->first()->bruikbaarVoor($gebruiker));
+        // Cursussen is sinds Fase B gebouwd en dus bruikbaar voor Financiën.
+        $this->assertTrue(Module::where('sleutel', 'cursussen')->first()->bruikbaarVoor($gebruiker));
     }
 
     public function test_onderwijsrol_heeft_geen_toegang_tot_cursussen(): void
@@ -84,7 +85,7 @@ class ModulekeuzeTest extends TestCase
     public function test_alleen_gebouwde_modules_hebben_een_startroute(): void
     {
         $this->assertSame('dashboard', Module::where('sleutel', 'studentenzaken')->first()->startRoute());
-        $this->assertNull(Module::where('sleutel', 'cursussen')->first()->startRoute());
+        $this->assertSame('cursussen.dashboard', Module::where('sleutel', 'cursussen')->first()->startRoute());
         $this->assertNull(Module::where('sleutel', 'hr')->first()->startRoute());
     }
 

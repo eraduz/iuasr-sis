@@ -26,6 +26,8 @@ enum Rol: string
     case Directie = 'directie';
     case Bestuur = 'bestuur';
     case Beheerder = 'beheerder';
+    // Module Cursussen Administratie. De cursusdirecteur volgt in een latere fase.
+    case Cursusadministratie = 'cursusadministratie';
 
     /** Leesbare naam voor UI en documenten (Nederlands, U-vorm). */
     public function label(): string
@@ -38,6 +40,7 @@ enum Rol: string
             self::Directie => 'Directie',
             self::Bestuur => 'Schoolbestuur',
             self::Beheerder => 'Beheerder',
+            self::Cursusadministratie => 'Cursusadministratie',
         };
     }
 
@@ -86,7 +89,8 @@ enum Rol: string
     {
         return match ($this) {
             self::Docent, self::Examencommissie, self::Directie => true,
-            self::Studentenzaken, self::Bestuur, self::Beheerder => false,
+            self::Studentenzaken, self::Bestuur, self::Beheerder,
+            self::Cursusadministratie => false,
         };
     }
 
@@ -105,7 +109,8 @@ enum Rol: string
     {
         return match ($this) {
             self::Studentenzaken, self::Beheerder => true,
-            self::Docent, self::Examencommissie, self::Directie, self::Bestuur => false,
+            self::Docent, self::Examencommissie, self::Directie, self::Bestuur,
+            self::Cursusadministratie => false,
         };
     }
 
@@ -129,7 +134,8 @@ enum Rol: string
     {
         return match ($this) {
             self::Docent, self::Examencommissie, self::Directie, self::Bestuur => true,
-            self::Studentenzaken, self::Financien, self::Beheerder => false,
+            self::Studentenzaken, self::Financien, self::Beheerder,
+            self::Cursusadministratie => false,
         };
     }
 
@@ -143,7 +149,7 @@ enum Rol: string
         return match ($this) {
             self::Studentenzaken, self::Docent, self::Examencommissie,
             self::Directie, self::Bestuur, self::Beheerder => true,
-            self::Financien => false,
+            self::Financien, self::Cursusadministratie => false,
         };
     }
 
@@ -198,6 +204,7 @@ enum Rol: string
         return match ($this) {
             self::Beheerder => ['*'],
             self::Financien => ['studentenzaken', 'cursussen'],
+            self::Cursusadministratie => ['cursussen'],
             self::Studentenzaken, self::Docent, self::Examencommissie,
             self::Directie, self::Bestuur => ['studentenzaken'],
         };

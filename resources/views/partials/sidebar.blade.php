@@ -118,14 +118,31 @@
         ],
     ];
 
-    $menu = $menus[$rol] ?? $menus[Rol::Studentenzaken->value];
+    // Binnen de module Cursussen Administratie geldt een eigen menu, ongeacht de
+    // rol (Cursusadministratie werkt uitsluitend hier). Het actief-patroon per
+    // item mag een wildcard zijn zodat sub-schermen de juiste regel oplichten.
+    $cursusMenu = [
+        'Cursussen' => [
+            ['Overzicht', 'cursussen.dashboard', 'dash', 'cursussen.dashboard'],
+            ['Cursusbeheer', 'cursussen.beheer', 'book', 'cursussen.beheer,cursussen.create,cursussen.edit'],
+        ],
+        'Cursisten' => [
+            ['Alle cursisten', 'cursisten', 'students', 'cursisten,cursisten.show,cursisten.edit'],
+            ['Cursist toevoegen', 'cursisten.create', 'plus', 'cursisten.create'],
+        ],
+    ];
+
+    $inCursusmodule = request()->routeIs('cursussen.*') || request()->routeIs('cursisten*');
+    $menu = $inCursusmodule
+        ? $cursusMenu
+        : ($menus[$rol] ?? $menus[Rol::Studentenzaken->value]);
 @endphp
 
 @foreach ($menu as $titel => $items)
   <div class="iuasr-dash-sidebar__group">
     <div class="iuasr-dash-sidebar__title">{{ $titel }}</div>
     @foreach ($items as [$label, $routeNaam, $ic, $actiefPatroon])
-      <a class="iuasr-dash-sidenav {{ request()->routeIs($actiefPatroon) ? 'is-active' : '' }}"
+      <a class="iuasr-dash-sidenav {{ request()->routeIs(explode(',', $actiefPatroon)) ? 'is-active' : '' }}"
          href="{{ Route::has($routeNaam) ? route($routeNaam) : '#' }}">
         <span aria-hidden="true">{!! $icon($ic) !!}</span>
         <span>{{ $label }}</span>

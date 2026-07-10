@@ -55,7 +55,15 @@ class DashboardStatistiekTest extends TestCase
             if (! $user) {
                 continue;
             }
-            $this->actingAs($user)->get(route('dashboard'))->assertOk();
+            $antwoord = $this->actingAs($user)->get(route('dashboard'));
+
+            if ($rol->magModule('studentenzaken')) {
+                $antwoord->assertOk();
+            } else {
+                // Rollen buiten Studentenzaken (bijv. Cursusadministratie) worden
+                // naar hun eigen module gestuurd.
+                $antwoord->assertRedirect(route('cursussen.dashboard'));
+            }
         }
     }
 
