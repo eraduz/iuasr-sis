@@ -28,6 +28,14 @@ use Illuminate\Support\Collection;
  * inschrijving worden 'vervallen' (geen factuur). Het totaal wordt herrekend
  * naar het pro rata verschuldigde bedrag; reeds vervallen termijnen behouden
  * hun bedrag en de laatste nog geldende termijn wordt bijgesteld.
+ *
+ * DUBBELE INSCHRIJVING. Collegegeld is per STUDIEJAAR eenmaal verschuldigd, ook
+ * als de student dat jaar twee opleidingen volgt. Er is dus per studiejaar maar
+ * één termijnschema: dat van de MAATGEVENDE inschrijving (het hoogste bedrag).
+ * De andere inschrijving levert geen termijnen op. Betalingen worden verrekend
+ * over het hele studiejaar — ook wanneer de boekhouding ze op de andere
+ * inschrijving heeft geboekt. Zou dat niet gebeuren, dan zou een student die
+ * alles betaald heeft toch een achterstand houden en geblokkeerd raken.
  */
 class Collegegeldtermijnen
 {
@@ -59,6 +67,12 @@ class Collegegeldtermijnen
             return collect();
         }
 
+        // Bij een dubbele inschrijving hangt het schema aan de maatgevende
+        // inschrijving; de andere levert geen facturen op.
+        if (! self::isMaatgevend($inschrijving, $peildatum)) {
+            return collect();
+        }
+
         $termijnen = self::nominaalSchema($inschrijving, $jaarbedrag, $start);
         $termijnen = self::herrekenBijBeeindiging($inschrijving, $termijnen, $peildatum);
         $termijnen = self::rekenBetalingenToe($inschrijving, $termijnen);
@@ -83,6 +97,74 @@ class Collegegeldtermijnen
     public static function regeling(Inschrijving $inschrijving): Betaalregeling
     {
         return $inschrijving->betaalregeling ?? Betaalregeling::Termijnen;
+    }
+
+    /*
+    |----------------------------------------------------------------------
+    | Studiejaar: één schema, ook bij een dubbele inschrijving
+    |----------------------------------------------------------------------
+    */
+
+    /**
+     * Het nominaal verschuldigde bedrag van deze inschrijving, VÓÓR betalingen.
+     * Bepaalt welke inschrijving maatgevend is; mag daarom nooit het termijnschema
+     * aanroepen (dat zou een kringverwijzing opleveren).
+     */
+    public static function verschuldigdTotaal(Inschrijving $inschrijving, ?Carbon $peildatum = null): float
+    {
+        $jaarbedrag = Collegegeldstatus::tarief($inschrijving);
+        if ($jaarbedrag === null || $inschrijving->status === InschrijvingStatus::Aangemeld) {
+            return 0.0;
+        }
+
+        // Beëindigd: pro rata. Lopend: het volledige jaarbedrag.
+        return self::eindeInschrijving($inschrijving) !== null
+            ? Collegegeldstatus::verschuldigd($inschrijving, $peildatum)
+            : round($jaarbedrag, 2);
+    }
+
+    /** Alle inschrijvingen van deze student in hetzelfde studiejaar (incl. zichzelf). */
+    public static function inschrijvingenVanStudiejaar(Inschrijving $inschrijving): Collection
+    {
+        return Inschrijving::where('student_id', $inschrijving->student_id)
+            ->where('periode_id', $inschrijving->periode_id)
+            ->orderBy('id')->get();
+    }
+
+    /**
+     * De inschrijving die het collegegeld van dit studiejaar bepaalt: die met het
+     * hoogste verschuldigde bedrag. Bij gelijke bedragen wint de laagste id, zodat
+     * de uitkomst deterministisch is.
+     */
+    public static function maatgevende(Inschrijving $inschrijving, ?Carbon $peildatum = null): Inschrijving
+    {
+        $broers = self::inschrijvingenVanStudiejaar($inschrijving);
+        if ($broers->count() <= 1) {
+            return $inschrijving;
+        }
+
+        return $broers
+            ->sortBy([
+                fn ($a, $b) => self::verschuldigdTotaal($b, $peildatum) <=> self::verschuldigdTotaal($a, $peildatum),
+                fn ($a, $b) => $a->id <=> $b->id,
+            ])
+            ->first();
+    }
+
+    public static function isMaatgevend(Inschrijving $inschrijving, ?Carbon $peildatum = null): bool
+    {
+        return self::maatgevende($inschrijving, $peildatum)->id === $inschrijving->id;
+    }
+
+    /**
+     * De opleiding waarbij het collegegeld van een niet-maatgevende inschrijving
+     * wordt verrekend — voor de uitleg op het scherm.
+     */
+    public static function verrekendBij(Inschrijving $inschrijving, ?Carbon $peildatum = null): ?Inschrijving
+    {
+        $maatgevend = self::maatgevende($inschrijving, $peildatum);
+
+        return $maatgevend->id === $inschrijving->id ? null : $maatgevend->load('opleiding');
     }
 
     /** Nominale termijnen: gelijke bedragen, afrondingsrestje op de laatste. */
@@ -153,10 +235,13 @@ class Collegegeldtermijnen
      * Betalingen toerekenen. Een betaling met een expliciet termijnnummer gaat
      * naar die termijn; betalingen zonder termijn worden op datumvolgorde
      * toegerekend aan de oudste termijn die nog openstaat.
+     *
+     * Bij een dubbele inschrijving tellen ALLE betalingen van dat studiejaar mee,
+     * ook die op de andere inschrijving zijn geboekt: er is maar één factuurreeks.
      */
     private static function rekenBetalingenToe(Inschrijving $inschrijving, Collection $termijnen): Collection
     {
-        $betalingen = $inschrijving->betalingen ?? collect();
+        $betalingen = self::betalingenVanStudiejaar($inschrijving);
         $betaaldPerNr = [];
 
         foreach ($betalingen->whereNotNull('termijn') as $betaling) {
@@ -185,6 +270,19 @@ class Collegegeldtermijnen
 
             return [...$t, 'betaald' => round($t['betaald'] + $toe, 2)];
         });
+    }
+
+    /** Alle betalingen van deze student in dit studiejaar, over alle inschrijvingen. */
+    private static function betalingenVanStudiejaar(Inschrijving $inschrijving): Collection
+    {
+        $ids = self::inschrijvingenVanStudiejaar($inschrijving)->pluck('id');
+
+        // Eén inschrijving: gebruik de al geladen relatie (scheelt een query).
+        if ($ids->count() <= 1) {
+            return $inschrijving->betalingen ?? collect();
+        }
+
+        return \App\Models\Betaling::whereIn('inschrijving_id', $ids)->orderBy('datum')->orderBy('id')->get();
     }
 
     /** Status en openstaand bedrag per termijn. */

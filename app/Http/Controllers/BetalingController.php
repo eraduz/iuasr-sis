@@ -62,7 +62,9 @@ class BetalingController extends Controller
         ]);
         $status = Collegegeldstatus::voor($student);
 
-        // Per inschrijving het termijnschema (de facturen) met betaalstand.
+        // Per inschrijving het termijnschema. Bij een dubbele inschrijving levert
+        // alleen de MAATGEVENDE inschrijving facturen op; de andere krijgt een
+        // toelichting in plaats van een tabel met knoppen waar niets te boeken valt.
         $regels = $student->inschrijvingen->sortByDesc('inschrijfdatum')->map(fn ($i) => [
             'inschrijving' => $i,
             'tarief' => Collegegeldstatus::tarief($i),
@@ -70,6 +72,9 @@ class BetalingController extends Controller
             'regeling' => Collegegeldtermijnen::regeling($i),
             'termijnen' => Collegegeldtermijnen::voor($i),
             'verschuldigd' => Collegegeldtermijnen::totaal($i),
+            'maatgevend' => Collegegeldtermijnen::isMaatgevend($i),
+            'verrekendBij' => Collegegeldtermijnen::verrekendBij($i),
+            'dubbelInStudiejaar' => Collegegeldtermijnen::inschrijvingenVanStudiejaar($i)->count() > 1,
         ]);
 
         return view('financien.student', compact('student', 'status', 'regels'));
@@ -147,6 +152,8 @@ class BetalingController extends Controller
 
                 continue;
             }
+            // Bij een dubbele inschrijving boeken op de maatgevende inschrijving.
+            $insch = Collegegeldtermijnen::maatgevende($insch);
 
             $bedrag = $this->parseBedrag($veld($kolommen, 'bedrag'));
             if ($bedrag === null || $bedrag <= 0) {
@@ -343,7 +350,13 @@ class BetalingController extends Controller
             'opmerking' => ['nullable', 'string', 'max:500'],
         ]);
 
-        $inschrijving = $student->inschrijvingen()->findOrFail($data['inschrijving_id']);
+        // Het collegegeld hangt aan het STUDIEJAAR: bij een dubbele inschrijving
+        // wordt de betaling geboekt op de maatgevende inschrijving, waar de
+        // facturen staan. Zo kan er nooit geld op een schemaloze inschrijving
+        // belanden.
+        $gekozen = $student->inschrijvingen()->findOrFail($data['inschrijving_id']);
+        $inschrijving = Collegegeldtermijnen::maatgevende($gekozen);
+
         // Uit een formulier komt de termijn als string binnen; het schema werkt
         // met integers. Zonder deze cast faalt de vergelijking hieronder altijd.
         $termijn = ($data['termijn'] ?? null) !== null ? (int) $data['termijn'] : null;

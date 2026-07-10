@@ -51,13 +51,36 @@
 {{-- Termijnschema per studiejaar: één klik per termijn om te boeken --}}
 @forelse ($regels as $r)
   @php $insch = $r['inschrijving']; $termijnen = $r['termijnen']; @endphp
-  <div class="sis-card" style="margin-bottom:16px;">
+  <div class="sis-card" style="margin-bottom:16px;{{ $r['maatgevend'] ? '' : 'opacity:.75;' }}">
     <div class="sis-card__hd">
-      <h3>{{ $insch->periode?->naam ?? 'Studiejaar' }} · {{ $insch->opleiding?->code }}</h3>
-      <span class="hint">{{ $r['regeling']->label() }} · jaartarief {{ $r['tarief'] !== null ? $euro($r['tarief']) : 'niet ingesteld' }} · {{ $insch->status->label() }}</span>
+      <h3>
+        {{ $insch->periode?->naam ?? 'Studiejaar' }} · {{ $insch->opleiding?->code }}
+        @if ($r['maatgevend'] && $r['dubbelInStudiejaar'])
+          <span class="sis-pill-soft" style="margin-left:6px;">maatgevend · dubbele inschrijving</span>
+        @endif
+      </h3>
+      <span class="hint">
+        @if ($r['maatgevend'])
+          {{ $r['regeling']->label() }} · jaartarief {{ $r['tarief'] !== null ? $euro($r['tarief']) : 'niet ingesteld' }} · {{ $insch->status->label() }}
+        @else
+          {{ $insch->status->label() }} · geen eigen facturen
+        @endif
+      </span>
     </div>
 
-    @if ($termijnen->isEmpty())
+    @if (! $r['maatgevend'])
+      {{-- Dubbele inschrijving: collegegeld is per studiejaar eenmaal verschuldigd. --}}
+      <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin:0;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span>
+          <b>Geen collegegeld verschuldigd voor deze inschrijving.</b>
+          Collegegeld wordt per studiejaar <b>éénmaal</b> berekend; bij deze <b>dubbele inschrijving</b> loopt het
+          via <b>{{ $r['verrekendBij']?->opleiding?->code ?? 'de andere opleiding' }}</b>
+          @if ($r['tarief'] !== null)<span class="sis-muted" style="font-size:11px;">(jaartarief hier zou {{ $euro($r['tarief']) }} zijn — het hoogste tarief is maatgevend)</span>@endif.
+          Boek betalingen op het schema hierboven; betalingen die per abuis op déze inschrijving zijn geboekt, worden gewoon meegeteld.
+        </span>
+      </div>
+    @elseif ($termijnen->isEmpty())
       <p class="sis-muted" style="font-size:13px;margin:0;">Geen termijnen: geen tarief ingesteld, of de student is aangemeld maar nog niet ingeschreven.</p>
     @else
       <div class="iuasr-dash-tbl-card" style="border:0;">
@@ -146,10 +169,13 @@
       @csrf
       <div class="sis-card__hd"><h3>Betaling registreren</h3><span class="hint">deelbetaling of afwijkend bedrag</span></div>
       <div class="sis-fld">
-        <label>Studiejaar / inschrijving <span class="req">*</span></label>
+        <label>Studiejaar <span class="req">*</span></label>
+        {{-- Alleen de maatgevende inschrijving per studiejaar: daar hangen de facturen. --}}
         <select name="inschrijving_id" required>
-          @foreach ($regels as $r)
-            <option value="{{ $r['inschrijving']->id }}">{{ $r['inschrijving']->periode?->naam }} · {{ $r['inschrijving']->opleiding?->code }}</option>
+          @foreach ($regels->where('maatgevend', true) as $r)
+            <option value="{{ $r['inschrijving']->id }}">
+              {{ $r['inschrijving']->periode?->naam }} · {{ $r['inschrijving']->opleiding?->code }}@if ($r['dubbelInStudiejaar']) (dubbele inschrijving)@endif
+            </option>
           @endforeach
         </select>
       </div>

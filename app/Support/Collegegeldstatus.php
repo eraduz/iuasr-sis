@@ -51,8 +51,9 @@ class Collegegeldstatus
         // student in datzelfde jaar twee opleidingen volgt (dubbele inschrijving).
         // De inschrijving met het hoogste verschuldigde bedrag is maatgevend.
         foreach ($student->inschrijvingen->groupBy('periode_id') as $perStudiejaar) {
-            $maatgevend = $perStudiejaar
-                ->sortByDesc(fn ($i) => Collegegeldtermijnen::totaal($i, $peildatum))->first();
+            // Bij een dubbele inschrijving telt alleen de maatgevende inschrijving:
+            // collegegeld is per studiejaar eenmaal verschuldigd.
+            $maatgevend = Collegegeldtermijnen::maatgevende($perStudiejaar->first(), $peildatum);
             $verschuldigd += Collegegeldtermijnen::totaal($maatgevend, $peildatum);
             $achterstallig += Collegegeldtermijnen::achterstallig($maatgevend, $peildatum);
             $maanden += self::maanden($maatgevend, $peildatum);

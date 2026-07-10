@@ -166,6 +166,10 @@
   <p>Op het financiële scherm van een student staat per studiejaar hetzelfde termijnoverzicht, met achter elke openstaande termijn de knop <b>Boek € …</b>. Eén klik boekt die termijn volledig op de datum van vandaag. Voor een deelbetaling of een afwijkend bedrag gebruikt u het formulier <b>Betaling registreren</b>; daar kiest u de termijn, of laat u <b>automatisch</b> staan — dan gaat de betaling naar de <b>oudste openstaande</b> termijn.</p>
   <p>Bij de <b>bulk-import</b> (CSV) is er een extra, optionele kolom <b>termijn</b> (1 t/m 5). Laat u die leeg, dan wordt de betaling automatisch toegerekend. Bestaande bestanden zonder termijnkolom blijven gewoon werken: de kolommen worden op naam herkend.</p>
 
+  <h3>Dubbele inschrijving</h3>
+  <p>Volgt een student twee opleidingen in hetzelfde studiejaar, dan is het collegegeld <b>éénmaal</b> verschuldigd. Het systeem kiest de opleiding met het <b>hoogste jaartarief</b> als maatgevend; daar hangt de termijntabel aan. De tweede inschrijving toont geen tabel maar de melding <b>“Geen collegegeld verschuldigd voor deze inschrijving”</b>, met de opleiding waar het wél via loopt.</p>
+  <div class="tip">Boek betalingen op het studiejaar dat in de keuzelijst staat; dat is altijd de maatgevende inschrijving. Is er in het verleden geld op de andere inschrijving geboekt, dan telt dat gewoon mee — het systeem verrekent alle betalingen van dat studiejaar in dezelfde termijnen. Ook de bulk-import boekt automatisch op de juiste inschrijving.</div>
+
   <h3>Tussentijdse uitschrijving</h3>
   <p>Schrijft een student zich halverwege uit, dan is hij alleen de verstreken maanden verschuldigd (jaarbedrag ÷ 12 × maanden, t/m het einde van de uitschrijfmaand). De termijnen ná de uitschrijfdatum krijgen de status <b>Vervallen</b> en de laatste nog geldende termijn wordt naar beneden bijgesteld. Is er meer betaald dan verschuldigd, dan verschijnt de student op het Financiën-overzicht onder <b>terugbetalingen</b>.</p>
 

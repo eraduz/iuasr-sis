@@ -210,13 +210,25 @@
       @if (auth()->user()->magFinancieelInzien())
         @php
           $euro = fn ($b) => '€ '.number_format($b, 2, ',', '.');
-          $regeling = $huidige ? \App\Support\Collegegeldtermijnen::regeling($huidige) : null;
+          // Bij een dubbele inschrijving hangen de facturen aan de maatgevende
+          // inschrijving; die kan een andere opleiding zijn dan de hier getoonde.
+          $cgi = $collegegeldInschrijving;
+          $regeling = $cgi ? \App\Support\Collegegeldtermijnen::regeling($cgi) : null;
         @endphp
         <div class="sis-card" style="margin-top:16px;">
           <div class="sis-card__hd">
             <h3>Collegegeld</h3>
             <span class="hint">{{ $regeling?->label() ?? 'geen inschrijving' }}</span>
           </div>
+
+          @if ($collegegeldDubbel && $cgi)
+            <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin:0 0 12px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span><b>Dubbele inschrijving.</b> Collegegeld wordt per studiejaar éénmaal berekend; het loopt via
+                <b>{{ $cgi->opleiding?->naam ?? $cgi->opleiding?->code }}</b> (het hoogste jaartarief is maatgevend).
+                Betalingen op de andere inschrijving worden hier gewoon verrekend.</span>
+            </div>
+          @endif
 
           @if ($financieel['jaarbedrag'] === null || $termijnen->isEmpty())
             <p class="sis-muted" style="font-size:13px;margin:0;">
@@ -295,9 +307,10 @@
             @endif
           @endif
 
-          @if ($huidige && auth()->user()->magCollegegeldBeheren())
-            {{-- De regeling geldt per studiejaar; bij herinschrijving opnieuw vast te stellen. --}}
-            <form method="POST" action="{{ route('inschrijving.betaalregeling', $huidige) }}" style="margin-top:14px;border-top:1px solid var(--borderColor);padding-top:12px;">
+          @if ($cgi && auth()->user()->magCollegegeldBeheren())
+            {{-- De regeling geldt per studiejaar en hoort bij de inschrijving waar
+                 de facturen aan hangen (de maatgevende bij dubbele inschrijving). --}}
+            <form method="POST" action="{{ route('inschrijving.betaalregeling', $cgi) }}" style="margin-top:14px;border-top:1px solid var(--borderColor);padding-top:12px;">
               @csrf
               <label style="display:block;font-size:12px;font-weight:600;color:var(--priColor100);margin-bottom:6px;">Betaalregeling</label>
               @foreach (App\Enums\Betaalregeling::cases() as $optie)
