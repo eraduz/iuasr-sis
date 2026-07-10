@@ -10,6 +10,15 @@
         <img src="{{ asset('assets/img/logo-dark.png') }}" alt="IUASR">
       </a>
       <span class="role role--{{ $rol->value }}">{{ $rol->label() }}</span>
+      @if ($rol === App\Enums\Rol::Directie)
+        @if ($u->opleidingen->isNotEmpty())
+          <span class="sis-pill-soft" style="letter-spacing:.03em;" title="Uw opleiding(en)">{{ $u->opleidingen->sortBy('code')->pluck('code')->implode(' · ') }}</span>
+        @else
+          <span class="sis-pill-soft" style="letter-spacing:.03em;color:var(--secColor100,#C8102E);" title="Geen opleiding toegewezen — vraag Beheer om toewijzing">geen opleiding</span>
+        @endif
+      @elseif ($rol === App\Enums\Rol::Cursusadministratie && $u->gedirigeerdeCursussen->isNotEmpty())
+        <span class="sis-pill-soft" style="letter-spacing:.03em;" title="Uw cursus(sen)">{{ $u->gedirigeerdeCursussen->sortBy('code')->pluck('code')->implode(' · ') }}</span>
+      @endif
       @php $inCursus = request()->routeIs('cursussen.*') || request()->routeIs('cursisten*'); @endphp
       <span class="sis-pill-soft" style="letter-spacing:0.04em;">{{ $inCursus ? 'Cursussen Administratie' : 'SIS · Studentbeheer' }}</span>
       <a class="sis-help-link" href="{{ route('modules.kiezen') }}" title="Naar het modulekeuzescherm">

@@ -323,11 +323,22 @@
     $slaag = $stat['slaag'] ?? ['percentage'=>0];
     $fin = $stat['financieel'] ?? ['verschuldigd'=>0,'betaald'=>0,'openstaand'=>0,'betaalgraad'=>0];
     $isBestuur = $rol === App\Enums\Rol::Bestuur;
+    $mijnOpleidingen = $isBestuur ? collect() : auth()->user()->opleidingen->sortBy('code');
+    $mijnCodes = $mijnOpleidingen->pluck('code')->implode(' · ');
+    $titel = ($isBestuur ? 'Schoolbestuur' : 'Directie').(! $isBestuur && $mijnCodes !== '' ? ' — '.$mijnCodes : '');
   @endphp
   <div class="iuasr-dash-vhead">
     <div>
-      <h1>{{ $isBestuur ? 'Schoolbestuur' : 'Directie' }}</h1>
-      <div class="summary">{{ $isBestuur ? 'Instellingsbrede kerncijfers' : 'Kerncijfers van uw opleiding(en)' }}: studiesucces, instroom en financiën</div>
+      <h1>{{ $titel }}</h1>
+      <div class="summary">
+        @if ($isBestuur)
+          Instellingsbrede kerncijfers: studiesucces, instroom en financiën
+        @elseif ($mijnOpleidingen->isNotEmpty())
+          Kerncijfers van <b>{{ $mijnOpleidingen->map(fn ($o) => $o->naam)->implode(', ') }}</b>: studiesucces, instroom en financiën
+        @else
+          <span style="color:var(--secColor100,#C8102E);">Nog geen opleiding toegewezen</span> — vraag Beheer om een opleidingtoewijzing
+        @endif
+      </div>
     </div>
     <div class="iuasr-dash-vhead__actions">
       @if ($isBestuur)<a class="iuasr-dash-btn" href="{{ route('ondertekening') }}">Ondertekende documenten</a>@endif

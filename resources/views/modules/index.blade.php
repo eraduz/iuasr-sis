@@ -13,6 +13,16 @@
 <body>
 @php
   $u = auth()->user();
+  // Naast de rol de opleiding(en)/cursus(sen) tonen, zodat meteen duidelijk is
+  // van WELKE opleiding een directeur is (bijv. "Directie · MGV").
+  $rolExtra = '';
+  if ($u->rol === \App\Enums\Rol::Directie) {
+    $rolExtra = $u->opleidingen->isNotEmpty()
+      ? ' · '.$u->opleidingen->sortBy('code')->pluck('code')->implode(' · ')
+      : ' · geen opleiding';
+  } elseif ($u->rol === \App\Enums\Rol::Cursusadministratie && $u->gedirigeerdeCursussen->isNotEmpty()) {
+    $rolExtra = ' · '.$u->gedirigeerdeCursussen->sortBy('code')->pluck('code')->implode(' · ');
+  }
   $icon = function (?string $k): string {
     return match ($k) {
       'students' => '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
@@ -36,7 +46,7 @@
       <span class="sis-pill-soft" style="letter-spacing:0.04em;">Platform</span>
     </div>
     <div class="sis-modulepage__user">
-      <span class="role role--{{ $u->rol->value }}">{{ $u->rol->label() }}</span>
+      <span class="role role--{{ $u->rol->value }}">{{ $u->rol->label() }}{{ $rolExtra }}</span>
       <span class="name">{{ $u->naam }}</span>
       <form method="POST" action="{{ route('logout') }}" style="display:inline;">
         @csrf
