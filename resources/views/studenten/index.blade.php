@@ -2,10 +2,20 @@
 
 @section('titel', 'Studenten')
 
-@php $magInschrijven = auth()->user()->magInschrijvingBeheren(); @endphp
+@php
+    $magInschrijven = auth()->user()->magInschrijvingBeheren();
+    $vrijstellingModus = request('doel') === 'vrijstelling';
+@endphp
 
 @section('inhoud')
 <div class="sis-crumb"><a href="{{ route('dashboard') }}">Dashboard</a><span class="sep">›</span><b>Studenten</b></div>
+
+@if ($vrijstellingModus)
+  <div class="iuasr-dash-alert iuasr-dash-alert--info" style="margin-bottom:16px;display:flex;gap:8px;align-items:center;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M8.21 13.89 7 22l5-3 5 3-1.21-8.11"/></svg>
+    <span>Kies een student om een <b>vrijstelling</b> vast te leggen — u komt direct bij het vrijstellingsformulier op het dossier.</span>
+  </div>
+@endif
 
 <div class="iuasr-dash-vhead">
   <div>
@@ -95,7 +105,7 @@
               <span class="iuasr-dash-status s-draft">—</span>
             @endif
           </td>
-          <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('studenten.show', $student) }}">Openen</a></td>
+          <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('studenten.show', $student) }}{{ $vrijstellingModus ? '#vrijstelling' : '' }}">Openen</a></td>
         </tr>
       @empty
         <tr><td colspan="7" style="padding:0;">

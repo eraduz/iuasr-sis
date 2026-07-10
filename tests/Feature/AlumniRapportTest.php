@@ -107,12 +107,14 @@ class AlumniRapportTest extends TestCase
         $this->actingAs($bestuur)->get(route('rapporten'))->assertForbidden();
     }
 
-    public function test_examencommissie_mag_het_alumni_rapport_niet_zien(): void
+    /** De examencommissie mag het alumni-rapport zien (geen cijfers/BSN) en ziet alle alumni. */
+    public function test_examencommissie_mag_het_alumni_rapport_zien(): void
     {
         $this->seedTwee();
         $ec = User::create(['naam' => 'EC', 'email' => 'ec@iuasr.test', 'rol' => Rol::Examencommissie]);
 
-        $this->actingAs($ec)->get(route('rapporten.alumni'))->assertForbidden();
+        $this->actingAs($ec)->get(route('rapporten.alumni'))
+            ->assertOk()->assertSee('260001')->assertDontSee('260002');
     }
 
     public function test_docent_en_financien_mogen_het_alumni_rapport_niet_zien(): void

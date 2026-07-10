@@ -68,7 +68,13 @@
         ],
         Rol::Examencommissie->value => [
             'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
-            'Studenten' => [['Alle studenten', 'studenten.index', 'students', 'studenten.*']],
+            'Studenten' => [
+                ['Alle studenten', 'studenten.index', 'students', 'studenten.*'],
+                // Snelkoppeling: direct naar de studentenlijst om een student te
+                // kiezen en meteen bij het vrijstellingsformulier op het dossier
+                // uit te komen.
+                ['Vrijstelling', 'studenten.index', 'cert', 'studenten.*', ['doel' => 'vrijstelling']],
+            ],
             'Cijfers' => [
                 ['Cijferoverzicht', 'cijferoverzicht', 'grade', 'cijferoverzicht'],
                 ['Cijferlijst', 'cijferlijst', 'report', 'cijferlijst'],
@@ -76,7 +82,10 @@
                 ['EC-rapport', 'ec-rapport', 'report', 'ec-rapport'],
             ],
             'Onderwijs' => [['Aanwezigheid', 'presentieoverzicht', 'check', 'presentieoverzicht']],
-            'Rapporten' => [['Rapporten', 'rapporten.inzage', 'report', 'rapporten.inzage']],
+            'Rapporten' => [
+                ['Rapporten', 'rapporten.inzage', 'report', 'rapporten.inzage'],
+                ['Alumni', 'rapporten.alumni', 'cert', 'rapporten.alumni'],
+            ],
         ],
         Rol::Directie->value => [
             'Overzicht' => [['Dashboard', 'dashboard', 'dash', 'dashboard']],
@@ -165,9 +174,18 @@
 @foreach ($menu as $titel => $items)
   <div class="iuasr-dash-sidebar__group">
     <div class="iuasr-dash-sidebar__title">{{ $titel }}</div>
-    @foreach ($items as [$label, $routeNaam, $ic, $actiefPatroon])
-      <a class="iuasr-dash-sidenav {{ request()->routeIs(explode(',', $actiefPatroon)) ? 'is-active' : '' }}"
-         href="{{ Route::has($routeNaam) ? route($routeNaam) : '#' }}">
+    @foreach ($items as $item)
+      @php
+        [$label, $routeNaam, $ic, $actiefPatroon] = $item;
+        // Optioneel 5e element: query-parameters (bv. ['doel' => 'vrijstelling']).
+        // Zo kunnen twee items naar dezelfde route wijzen met een eigen context;
+        // het 'doel' bepaalt ook welk item oplicht.
+        $params = $item[4] ?? [];
+        $isActief = request()->routeIs(explode(',', $actiefPatroon))
+            && (request('doel') ?: null) === ($params['doel'] ?? null);
+      @endphp
+      <a class="iuasr-dash-sidenav {{ $isActief ? 'is-active' : '' }}"
+         href="{{ Route::has($routeNaam) ? route($routeNaam, $params) : '#' }}">
         <span aria-hidden="true">{!! $icon($ic) !!}</span>
         <span>{{ $label }}</span>
       </a>

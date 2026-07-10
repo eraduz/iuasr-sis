@@ -682,7 +682,7 @@
       $openBesluitVakIds = $besluiten->where('status', App\Enums\VrijstellingsbesluitStatus::Open)->pluck('vak_id')->flip();
       $besluitBaar = $nietVrij->filter(fn ($t) => ! isset($openBesluitVakIds[$t->vak_id]));
     @endphp
-    <div class="sis-card" style="margin-top:16px;">
+    <div class="sis-card" id="vrijstelling" style="margin-top:16px;scroll-margin-top:16px;">
       <div class="sis-card__hd"><h3>Vrijstellingen</h3><span class="hint">{{ $huidige->periode?->naam }} · verleend door de examencommissie, vastgelegd door Studentenzaken</span></div>
 
       @if ($vrijLijst->isEmpty())

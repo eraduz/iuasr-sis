@@ -319,9 +319,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/vrijstellingsbesluiten/{besluit}/annuleren', [App\Http\Controllers\VrijstellingsbesluitController::class, 'annuleer'])->name('vrijstellingsbesluiten.annuleren');
     });
 
-    // --- Alumni-rapport — Studentenzaken, Directie & Schoolbestuur ---
-    // Bevat geen cijfers en geen BSN; Directie ziet alleen de eigen opleiding(en).
-    Route::middleware('rol:studentenzaken,directie,bestuur')->group(function () {
+    // --- Alumni-rapport — Studentenzaken, Examencommissie, Directie & Schoolbestuur ---
+    // Bevat geen cijfers en geen BSN; Directie ziet alleen de eigen opleiding(en),
+    // de overige rollen alle alumni.
+    Route::middleware('rol:studentenzaken,examencommissie,directie,bestuur')->group(function () {
         Route::get('/rapporten/alumni', [RapportController::class, 'alumni'])->name('rapporten.alumni');
     });
 
