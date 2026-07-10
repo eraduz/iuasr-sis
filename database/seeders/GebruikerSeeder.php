@@ -44,12 +44,14 @@ class GebruikerSeeder extends Seeder
         User::create(['naam' => 'Ismail Kaya', 'email' => 'i.kaya@iuasr.nl', 'rol' => Rol::Beheerder]);
 
         // Module Cursussen Administratie: de cursusadministratie is per cursus
-        // afgeschermd. Elke cursusdirecteur ziet en beheert uitsluitend de eigen
-        // cursus(sen); Financiën (boekhouding), Beheer en Bestuur zien alle cursussen.
+        // afgeschermd. Arabische Taal is een aparte cursus met een eigen directeur;
+        // Hifz en Ijaaza worden door dezelfde directeur beheerd. Elke directeur ziet
+        // en beheert uitsluitend de eigen cursus(sen); Financiën (boekhouding),
+        // Beheer en Bestuur zien alle cursussen.
         $hafsa = User::create(['naam' => 'Hafsa Bakkali', 'email' => 'h.bakkali@iuasr.nl', 'rol' => Rol::Cursusadministratie]);
         $omar = User::create(['naam' => 'Omar Faruk', 'email' => 'o.faruk@iuasr.nl', 'rol' => Rol::Cursusadministratie]);
 
-        Cursus::whereIn('code', ['ARAB-TAAL', 'HIFZ'])->update(['directeur_id' => $hafsa->id]);
-        Cursus::where('code', 'IJAZA')->update(['directeur_id' => $omar->id]);
+        Cursus::where('code', 'ARAB-TAAL')->update(['directeur_id' => $hafsa->id]);
+        Cursus::whereIn('code', ['HIFZ', 'IJAZA'])->update(['directeur_id' => $omar->id]);
     }
 }

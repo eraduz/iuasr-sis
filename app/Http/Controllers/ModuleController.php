@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cursus;
 use App\Models\Module;
 use Illuminate\Contracts\View\View;
 
@@ -18,6 +19,16 @@ class ModuleController extends Controller
         $gebruiker = auth()->user();
         $modules = Module::voorKeuzescherm($gebruiker);
 
+        // Directe knoppen per cursus op het welkomstscherm. De gebruiker ziet
+        // uitsluitend de cursussen die hij mag openen (cursusdirecteur = eigen
+        // cursus[sen]; Financiën, Beheer en Bestuur = alle actieve cursussen).
+        $cursussen = collect();
+        $cursusModule = Module::where('sleutel', 'cursussen')->first();
+        if ($cursusModule && $cursusModule->bruikbaarVoor($gebruiker)) {
+            $cursussen = Cursus::query()->zichtbaarVoor($gebruiker)
+                ->where('actief', true)->orderBy('naam')->get();
+        }
+
         return view('modules.index', [
             'modules' => $modules->map(fn (Module $m) => [
                 'module' => $m,
@@ -25,6 +36,7 @@ class ModuleController extends Controller
                 'toegankelijk' => $m->toegankelijkVoor($gebruiker),
                 'route' => $m->startRoute(),
             ]),
+            'cursussen' => $cursussen,
         ]);
     }
 }

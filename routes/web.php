@@ -72,6 +72,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [App\Http\Controllers\Cursus\CursusDashboardController::class, 'index'])->name('cursussen.dashboard');
         Route::get('/rapport', [App\Http\Controllers\Cursus\CursusrapportController::class, 'index'])->name('cursussen.rapport');
         Route::get('/rapport/export.csv', [App\Http\Controllers\Cursus\CursusrapportController::class, 'export'])->name('cursussen.rapport.export');
+        // Startpagina van één cursus (directe ingang vanaf het welkomstscherm).
+        Route::get('/cursus/{cursus}', [App\Http\Controllers\Cursus\CursusDashboardController::class, 'cursus'])->name('cursussen.cursus');
     });
 
     // Boekhouding: cursusgelden volgen en betalingen registreren/corrigeren (alle cursussen).

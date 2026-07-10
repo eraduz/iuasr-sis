@@ -41,4 +41,29 @@ class CursusDashboardController extends Controller
             'financieel' => $financieel,
         ]);
     }
+
+    /**
+     * Startpagina van één cursus: de directe ingang vanaf het welkomstscherm.
+     * Toont de kerncijfers, de cursisten en snelkoppelingen naar de cursusgelden
+     * en de rapportage. Server-side afgeschermd: wie de cursus niet mag zien,
+     * komt er niet in (ook niet met een geraden id).
+     */
+    public function cursus(Request $request, Cursus $cursus): View
+    {
+        abort_unless($cursus->zichtbaarVoor($request->user()), 403, 'Deze cursus valt buiten uw toegang.');
+
+        $cursus->load(['inschrijvingen.cursist', 'inschrijvingen.betalingen']);
+        $financieel = Cursusrapport::financieelTotaal(collect([$cursus]));
+
+        $perStatus = [];
+        foreach (CursusinschrijvingStatus::cases() as $status) {
+            $perStatus[$status->value] = $cursus->inschrijvingen->filter(fn ($i) => $i->status === $status)->count();
+        }
+
+        return view('cursussen.cursus', [
+            'cursus' => $cursus,
+            'financieel' => $financieel,
+            'perStatus' => $perStatus,
+        ]);
+    }
 }

@@ -89,14 +89,15 @@ class CursussenModuleTest extends TestCase
 
     public function test_cursist_direct_inschrijven_neemt_het_cursusgeld_over(): void
     {
-        $cursus = Cursus::where('code', 'HIFZ')->firstOrFail();
+        // Arabische Taal is de cursus van de standaard-cursusdirecteur (Hafsa).
+        $cursus = Cursus::where('code', 'ARAB-TAAL')->firstOrFail();
 
         $this->actingAs($this->cursusadmin)->post(route('cursisten.store'), [
             'voornaam' => 'Sara', 'achternaam' => 'El Amrani', 'cursus_id' => $cursus->id,
         ])->assertSessionHasNoErrors();
 
         $inschrijving = Cursusinschrijving::first();
-        $this->assertSame(330.0, (float) $inschrijving->totaalbedrag);
+        $this->assertSame(265.0, (float) $inschrijving->totaalbedrag);
         $this->assertSame(CursusinschrijvingStatus::Actief, $inschrijving->status);
     }
 
@@ -130,7 +131,7 @@ class CursussenModuleTest extends TestCase
     public function test_bulk_import_csv_met_directe_inschrijving(): void
     {
         $csv = "voornaam;tussenvoegsel;achternaam;geboortedatum;email;telefoon;adres;postcode;woonplaats;cursuscode\r\n"
-            ."Yusuf;;Demir;01-01-2000;y@example.com;0612345678;Straat 1;3011AB;Rotterdam;HIFZ\r\n"
+            ."Yusuf;;Demir;01-01-2000;y@example.com;0612345678;Straat 1;3011AB;Rotterdam;ARAB-TAAL\r\n"
             ."Fatima;el;Idrissi;;f@example.com;;;;;ONBEKEND\r\n"; // onbekende cursuscode -> overslaan
 
         $this->actingAs($this->cursusadmin)->post(route('cursisten.import.controle'), [
@@ -142,8 +143,8 @@ class CursussenModuleTest extends TestCase
         $this->actingAs($this->cursusadmin)->post(route('cursisten.import'))->assertRedirect(route('cursisten'));
 
         $this->assertSame(1, Cursist::count());               // alleen de geldige rij
-        $this->assertSame(1, Cursusinschrijving::count());     // ingeschreven op HIFZ
-        $this->assertSame(330.0, (float) Cursusinschrijving::first()->totaalbedrag);
+        $this->assertSame(1, Cursusinschrijving::count());     // ingeschreven op Arabische Taal
+        $this->assertSame(265.0, (float) Cursusinschrijving::first()->totaalbedrag);
     }
 
     public function test_studentenzaken_heeft_geen_toegang_tot_de_cursusmodule(): void

@@ -21,9 +21,9 @@ class CursusdirecteurTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $hafsa;   // directeur ARAB-TAAL + HIFZ
+    private User $hafsa;   // directeur ARAB-TAAL
 
-    private User $omar;    // directeur IJAZA
+    private User $omar;    // directeur HIFZ + IJAZA
 
     private Cursus $arab;
 
@@ -55,13 +55,14 @@ class CursusdirecteurTest extends TestCase
     public function test_directeur_ziet_alleen_eigen_cursussen_op_het_dashboard(): void
     {
         $this->actingAs($this->hafsa)->get(route('cursussen.dashboard'))
-            ->assertOk()->assertSee('Arabische Taal')->assertSee('Hifz')->assertDontSee('Ijaaza');
+            ->assertOk()->assertSee('Arabische Taal')->assertDontSee('Hifz')->assertDontSee('Ijaaza');
     }
 
     public function test_directeur_beheerlijst_is_gescoped(): void
     {
-        $this->assertSame(2, Cursus::query()->zichtbaarVoor($this->hafsa)->count());
-        $this->assertSame(1, Cursus::query()->zichtbaarVoor($this->omar)->count());
+        // Arabisch apart (Hafsa); Hifz + Ijaaza samen bij Omar.
+        $this->assertSame(1, Cursus::query()->zichtbaarVoor($this->hafsa)->count());
+        $this->assertSame(2, Cursus::query()->zichtbaarVoor($this->omar)->count());
     }
 
     public function test_directeur_mag_andermans_cursus_niet_bewerken(): void
@@ -185,8 +186,46 @@ class CursusdirecteurTest extends TestCase
         ])->assertSessionHasNoErrors();
 
         $this->assertSame($this->hafsa->id, $this->ijaza->fresh()->directeur_id);
-        // Nu ziet Hafsa drie cursussen, Omar geen.
-        $this->assertSame(3, Cursus::query()->zichtbaarVoor($this->hafsa)->count());
-        $this->assertSame(0, Cursus::query()->zichtbaarVoor($this->omar)->count());
+        // Ijaaza gaat naar Hafsa: Hafsa dirigeert dan Arabisch + Ijaaza (2), Omar houdt Hifz (1).
+        $this->assertSame(2, Cursus::query()->zichtbaarVoor($this->hafsa)->count());
+        $this->assertSame(1, Cursus::query()->zichtbaarVoor($this->omar)->count());
+    }
+
+    /* ---------------------------------------------- welkomstscherm & cursuspagina */
+
+    public function test_welkomstscherm_toont_een_knop_per_eigen_cursus(): void
+    {
+        $this->actingAs($this->hafsa)->get(route('modules.kiezen'))
+            ->assertOk()->assertSee('Arabische Taal')->assertDontSee('Hifz')->assertDontSee('Ijaaza');
+    }
+
+    public function test_welkomstscherm_boekhouding_toont_alle_cursussen(): void
+    {
+        $financien = User::where('rol', Rol::Financien)->firstOrFail();
+        $this->actingAs($financien)->get(route('modules.kiezen'))
+            ->assertOk()->assertSee('Arabische Taal')->assertSee('Ijaaza');
+    }
+
+    public function test_directeur_opent_de_eigen_cursuspagina(): void
+    {
+        $this->actingAs($this->hafsa)->get(route('cursussen.cursus', $this->arab))
+            ->assertOk()->assertSee('Arabische Taal')->assertSee('Cursisten op deze cursus');
+    }
+
+    public function test_directeur_kan_andermans_cursuspagina_niet_openen(): void
+    {
+        $this->actingAs($this->hafsa)->get(route('cursussen.cursus', $this->ijaza))->assertForbidden();
+    }
+
+    public function test_boekhouding_opent_elke_cursuspagina(): void
+    {
+        $financien = User::where('rol', Rol::Financien)->firstOrFail();
+        $this->actingAs($financien)->get(route('cursussen.cursus', $this->ijaza))->assertOk();
+    }
+
+    public function test_onbevoegde_rol_komt_niet_op_de_cursuspagina(): void
+    {
+        $docent = User::where('rol', Rol::Docent)->firstOrFail();
+        $this->actingAs($docent)->get(route('cursussen.cursus', $this->arab))->assertForbidden();
     }
 }

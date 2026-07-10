@@ -70,6 +70,21 @@
       @endforeach
     </div>
 
+    @if ($cursussen->isNotEmpty())
+      <h2 style="font-family:'DM Serif Display',serif;font-size:22px;margin:34px 0 6px;color:var(--priColor100,#1E1446);">Cursussen</h2>
+      <p class="sub" style="margin:0 0 14px;">Kies uw cursus om er direct in te werken.</p>
+      <div class="sis-modulegrid">
+        @foreach ($cursussen as $cursus)
+          <a class="sis-moduletile" href="{{ route('cursussen.cursus', $cursus) }}">
+            <span class="sis-moduletile__icon">{!! $icon('book') !!}</span>
+            <span class="sis-moduletile__naam">{{ $cursus->naam }}</span>
+            <span class="sis-moduletile__oms">Cursuscode {{ $cursus->code }}</span>
+            <span class="sis-moduletile__cta">Openen →</span>
+          </a>
+        @endforeach
+      </div>
+    @endif
+
     @if ($u->rol->magCursusInzien() && $u->rol->value === 'bestuur')
       <h2 style="font-family:'DM Serif Display',serif;font-size:22px;margin:34px 0 14px;color:var(--priColor100,#1E1446);">Bestuur</h2>
       <div class="sis-modulegrid">
