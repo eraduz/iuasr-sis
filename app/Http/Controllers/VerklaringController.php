@@ -46,8 +46,9 @@ class VerklaringController extends Controller
         $financieel = null;
         if ($student) {
             $financieel = \App\Support\Collegegeldstatus::voor($student);
-            // Blokkade: geen officiële documenten bij een betalingsachterstand.
-            if (! $financieel['achterstand']) {
+            // Blokkade: geen officiële documenten bij een betalingsachterstand,
+            // tenzij er een lopende betalingsafspraak is.
+            if (! $financieel['geblokkeerd']) {
                 $verklaring = $this->bouw($student, $type);
                 AuditLogger::log(AuditLogger::UITGIFTE, $student, veld: 'verklaring', context: ['type' => $type]);
             }
@@ -71,8 +72,9 @@ class VerklaringController extends Controller
 
         $student = Student::with(['inschrijvingen.opleiding', 'inschrijvingen.periode'])->findOrFail($data['student']);
 
-        // Zelfde blokkade als de preview: geen officiële documenten bij achterstand.
-        if (\App\Support\Collegegeldstatus::voor($student)['achterstand']) {
+        // Zelfde blokkade als de preview: geen officiële documenten bij achterstand,
+        // tenzij de Financiële Administratie een betalingsafspraak heeft vastgelegd.
+        if (\App\Support\Collegegeldstatus::isGeblokkeerd($student)) {
             return back()->withErrors(['ontvanger' => 'Geblokkeerd wegens betalingsachterstand.']);
         }
 

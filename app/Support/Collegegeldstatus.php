@@ -87,6 +87,9 @@ class Collegegeldstatus
             InschrijvingStatus::Aangemeld,
         ], true));
 
+        // Een lopende betalingsafspraak heft de blokkades op; de schuld blijft.
+        $afspraak = \App\Models\Betalingsafspraak::lopendVoor($student, $peildatum);
+
         return [
             // Som van de jaarbedragen ná korting, over alle opleidingen.
             'jaarbedrag' => $heeftTarief ? round($jaarbedrag, 2) : null,
@@ -103,13 +106,29 @@ class Collegegeldstatus
             'lopend' => $lopend,
             'saldo' => round($betaald - $verschuldigd, 2),
             // Een achterstand bestaat pas bij een onbetaalde VERVALLEN termijn.
+            // Dit beschrijft de SCHULD en blijft staan, ook bij een afspraak.
             'achterstand' => $achterstallig > 0,
+            // Het GEVOLG van de schuld: geen verklaringen, geen herinschrijving.
+            // Een lopende betalingsafspraak schort dat op.
+            'geblokkeerd' => $achterstallig > 0 && $afspraak === null,
+            'afspraak' => $afspraak,
         ];
     }
 
+    /** Heeft de student een openstaande schuld? (los van een betalingsafspraak) */
     public static function heeftAchterstand(Student $student): bool
     {
         return self::voor($student)['achterstand'];
+    }
+
+    /**
+     * Zijn verklaringen en herinschrijven geblokkeerd? Dat is niet hetzelfde als
+     * een achterstand hebben: met een lopende betalingsafspraak blijft de schuld
+     * bestaan, maar vervallen de blokkades.
+     */
+    public static function isGeblokkeerd(Student $student): bool
+    {
+        return self::voor($student)['geblokkeerd'];
     }
 
     /**

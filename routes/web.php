@@ -5,6 +5,7 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\DevLoginController;
 use App\Http\Controllers\BetaalregelingController;
 use App\Http\Controllers\BetalingController;
+use App\Http\Controllers\BetalingsafspraakController;
 use App\Http\Controllers\BulkInschrijvingController;
 use App\Http\Controllers\CijferController;
 use App\Http\Controllers\CollegegeldController;
@@ -184,6 +185,10 @@ Route::middleware('auth')->group(function () {
         // Corrigeren en verwijderen van een geboekte betaling (beide gelogd).
         Route::put('/financien/{student}/betaling/{betaling}', [BetalingController::class, 'bijwerken'])->name('financien.betaling.bijwerken');
         Route::delete('/financien/{student}/betaling/{betaling}', [BetalingController::class, 'verwijderen'])->name('financien.betaling.verwijderen');
+
+        // Betalingsafspraak: heft de blokkades op zolang zij loopt (gelogd).
+        Route::post('/financien/{student}/afspraak', [BetalingsafspraakController::class, 'vastleggen'])->name('financien.afspraak');
+        Route::post('/financien/{student}/afspraak/{afspraak}/intrekken', [BetalingsafspraakController::class, 'intrekken'])->name('financien.afspraak.intrekken');
     });
 
     // --- Docent — eigen vak ---

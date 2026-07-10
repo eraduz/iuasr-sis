@@ -151,10 +151,12 @@ class InschrijvingActiesController extends Controller
         $huidige = $this->huidige($student);
         abort_if($huidige === null, 404, 'Geen bestaande inschrijving om op voort te bouwen.');
 
-        // Blokkade studievoortgang bij betalingsachterstand.
-        if (\App\Support\Collegegeldstatus::heeftAchterstand($student)) {
+        // Blokkade studievoortgang bij betalingsachterstand. Een lopende
+        // betalingsafspraak (vastgelegd door de Financiële Administratie) heft
+        // die blokkade op; de schuld zelf blijft bestaan.
+        if (\App\Support\Collegegeldstatus::isGeblokkeerd($student)) {
             return redirect()->route('studenten.show', $student)
-                ->with('status', 'Herinschrijven geblokkeerd: de student heeft een openstaande betalingsachterstand.');
+                ->with('status', 'Herinschrijven geblokkeerd: de student heeft een openstaande betalingsachterstand en geen lopende betalingsafspraak.');
         }
 
         $data = $request->validate([

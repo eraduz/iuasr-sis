@@ -160,6 +160,17 @@ class DashboardController extends Controller
                 ->values();
         }
 
+        // Lopende betalingsafspraken: studenten met een schuld waarvan de blokkades
+        // tijdelijk zijn opgeheven. Voor de Financiële Administratie en Beheer.
+        $afspraken = collect();
+        if (in_array($rol, [Rol::Financien, Rol::Beheerder], true)) {
+            $afspraken = \App\Models\Betalingsafspraak::lopend()
+                ->with(['student', 'vastgelegdDoor'])
+                ->orderBy('geldig_tot')->get()
+                ->filter(fn ($a) => $a->student !== null)
+                ->values();
+        }
+
         // Venster 'Mijn taken': eigen taken plus de taken die aan niemand zijn
         // toegewezen, op urgentie. Taken zonder vervaldatum blijven buiten beeld.
         $mijnTaken = collect();
@@ -210,7 +221,7 @@ class DashboardController extends Controller
 
         return view('dashboard.index', compact('kpi', 'nt2', 'docLater', 'stat', 'openBesluiten',
             'vrijstellingLijst', 'kennistoetsBewaking', 'dubbeleInschrijving',
-            'regelingLijst', 'presentieAchterstand', 'mijnTaken'));
+            'regelingLijst', 'presentieAchterstand', 'mijnTaken', 'afspraken'));
     }
 
     /**

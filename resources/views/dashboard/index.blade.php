@@ -435,6 +435,35 @@
   </div>
 @endif
 
+{{-- Lopende betalingsafspraken: schuld blijft, blokkades tijdelijk opgeheven --}}
+@if ($afspraken->isNotEmpty())
+  <div class="sis-card" style="margin-top:16px;border-left:3px solid var(--heritage-groen,#285C4D);">
+    <div class="sis-card__hd">
+      <h3>Lopende betalingsafspraken</h3>
+      <span class="hint">{{ $afspraken->count() }} student(en) · blokkades tijdelijk opgeheven</span>
+    </div>
+    <div class="iuasr-dash-tbl-card" style="border:0;">
+      <table class="iuasr-dash-tbl">
+        <thead><tr><th style="width:110px;">Studentnr.</th><th style="width:220px;">Naam</th><th>Afspraak</th><th style="text-align:center;">Betalen vóór</th><th style="text-align:center;">Resterend</th><th>Vastgelegd door</th></tr></thead>
+        <tbody>
+          @foreach ($afspraken as $a)
+            @php $dagen = $a->dagenResterend(); @endphp
+            <tr>
+              <td class="tnum">{{ $a->student->studentnummer }}</td>
+              <td class="nm"><a href="{{ route('financien.student', $a->student) }}">{{ $a->student->volledigeNaam() }}</a></td>
+              <td>{{ $a->reden }}</td>
+              <td class="dt" style="text-align:center;">{{ $a->geldig_tot->format('d-m-Y') }}</td>
+              <td style="text-align:center;"><span class="{{ $dagen <= 7 ? 'is-laat' : 'sis-muted' }}" style="font-size:12px;">{{ $dagen }} {{ $dagen === 1 ? 'dag' : 'dagen' }}</span></td>
+              <td>{{ $a->vastgelegdDoor?->naam ?? '—' }}</td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+    <p class="sis-tblnote" style="margin-top:6px;">Deze studenten hebben nog een openstaande schuld, maar hebben afgesproken vóór de genoemde datum te betalen. Verklaringen en herinschrijven zijn voor hen tijdelijk weer mogelijk. Na de einddatum keert de blokkade automatisch terug als er niet is betaald.</p>
+  </div>
+@endif
+
 {{-- Presentieregistratie die achterloopt — registreren is voor de docent verplicht --}}
 @if ($presentieAchterstand->isNotEmpty())
   <div class="sis-card" style="margin-top:16px;border-left:3px solid var(--secColor100);">

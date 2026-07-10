@@ -177,6 +177,20 @@
   </table>
   <div class="tip">Bij 100% korting ontstaan er geen facturen voor die opleiding. Een <b>achterstand bij één van de twee</b> opleidingen blokkeert herinschrijven en verklaringen: de student heeft dan een schuld aan de instelling. De boekhouding boekt elke betaling op de opleiding waar zij bij hoort; geld wordt nooit tussen opleidingen verschoven.</div>
 
+  <h3>Betalingsafspraak: blokkade tijdelijk opheffen</h3>
+  <p>Bij een betalingsachterstand kan Studentenzaken <b>geen verklaring afgeven</b> en de student <b>niet herinschrijven</b>. Maakt de student een afspraak om alsnog te betalen, dan legt de <b>Financiële Administratie</b> die afspraak vast op het financiële scherm van de student, in de kaart <b>Betalingsafspraak</b>: vul in <b>vóór welke datum</b> betaald wordt en <b>wat er is afgesproken</b>. Beide zijn verplicht.</p>
+  <p>Zolang de afspraak loopt vervallen <b>beide blokkades</b>: verklaringen en herinschrijven zijn weer mogelijk. De <b>schuld verdwijnt niet</b> — het achterstallige bedrag blijft op het dossier staan, met de melding dat er een afspraak loopt en tot wanneer.</p>
+  <table class="rol">
+    <tr><th>Situatie</th><th>Verklaring / herinschrijven</th></tr>
+    <tr><td>Achterstand, geen afspraak</td><td><b>Geblokkeerd</b></td></tr>
+    <tr><td>Achterstand, lopende afspraak</td><td>Toegestaan</td></tr>
+    <tr><td>Afspraak verlopen, nog niet betaald</td><td><b>Geblokkeerd</b> (automatisch)</td></tr>
+    <tr><td>Afspraak ingetrokken, nog niet betaald</td><td><b>Geblokkeerd</b></td></tr>
+    <tr><td>Schuld voldaan</td><td>Toegestaan</td></tr>
+  </table>
+  <div class="tip">Na de einddatum keert de blokkade <b>vanzelf</b> terug als er niet is betaald; u hoeft niets te doen. Legt u een nieuwe afspraak vast terwijl er al één loopt, dan wordt de oude automatisch ingetrokken — er is altijd hoogstens één geldende afspraak. Op het dashboard van de Financiële Administratie staat het venster <b>Lopende betalingsafspraken</b> met de einddatum en het aantal resterende dagen.</div>
+  <div class="let">Alleen de <b>Financiële Administratie</b> (en Beheer) kan een afspraak vastleggen of intrekken. Studentenzaken kan dat bewust niet: anders zou de rol die de verklaring wil afgeven ook de betaalblokkade kunnen wegnemen. Vastleggen en intrekken worden gelogd.</div>
+
   <h3>Een betaling corrigeren of verwijderen</h3>
   <p>Staat er een betaling verkeerd geboekt, dan herstelt de <b>Financiële Administratie</b> dat zelf. Klik in de lijst <b>Geregistreerde betalingen</b> op <b>Wijzigen</b>: u past opleiding, termijn, bedrag, datum, betaalwijze en opmerking aan. Met <b>Verwijderen</b> haalt u een betaling helemaal weg, na een bevestiging.</p>
   <div class="let">Beide handelingen worden <b>gelogd</b> in de audit-log, met de <b>oude én de nieuwe waarden</b> en de naam van degene die het deed. Zo blijft elke mutatie op een geldbedrag herleidbaar. Alleen de Financiële Administratie en Beheer kunnen dit; Studentenzaken niet.</div>

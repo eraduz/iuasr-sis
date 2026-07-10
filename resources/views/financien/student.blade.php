@@ -48,6 +48,55 @@
   </div>
 @endif
 
+{{-- Betalingsafspraak: heft de blokkades op zonder de schuld weg te nemen --}}
+@php $afspraak = $status['afspraak']; @endphp
+@if ($status['achterstand'] || $afspraak)
+  <div class="sis-card" style="margin-bottom:16px;border-left:3px solid {{ $afspraak ? 'var(--heritage-groen,#285C4D)' : 'var(--secColor100)' }};">
+    <div class="sis-card__hd">
+      <h3>Betalingsafspraak</h3>
+      <span class="hint">heft de blokkade op verklaringen en herinschrijven op · de schuld blijft staan</span>
+    </div>
+
+    @if ($afspraak)
+      <div class="iuasr-dash-alert iuasr-dash-alert--ok" style="margin:0 0 12px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        <span>
+          <b>Lopende afspraak tot {{ $afspraak->geldig_tot->format('d-m-Y') }}</b>
+          ({{ $afspraak->dagenResterend() }} {{ $afspraak->dagenResterend() === 1 ? 'dag' : 'dagen' }} resterend) —
+          {{ $afspraak->reden }}.
+          Vastgelegd door {{ $afspraak->vastgelegdDoor?->naam ?? 'onbekend' }}.
+          Blokkades zijn opgeheven; het achterstallige bedrag van {{ $euro($status['achterstallig']) }} blijft openstaan.
+        </span>
+      </div>
+      <form method="POST" action="{{ route('financien.afspraak.intrekken', [$student, $afspraak]) }}"
+            onsubmit="return confirm('Afspraak intrekken? Bij een openstaande achterstand gelden de blokkades daarna weer.');" style="margin-bottom:12px;">
+        @csrf
+        <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" type="submit">Afspraak intrekken</button>
+      </form>
+    @else
+      <p class="sis-muted" style="font-size:13px;margin:0 0 10px;">
+        Deze student heeft <b>{{ $euro($status['achterstallig']) }}</b> achterstallig; verklaringen en herinschrijven zijn <b>geblokkeerd</b>.
+        Maakt de student een afspraak om te betalen, leg die dan hier vast — de blokkades vervallen dan tot de einddatum.
+      </p>
+    @endif
+
+    <form method="POST" action="{{ route('financien.afspraak', $student) }}" class="sis-form">
+      @csrf
+      <div class="sis-fld-row sis-fld-row--2">
+        <div class="sis-fld"><label>Betalen vóór <span class="req">*</span></label>
+          <input type="date" name="geldig_tot" value="{{ old('geldig_tot', now()->addMonth()->toDateString()) }}" min="{{ now()->addDay()->toDateString() }}" required>
+        </div>
+        <div class="sis-fld"><label>Wat is er afgesproken? <span class="req">*</span></label>
+          <input type="text" name="reden" maxlength="200" value="{{ old('reden') }}" placeholder="Bijv. gespreide betaling in twee delen" required>
+        </div>
+      </div>
+      <div class="sis-form__actions"><span></span>
+        <div class="right"><button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit">{{ $afspraak ? 'Afspraak vervangen' : 'Afspraak vastleggen' }}</button></div>
+      </div>
+    </form>
+  </div>
+@endif
+
 {{-- Termijnschema per studiejaar: één klik per termijn om te boeken --}}
 @forelse ($regels as $r)
   @php $insch = $r['inschrijving']; $termijnen = $r['termijnen']; @endphp
