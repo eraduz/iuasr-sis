@@ -58,6 +58,31 @@ class CursusController extends Controller
         return view('cursussen.form', ['cursus' => $cursus, 'directeuren' => $this->directeuren()]);
     }
 
+    /**
+     * "Kopieer"-wizard (Beheerder): toont het cursusformulier vooraf ingevuld met
+     * de gegevens van de bron-cursus (cursusgeld, omschrijving, looptijd, directeur).
+     * De Beheerder geeft alleen een nieuwe, unieke code en naam op; bij opslaan
+     * ontstaat een NIEUWE cursus. Inschrijvingen/cursisten worden NIET meegekopieerd.
+     */
+    public function kopieForm(Cursus $bron): View
+    {
+        $kopie = new Cursus([
+            'naam' => $bron->naam,
+            'omschrijving' => $bron->omschrijving,
+            'cursusgeld' => $bron->cursusgeld,
+            'startdatum' => $bron->startdatum,
+            'einddatum' => $bron->einddatum,
+            'directeur_id' => $bron->directeur_id,
+            'actief' => true,
+        ]);
+
+        return view('cursussen.form', [
+            'cursus' => $kopie,
+            'directeuren' => $this->directeuren(),
+            'bron' => $bron,
+        ]);
+    }
+
     public function update(Request $request, Cursus $cursus): RedirectResponse
     {
         abort_unless($cursus->beheerbaarVoor($request->user()), 403, 'Deze cursus valt buiten uw beheer.');

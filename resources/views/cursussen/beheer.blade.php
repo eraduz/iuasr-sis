@@ -36,6 +36,7 @@
           <td class="row-act" style="white-space:nowrap;">
             <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('cursussen.edit', $c) }}">Bewerken</a>
             @if ($magBeheerder)
+              <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('cursussen.kopieren', $c) }}">Kopiëren</a>
               <form method="POST" action="{{ route('cursussen.destroy', $c) }}" onsubmit="return confirm('Cursus verwijderen?');" style="display:inline;">
                 @csrf @method('DELETE')
                 <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" type="submit">Verwijderen</button>

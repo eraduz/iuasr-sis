@@ -84,10 +84,11 @@ Route::middleware('auth')->group(function () {
         Route::delete('/betalingen/{betaling}', [App\Http\Controllers\Cursus\CursusbetalingController::class, 'verwijderen'])->name('cursussen.betaling.verwijderen');
     });
 
-    // Cursus aanmaken, verwijderen en directeur toewijzen: uitsluitend de Beheerder.
+    // Cursus aanmaken, kopiëren, verwijderen en directeur toewijzen: uitsluitend de Beheerder.
     Route::middleware('rol:beheerder')->prefix('cursussen')->group(function () {
         Route::get('/beheer/nieuw', [App\Http\Controllers\Cursus\CursusController::class, 'create'])->name('cursussen.create');
         Route::post('/beheer', [App\Http\Controllers\Cursus\CursusController::class, 'store'])->name('cursussen.store');
+        Route::get('/beheer/{bron}/kopieren', [App\Http\Controllers\Cursus\CursusController::class, 'kopieForm'])->name('cursussen.kopieren');
         Route::delete('/beheer/{cursus}', [App\Http\Controllers\Cursus\CursusController::class, 'destroy'])->name('cursussen.destroy');
     });
 

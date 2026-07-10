@@ -175,4 +175,35 @@ class CursussenModuleTest extends TestCase
         $beheer = User::where('rol', Rol::Beheerder)->firstOrFail();
         $this->actingAs($beheer)->get(route('cursussen.beheer'))->assertOk()->assertSee('Directeur');
     }
+
+    public function test_beheerder_kopieert_een_cursus_naar_een_nieuwe(): void
+    {
+        $beheer = User::where('rol', Rol::Beheerder)->firstOrFail();
+        $bron = Cursus::where('code', 'ARAB-TAAL')->firstOrFail();
+
+        // De wizard toont het formulier vooraf ingevuld met de brongegevens.
+        $this->actingAs($beheer)->get(route('cursussen.kopieren', $bron))
+            ->assertOk()->assertSee('Cursus kopiëren')->assertSee('Arabische Taal');
+
+        // Opslaan als nieuwe cursus (kopie): nieuwe code + naam, overige velden overgenomen.
+        $this->actingAs($beheer)->post(route('cursussen.store'), [
+            'code' => 'TURK-TAAL', 'naam' => 'Turkse Taal',
+            'cursusgeld' => number_format((float) $bron->cursusgeld, 2, '.', ''),
+            'omschrijving' => $bron->omschrijving,
+            'directeur_id' => $bron->directeur_id,
+            'actief' => '1',
+        ])->assertSessionHasNoErrors()->assertRedirect(route('cursussen.beheer'));
+
+        $nieuw = Cursus::where('code', 'TURK-TAAL')->firstOrFail();
+        $this->assertSame((float) $bron->cursusgeld, (float) $nieuw->cursusgeld);
+        $this->assertSame($bron->directeur_id, $nieuw->directeur_id);
+        $this->assertSame(0, $nieuw->inschrijvingen()->count()); // geen cursisten meegekopieerd
+        $this->assertNotSame($bron->id, $nieuw->id);
+    }
+
+    public function test_cursusdirecteur_mag_geen_cursus_kopieren(): void
+    {
+        $bron = Cursus::where('code', 'ARAB-TAAL')->firstOrFail();
+        $this->actingAs($this->cursusadmin)->get(route('cursussen.kopieren', $bron))->assertForbidden();
+    }
 }
