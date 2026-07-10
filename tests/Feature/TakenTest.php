@@ -186,13 +186,30 @@ class TakenTest extends TestCase
             ->assertOk()->assertDontSee('Volgende maand');
     }
 
-    public function test_takenlijst_filtert_op_openstaand(): void
+    /**
+     * In de standaardweergave staat de werkvoorraad bovenaan en de afgeronde
+     * taken in een aparte sectie eronder — beide zijn dus zichtbaar.
+     */
+    public function test_afgeronde_taken_staan_apart_onder_de_openstaande(): void
     {
         $this->taak(['titel' => 'Nog te doen']);
         $this->taak(['titel' => 'Al gedaan', 'status' => TaakStatus::Afgerond, 'afgerond_op' => now()]);
 
-        $this->actingAs($this->sz)->get(route('taken'))
-            ->assertOk()->assertSee('Nog te doen')->assertDontSee('Al gedaan');
+        $antwoord = $this->actingAs($this->sz)->get(route('taken'))->assertOk();
+        $antwoord->assertSee('Nog te doen')->assertSee('Al gedaan')->assertSee('Afgerond');
+
+        // De afgeronde taak staat ná de openstaande in de pagina.
+        $html = $antwoord->getContent();
+        $this->assertLessThan(strpos($html, 'Al gedaan'), strpos($html, 'Nog te doen'));
+    }
+
+    public function test_filteren_op_afgerond_toont_alleen_afgeronde_taken(): void
+    {
+        $this->taak(['titel' => 'Nog te doen']);
+        $this->taak(['titel' => 'Al gedaan', 'status' => TaakStatus::Afgerond, 'afgerond_op' => now()]);
+
+        $this->actingAs($this->sz)->get(route('taken', ['status' => 'afgerond']))
+            ->assertOk()->assertSee('Al gedaan')->assertDontSee('Nog te doen');
 
         $this->actingAs($this->sz)->get(route('taken', ['status' => 'alle']))
             ->assertOk()->assertSee('Nog te doen')->assertSee('Al gedaan');

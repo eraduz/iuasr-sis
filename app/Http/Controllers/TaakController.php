@@ -48,8 +48,23 @@ class TaakController extends Controller
             ->paginate(25)
             ->withQueryString();
 
+        // In de standaardweergave ('openstaand') staan de afgeronde taken niet in
+        // de hoofdlijst. Ze worden apart onderaan getoond, zodat zichtbaar blijft
+        // wat er af is zonder dat het de werkvoorraad vertroebelt.
+        $afgerond = collect();
+        if ($status === 'openstaand') {
+            $afgerond = Taak::where('status', TaakStatus::Afgerond->value)
+                ->when($vanMij, fn ($q) => $q->where('toegewezen_aan_id', $request->user()->id))
+                ->when($zoek !== '', fn ($q) => $q->where('titel', 'like', '%'.$zoek.'%'))
+                ->with(['student', 'toegewezenAan'])
+                ->orderByDesc('afgerond_op')->orderByDesc('id')
+                ->limit(25)->get();
+        }
+
         return view('taken.index', [
             'taken' => $taken,
+            'afgerond' => $afgerond,
+            'afgerondTotaal' => Taak::where('status', TaakStatus::Afgerond->value)->count(),
             'zoek' => $zoek,
             'status' => $status,
             'vanMij' => $vanMij,

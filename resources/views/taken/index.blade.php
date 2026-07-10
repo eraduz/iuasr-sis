@@ -221,6 +221,59 @@
 
 <div style="margin-top:12px;">{{ $taken->links() }}</div>
 
+{{-- Afgeronde taken: apart onderaan, zodat de werkvoorraad bovenaan schoon blijft --}}
+@if ($status === 'openstaand')
+  <div class="sis-card" style="margin-top:20px;">
+    <div class="sis-card__hd">
+      <h3>Afgerond</h3>
+      <span class="hint">
+        {{ $afgerond->count() }} van {{ $afgerondTotaal }} getoond ·
+        <a href="{{ route('taken', array_filter(['status' => 'afgerond', 'q' => $zoek, 'mijn' => $vanMij ? 1 : null])) }}">alle afgeronde taken</a>
+      </span>
+    </div>
+
+    @if ($afgerond->isEmpty())
+      <p class="sis-muted" style="font-size:13px;margin:0;">Nog niets afgerond.</p>
+    @else
+      <div class="iuasr-dash-tbl-card" style="border:0;">
+        <table class="iuasr-dash-tbl">
+          <thead>
+            <tr>
+              <th style="width:40px;"></th><th>Onderwerp</th><th>Student</th>
+              <th>Toegewezen aan</th><th style="text-align:center;">Afgerond op</th><th class="row-act"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach ($afgerond as $taak)
+              <tr class="taak-af">
+                <td style="text-align:center;">
+                  <form method="POST" action="{{ route('taken.afronden', $taak) }}" style="display:inline;">
+                    @csrf
+                    <button class="sis-taak-vink is-af" type="submit" title="Heropenen" aria-label="Taak heropenen">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    </button>
+                  </form>
+                </td>
+                <td class="nm">{{ $taak->titel }}</td>
+                <td>@if ($taak->student)<a href="{{ route('studenten.show', $taak->student) }}">{{ $taak->student->studentnummer }}</a>@else<span class="sis-muted">—</span>@endif</td>
+                <td>{{ $taak->toegewezenAan?->naam ?? '—' }}</td>
+                <td class="dt" style="text-align:center;">{{ $taak->afgerond_op?->format('d-m-Y') ?? '—' }}</td>
+                <td class="row-act">
+                  <form method="POST" action="{{ route('taken.destroy', $taak) }}" onsubmit="return confirm('Taak verwijderen?');" style="display:inline;">
+                    @csrf @method('DELETE')
+                    <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" type="submit">Verwijderen</button>
+                  </form>
+                </td>
+              </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+      <p class="sis-tblnote" style="margin-top:6px;">De 25 laatst afgeronde taken. Klik op het groene vinkje om een taak weer te <b>heropenen</b>.</p>
+    @endif
+  </div>
+@endif
+
 <p class="sis-tblnote">Deze lijst is <b>gedeeld</b> binnen Studentenzaken: iedereen ziet alle taken en kan een taak die aan niemand is toegewezen oppakken. Een taak wordt <b>te laat</b> zodra de vervaldatum is verstreken en zij niet is afgerond — dat is geen aparte status, maar wordt afgeleid. Taken zonder vervaldatum staan onderaan en tellen niet mee in de signalering.</p>
 
 @push('scripts')
