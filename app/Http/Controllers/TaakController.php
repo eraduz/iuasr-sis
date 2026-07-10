@@ -32,7 +32,7 @@ class TaakController extends Controller
         $vanMij = $request->boolean('mijn');
 
         $taken = Taak::query()
-            ->with(['student', 'toegewezenAan', 'aangemaaktDoor'])
+            ->with(['student', 'toegewezenAan', 'aangemaaktDoor', 'afgerondDoor'])
             // 'openstaand' = alles behalve afgerond; 'alle' = geen filter.
             ->when($status === 'openstaand', fn ($q) => $q->openstaand())
             ->when(array_key_exists($status, TaakStatus::opties()), fn ($q) => $q->where('status', $status))
@@ -56,7 +56,7 @@ class TaakController extends Controller
             $afgerond = Taak::where('status', TaakStatus::Afgerond->value)
                 ->when($vanMij, fn ($q) => $q->where('toegewezen_aan_id', $request->user()->id))
                 ->when($zoek !== '', fn ($q) => $q->where('titel', 'like', '%'.$zoek.'%'))
-                ->with(['student', 'toegewezenAan'])
+                ->with(['student', 'toegewezenAan', 'afgerondDoor'])
                 ->orderByDesc('afgerond_op')->orderByDesc('id')
                 ->limit(25)->get();
         }
@@ -84,6 +84,7 @@ class TaakController extends Controller
         // Een nieuwe taak begint altijd op 'open', ongeacht wat er wordt meegestuurd.
         $data['status'] = TaakStatus::Open->value;
         $data['afgerond_op'] = null;
+        $data['afgerond_door_id'] = null;
         $data['aangemaakt_door_id'] = $request->user()->id;
 
         Taak::create($data);
@@ -96,10 +97,15 @@ class TaakController extends Controller
         $data = $this->valideer($request);
         $data['status'] = $request->input('status', $taak->status->value);
 
-        // Het afrondmoment volgt de status; nooit een afgeronde taak zonder datum.
-        $data['afgerond_op'] = $data['status'] === TaakStatus::Afgerond->value
-            ? ($taak->afgerond_op ?? now())
-            : null;
+        // Afrondmoment én afronder volgen de status; een afgeronde taak heeft
+        // altijd een datum, een openstaande taak nooit.
+        if ($data['status'] === TaakStatus::Afgerond->value) {
+            $data['afgerond_op'] = $taak->afgerond_op ?? now();
+            $data['afgerond_door_id'] = $taak->afgerond_door_id ?? $request->user()->id;
+        } else {
+            $data['afgerond_op'] = null;
+            $data['afgerond_door_id'] = null;
+        }
 
         $taak->update($data);
 
@@ -114,6 +120,8 @@ class TaakController extends Controller
         $taak->update([
             'status' => $afronden ? TaakStatus::Afgerond : TaakStatus::Open,
             'afgerond_op' => $afronden ? now() : null,
+            // Wie afvinkt hoeft niet degene te zijn aan wie de taak was toegewezen.
+            'afgerond_door_id' => $afronden ? $request->user()->id : null,
         ]);
 
         return back()->with('status', $afronden ? 'Taak afgerond.' : 'Taak heropend.');

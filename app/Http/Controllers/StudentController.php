@@ -141,7 +141,7 @@ class StudentController extends Controller
         // Taken die aan dit dossier hangen (alleen voor Studentenzaken/Beheer).
         $taken = auth()->user()->magTakenBeheren()
             ? \App\Models\Taak::where('student_id', $student->id)
-                ->with('toegewezenAan')->opUrgentie()->get()
+                ->with(['toegewezenAan', 'afgerondDoor'])->opUrgentie()->get()
             : collect();
 
         $grondslagen = \App\Enums\VrijstellingGrondslag::opties();

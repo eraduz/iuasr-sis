@@ -262,7 +262,10 @@ opleverpunt aantoonbaar klaar is.
     binnen 7 dagen of verstreken, op urgentie).
   - Toegang: uitsluitend Studentenzaken en Beheer (`Rol::magTakenBeheren()`).
     Geen audit-logging — werkverdeling, geen gevoelig persoonsgegeven.
-  - 16 nieuwe tests (`TakenTest`); 218 tests groen.
+  - Afgeronde taken staan in een aparte sectie onder de werkvoorraad, met de
+    datum en **wie de taak heeft afgevinkt** (`afgerond_door_id`). Dat is niet per
+    se degene aan wie de taak was toegewezen. Bij heropenen vervallen beide velden.
+  - 20 nieuwe tests (`TakenTest`); 222 tests groen.
 - [ ] **Fase 6 — Portaalkoppeling**
   - Koppeling met publiek aanmeldportaal (gescheiden regime).
 - [ ] **Fase 7 — Migratie**

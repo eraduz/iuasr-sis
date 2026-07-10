@@ -154,6 +154,9 @@
           <td style="text-align:center;">{{ $taak->prioriteit->label() }}</td>
           <td style="text-align:center;">
             <span class="iuasr-dash-status {{ $laat ? 's-rejected' : $taak->status->badge() }}">{{ $laat ? 'Te laat' : $taak->status->label() }}</span>
+            @if ($taak->isAfgerond() && $taak->afgerondDoor)
+              <small class="sis-muted" style="display:block;font-size:11px;">door {{ $taak->afgerondDoor->naam }}</small>
+            @endif
           </td>
           <td class="row-act" style="white-space:nowrap;">
             <button class="iuasr-dash-btn iuasr-dash-btn--sm taak-bewerk" type="button" data-taak="{{ $taak->id }}">Bewerken</button>
@@ -240,7 +243,7 @@
           <thead>
             <tr>
               <th style="width:40px;"></th><th>Onderwerp</th><th>Student</th>
-              <th>Toegewezen aan</th><th style="text-align:center;">Afgerond op</th><th class="row-act"></th>
+              <th>Toegewezen aan</th><th>Afgevinkt door</th><th style="text-align:center;">Afgerond op</th><th class="row-act"></th>
             </tr>
           </thead>
           <tbody>
@@ -257,6 +260,7 @@
                 <td class="nm">{{ $taak->titel }}</td>
                 <td>@if ($taak->student)<a href="{{ route('studenten.show', $taak->student) }}">{{ $taak->student->studentnummer }}</a>@else<span class="sis-muted">—</span>@endif</td>
                 <td>{{ $taak->toegewezenAan?->naam ?? '—' }}</td>
+                <td>{{ $taak->afgerondDoor?->naam ?? '—' }}</td>
                 <td class="dt" style="text-align:center;">{{ $taak->afgerond_op?->format('d-m-Y') ?? '—' }}</td>
                 <td class="row-act">
                   <form method="POST" action="{{ route('taken.destroy', $taak) }}" onsubmit="return confirm('Taak verwijderen?');" style="display:inline;">

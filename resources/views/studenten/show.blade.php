@@ -338,12 +338,16 @@
                   @if ($taak->prioriteit === App\Enums\TaakPrioriteit::Hoog && ! $taak->isAfgerond())<span class="sis-pill-prio">hoog</span>@endif
                 </div>
                 <div class="sis-muted" style="font-size:11.5px;">
-                  @if ($taak->vervaldatum)
-                    <span class="{{ $laat ? 'is-laat' : '' }}">{{ $taak->vervaldatum->format('d-m-Y') }} · {{ $taak->urgentie() }}</span>
+                  @if ($taak->isAfgerond())
+                    Afgerond{{ $taak->afgerond_op ? ' op '.$taak->afgerond_op->format('d-m-Y') : '' }}@if ($taak->afgerondDoor) door {{ $taak->afgerondDoor->naam }}@endif
                   @else
-                    geen vervaldatum
+                    @if ($taak->vervaldatum)
+                      <span class="{{ $laat ? 'is-laat' : '' }}">{{ $taak->vervaldatum->format('d-m-Y') }} · {{ $taak->urgentie() }}</span>
+                    @else
+                      geen vervaldatum
+                    @endif
+                    · {{ $taak->toegewezenAan?->naam ?? 'niemand toegewezen' }}
                   @endif
-                  · {{ $taak->toegewezenAan?->naam ?? 'niemand toegewezen' }}
                 </div>
               </div>
             </div>

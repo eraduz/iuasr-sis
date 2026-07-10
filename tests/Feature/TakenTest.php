@@ -91,7 +91,7 @@ class TakenTest extends TestCase
         $this->assertDatabaseHas('taken', ['titel' => 'Ooit een keer', 'vervaldatum' => null]);
     }
 
-    public function test_afvinken_zet_status_en_afrondmoment(): void
+    public function test_afvinken_legt_status_moment_en_afvinker_vast(): void
     {
         $taak = $this->taak();
 
@@ -100,17 +100,56 @@ class TakenTest extends TestCase
         $taak->refresh();
         $this->assertSame(TaakStatus::Afgerond, $taak->status);
         $this->assertNotNull($taak->afgerond_op);
+        $this->assertSame($this->sz->id, $taak->afgerond_door_id);
     }
 
-    public function test_heropenen_wist_het_afrondmoment(): void
+    /** Wie afvinkt is niet per se degene aan wie de taak was toegewezen. */
+    public function test_een_collega_mag_de_taak_van_een_ander_afvinken(): void
     {
-        $taak = $this->taak(['status' => TaakStatus::Afgerond, 'afgerond_op' => now()]);
+        $beheerder = User::where('rol', Rol::Beheerder)->first();
+        $taak = $this->taak(['toegewezen_aan_id' => $this->sz->id]);
+
+        $this->actingAs($beheerder)->post(route('taken.afronden', $taak))->assertRedirect();
+
+        $taak->refresh();
+        $this->assertSame($this->sz->id, $taak->toegewezen_aan_id);   // toewijzing blijft
+        $this->assertSame($beheerder->id, $taak->afgerond_door_id);   // afvinker is de ander
+    }
+
+    public function test_heropenen_wist_het_afrondmoment_en_de_afvinker(): void
+    {
+        $taak = $this->taak([
+            'status' => TaakStatus::Afgerond, 'afgerond_op' => now(), 'afgerond_door_id' => $this->sz->id,
+        ]);
 
         $this->actingAs($this->sz)->post(route('taken.afronden', $taak))->assertRedirect();
 
         $taak->refresh();
         $this->assertSame(TaakStatus::Open, $taak->status);
         $this->assertNull($taak->afgerond_op);
+        $this->assertNull($taak->afgerond_door_id);
+    }
+
+    public function test_afronden_via_het_bewerkformulier_legt_de_afvinker_vast(): void
+    {
+        $taak = $this->taak();
+
+        $this->actingAs($this->sz)->put(route('taken.update', $taak), [
+            'titel' => $taak->titel, 'prioriteit' => 'normaal', 'status' => 'afgerond',
+        ])->assertSessionHasNoErrors();
+
+        $taak->refresh();
+        $this->assertNotNull($taak->afgerond_op);
+        $this->assertSame($this->sz->id, $taak->afgerond_door_id);
+    }
+
+    public function test_afvinker_is_zichtbaar_op_de_takenlijst(): void
+    {
+        $taak = $this->taak();
+        $this->actingAs($this->sz)->post(route('taken.afronden', $taak));
+
+        $this->actingAs($this->sz)->get(route('taken'))
+            ->assertOk()->assertSee('Afgevinkt door')->assertSee($this->sz->naam);
     }
 
     /** 'Te laat' is afgeleid, geen opgeslagen status. */
@@ -217,7 +256,9 @@ class TakenTest extends TestCase
 
     public function test_bijwerken_wist_het_afrondmoment_bij_heropenen(): void
     {
-        $taak = $this->taak(['status' => TaakStatus::Afgerond, 'afgerond_op' => now()]);
+        $taak = $this->taak([
+            'status' => TaakStatus::Afgerond, 'afgerond_op' => now(), 'afgerond_door_id' => $this->sz->id,
+        ]);
 
         $this->actingAs($this->sz)->put(route('taken.update', $taak), [
             'titel' => $taak->titel, 'prioriteit' => 'normaal', 'status' => 'bezig',
@@ -226,6 +267,7 @@ class TakenTest extends TestCase
         $taak->refresh();
         $this->assertSame(TaakStatus::Bezig, $taak->status);
         $this->assertNull($taak->afgerond_op);
+        $this->assertNull($taak->afgerond_door_id);
     }
 
     public function test_alleen_studentenzaken_en_beheer_hebben_toegang(): void

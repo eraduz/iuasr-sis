@@ -31,6 +31,7 @@ class Taak extends Model
         'status',
         'prioriteit',
         'afgerond_op',
+        'afgerond_door_id',
     ];
 
     protected function casts(): array
@@ -57,6 +58,12 @@ class Taak extends Model
     public function aangemaaktDoor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'aangemaakt_door_id');
+    }
+
+    /** Wie de taak heeft afgevinkt — niet per se degene aan wie zij was toegewezen. */
+    public function afgerondDoor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'afgerond_door_id');
     }
 
     public function isAfgerond(): bool
