@@ -135,6 +135,22 @@ class ReferentieSeeder extends Seeder
         Klas::create(['opleiding_id' => $mgv->id, 'code' => 'MGV-D', 'naam' => 'MGV deeltijd', 'leerjaar' => 1, 'groep' => 'deeltijd']);
         Klas::create(['opleiding_id' => $krn->id, 'code' => 'KH-2', 'naam' => 'Koran & Hifz jaar 2', 'leerjaar' => 2, 'groep' => 'deeltijd']);
 
+        // Vastgestelde collegegeldtarieven 2026-2027 (opdrachtgever 2026-07-10).
+        // Ook via een migratie gezet voor reeds bestaande databases; hier voor een
+        // verse migrate:fresh --seed, waar de migratie op een lege DB draaide.
+        $sj2627 = Periode::where('code', '2026-2027')->first();
+        if ($sj2627) {
+            foreach (['PMGV' => 3500.00, 'MGV' => 4000.00, 'PABO' => 3500.00] as $code => $bedrag) {
+                $opleiding = Opleiding::where('code', $code)->first();
+                if ($opleiding) {
+                    \App\Models\CollegegeldTarief::firstOrCreate(
+                        ['periode_id' => $sj2627->id, 'opleiding_id' => $opleiding->id],
+                        ['bedrag' => $bedrag, 'aantal_termijnen' => 5],
+                    );
+                }
+            }
+        }
+
         // Het ECHTE curriculum staat in CurriculumSeeder (database/data/curriculum.csv).
         // De synthetische voorbeeldvakken (ISLTH-*) zijn verhuisd naar
         // SynthetischVakSeeder: die is alleen een testfixture en mag niet naast
