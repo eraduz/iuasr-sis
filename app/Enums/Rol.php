@@ -369,6 +369,21 @@ enum Rol: string
         };
     }
 
+    /**
+     * Ziet deze rol álle opleidingen (dus niet opleidinggebonden) binnen de
+     * Studentenzaken-context? Gebruikt bij multi-rol om de scoping te verruimen:
+     * heeft iemand naast Directie ook zo'n rol, dan vervalt de opleidinggrens.
+     * De Directie is juist wél opleidinggebonden en staat hier daarom niet in.
+     */
+    public function zietAlleOpleidingen(): bool
+    {
+        return match ($this) {
+            self::Studentenzaken, self::Financien, self::Examencommissie,
+            self::Bestuur, self::Beheerder => true,
+            default => false,
+        };
+    }
+
     /** Mag deze rol de opgegeven module benaderen? */
     public function magModule(string $sleutel): bool
     {

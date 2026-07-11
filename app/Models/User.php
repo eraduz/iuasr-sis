@@ -14,6 +14,12 @@ use Illuminate\Support\Collection;
  * het systeem beheert zelf GEEN wachtwoorden. De rol volgt bij voorkeur uit de
  * Entra-groep en wordt bij elke actie server-side gecontroleerd.
  *
+ * Multi-rol: `rol` is de PRIMAIRE rol (startdashboard, standaard-scoping,
+ * weergave). Aanvullende rollen staan in {@see Roltoewijzing}. De rechten worden
+ * als UNIE over {@see self::alleRollen()} bepaald: een gebruiker mag iets zodra
+ * één van zijn rollen dat toestaat. De scoping (opleiding/cursus/relatie) volgt
+ * de ruimste rol: beperkt blijft men alleen als géén rol brede inzage geeft.
+ *
  * @property Rol $rol
  */
 class User extends Authenticatable
@@ -50,6 +56,46 @@ class User extends Authenticatable
         return $this->belongsTo(Docent::class);
     }
 
+    // --- Rollen (multi-rol) ---
+
+    /** De aanvullende (niet-primaire) rollen van deze gebruiker. */
+    public function rolToewijzingen(): HasMany
+    {
+        return $this->hasMany(Roltoewijzing::class);
+    }
+
+    /**
+     * Alle rollen van deze gebruiker: de primaire rol plus de extra rollen,
+     * ontdubbeld. Dit is de bron voor élke rechtenbeslissing (unie).
+     *
+     * @return Collection<int, Rol>
+     */
+    public function alleRollen(): Collection
+    {
+        return collect([$this->rol])
+            ->merge($this->rolToewijzingen->pluck('rol'))
+            ->unique(fn (Rol $r) => $r->value)
+            ->values();
+    }
+
+    /** Uitsluitend de extra rollen (zonder de primaire). @return Collection<int, Rol> */
+    public function extraRollen(): Collection
+    {
+        return $this->alleRollen()->reject(fn (Rol $r) => $r === $this->rol)->values();
+    }
+
+    /** @return array<int, string> de rolsleutels van alle rollen. */
+    public function rolSleutels(): array
+    {
+        return $this->alleRollen()->map(fn (Rol $r) => $r->value)->all();
+    }
+
+    /** Waar zodra één van de rollen aan de regel voldoet (unie over de rolset). */
+    private function magVolgensRol(callable $regel): bool
+    {
+        return $this->alleRollen()->contains(fn (Rol $r) => $regel($r));
+    }
+
     /**
      * Opleidingen waaraan een directielid is toegewezen. Een directeur ziet
      * uitsluitend studenten/cijfers/rapporten van deze opleiding(en).
@@ -61,12 +107,17 @@ class User extends Authenticatable
 
     /**
      * Is de zichtbaarheid van deze gebruiker beperkt tot bepaalde opleidingen?
-     * Alleen de rol Directie is opleidinggebonden; overige rollen zien alles
-     * (binnen hun eigen rolrechten).
+     * Alleen de rol Directie is opleidinggebonden. Bij multi-rol geldt de ruimste
+     * rol: heeft de gebruiker naast Directie óók een rol die alle opleidingen ziet
+     * (bijv. Studentenzaken of Beheerder), dan is hij niet beperkt.
      */
     public function isOpleidingBeperkt(): bool
     {
-        return $this->rol === Rol::Directie;
+        if (! $this->heeftRol(Rol::Directie)) {
+            return false;
+        }
+
+        return ! $this->magVolgensRol(fn (Rol $r) => $r !== Rol::Directie && $r->zietAlleOpleidingen());
     }
 
     /** Het eigen personeelsrecord (module HR), voor self-service en team-scoping. */
@@ -79,22 +130,22 @@ class User extends Authenticatable
 
     public function magHrBeheer(): bool
     {
-        return $this->rol->magHrBeheer();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magHrBeheer());
     }
 
     public function magHrInzien(): bool
     {
-        return $this->rol->magHrInzien();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magHrInzien());
     }
 
     public function isHrTeamBeperkt(): bool
     {
-        return $this->rol->isHrTeamBeperkt();
+        return $this->magVolgensRol(fn (Rol $r) => $r->isHrTeamBeperkt());
     }
 
     public function magVerlofBeoordelen(): bool
     {
-        return $this->rol->magVerlofBeoordelen();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magVerlofBeoordelen());
     }
 
     /**
@@ -128,7 +179,14 @@ class User extends Authenticatable
      */
     public function isCursusBeperkt(): bool
     {
-        return $this->rol->isCursusBeperkt();
+        if (! $this->heeftRol(Rol::Cursusadministratie)) {
+            return false;
+        }
+
+        // Financiën, Beheer en Bestuur zien alle cursussen; die verruimen de scope.
+        return ! $this->magVolgensRol(
+            fn (Rol $r) => in_array($r, [Rol::Financien, Rol::Beheerder, Rol::Bestuur], true)
+        );
     }
 
     /**
@@ -141,94 +199,101 @@ class User extends Authenticatable
         return $this->gedirigeerdeCursussen()->pluck('id');
     }
 
+    /** Heeft de gebruiker deze rol (primair óf als extra rol)? */
     public function heeftRol(Rol $rol): bool
     {
-        return $this->rol === $rol;
+        return $this->alleRollen()->contains(fn (Rol $r) => $r === $rol);
     }
 
     /** Vergelijk op rolsleutel (handig in Blade): $user->rolIs('docent'). */
     public function rolIs(string ...$rollen): bool
     {
-        return in_array($this->rol->value, $rollen, true);
+        return count(array_intersect($this->rolSleutels(), $rollen)) > 0;
+    }
+
+    /** Mag de gebruiker de opgegeven module benaderen (unie over alle rollen)? */
+    public function magModule(string $sleutel): bool
+    {
+        return $this->magVolgensRol(fn (Rol $r) => $r->magModule($sleutel));
     }
 
     // Doorverwijzingen naar de rol-regels, zodat views en policies hetzelfde
     // vocabulaire delen als de UI (design system).
     public function magCijfersInzien(): bool
     {
-        return $this->rol->magCijfersInzien();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magCijfersInzien());
     }
 
     public function magCijfersInvoeren(): bool
     {
-        return $this->rol->magCijfersInvoeren();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magCijfersInvoeren());
     }
 
     public function magInschrijvingBeheren(): bool
     {
-        return $this->rol->magInschrijvingBeheren();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magInschrijvingBeheren());
     }
 
     public function magBsnInzien(): bool
     {
-        return $this->rol->magBsnInzien();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magBsnInzien());
     }
 
     public function magPresentieRegistreren(): bool
     {
-        return $this->rol->magPresentieRegistreren();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magPresentieRegistreren());
     }
 
     public function magPresentieInzien(): bool
     {
-        return $this->rol->magPresentieInzien();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magPresentieInzien());
     }
 
     public function magAanwezigheidsregelingZien(): bool
     {
-        return $this->rol->magAanwezigheidsregelingZien();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magAanwezigheidsregelingZien());
     }
 
     public function magAanwezigheidsregelingBeheren(): bool
     {
-        return $this->rol->magAanwezigheidsregelingBeheren();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magAanwezigheidsregelingBeheren());
     }
 
     public function magTakenBeheren(): bool
     {
-        return $this->rol->magTakenBeheren();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magTakenBeheren());
     }
 
     public function magCursusBeheer(): bool
     {
-        return $this->rol->magCursusBeheer();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magCursusBeheer());
     }
 
     public function magCursusFinancien(): bool
     {
-        return $this->rol->magCursusFinancien();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magCursusFinancien());
     }
 
     public function magCursusInzien(): bool
     {
-        return $this->rol->magCursusInzien();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magCursusInzien());
     }
 
     // --- Module Relatiebeheer & Stagebeheer ---
 
     public function magRelatiebeheer(): bool
     {
-        return $this->rol->magRelatiebeheer();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magRelatiebeheer());
     }
 
     public function magStagebeheer(): bool
     {
-        return $this->rol->magStagebeheer();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magStagebeheer());
     }
 
     public function magRelatieInzien(): bool
     {
-        return $this->rol->magRelatieInzien();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magRelatieInzien());
     }
 
     /**
@@ -238,26 +303,34 @@ class User extends Authenticatable
      */
     public function isRelatieBeperkt(): bool
     {
-        return $this->rol->isRelatieBeperkt();
+        $heeftBeperkteRol = $this->magVolgensRol(fn (Rol $r) => $r->isRelatieBeperkt());
+        if (! $heeftBeperkteRol) {
+            return false;
+        }
+
+        // Bestuur en Beheer zien alle relaties; die verruimen de scope.
+        return ! $this->magVolgensRol(
+            fn (Rol $r) => in_array($r, [Rol::Bestuur, Rol::Beheerder], true)
+        );
     }
 
     public function magFinancieelInzien(): bool
     {
-        return $this->rol->magFinancieelInzien();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magFinancieelInzien());
     }
 
     public function magCollegegeldBeheren(): bool
     {
-        return $this->rol->magCollegegeldBeheren();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magCollegegeldBeheren());
     }
 
     public function magBetalingenRegistreren(): bool
     {
-        return $this->rol->magBetalingenRegistreren();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magBetalingenRegistreren());
     }
 
     public function magAlleOndertekendeDocumentenZien(): bool
     {
-        return $this->rol->magAlleOndertekendeDocumentenZien();
+        return $this->magVolgensRol(fn (Rol $r) => $r->magAlleOndertekendeDocumentenZien());
     }
 }

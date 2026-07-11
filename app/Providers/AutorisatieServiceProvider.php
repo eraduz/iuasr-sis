@@ -18,16 +18,20 @@ class AutorisatieServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        // Alle Gates gebruiken de gebruiker-methoden, die de rechten als UNIE over
+        // alle rollen bepalen (primair + extra). Zo geeft een extra rol daadwerkelijk
+        // toegang; de rolscheiding zelf blijft per rol in de Rol-enum vastgelegd.
+
         // Cijfers/resultaten INZIEN.
-        Gate::define('cijfers-inzien', fn (User $user) => $user->rol->magCijfersInzien());
+        Gate::define('cijfers-inzien', fn (User $user) => $user->magCijfersInzien());
 
         // Cijfers INVOEREN/MUTEREN — Docent enkel voor het eigen vak.
         Gate::define('cijfers-invoeren', function (User $user, ?Vak $vak = null) {
-            if (! $user->rol->magCijfersInvoeren()) {
+            if (! $user->magCijfersInvoeren()) {
                 return false;
             }
             // Docent: alleen het eigen vak.
-            if ($user->rol === \App\Enums\Rol::Docent) {
+            if ($user->heeftRol(\App\Enums\Rol::Docent)) {
                 return $vak !== null && $user->docent_id !== null
                     && $vak->docent_id === $user->docent_id;
             }
@@ -37,24 +41,24 @@ class AutorisatieServiceProvider extends ServiceProvider
 
         // Presentie REGISTREREN — Docent enkel voor het eigen vak (verplicht).
         Gate::define('presentie-registreren', function (User $user, ?Vak $vak = null) {
-            return $user->rol->magPresentieRegistreren()
+            return $user->magPresentieRegistreren()
                 && $vak !== null && $user->docent_id !== null
                 && $vak->docent_id === $user->docent_id;
         });
 
         // Presentielijsten INZIEN (Docent eigen vak, Examencie, Directie, Bestuur).
-        Gate::define('presentie-inzien', fn (User $user) => $user->rol->magPresentieInzien());
+        Gate::define('presentie-inzien', fn (User $user) => $user->magPresentieInzien());
 
         // 50%-aanwezigheidsregeling toekennen/intrekken (Studentenzaken, Beheerder).
-        Gate::define('aanwezigheidsregeling-beheren', fn (User $user) => $user->rol->magAanwezigheidsregelingBeheren());
+        Gate::define('aanwezigheidsregeling-beheren', fn (User $user) => $user->magAanwezigheidsregelingBeheren());
 
         // Identiteit/inschrijving beheren (Studentenzaken, Beheerder).
-        Gate::define('inschrijving-beheren', fn (User $user) => $user->rol->magInschrijvingBeheren());
+        Gate::define('inschrijving-beheren', fn (User $user) => $user->magInschrijvingBeheren());
 
         // BSN inzien — gelogd (Studentenzaken, Beheerder).
-        Gate::define('bsn-inzien', fn (User $user) => $user->rol->magBsnInzien());
+        Gate::define('bsn-inzien', fn (User $user) => $user->magBsnInzien());
 
         // Gebruikers/rollen/referentiedata beheren (Beheerder).
-        Gate::define('beheer', fn (User $user) => $user->rol === \App\Enums\Rol::Beheerder);
+        Gate::define('beheer', fn (User $user) => $user->heeftRol(\App\Enums\Rol::Beheerder));
     }
 }

@@ -21,7 +21,8 @@ class RolMiddleware
             abort(401);
         }
 
-        if (! in_array($user->rol->value, $rollen, true)) {
+        // Multi-rol: toegang zodra één van de rollen van de gebruiker volstaat.
+        if (count(array_intersect($user->rolSleutels(), $rollen)) === 0) {
             abort(403, 'Uw rol heeft geen toegang tot deze functie.');
         }
 

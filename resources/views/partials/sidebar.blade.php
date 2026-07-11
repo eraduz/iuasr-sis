@@ -217,14 +217,50 @@
         $hrMenu['HR / Personeelszaken'][] = ['Medewerker toevoegen', 'medewerkers.create', 'plus', 'medewerkers.create'];
     }
 
-    // Standaardmenu buiten een module. De relatiebeheerder/stagecoördinator en de
-    // HR-medewerker hebben geen eigen rol-menu in $menus; hun thuisbasis is hun module.
-    $standaardMenu = $menus[$rol]
-        ?? (in_array($rol, [Rol::Relatiebeheerder->value, Rol::Stagecoordinator->value], true)
-            ? $relatieMenu
-            : ($rol === Rol::Hrmedewerker->value
-                ? $hrMenu
-                : $menus[Rol::Studentenzaken->value]));
+    // Standaardmenu buiten een module. Bij multi-rol worden de menu's van álle
+    // rollen samengevoegd, zodat de gebruiker elk scherm bereikt waar hij recht op
+    // heeft. Groepen worden op titel gecombineerd; dubbele items (zelfde route +
+    // label + doel) verschijnen één keer. De relatiebeheerder/stagecoördinator en
+    // de HR-medewerker hebben geen eigen rol-menu in $menus; hun thuisbasis is hun
+    // module. Het Schoolbestuur houdt bewust zijn eigen, afgeschermde menu (zie
+    // onder) en wordt daarom nooit in het gemengde menu opgenomen.
+    $mergeMenu = function (array $doel, array $bron): array {
+        foreach ($bron as $groep => $items) {
+            $bestaand = $doel[$groep] ?? [];
+            $sleutels = array_map(fn ($i) => $i[1].'|'.$i[0].'|'.($i[4]['doel'] ?? ''), $bestaand);
+            foreach ($items as $item) {
+                $sleutel = $item[1].'|'.$item[0].'|'.($item[4]['doel'] ?? '');
+                if (! in_array($sleutel, $sleutels, true)) {
+                    $bestaand[] = $item;
+                    $sleutels[] = $sleutel;
+                }
+            }
+            $doel[$groep] = $bestaand;
+        }
+
+        return $doel;
+    };
+
+    if ($gebruiker->rol === Rol::Bestuur) {
+        $standaardMenu = $menus[Rol::Bestuur->value];
+    } else {
+        $standaardMenu = [];
+        foreach ($gebruiker->alleRollen() as $r) {
+            if ($r === Rol::Bestuur) {
+                continue; // Het afgeschermde Bestuur-menu niet in een gemengd menu mengen.
+            }
+            $rolMenu = $menus[$r->value]
+                ?? (in_array($r, [Rol::Relatiebeheerder, Rol::Stagecoordinator], true)
+                    ? $relatieMenu
+                    : ($r === Rol::Hrmedewerker ? $hrMenu : null));
+            if ($rolMenu !== null) {
+                $standaardMenu = $mergeMenu($standaardMenu, $rolMenu);
+            }
+        }
+        if (empty($standaardMenu)) {
+            $standaardMenu = $menus[Rol::Studentenzaken->value];
+        }
+    }
 
     $inCursusmodule = request()->routeIs('cursussen.*') || request()->routeIs('cursisten*');
     $inHrmodule = request()->routeIs('hr.*') || request()->routeIs('medewerkers*') || request()->routeIs('dienstverbanden*') || request()->routeIs('hrdocumenten*') || request()->routeIs('verlof*') || request()->routeIs('verzuim*') || request()->routeIs('ziekmeldingen*') || request()->routeIs('gesprekken*') || request()->routeIs('gespreksdoelen*') || request()->routeIs('competentiescores*') || request()->routeIs('checklist*') || request()->routeIs('hr.*');

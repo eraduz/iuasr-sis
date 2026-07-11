@@ -52,7 +52,8 @@ class Module extends Model
     /** Mag de gebruiker deze module benaderen (los van of hij al gebouwd is)? */
     public function toegankelijkVoor(User $gebruiker): bool
     {
-        return $gebruiker->rol->magModule($this->sleutel);
+        // Unie over alle rollen: een extra rol kan een module ontsluiten.
+        return $gebruiker->magModule($this->sleutel);
     }
 
     /** Kan de gebruiker deze module nu openen: hij is gebouwd én toegankelijk. */

@@ -528,6 +528,7 @@ Route::middleware('auth')->group(function () {
     // --- Beheer — Beheerder ---
     Route::middleware('rol:beheerder')->group(function () {
         Route::get('/gebruikers', [GebruikerController::class, 'index'])->name('gebruikers');
+        Route::post('/gebruikers', [GebruikerController::class, 'store'])->name('gebruikers.store');
         Route::put('/gebruikers/{gebruiker}/rol', [GebruikerController::class, 'updateRol'])->name('gebruikers.rol');
         // Opleidingtoewijzing voor directieleden (zichtbaarheid per opleiding).
         Route::put('/gebruikers/{gebruiker}/opleidingen', [GebruikerController::class, 'updateOpleidingen'])->name('gebruikers.opleidingen');
