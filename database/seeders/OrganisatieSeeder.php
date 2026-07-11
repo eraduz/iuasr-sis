@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Enums\Rol;
 use App\Enums\Stagestatus;
+use App\Models\Afspraak;
 use App\Models\Contactmoment;
 use App\Models\ContactmomentType;
 use App\Models\Contactpersoon;
@@ -11,6 +12,7 @@ use App\Models\Opleiding;
 use App\Models\Organisatie;
 use App\Models\OrganisatieType;
 use App\Models\RelatieNotitie;
+use App\Models\Relatietaak;
 use App\Models\Stage;
 use App\Models\Stageplaats;
 use App\Models\Student;
@@ -182,6 +184,31 @@ class OrganisatieSeeder extends Seeder
                     'startdatum' => '2026-09-01',
                     'einddatum' => '2027-01-31',
                     'status' => Stagestatus::Lopend->value,
+                ]
+            );
+        }
+
+        // Demo-taak en -afspraak (Fase E) op Basisschool De Regenboog.
+        if ($regenboog !== null) {
+            Relatietaak::firstOrCreate(
+                ['organisatie_id' => $regenboog->id, 'titel' => 'Samenwerkingsovereenkomst verlengen'],
+                [
+                    'toegewezen_aan_id' => $medewerkerId,
+                    'aangemaakt_door_id' => $medewerkerId,
+                    'prioriteit' => 'hoog',
+                    'status' => 'open',
+                    'vervaldatum' => '2026-10-15',
+                ]
+            );
+            Afspraak::firstOrCreate(
+                ['organisatie_id' => $regenboog->id, 'type' => 'stagebezoek', 'datum' => '2026-10-08'],
+                [
+                    'medewerker_id' => $medewerkerId,
+                    'tijd_van' => '10:00',
+                    'tijd_tot' => '11:00',
+                    'locatie' => 'Rotterdam',
+                    'status' => 'gepland',
+                    'omschrijving' => 'Eerste stagebezoek bij de student.',
                 ]
             );
         }

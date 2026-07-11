@@ -152,6 +152,83 @@
   @endif
 </div>
 
+{{-- Taken (Fase E). --}}
+<div class="sis-card" id="taken" style="margin-bottom:16px;">
+  <div class="sis-card__hd"><b>Taken ({{ $organisatie->relatietaken->where('status','!=','afgerond')->count() }} open)</b></div>
+  <div style="padding:14px 16px;">
+    @if ($magBeheer)
+      <form method="POST" action="{{ route('relatietaken.store', $organisatie) }}" style="margin-bottom:14px;">
+        @csrf
+        <div class="sis-fld"><label>Nieuwe taak <span class="req">*</span></label><input type="text" name="titel" maxlength="255" required placeholder="bv. Contract verlengen, stagebezoek plannen"></div>
+        <div class="sis-fld-row sis-fld-row--2">
+          <div class="sis-fld"><label>Toegewezen aan</label><select name="toegewezen_aan_id"><option value="">— vrij op te pakken —</option>@foreach ($taakMedewerkers as $m)<option value="{{ $m->id }}">{{ $m->naam }}</option>@endforeach</select></div>
+          <div class="sis-fld"><label>Prioriteit</label><select name="prioriteit">@foreach (\App\Enums\TaakPrioriteit::opties() as $w => $l)<option value="{{ $w }}" @selected($w==='normaal')>{{ $l }}</option>@endforeach</select></div>
+        </div>
+        <div class="sis-fld-row sis-fld-row--2">
+          <div class="sis-fld"><label>Vervaldatum</label><input type="date" name="vervaldatum"></div>
+          <div class="sis-fld" style="align-self:end; text-align:right;"><button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Taak toevoegen</button></div>
+        </div>
+      </form>
+    @endif
+    @forelse ($organisatie->relatietaken as $taak)
+      <div style="display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-top:1px solid var(--border,#e5e5e5); {{ $taak->status->value==='afgerond' ? 'opacity:.55;' : '' }}">
+        <div>
+          <b>{{ $taak->titel }}</b>
+          <span class="iuasr-dash-status {{ $taak->status->badge() }}">{{ $taak->status->label() }}</span>
+          @if ($taak->isTeLaat())<span class="iuasr-dash-status s-rejected">Te laat</span>@endif
+          <div><small class="sis-muted">
+            {{ $taak->toegewezenAan?->naam ?? 'Vrij' }} · prioriteit {{ $taak->prioriteit->label() }}@if($taak->vervaldatum) · vervalt {{ $taak->vervaldatum->format('d-m-Y') }}@endif
+          </small></div>
+        </div>
+        @if ($magBeheer)
+          <div style="white-space:nowrap;">
+            <form method="POST" action="{{ route('relatietaken.afronden', $taak) }}" style="display:inline;">@csrf<button class="iuasr-dash-btn iuasr-dash-btn--sm" type="submit">{{ $taak->status->value==='afgerond' ? 'Heropenen' : 'Afronden' }}</button></form>
+            <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('relatietaken.edit', $taak) }}">Bewerken</a>
+            <form method="POST" action="{{ route('relatietaken.destroy', $taak) }}" onsubmit="return confirm('Taak verwijderen?');" style="display:inline;">@csrf @method('DELETE')<button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" type="submit">×</button></form>
+          </div>
+        @endif
+      </div>
+    @empty
+      <p class="sis-muted" style="margin:0;">Nog geen taken.</p>
+    @endforelse
+  </div>
+</div>
+
+{{-- Agenda (Fase E). --}}
+<div class="sis-card" id="agenda" style="margin-bottom:16px;">
+  <div class="sis-card__hd" style="display:flex; align-items:center; justify-content:space-between;">
+    <b>Agenda ({{ $organisatie->afspraken->count() }})</b>
+    @if ($magBeheer)
+      <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('afspraken.create', $organisatie) }}">Afspraak plannen</a>
+    @endif
+  </div>
+  @if ($organisatie->afspraken->isEmpty())
+    <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Nog geen afspraken gepland.</p></div>
+  @else
+    <table class="iuasr-dash-tbl">
+      <thead><tr><th>Datum</th><th>Tijd</th><th>Type</th><th>Onderwerp</th><th>Door</th><th style="text-align:center;">Status</th>@if($magBeheer)<th class="row-act"></th>@endif</tr></thead>
+      <tbody>
+        @foreach ($organisatie->afspraken as $af)
+          <tr>
+            <td class="dt">{{ $af->datum?->format('d-m-Y') }}</td>
+            <td class="dt">{{ $af->tijd_van ? \Illuminate\Support\Str::of($af->tijd_van)->substr(0,5) : '—' }}@if($af->tijd_tot)–{{ \Illuminate\Support\Str::of($af->tijd_tot)->substr(0,5) }}@endif</td>
+            <td>{{ $af->type?->label() ?? '—' }}</td>
+            <td class="nm">{{ $af->omschrijving ? \Illuminate\Support\Str::limit($af->omschrijving, 60) : '—' }}@if($af->stage)<br><small class="sis-muted">Stage {{ $af->stage->student?->achternaam }}</small>@endif</td>
+            <td>{{ $af->medewerker?->naam ?? '—' }}</td>
+            <td style="text-align:center;"><span class="iuasr-dash-status {{ $af->status==='gepland' ? 's-requested' : ($af->status==='afgerond' ? 's-approved' : 's-rejected') }}">{{ ucfirst($af->status) }}</span></td>
+            @if($magBeheer)
+              <td class="row-act" style="white-space:nowrap;">
+                <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('afspraken.edit', $af) }}">Bewerken</a>
+                <form method="POST" action="{{ route('afspraken.destroy', $af) }}" onsubmit="return confirm('Afspraak verwijderen?');" style="display:inline;">@csrf @method('DELETE')<button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" type="submit">×</button></form>
+              </td>
+            @endif
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+  @endif
+</div>
+
 {{-- Contactmomenten (Fase C). --}}
 <div class="sis-card" id="contactmomenten" style="margin-bottom:16px;">
   <div class="sis-card__hd" style="display:flex; align-items:center; justify-content:space-between;">
@@ -242,11 +319,11 @@
   </div>
 </div>
 
-{{-- De overige panelen (documenten, overeenkomsten, taken, agenda) volgen in de fasen E t/m G. --}}
+{{-- De overige panelen (documenten, overeenkomsten) volgen in fase F. --}}
 <div class="sis-card">
   <div class="sis-card__hd"><b>Overige onderdelen</b></div>
   <div style="padding:14px 16px;">
-    <p class="sis-muted" style="margin:0;">Documenten, overeenkomsten, taken en agenda verschijnen hier zodra de bijbehorende fasen (E t/m G) van de module Relatiebeheer &amp; Stage zijn opgeleverd.</p>
+    <p class="sis-muted" style="margin:0;">Documenten en overeenkomsten verschijnen hier zodra fase F van de module Relatiebeheer &amp; Stage is opgeleverd.</p>
   </div>
 </div>
 @endsection

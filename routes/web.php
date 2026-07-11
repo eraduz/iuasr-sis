@@ -172,9 +172,26 @@ Route::middleware('auth')->group(function () {
         Route::put('/stages/{stage}', [App\Http\Controllers\Relatie\StageController::class, 'update'])->name('stages.update');
     });
 
+    // Taken en agenda-afspraken bij een organisatie (Fase E). Muteren door wie de
+    // organisatie beheert (relatiebeheerder/stagecoördinator eigen opleiding + Beheer).
+    Route::middleware('rol:relatiebeheerder,stagecoordinator,beheerder')->prefix('relatiebeheer')->group(function () {
+        Route::post('/organisaties/{organisatie}/taken', [App\Http\Controllers\Relatie\RelatietaakController::class, 'store'])->name('relatietaken.store');
+        Route::get('/taken/{taak}/bewerken', [App\Http\Controllers\Relatie\RelatietaakController::class, 'edit'])->name('relatietaken.edit');
+        Route::put('/taken/{taak}', [App\Http\Controllers\Relatie\RelatietaakController::class, 'update'])->name('relatietaken.update');
+        Route::post('/taken/{taak}/afronden', [App\Http\Controllers\Relatie\RelatietaakController::class, 'afronden'])->name('relatietaken.afronden');
+        Route::delete('/taken/{taak}', [App\Http\Controllers\Relatie\RelatietaakController::class, 'destroy'])->name('relatietaken.destroy');
+
+        Route::get('/organisaties/{organisatie}/afspraken/nieuw', [App\Http\Controllers\Relatie\AfspraakController::class, 'create'])->name('afspraken.create');
+        Route::post('/organisaties/{organisatie}/afspraken', [App\Http\Controllers\Relatie\AfspraakController::class, 'store'])->name('afspraken.store');
+        Route::get('/afspraken/{afspraak}/bewerken', [App\Http\Controllers\Relatie\AfspraakController::class, 'edit'])->name('afspraken.edit');
+        Route::put('/afspraken/{afspraak}', [App\Http\Controllers\Relatie\AfspraakController::class, 'update'])->name('afspraken.update');
+        Route::delete('/afspraken/{afspraak}', [App\Http\Controllers\Relatie\AfspraakController::class, 'destroy'])->name('afspraken.destroy');
+    });
+
     Route::middleware('rol:relatiebeheerder,stagecoordinator,directie,bestuur,beheerder')->prefix('relatiebeheer')->group(function () {
         Route::get('/', [App\Http\Controllers\Relatie\OrganisatieController::class, 'index'])->name('relaties');
         Route::get('/stages', [App\Http\Controllers\Relatie\StageController::class, 'index'])->name('stages');
+        Route::get('/agenda', [App\Http\Controllers\Relatie\AfspraakController::class, 'index'])->name('agenda');
         Route::get('/organisaties/{organisatie}', [App\Http\Controllers\Relatie\OrganisatieController::class, 'show'])->name('relaties.show');
     });
 

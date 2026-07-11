@@ -102,11 +102,16 @@ class OrganisatieController extends Controller
             'notities' => fn ($q) => $q->with('auteur')->orderByDesc('created_at'),
             'stageplaatsen' => fn ($q) => $q->with(['opleiding', 'periode', 'stages'])->orderByDesc('actief')->orderBy('id'),
             'stages' => fn ($q) => $q->with(['student', 'opleiding', 'stagebegeleider', 'werkplekbegeleider'])->orderByDesc('id'),
+            'relatietaken' => fn ($q) => $q->with(['toegewezenAan'])->orderByRaw("status='afgerond'")->orderByRaw('vervaldatum is null, vervaldatum asc'),
+            'afspraken' => fn ($q) => $q->with(['medewerker', 'stage.student'])->orderByDesc('datum')->orderByDesc('id'),
         ]);
 
         return view('relaties.show', [
             'organisatie' => $organisatie,
             'tijdlijn' => \App\Support\Relatietijdlijn::voor($organisatie),
+            'taakMedewerkers' => \App\Models\User::whereIn('rol', [
+                \App\Enums\Rol::Relatiebeheerder, \App\Enums\Rol::Stagecoordinator, \App\Enums\Rol::Beheerder,
+            ])->orderBy('naam')->get(),
         ]);
     }
 

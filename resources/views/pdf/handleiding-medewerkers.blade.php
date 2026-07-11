@@ -257,7 +257,13 @@
   <h3>Stages (studenten plaatsen)</h3>
   <p>Met de knop <b>Student plaatsen</b> koppelt u een student aan de organisatie: u kiest de student (uit de opleidingen van de organisatie), de opleiding, eventueel een specifieke stageplaats, de <b>stagebegeleider</b> vanuit de opleiding en de <b>werkplekbegeleider</b> op de locatie (een contactpersoon), de periode en de status (aangevraagd, lopend, afgerond, afgebroken). Elke stage krijgt een uniek <b>stagenummer</b>. Alle stages samen ziet u ook via het menu <b>Stages</b>, met filters op status en opleiding.</p>
   <p>Bij het bewerken van een stage legt u de <b>beoordeling</b> vast: <b>voldoende</b> of <b>onvoldoende</b>, met een optionele toelichting. Let op: de beoordeling gaat over de student en wordt gelogd — leg alleen de formeel vastgestelde uitslag vast.</p>
-  <p>De overige onderdelen van de relatiekaart — documenten, overeenkomsten, taken en agenda — worden in de volgende fasen van de module toegevoegd.</p>
+  <h3>Taken</h3>
+  <p>Onder <b>Taken</b> op de relatiekaart houdt u de werkverdeling bij: geef een taak een titel, wijs haar toe aan een medewerker (of laat haar vrij op te pakken), stel een prioriteit en een vervaldatum in. Een taak vinkt u met één klik af (of heropent u). Een taak waarvan de vervaldatum verstreken is en die nog niet is afgerond, wordt gemarkeerd als <b>Te laat</b>. Taken zijn werkinformatie en worden niet apart gelogd.</p>
+  <h3>Agenda</h3>
+  <p>Onder <b>Agenda</b> plant u afspraken bij de organisatie: <b>schoolbezoek</b>, <b>stagebezoek</b>, <b>evaluatie</b>, <b>overleg</b> of <b>open dag</b>, met datum, tijd, locatie en een status (gepland, afgerond, geannuleerd). Een afspraak kunt u aan een specifieke stage koppelen.</p>
+  <h3>Agenda &amp; taken (planning)</h3>
+  <p>Via het menu <b>Agenda &amp; taken</b> ziet u een overzicht over alle organisaties binnen uw bereik: de <b>aankomende afspraken</b> en de <b>openstaande taken</b> (met vervaldatum en de markering ‘te laat’). Zo hebt u uw werkvoorraad in één scherm.</p>
+  <p>De overige onderdelen van de relatiekaart — documenten en overeenkomsten — worden in de volgende fase van de module toegevoegd.</p>
   <div class="tip">Belangrijk (AVG): in deze module leggen wij uitsluitend gegevens van de <b>organisatie</b> en haar contactpersonen vast — nooit gegevens van leerlingen of cliënten van de stageplaats. De organisatietypes beheert de Beheerder via Opzoektabellen (per opleiding instelbaar). Het aanmaken en wijzigen van organisaties wordt gelogd.</div>
 
   <h2>13. Vragen of problemen?</h2>
