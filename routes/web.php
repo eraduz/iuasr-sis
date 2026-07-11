@@ -186,12 +186,25 @@ Route::middleware('auth')->group(function () {
         Route::get('/afspraken/{afspraak}/bewerken', [App\Http\Controllers\Relatie\AfspraakController::class, 'edit'])->name('afspraken.edit');
         Route::put('/afspraken/{afspraak}', [App\Http\Controllers\Relatie\AfspraakController::class, 'update'])->name('afspraken.update');
         Route::delete('/afspraken/{afspraak}', [App\Http\Controllers\Relatie\AfspraakController::class, 'destroy'])->name('afspraken.destroy');
+
+        // Documenten (versiebeheer) en overeenkomsten (Fase F).
+        Route::post('/organisaties/{organisatie}/documenten', [App\Http\Controllers\Relatie\RelatieDocumentController::class, 'store'])->name('relatiedocumenten.store');
+        Route::post('/relatie-documenten/{document}/versie', [App\Http\Controllers\Relatie\RelatieDocumentController::class, 'versie'])->name('relatiedocumenten.versie');
+        Route::delete('/relatie-documenten/{document}', [App\Http\Controllers\Relatie\RelatieDocumentController::class, 'destroy'])->name('relatiedocumenten.destroy');
+
+        Route::get('/organisaties/{organisatie}/overeenkomsten/nieuw', [App\Http\Controllers\Relatie\OvereenkomstController::class, 'create'])->name('overeenkomsten.create');
+        Route::post('/organisaties/{organisatie}/overeenkomsten', [App\Http\Controllers\Relatie\OvereenkomstController::class, 'store'])->name('overeenkomsten.store');
+        Route::get('/overeenkomsten/{overeenkomst}/bewerken', [App\Http\Controllers\Relatie\OvereenkomstController::class, 'edit'])->name('overeenkomsten.edit');
+        Route::put('/overeenkomsten/{overeenkomst}', [App\Http\Controllers\Relatie\OvereenkomstController::class, 'update'])->name('overeenkomsten.update');
+        Route::delete('/overeenkomsten/{overeenkomst}', [App\Http\Controllers\Relatie\OvereenkomstController::class, 'destroy'])->name('overeenkomsten.destroy');
     });
 
     Route::middleware('rol:relatiebeheerder,stagecoordinator,directie,bestuur,beheerder')->prefix('relatiebeheer')->group(function () {
         Route::get('/', [App\Http\Controllers\Relatie\OrganisatieController::class, 'index'])->name('relaties');
         Route::get('/stages', [App\Http\Controllers\Relatie\StageController::class, 'index'])->name('stages');
         Route::get('/agenda', [App\Http\Controllers\Relatie\AfspraakController::class, 'index'])->name('agenda');
+        Route::get('/relatie-documenten/{document}/download', [App\Http\Controllers\Relatie\RelatieDocumentController::class, 'download'])->name('relatiedocumenten.download');
+        Route::get('/overeenkomsten/{overeenkomst}/download', [App\Http\Controllers\Relatie\OvereenkomstController::class, 'download'])->name('overeenkomsten.download');
         Route::get('/organisaties/{organisatie}', [App\Http\Controllers\Relatie\OrganisatieController::class, 'show'])->name('relaties.show');
     });
 

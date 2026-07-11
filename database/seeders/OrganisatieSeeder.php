@@ -11,6 +11,7 @@ use App\Models\Contactpersoon;
 use App\Models\Opleiding;
 use App\Models\Organisatie;
 use App\Models\OrganisatieType;
+use App\Models\Overeenkomst;
 use App\Models\RelatieNotitie;
 use App\Models\Relatietaak;
 use App\Models\Stage;
@@ -209,6 +210,16 @@ class OrganisatieSeeder extends Seeder
                     'locatie' => 'Rotterdam',
                     'status' => 'gepland',
                     'omschrijving' => 'Eerste stagebezoek bij de student.',
+                ]
+            );
+            // Demo-overeenkomst (Fase F).
+            Overeenkomst::firstOrCreate(
+                ['organisatie_id' => $regenboog->id, 'type' => 'samenwerkingsovereenkomst'],
+                [
+                    'titel' => 'Samenwerkingsovereenkomst 2026–2028',
+                    'startdatum' => '2026-08-01',
+                    'verloopdatum' => '2028-07-31',
+                    'status' => 'getekend',
                 ]
             );
         }

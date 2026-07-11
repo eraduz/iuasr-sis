@@ -319,11 +319,86 @@
   </div>
 </div>
 
-{{-- De overige panelen (documenten, overeenkomsten) volgen in fase F. --}}
-<div class="sis-card">
-  <div class="sis-card__hd"><b>Overige onderdelen</b></div>
+{{-- Overeenkomsten (Fase F). --}}
+<div class="sis-card" id="overeenkomsten" style="margin-bottom:16px;">
+  <div class="sis-card__hd" style="display:flex; align-items:center; justify-content:space-between;">
+    <b>Overeenkomsten ({{ $organisatie->overeenkomsten->count() }})</b>
+    @if ($magBeheer)
+      <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('overeenkomsten.create', $organisatie) }}">Overeenkomst toevoegen</a>
+    @endif
+  </div>
+  @if ($organisatie->overeenkomsten->isEmpty())
+    <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Nog geen overeenkomsten vastgelegd.</p></div>
+  @else
+    <table class="iuasr-dash-tbl">
+      <thead><tr><th>Type</th><th>Start</th><th>Verloopt</th><th style="text-align:center;">Status</th><th>Getekend</th>@if($magBeheer)<th class="row-act"></th>@endif</tr></thead>
+      <tbody>
+        @foreach ($organisatie->overeenkomsten as $ovk)
+          <tr>
+            <td class="nm">{{ $ovk->type?->label() }}@if($ovk->titel)<br><small class="sis-muted">{{ $ovk->titel }}</small>@endif</td>
+            <td class="dt">{{ $ovk->startdatum?->format('d-m-Y') ?? '—' }}</td>
+            <td class="dt">{{ $ovk->verloopdatum?->format('d-m-Y') ?? '—' }} @if($ovk->isVerlopen())<span class="iuasr-dash-status s-rejected">Verlopen</span>@elseif($ovk->dagenTotVerloop() !== null && $ovk->dagenTotVerloop() <= 60)<span class="iuasr-dash-status s-requested">Loopt af</span>@endif</td>
+            <td style="text-align:center;"><span class="iuasr-dash-status {{ $ovk->status?->badge() }}">{{ $ovk->status?->label() }}</span></td>
+            <td>@if($ovk->ondertekend_document_id)<a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('overeenkomsten.download', $ovk) }}">PDF</a>@else <span class="sis-muted">—</span> @endif</td>
+            @if($magBeheer)
+              <td class="row-act" style="white-space:nowrap;">
+                <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('overeenkomsten.edit', $ovk) }}">Bewerken</a>
+                <form method="POST" action="{{ route('overeenkomsten.destroy', $ovk) }}" onsubmit="return confirm('Overeenkomst verwijderen?');" style="display:inline;">@csrf @method('DELETE')<button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" type="submit">×</button></form>
+              </td>
+            @endif
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+  @endif
+</div>
+
+{{-- Documenten met versiebeheer (Fase F). --}}
+<div class="sis-card" id="documenten" style="margin-bottom:16px;">
+  <div class="sis-card__hd"><b>Documenten ({{ $organisatie->documenten->count() }})</b></div>
   <div style="padding:14px 16px;">
-    <p class="sis-muted" style="margin:0;">Documenten en overeenkomsten verschijnen hier zodra fase F van de module Relatiebeheer &amp; Stage is opgeleverd.</p>
+    @if ($magBeheer)
+      <form method="POST" action="{{ route('relatiedocumenten.store', $organisatie) }}" enctype="multipart/form-data" style="margin-bottom:14px;">
+        @csrf
+        <div class="sis-fld-row sis-fld-row--2">
+          <div class="sis-fld"><label>Categorie <span class="req">*</span></label><select name="categorie" required>@foreach (\App\Models\RelatieDocument::CATEGORIEEN as $w => $l)<option value="{{ $w }}">{{ $l }}</option>@endforeach</select></div>
+          <div class="sis-fld"><label>Titel</label><input type="text" name="titel" maxlength="255" placeholder="Optioneel"></div>
+        </div>
+        <div class="sis-fld-row sis-fld-row--2">
+          <div class="sis-fld"><label>Bestand <span class="req">*</span></label><input type="file" name="bestand" required></div>
+          <div class="sis-fld" style="align-self:end; text-align:right;"><button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Uploaden</button></div>
+        </div>
+        <small class="sis-muted">PDF, afbeelding of Office-bestand (max. 16 MB). Op de private schijf; inzage wordt gelogd.</small>
+      </form>
+    @endif
+    @if ($organisatie->documenten->isEmpty())
+      <p class="sis-muted" style="margin:0;">Nog geen documenten.</p>
+    @else
+      <table class="iuasr-dash-tbl">
+        <thead><tr><th>Categorie</th><th>Bestand</th><th>Versie</th><th>Geüpload</th>@if($magBeheer)<th class="row-act"></th>@endif</tr></thead>
+        <tbody>
+          @foreach ($organisatie->documenten as $doc)
+            <tr @if(! $doc->isHuidigeVersie()) style="opacity:.55;" @endif>
+              <td>{{ $doc->categorieLabel() }}@if($doc->titel)<br><small class="sis-muted">{{ $doc->titel }}</small>@endif</td>
+              <td class="nm"><a href="{{ route('relatiedocumenten.download', $doc) }}">{{ $doc->bestandsnaam }}</a></td>
+              <td>v{{ $doc->versie }}@if(! $doc->isHuidigeVersie()) <small class="sis-muted">(vervangen)</small>@endif</td>
+              <td class="dt"><small>{{ $doc->created_at?->format('d-m-Y') }}<br>{{ $doc->geuploadDoor?->naam }}</small></td>
+              @if($magBeheer)
+                <td class="row-act" style="white-space:nowrap;">
+                  @if ($doc->isHuidigeVersie())
+                    <form method="POST" action="{{ route('relatiedocumenten.versie', $doc) }}" enctype="multipart/form-data" style="display:inline;" onsubmit="return this.bestand.value !== '';">
+                      @csrf
+                      <label class="iuasr-dash-btn iuasr-dash-btn--sm" style="cursor:pointer;">Nieuwe versie<input type="file" name="bestand" style="display:none;" onchange="this.form.submit()"></label>
+                    </form>
+                  @endif
+                  <form method="POST" action="{{ route('relatiedocumenten.destroy', $doc) }}" onsubmit="return confirm('Document verwijderen?');" style="display:inline;">@csrf @method('DELETE')<button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" type="submit">×</button></form>
+                </td>
+              @endif
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+    @endif
   </div>
 </div>
 @endsection

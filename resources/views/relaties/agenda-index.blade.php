@@ -30,6 +30,27 @@
   @endif
 </div>
 
+<div class="sis-card" style="margin-bottom:16px;">
+  <div class="sis-card__hd"><b>Contracten die verlopen ({{ $overeenkomsten->count() }})</b></div>
+  @if ($overeenkomsten->isEmpty())
+    <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Geen aflopende overeenkomsten binnen 60 dagen.</p></div>
+  @else
+    <table class="iuasr-dash-tbl">
+      <thead><tr><th>Organisatie</th><th>Type</th><th>Verloopt</th><th style="text-align:center;">Status</th></tr></thead>
+      <tbody>
+        @foreach ($overeenkomsten as $ovk)
+          <tr>
+            <td class="nm"><a href="{{ route('relaties.show', $ovk->organisatie) }}#overeenkomsten">{{ $ovk->organisatie?->naam }}</a></td>
+            <td>{{ $ovk->type?->label() }}</td>
+            <td class="dt">{{ $ovk->verloopdatum?->format('d-m-Y') }} @if($ovk->isVerlopen())<span class="iuasr-dash-status s-rejected">Verlopen</span>@else<span class="iuasr-dash-status s-requested">{{ $ovk->dagenTotVerloop() }} dagen</span>@endif</td>
+            <td style="text-align:center;"><span class="iuasr-dash-status {{ $ovk->status?->badge() }}">{{ $ovk->status?->label() }}</span></td>
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+  @endif
+</div>
+
 <div class="sis-card">
   <div class="sis-card__hd"><b>Openstaande taken ({{ $taken->count() }})</b></div>
   @if ($taken->isEmpty())

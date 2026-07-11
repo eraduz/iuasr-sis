@@ -104,6 +104,8 @@ class OrganisatieController extends Controller
             'stages' => fn ($q) => $q->with(['student', 'opleiding', 'stagebegeleider', 'werkplekbegeleider'])->orderByDesc('id'),
             'relatietaken' => fn ($q) => $q->with(['toegewezenAan'])->orderByRaw("status='afgerond'")->orderByRaw('vervaldatum is null, vervaldatum asc'),
             'afspraken' => fn ($q) => $q->with(['medewerker', 'stage.student'])->orderByDesc('datum')->orderByDesc('id'),
+            'documenten' => fn ($q) => $q->with('geuploadDoor')->orderBy('categorie')->orderByDesc('versie'),
+            'overeenkomsten' => fn ($q) => $q->with('ondertekendDocument')->orderByDesc('id'),
         ]);
 
         return view('relaties.show', [

@@ -75,6 +75,16 @@ class Organisatie extends Model
         return $this->hasMany(Afspraak::class);
     }
 
+    public function documenten(): HasMany
+    {
+        return $this->hasMany(RelatieDocument::class);
+    }
+
+    public function overeenkomsten(): HasMany
+    {
+        return $this->hasMany(Overeenkomst::class);
+    }
+
     /**
      * Mag deze gebruiker de stageplaatsen/stages van deze organisatie beheren?
      * De stagecoördinator (eigen opleiding) en de Beheerder. De relatiebeheerder

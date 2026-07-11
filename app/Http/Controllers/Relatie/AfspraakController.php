@@ -6,6 +6,7 @@ use App\Enums\AfspraakType;
 use App\Http\Controllers\Controller;
 use App\Models\Afspraak;
 use App\Models\Organisatie;
+use App\Models\Overeenkomst;
 use App\Models\Relatietaak;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -39,7 +40,18 @@ class AfspraakController extends Controller
             ->orderByRaw('vervaldatum is null, vervaldatum asc')
             ->limit(50)->get();
 
-        return view('relaties.agenda-index', compact('afspraken', 'taken'));
+        // Signalering 'contracten die verlopen': aflopend binnen 60 dagen of al
+        // verlopen, en niet opgezegd.
+        $overeenkomsten = Overeenkomst::query()
+            ->zichtbaarVoor($gebruiker)
+            ->with('organisatie')
+            ->whereNotNull('verloopdatum')
+            ->where('status', '!=', 'opgezegd')
+            ->whereDate('verloopdatum', '<=', now()->addDays(60)->toDateString())
+            ->orderBy('verloopdatum')
+            ->limit(50)->get();
+
+        return view('relaties.agenda-index', compact('afspraken', 'taken', 'overeenkomsten'));
     }
 
     public function store(Request $request, Organisatie $organisatie): RedirectResponse

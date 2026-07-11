@@ -263,7 +263,10 @@
   <p>Onder <b>Agenda</b> plant u afspraken bij de organisatie: <b>schoolbezoek</b>, <b>stagebezoek</b>, <b>evaluatie</b>, <b>overleg</b> of <b>open dag</b>, met datum, tijd, locatie en een status (gepland, afgerond, geannuleerd). Een afspraak kunt u aan een specifieke stage koppelen.</p>
   <h3>Agenda &amp; taken (planning)</h3>
   <p>Via het menu <b>Agenda &amp; taken</b> ziet u een overzicht over alle organisaties binnen uw bereik: de <b>aankomende afspraken</b> en de <b>openstaande taken</b> (met vervaldatum en de markering ‘te laat’). Zo hebt u uw werkvoorraad in één scherm.</p>
-  <p>De overige onderdelen van de relatiekaart — documenten en overeenkomsten — worden in de volgende fase van de module toegevoegd.</p>
+  <h3>Overeenkomsten</h3>
+  <p>Onder <b>Overeenkomsten</b> op de relatiekaart legt u samenwerkingsovereenkomsten, convenanten en stagecontracten vast, met een start- en een <b>verloopdatum</b> en een status (concept, getekend, verlopen, opgezegd). U kunt een <b>getekende PDF</b> uploaden: die krijgt automatisch een SHA-256-echtheidskenmerk en een verificatiecode via de ondertekenmodule en de status wordt dan ‘Getekend’; het gewaarmerkte document is daarna te downloaden. Overeenkomsten waarvan de verloopdatum nadert of verstreken is, verschijnen op de pagina <b>Agenda &amp; taken</b> onder ‘Contracten die verlopen’.</p>
+  <h3>Documenten</h3>
+  <p>Onder <b>Documenten</b> uploadt u bestanden bij de organisatie (stagecontract, convenant, beoordeling, verslag, correspondentie, foto, certificaat of overig). De bestanden staan op de <b>private schijf</b> (buiten het web) en de inzage wordt gelogd (AVG). Met <b>Nieuwe versie</b> vervangt u een document terwijl de oude versie bewaard blijft (versiebeheer); verwijderen kan ook.</p>
   <div class="tip">Belangrijk (AVG): in deze module leggen wij uitsluitend gegevens van de <b>organisatie</b> en haar contactpersonen vast — nooit gegevens van leerlingen of cliënten van de stageplaats. De organisatietypes beheert de Beheerder via Opzoektabellen (per opleiding instelbaar). Het aanmaken en wijzigen van organisaties wordt gelogd.</div>
 
   <h2>13. Vragen of problemen?</h2>
