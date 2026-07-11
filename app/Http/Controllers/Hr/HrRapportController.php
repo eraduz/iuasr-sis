@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Hr;
 
 use App\Http\Controllers\Controller;
 use App\Models\Afdeling;
+use App\Models\Functie;
 use App\Models\Medewerker;
 use App\Support\AuditLogger;
 use App\Support\HrRapport;
@@ -68,9 +69,18 @@ class HrRapportController extends Controller
         $perOuder = $afdelingen->groupBy('bovenliggende_afdeling_id');
         $wortels = $perOuder->get(null) ?? collect();
 
+        // Beheergegevens (alleen relevant voor rollen met magHrBeheer): de volledige
+        // lijsten + keuzelijsten om afdelingen/functies te muteren op deze pagina.
+        $magBeheer = $request->user()->magHrBeheer();
+
         return view('hr.organisatie', [
             'wortels' => $wortels->sortBy('naam')->values(),
             'perOuder' => $perOuder,
+            'magBeheer' => $magBeheer,
+            'afdelingen' => $magBeheer ? $afdelingen->sortBy('naam')->values() : collect(),
+            'functies' => $magBeheer ? Functie::orderBy('naam')->get() : collect(),
+            'medewerkers' => $magBeheer ? Medewerker::orderBy('achternaam')->orderBy('voornaam')->get() : collect(),
+            'categorieen' => Functie::CATEGORIEEN,
         ]);
     }
 }

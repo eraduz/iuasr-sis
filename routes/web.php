@@ -241,6 +241,15 @@ Route::middleware('auth')->group(function () {
         Route::post('/medewerkers/{medewerker}/documenten', [App\Http\Controllers\Hr\HrDocumentController::class, 'store'])->name('hrdocumenten.store');
         Route::delete('/hr-documenten/{document}', [App\Http\Controllers\Hr\HrDocumentController::class, 'destroy'])->name('hrdocumenten.destroy');
         Route::post('/medewerkers/{medewerker}/verlofsaldo', [App\Http\Controllers\Hr\VerlofsaldoController::class, 'bijwerken'])->name('verlofsaldo.bijwerken');
+
+        // Organisatiestructuur-beheer (Fase F+): afdelingen en functies rechtstreeks
+        // beheren door HR (voorheen alleen Beheer via Opzoektabellen).
+        Route::post('/organisatie/afdelingen', [App\Http\Controllers\Hr\OrganisatiebeheerController::class, 'afdelingStore'])->name('hr.afdeling.store');
+        Route::put('/organisatie/afdelingen/{afdeling}', [App\Http\Controllers\Hr\OrganisatiebeheerController::class, 'afdelingUpdate'])->name('hr.afdeling.update');
+        Route::delete('/organisatie/afdelingen/{afdeling}', [App\Http\Controllers\Hr\OrganisatiebeheerController::class, 'afdelingDestroy'])->name('hr.afdeling.destroy');
+        Route::post('/organisatie/functies', [App\Http\Controllers\Hr\OrganisatiebeheerController::class, 'functieStore'])->name('hr.functie.store');
+        Route::put('/organisatie/functies/{functie}', [App\Http\Controllers\Hr\OrganisatiebeheerController::class, 'functieUpdate'])->name('hr.functie.update');
+        Route::delete('/organisatie/functies/{functie}', [App\Http\Controllers\Hr\OrganisatiebeheerController::class, 'functieDestroy'])->name('hr.functie.destroy');
     });
 
     Route::middleware('rol:hrmedewerker,beheerder,bestuur')->prefix('hr')->group(function () {
