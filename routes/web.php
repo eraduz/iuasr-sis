@@ -282,9 +282,15 @@ Route::middleware('auth')->group(function () {
         Route::delete('/checklisttaken/{taak}', [App\Http\Controllers\Hr\ChecklistController::class, 'destroy'])->name('checklist.destroy');
     });
 
-    // Self-service verlof: elke ingelogde medewerker (met een gekoppeld dossier).
-    // Geen rol-beperking; de controller vereist een gekoppeld personeelsrecord.
+    // Self-service "Mijn HR" & verlof: elke ingelogde medewerker (met een gekoppeld
+    // dossier). Geen rol-beperking; de controllers vereisen een personeelsrecord.
     Route::prefix('hr')->group(function () {
+        // Mijn HR — eigen dossier + iCal-agenda + eigen documenten (Fase F).
+        Route::get('/mijn', [App\Http\Controllers\Hr\MijnHrController::class, 'index'])->name('hr.mijn');
+        Route::get('/mijn/agenda.ics', [App\Http\Controllers\Hr\MijnHrController::class, 'agenda'])->name('hr.mijn.agenda');
+        Route::get('/mijn/documenten/{document}/download', [App\Http\Controllers\Hr\MijnHrController::class, 'document'])->name('hr.mijn.document');
+
+        // Mijn verlof — zelfservice-aanvragen (Fase B).
         Route::get('/mijn/verlof', [App\Http\Controllers\Hr\VerlofController::class, 'mijn'])->name('verlof.mijn');
         Route::get('/mijn/verlof/nieuw', [App\Http\Controllers\Hr\VerlofController::class, 'create'])->name('verlof.create');
         Route::post('/mijn/verlof', [App\Http\Controllers\Hr\VerlofController::class, 'store'])->name('verlof.store');

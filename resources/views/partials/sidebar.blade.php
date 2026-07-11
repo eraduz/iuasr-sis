@@ -181,8 +181,8 @@
         $relatieMenu['Relatiebeheer'][] = ['Organisatie toevoegen', 'relaties.create', 'plus', 'relaties.create'];
     }
 
-    // Module HR / Personeelszaken — rolbewust menu. HR/Beheer beheren; Manager
-    // (eigen team) en Bestuur kijken mee.
+    // Module HR / Personeelszaken — rolbewust menu. HR/Beheer beheren; Bestuur
+    // kijkt mee. De Zelfservice-groep geldt voor elke gekoppelde medewerker.
     $hrMenu = [
         'HR / Personeelszaken' => [
             ['Overzicht', 'hr.dashboard', 'dash', 'hr.dashboard'],
@@ -194,6 +194,7 @@
             ['Rapportage', 'hr.rapport', 'report', 'hr.rapport'],
         ],
         'Zelfservice' => [
+            ['Mijn HR', 'hr.mijn', 'eye', 'hr.mijn'],
             ['Mijn verlof', 'verlof.mijn', 'taak', 'verlof.mijn,verlof.create'],
         ],
     ];
@@ -216,6 +217,16 @@
     $menu = $inCursusmodule
         ? $cursusMenu
         : ($inRelatiemodule ? $relatieMenu : ($inHrmodule ? $hrMenu : $standaardMenu));
+
+    // Zelfservice "Mijn HR" is er voor iedere gekoppelde medewerker, ook buiten de
+    // HR-module (bv. een docent met een personeelsdossier). Voeg de groep toe aan
+    // het actieve menu wanneer die er nog niet in staat.
+    if (! array_key_exists('Zelfservice', $menu) && $gebruiker->medewerker !== null) {
+        $menu['Zelfservice'] = [
+            ['Mijn HR', 'hr.mijn', 'eye', 'hr.mijn'],
+            ['Mijn verlof', 'verlof.mijn', 'taak', 'verlof.mijn,verlof.create'],
+        ];
+    }
 @endphp
 
 @foreach ($menu as $titel => $items)

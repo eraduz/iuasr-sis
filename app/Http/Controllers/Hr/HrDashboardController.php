@@ -8,6 +8,7 @@ use App\Models\Dienstverband;
 use App\Models\Gesprek;
 use App\Models\Medewerker;
 use App\Models\Verlofaanvraag;
+use App\Models\Ziekmelding;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
@@ -54,6 +55,13 @@ class HrDashboardController extends Controller
             ->with(['medewerker', 'gespreksvoerder'])
             ->orderBy('datum')->limit(15)->get();
 
+        // Actuele ziekmeldingen (nog niet hersteld), binnen de scope.
+        $openZiekmeldingen = Ziekmelding::query()
+            ->whereIn('medewerker_id', $medewerkerIds)
+            ->whereNull('hersteld_op')
+            ->with('medewerker')
+            ->orderByDesc('ziek_van')->limit(15)->get();
+
         return view('hr.dashboard', [
             'aantal' => $medewerkers->where('actief', true)->count(),
             'fteTotaal' => $fteTotaal,
@@ -61,6 +69,7 @@ class HrDashboardController extends Controller
             'aflopend' => $aflopend,
             'openAanvragen' => $openAanvragen,
             'geplandeGesprekken' => $geplandeGesprekken,
+            'openZiekmeldingen' => $openZiekmeldingen,
         ]);
     }
 }

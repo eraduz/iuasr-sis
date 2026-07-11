@@ -7,7 +7,10 @@
 
 <div class="iuasr-dash-vhead">
   <div><h1>HR / Personeelszaken</h1><div class="summary">Overzicht van uw {{ auth()->user()->isHrTeamBeperkt() ? 'team' : 'personeel' }}</div></div>
-  <div class="iuasr-dash-vhead__actions"><a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('medewerkers') }}">Medewerkers</a></div>
+  <div class="iuasr-dash-vhead__actions">
+    @if (auth()->user()->medewerker)<a class="iuasr-dash-btn" href="{{ route('hr.mijn') }}">Mijn HR</a>@endif
+    <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('medewerkers') }}">Medewerkers</a>
+  </div>
 </div>
 
 <div class="iuasr-dash-stats" style="grid-template-columns:repeat(4,1fr);">
@@ -68,6 +71,27 @@
 </div>
 
 <div class="sis-card" style="margin-top:16px;">
+  <div class="sis-card__hd"><b>Actuele ziekmeldingen ({{ $openZiekmeldingen->count() }})</b></div>
+  @if ($openZiekmeldingen->isEmpty())
+    <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Geen openstaande ziekmeldingen.</p></div>
+  @else
+    <table class="iuasr-dash-tbl">
+      <thead><tr><th>Medewerker</th><th>Ziek sinds</th><th style="text-align:right;">Dagen</th><th class="row-act"></th></tr></thead>
+      <tbody>
+        @foreach ($openZiekmeldingen as $z)
+          <tr>
+            <td class="nm"><a href="{{ route('medewerkers.show', $z->medewerker) }}#verzuim">{{ $z->medewerker?->volledigeNaam() }}</a></td>
+            <td class="dt">{{ $z->ziek_van?->format('d-m-Y') }} <span class="iuasr-dash-status s-requested">ziek</span></td>
+            <td class="tnum" style="text-align:right;">{{ $z->dagen() }}</td>
+            <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('verzuim') }}">Naar verzuim</a></td>
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+  @endif
+</div>
+
+<div class="sis-card" style="margin-top:16px;">
   <div class="sis-card__hd"><b>Aankomende gesprekken ({{ $geplandeGesprekken->count() }})</b></div>
   @if ($geplandeGesprekken->isEmpty())
     <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Geen geplande gesprekken.</p></div>
@@ -89,8 +113,13 @@
   @endif
 </div>
 
-<div class="sis-card" style="margin-top:16px;">
-  <div class="sis-card__hd"><b>Volgende fasen</b></div>
-  <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Onboarding/offboarding en de HR-rapportages verschijnen hier zodra de fasen D t/m G van de module zijn opgeleverd.</p></div>
-</div>
+@if (auth()->user()->medewerker)
+  <div class="sis-card" style="margin-top:16px;">
+    <div class="sis-card__hd"><b>Mijn HR (zelfservice)</b></div>
+    <div style="padding:14px 16px;">
+      <p class="sis-muted" style="margin:0 0 10px;">Uw eigen dossier: gegevens, verlofsaldo, gesprekken, documenten en checklists. U kunt uw agenda (gesprekken + goedgekeurd verlof) als iCal downloaden.</p>
+      <a class="iuasr-dash-btn" href="{{ route('hr.mijn') }}">Naar Mijn HR</a>
+    </div>
+  </div>
+@endif
 @endsection
