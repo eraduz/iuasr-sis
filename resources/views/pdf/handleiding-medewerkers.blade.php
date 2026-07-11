@@ -290,7 +290,9 @@
   <p>Onder <b>Verzuim</b> (of op de medewerkerkaart) registreert HR/Manager een <b>ziekmelding</b> (ziek vanaf, percentage) en later de <b>herstelmelding</b>. Zolang een melding openstaat, staat de medewerker op status ‘ziek’; bij herstel keert de status terug naar ‘actief’. Het dashboard toont de openstaande verlofaanvragen en de actuele ziekmeldingen.</p>
   <h3>Gesprekken &amp; performance</h3>
   <p>Onder <b>Gesprekken</b> (of op de medewerkerkaart) plant HR/Manager een <b>beoordelings-</b>, <b>functionerings-</b> of <b>exitgesprek</b>: kies datum, gespreksvoerder en status (gepland, gehouden, afgerond). Op het gespreksscherm legt u de <b>samenvatting</b> en <b>feedback</b> vast en beheert u de <b>doelen/KPI's</b> (met status open/behaald/niet behaald) en de <b>competentiebeoordelingen</b> (onvoldoende t/m uitstekend, met toelichting). De gesprekken blijven als <b>historie</b> bij de medewerker staan; het dashboard toont de aankomende geplande gesprekken. Een Manager ziet en voert uitsluitend gesprekken van het eigen team.</p>
-  <div class="tip">Onboarding/offboarding en de HR-rapportages worden in de volgende fasen van de module toegevoegd.</div>
+  <h3>Organisatie &amp; rapportage</h3>
+  <p>Onder <b>Organisatie</b> ziet u de <b>afdelingenboom</b>: afdelingen, onderliggende teams (een afdeling met een bovenliggende afdeling), de afdelingsmanager en het aantal medewerkers. Afdelingen, teams en de manager beheert u via <b>Opzoektabellen → Afdelingen</b>. Onder <b>Rapportage</b> staan de kerncijfers (medewerkers, totaal- en gemiddelde FTE, actueel verzuim en ziektedagen) en een overzicht <b>per afdeling</b> (aantal, FTE, verzuim%), met grafieken en een <b>CSV-export</b> op medewerkerniveau. Een Manager ziet de cijfers van het eigen team; HR, Beheer en Schoolbestuur van de hele instelling.</p>
+  <div class="tip">Onboarding/offboarding en de self-service ‘Mijn HR’ worden in de volgende fasen van de module toegevoegd.</div>
 
   <h2>14. Vragen of problemen?</h2>
   <p>Neem bij vragen contact op met de systeembeheerder of Studentenzaken (szaken@iuasr.nl). Werkt iets niet zoals verwacht, meld dan wat u deed en wat u zag.</p>

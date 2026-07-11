@@ -191,6 +191,8 @@
             ['Verlof', 'verlof', 'cert', 'verlof'],
             ['Verzuim', 'verzuim', 'check', 'verzuim'],
             ['Gesprekken', 'gesprekken', 'report', 'gesprekken,gesprekken.show,gesprekken.create'],
+            ['Organisatie', 'hr.organisatie', 'db', 'hr.organisatie'],
+            ['Rapportage', 'hr.rapport', 'report', 'hr.rapport'],
         ],
         'Zelfservice' => [
             ['Mijn verlof', 'verlof.mijn', 'taak', 'verlof.mijn,verlof.create'],

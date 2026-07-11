@@ -45,6 +45,11 @@ class HrSeeder extends Seeder
         ] as [$code, $naam]) {
             $afdeling[$code] = Afdeling::firstOrCreate(['code' => $code], ['naam' => $naam, 'actief' => true])->id;
         }
+        // Team (een afdeling met een bovenliggende afdeling) — toont de hiërarchie.
+        $afdeling['ONDW-PABO'] = Afdeling::firstOrCreate(
+            ['code' => 'ONDW-PABO'],
+            ['naam' => 'PABO-team', 'bovenliggende_afdeling_id' => $afdeling['ONDW'], 'actief' => true]
+        )->id;
 
         // Rolaccounts.
         $hr = User::firstOrCreate(['email' => 'n.aslan@iuasr.nl'], ['naam' => 'Nadia Aslan', 'rol' => Rol::Hrmedewerker]);
@@ -52,13 +57,13 @@ class HrSeeder extends Seeder
 
         // Manager-medewerker eerst (referentiepunt voor het team).
         $rubenMed = $this->medewerker('P260001', 'Ruben', 'Smit', $afdeling['ONDW'], $functie['MGR'], null, $manager->id, 40, 'vast');
-        Afdeling::where('id', $afdeling['ONDW'])->update(['manager_id' => $rubenMed->id]);
+        Afdeling::whereIn('id', [$afdeling['ONDW'], $afdeling['ONDW-PABO']])->update(['manager_id' => $rubenMed->id]);
 
         $this->medewerker('P260002', 'Nadia', 'Aslan', $afdeling['HRB'], $functie['STAF'], null, $hr->id, 32, 'vast');
 
-        // Teamleden onder Ruben (voor de team-scoping van de Manager).
-        $this->medewerker('P260003', 'Sophie', 'Willemsen', $afdeling['ONDW'], $functie['DOC'], $rubenMed->id, null, 20, 'tijdelijk');
-        $this->medewerker('P260004', 'Mehmet', 'Yilmaz', $afdeling['ONDW'], $functie['DOC'], $rubenMed->id, null, 38, 'vast');
+        // Teamleden onder Ruben (voor de team-scoping van de Manager), in het PABO-team.
+        $this->medewerker('P260003', 'Sophie', 'Willemsen', $afdeling['ONDW-PABO'], $functie['DOC'], $rubenMed->id, null, 20, 'tijdelijk');
+        $this->medewerker('P260004', 'Mehmet', 'Yilmaz', $afdeling['ONDW-PABO'], $functie['DOC'], $rubenMed->id, null, 38, 'vast');
 
         // Medewerkers buiten het team van Ruben.
         $this->medewerker('P260005', 'Fadwa', 'Ben Ali', $afdeling['ADM'], $functie['ADMIN'], null, null, 24, 'vast');

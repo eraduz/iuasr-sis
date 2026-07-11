@@ -247,6 +247,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [App\Http\Controllers\Hr\HrDashboardController::class, 'index'])->name('hr.dashboard');
         Route::get('/medewerkers', [App\Http\Controllers\Hr\MedewerkerController::class, 'index'])->name('medewerkers');
         Route::get('/hr-documenten/{document}/download', [App\Http\Controllers\Hr\HrDocumentController::class, 'download'])->name('hrdocumenten.download');
+        // Rapportages & organisatiestructuur (Fase D).
+        Route::get('/rapport', [App\Http\Controllers\Hr\HrRapportController::class, 'rapport'])->name('hr.rapport');
+        Route::get('/rapport/export.csv', [App\Http\Controllers\Hr\HrRapportController::class, 'export'])->name('hr.rapport.export');
+        Route::get('/organisatie', [App\Http\Controllers\Hr\HrRapportController::class, 'organisatie'])->name('hr.organisatie');
         Route::get('/medewerkers/{medewerker}', [App\Http\Controllers\Hr\MedewerkerController::class, 'show'])->name('medewerkers.show');
     });
 
