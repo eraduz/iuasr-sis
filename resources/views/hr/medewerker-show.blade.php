@@ -210,9 +210,35 @@
   </div>
 </div>
 
-{{-- Gesprekken en onboarding/offboarding volgen in de fasen C en E. --}}
+{{-- Gesprekken (Fase C). --}}
+<div class="sis-card" id="gesprekken" style="margin-bottom:16px;">
+  <div class="sis-card__hd" style="display:flex; align-items:center; justify-content:space-between;">
+    <b>Gesprekken ({{ $medewerker->gesprekken->count() }})</b>
+    <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('gesprekken.create', $medewerker) }}">Gesprek plannen</a>
+  </div>
+  @if ($medewerker->gesprekken->isEmpty())
+    <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Nog geen gesprekken.</p></div>
+  @else
+    <table class="iuasr-dash-tbl">
+      <thead><tr><th>Type</th><th>Datum</th><th>Gespreksvoerder</th><th style="text-align:center;">Status</th><th class="row-act"></th></tr></thead>
+      <tbody>
+        @foreach ($medewerker->gesprekken as $g)
+          <tr>
+            <td class="nm">{{ $g->type?->label() }}</td>
+            <td class="dt">{{ $g->datum?->format('d-m-Y') }}</td>
+            <td>{{ $g->gespreksvoerder?->naam ?? '—' }}</td>
+            <td style="text-align:center;"><span class="iuasr-dash-status {{ $g->status?->badge() }}">{{ $g->status?->label() }}</span></td>
+            <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('gesprekken.show', $g) }}">Openen</a></td>
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+  @endif
+</div>
+
+{{-- Onboarding/offboarding volgt in fase E. --}}
 <div class="sis-card">
   <div class="sis-card__hd"><b>Overige onderdelen</b></div>
-  <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Gesprekken (beoordelings-/functionerings-/exitgesprek) en onboarding/offboarding verschijnen hier zodra de fasen C en E van de module zijn opgeleverd.</p></div>
+  <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Onboarding/offboarding verschijnt hier zodra fase E van de module is opgeleverd.</p></div>
 </div>
 @endsection

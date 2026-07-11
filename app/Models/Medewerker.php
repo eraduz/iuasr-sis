@@ -96,6 +96,11 @@ class Medewerker extends Model
         return $this->hasMany(Ziekmelding::class)->orderByDesc('ziek_van');
     }
 
+    public function gesprekken(): HasMany
+    {
+        return $this->hasMany(Gesprek::class)->orderByDesc('datum');
+    }
+
     public function volledigeNaam(): string
     {
         return trim(implode(' ', array_filter([$this->voornaam, $this->tussenvoegsel, $this->achternaam])));

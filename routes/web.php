@@ -258,6 +258,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/verzuim', [App\Http\Controllers\Hr\ZiekmeldingController::class, 'index'])->name('verzuim');
         Route::post('/ziekmeldingen', [App\Http\Controllers\Hr\ZiekmeldingController::class, 'store'])->name('ziekmeldingen.store');
         Route::post('/ziekmeldingen/{ziekmelding}/herstel', [App\Http\Controllers\Hr\ZiekmeldingController::class, 'herstel'])->name('ziekmeldingen.herstel');
+
+        // Gesprekken & performance (Fase C).
+        Route::get('/gesprekken', [App\Http\Controllers\Hr\GesprekController::class, 'index'])->name('gesprekken');
+        Route::get('/medewerkers/{medewerker}/gesprekken/nieuw', [App\Http\Controllers\Hr\GesprekController::class, 'create'])->name('gesprekken.create');
+        Route::post('/medewerkers/{medewerker}/gesprekken', [App\Http\Controllers\Hr\GesprekController::class, 'store'])->name('gesprekken.store');
+        Route::get('/gesprekken/{gesprek}', [App\Http\Controllers\Hr\GesprekController::class, 'show'])->name('gesprekken.show');
+        Route::put('/gesprekken/{gesprek}', [App\Http\Controllers\Hr\GesprekController::class, 'update'])->name('gesprekken.update');
+        Route::delete('/gesprekken/{gesprek}', [App\Http\Controllers\Hr\GesprekController::class, 'destroy'])->name('gesprekken.destroy');
+        Route::post('/gesprekken/{gesprek}/doelen', [App\Http\Controllers\Hr\GesprekController::class, 'doelStore'])->name('gesprekken.doel.store');
+        Route::delete('/gespreksdoelen/{doel}', [App\Http\Controllers\Hr\GesprekController::class, 'doelDestroy'])->name('gesprekken.doel.destroy');
+        Route::post('/gesprekken/{gesprek}/competenties', [App\Http\Controllers\Hr\GesprekController::class, 'competentieStore'])->name('gesprekken.competentie.store');
+        Route::delete('/competentiescores/{score}', [App\Http\Controllers\Hr\GesprekController::class, 'competentieDestroy'])->name('gesprekken.competentie.destroy');
     });
 
     // Self-service verlof: elke ingelogde medewerker (met een gekoppeld dossier).

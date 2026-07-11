@@ -190,6 +190,7 @@
             ['Medewerkers', 'medewerkers', 'students', 'medewerkers,medewerkers.show,medewerkers.edit,dienstverbanden.edit,dienstverbanden.create'],
             ['Verlof', 'verlof', 'cert', 'verlof'],
             ['Verzuim', 'verzuim', 'check', 'verzuim'],
+            ['Gesprekken', 'gesprekken', 'report', 'gesprekken,gesprekken.show,gesprekken.create'],
         ],
         'Zelfservice' => [
             ['Mijn verlof', 'verlof.mijn', 'taak', 'verlof.mijn,verlof.create'],
@@ -209,7 +210,7 @@
                 : $menus[Rol::Studentenzaken->value]));
 
     $inCursusmodule = request()->routeIs('cursussen.*') || request()->routeIs('cursisten*');
-    $inHrmodule = request()->routeIs('hr.*') || request()->routeIs('medewerkers*') || request()->routeIs('dienstverbanden*') || request()->routeIs('hrdocumenten*') || request()->routeIs('verlof*') || request()->routeIs('verzuim*') || request()->routeIs('ziekmeldingen*');
+    $inHrmodule = request()->routeIs('hr.*') || request()->routeIs('medewerkers*') || request()->routeIs('dienstverbanden*') || request()->routeIs('hrdocumenten*') || request()->routeIs('verlof*') || request()->routeIs('verzuim*') || request()->routeIs('ziekmeldingen*') || request()->routeIs('gesprekken*') || request()->routeIs('gespreksdoelen*') || request()->routeIs('competentiescores*');
     $inRelatiemodule = request()->routeIs('relatiebeheer.*') || request()->routeIs('relaties*') || request()->routeIs('contactpersonen*') || request()->routeIs('contactmomenten*') || request()->routeIs('stages*') || request()->routeIs('stageplaatsen*') || request()->routeIs('agenda*') || request()->routeIs('afspraken*') || request()->routeIs('relatietaken*') || request()->routeIs('overeenkomsten*') || request()->routeIs('relatiedocumenten*');
     $menu = $inCursusmodule
         ? $cursusMenu

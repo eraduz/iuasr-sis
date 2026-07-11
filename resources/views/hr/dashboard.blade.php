@@ -68,7 +68,29 @@
 </div>
 
 <div class="sis-card" style="margin-top:16px;">
+  <div class="sis-card__hd"><b>Aankomende gesprekken ({{ $geplandeGesprekken->count() }})</b></div>
+  @if ($geplandeGesprekken->isEmpty())
+    <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Geen geplande gesprekken.</p></div>
+  @else
+    <table class="iuasr-dash-tbl">
+      <thead><tr><th>Datum</th><th>Type</th><th>Medewerker</th><th>Gespreksvoerder</th><th class="row-act"></th></tr></thead>
+      <tbody>
+        @foreach ($geplandeGesprekken as $g)
+          <tr>
+            <td class="dt">{{ $g->datum?->format('d-m-Y') }}</td>
+            <td>{{ $g->type?->label() }}</td>
+            <td class="nm">{{ $g->medewerker?->volledigeNaam() }}</td>
+            <td>{{ $g->gespreksvoerder?->naam ?? '—' }}</td>
+            <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('gesprekken.show', $g) }}">Openen</a></td>
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+  @endif
+</div>
+
+<div class="sis-card" style="margin-top:16px;">
   <div class="sis-card__hd"><b>Volgende fasen</b></div>
-  <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Gesprekken, onboarding/offboarding en de HR-rapportages verschijnen hier zodra de fasen C t/m G van de module zijn opgeleverd.</p></div>
+  <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Onboarding/offboarding en de HR-rapportages verschijnen hier zodra de fasen D t/m G van de module zijn opgeleverd.</p></div>
 </div>
 @endsection

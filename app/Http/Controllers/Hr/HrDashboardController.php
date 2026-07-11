@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Hr;
 use App\Enums\MedewerkerStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Dienstverband;
+use App\Models\Gesprek;
 use App\Models\Medewerker;
 use App\Models\Verlofaanvraag;
 use Illuminate\Contracts\View\View;
@@ -46,12 +47,20 @@ class HrDashboardController extends Controller
             ->with('medewerker')
             ->orderBy('van')->limit(15)->get();
 
+        $geplandeGesprekken = Gesprek::query()
+            ->whereIn('medewerker_id', $medewerkerIds)
+            ->where('status', 'gepland')
+            ->whereDate('datum', '>=', now()->toDateString())
+            ->with(['medewerker', 'gespreksvoerder'])
+            ->orderBy('datum')->limit(15)->get();
+
         return view('hr.dashboard', [
             'aantal' => $medewerkers->where('actief', true)->count(),
             'fteTotaal' => $fteTotaal,
             'statusVerdeling' => $statusVerdeling,
             'aflopend' => $aflopend,
             'openAanvragen' => $openAanvragen,
+            'geplandeGesprekken' => $geplandeGesprekken,
         ]);
     }
 }

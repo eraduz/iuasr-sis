@@ -4,8 +4,11 @@ namespace Database\Seeders;
 
 use App\Enums\Rol;
 use App\Models\Afdeling;
+use App\Models\Competentiescore;
 use App\Models\Dienstverband;
 use App\Models\Functie;
+use App\Models\Gesprek;
+use App\Models\Gespreksdoel;
 use App\Models\Medewerker;
 use App\Models\User;
 use App\Models\Verlofaanvraag;
@@ -62,6 +65,32 @@ class HrSeeder extends Seeder
         $this->medewerker('P260006', 'Johan', 'Bakker', $afdeling['ADM'], $functie['ADMIN'], null, null, 36, 'tijdelijk');
 
         $this->verlofEnVerzuim();
+        $this->gesprekken();
+    }
+
+    /** Synthetische HR-gesprekken met doelen en competenties (Fase C). */
+    private function gesprekken(): void
+    {
+        $jaar = (int) date('Y');
+        $ruben = User::where('email', 'r.smit@iuasr.nl')->value('id');
+
+        $sophie = Medewerker::where('personeelsnummer', 'P260003')->first();
+        if ($sophie !== null) {
+            Gesprek::firstOrCreate(
+                ['medewerker_id' => $sophie->id, 'type' => 'functionering', 'datum' => $jaar.'-11-15'],
+                ['gespreksvoerder_id' => $ruben, 'status' => 'gepland']
+            );
+        }
+
+        $mehmet = Medewerker::where('personeelsnummer', 'P260004')->first();
+        if ($mehmet !== null) {
+            $gesprek = Gesprek::firstOrCreate(
+                ['medewerker_id' => $mehmet->id, 'type' => 'beoordeling', 'datum' => $jaar.'-02-10'],
+                ['gespreksvoerder_id' => $ruben, 'status' => 'afgerond', 'samenvatting' => 'Sterk jaar; doelen behaald.', 'feedback' => 'Blijf de nieuwe lesmethode doorontwikkelen.']
+            );
+            Gespreksdoel::firstOrCreate(['gesprek_id' => $gesprek->id, 'omschrijving' => 'Nieuwe lesmethode invoeren'], ['status' => 'behaald']);
+            Competentiescore::firstOrCreate(['gesprek_id' => $gesprek->id, 'competentie' => 'Samenwerking'], ['score' => 'goed']);
+        }
     }
 
     /** Synthetisch verlofrecht, enkele aanvragen en een ziekmelding (Fase B). */
