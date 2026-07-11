@@ -16,14 +16,15 @@ use Tests\TestCase;
 
 /**
  * Module HR / Personeelszaken — Fase A (medewerkersregistratie). Bewaakt de
- * moduletoegang, de team-scoping van de Manager, de CRUD en de FTE-berekening.
+ * moduletoegang, de CRUD en de FTE-berekening. HR-medewerker en Manager zijn
+ * samengevoegd tot één rol die alle medewerkers ziet.
  */
 class HrModuleTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $hr;       // HR-medewerker
-    private User $manager;  // Manager (Ruben Smit)
+    private User $hr;           // HR-medewerker (Nadia Aslan)
+    private User $leidingg;     // HR-medewerker/leidinggevende (Ruben Smit)
 
     protected function setUp(): void
     {
@@ -32,7 +33,7 @@ class HrModuleTest extends TestCase
         $this->seed([ReferentieSeeder::class, DocentSeeder::class, GebruikerSeeder::class, HrSeeder::class]);
 
         $this->hr = User::where('email', 'n.aslan@iuasr.nl')->firstOrFail();
-        $this->manager = User::where('email', 'r.smit@iuasr.nl')->firstOrFail();
+        $this->leidingg = User::where('email', 'r.smit@iuasr.nl')->firstOrFail();
     }
 
     public function test_hr_ziet_de_medewerkerslijst(): void
@@ -78,19 +79,20 @@ class HrModuleTest extends TestCase
         $this->assertSame(0.5, $dienstverband->fte()); // 20 ÷ 40
     }
 
-    public function test_manager_ziet_alleen_eigen_team(): void
+    public function test_gecombineerde_hr_rol_ziet_alle_medewerkers(): void
     {
-        $zichtbaar = Medewerker::query()->zichtbaarVoor($this->manager)->pluck('achternaam');
+        // Sinds het samenvoegen van HR-medewerker en Manager is er geen team-scoping
+        // meer: de gecombineerde rol ziet iedereen, ook buiten het eigen team.
+        $zichtbaar = Medewerker::query()->zichtbaarVoor($this->leidingg)->pluck('achternaam');
 
-        // Ruben (zelf) en zijn teamleden Willemsen/Yilmaz wel; Bakker (andere afdeling) niet.
         $this->assertTrue($zichtbaar->contains('Willemsen'));
         $this->assertTrue($zichtbaar->contains('Smit'));
-        $this->assertFalse($zichtbaar->contains('Bakker'));
+        $this->assertTrue($zichtbaar->contains('Bakker'));
     }
 
-    public function test_manager_kan_geen_medewerker_aanmaken(): void
+    public function test_gecombineerde_hr_rol_kan_medewerker_aanmaken(): void
     {
-        $this->actingAs($this->manager)->get(route('medewerkers.create'))->assertForbidden();
+        $this->actingAs($this->leidingg)->get(route('medewerkers.create'))->assertOk();
     }
 
     public function test_document_uploaden(): void

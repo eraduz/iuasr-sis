@@ -14,14 +14,15 @@ use Tests\TestCase;
 
 /**
  * Module HR / Personeelszaken — Fase C (gesprekken & performance). Bewaakt het
- * plannen, de doelen/competenties, de team-scoping en het overzicht.
+ * plannen, de doelen/competenties en het overzicht. HR-medewerker en Manager zijn
+ * samengevoegd tot één rol die alle medewerkers ziet.
  */
 class HrGesprekTest extends TestCase
 {
     use RefreshDatabase;
 
     private User $hr;
-    private User $manager;
+    private User $leidingg;
 
     protected function setUp(): void
     {
@@ -30,14 +31,14 @@ class HrGesprekTest extends TestCase
         $this->seed([ReferentieSeeder::class, DocentSeeder::class, GebruikerSeeder::class, HrSeeder::class]);
 
         $this->hr = User::where('email', 'n.aslan@iuasr.nl')->firstOrFail();
-        $this->manager = User::where('email', 'r.smit@iuasr.nl')->firstOrFail();
+        $this->leidingg = User::where('email', 'r.smit@iuasr.nl')->firstOrFail();
     }
 
-    public function test_manager_plant_gesprek_voor_teamlid(): void
+    public function test_hr_plant_gesprek_voor_medewerker(): void
     {
         $sophie = Medewerker::where('personeelsnummer', 'P260003')->firstOrFail();
 
-        $this->actingAs($this->manager)->post(route('gesprekken.store', $sophie), [
+        $this->actingAs($this->leidingg)->post(route('gesprekken.store', $sophie), [
             'type' => 'functionering',
             'datum' => date('Y').'-12-01',
             'status' => 'gepland',
@@ -48,10 +49,11 @@ class HrGesprekTest extends TestCase
         ]);
     }
 
-    public function test_manager_kan_geen_gesprek_buiten_team(): void
+    public function test_gecombineerde_hr_rol_plant_ook_buiten_eigen_team(): void
     {
-        $fadwa = Medewerker::where('personeelsnummer', 'P260005')->firstOrFail(); // niet Rubens team
-        $this->actingAs($this->manager)->get(route('gesprekken.create', $fadwa))->assertForbidden();
+        // Zonder team-scoping mag de gecombineerde HR-rol voor iedereen plannen.
+        $fadwa = Medewerker::where('personeelsnummer', 'P260005')->firstOrFail();
+        $this->actingAs($this->leidingg)->get(route('gesprekken.create', $fadwa))->assertOk();
     }
 
     public function test_doel_en_competentie_toevoegen(): void
@@ -81,11 +83,11 @@ class HrGesprekTest extends TestCase
             ->assertSee('Samenwerking');
     }
 
-    public function test_overzicht_is_gescoped(): void
+    public function test_overzicht_toont_alle_gesprekken(): void
     {
-        // De manager ziet de gesprekken van het eigen team (Mehmet), HR alles.
-        $this->actingAs($this->manager)->get(route('gesprekken'))->assertOk()->assertSee('Mehmet');
-        $this->actingAs($this->hr)->get(route('gesprekken'))->assertOk();
+        // De gecombineerde HR-rol ziet alle gesprekken (geen team-scoping meer).
+        $this->actingAs($this->leidingg)->get(route('gesprekken'))->assertOk()->assertSee('Mehmet');
+        $this->actingAs($this->hr)->get(route('gesprekken'))->assertOk()->assertSee('Mehmet');
     }
 
     public function test_studentenzaken_heeft_geen_toegang(): void

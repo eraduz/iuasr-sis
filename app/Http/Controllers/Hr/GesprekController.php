@@ -19,8 +19,8 @@ use Illuminate\Validation\Rule;
 
 /**
  * HR-gesprekken (beoordeling/functionering/exit) met doelen en competentiescores.
- * HR ziet iedereen, een Manager uitsluitend het eigen team (via de zichtbaarheid
- * van de medewerker). Mutaties gelogd (personeelsdossier is gevoelig).
+ * De HR-medewerker (tevens leidinggevende) ziet alle medewerkers. Mutaties gelogd
+ * (personeelsdossier is gevoelig).
  */
 class GesprekController extends Controller
 {
@@ -148,7 +148,7 @@ class GesprekController extends Controller
     /** @return \Illuminate\Support\Collection<int,User> */
     private function gespreksvoerders()
     {
-        return User::whereIn('rol', [Rol::Hrmedewerker, Rol::Manager, Rol::Beheerder])->orderBy('naam')->get();
+        return User::whereIn('rol', [Rol::Hrmedewerker, Rol::Beheerder])->orderBy('naam')->get();
     }
 
     private function valideer(Request $request): array

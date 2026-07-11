@@ -51,11 +51,36 @@ class BestuurPaginaTest extends TestCase
 
     public function test_bestuurspagina_rendert_met_data(): void
     {
-        // Met synthetische studenten/vakken mogen de aggregaties niet breken.
-        $this->seed([SynthetischVakSeeder::class, SynthetischeStudentSeeder::class]);
+        // Met synthetische studenten/vakken/personeel mogen de aggregaties van álle
+        // modules niet breken; de HR-seeder vult de personeelscijfers.
+        $this->seed([SynthetischVakSeeder::class, SynthetischeStudentSeeder::class,
+            \Database\Seeders\DocentSeeder::class, \Database\Seeders\HrSeeder::class]);
 
         $this->actingAs($this->user(Rol::Bestuur))->get(route('bestuur'))
             ->assertOk()->assertSee('Studenten per opleiding')->assertSee('Cursussen');
+    }
+
+    public function test_bestuurspagina_toont_alle_rubrieken(): void
+    {
+        // De vijf hoofdlijnen bundelen alle modules op één pagina.
+        $this->actingAs($this->user(Rol::Bestuur))->get(route('bestuur'))
+            ->assertOk()
+            ->assertSee('Studenten &amp; onderwijs', false)
+            ->assertSee('Financiën')
+            ->assertSee('Cursussen')
+            ->assertSee('Relatiebeheer &amp; stage', false)
+            ->assertSee('HR / Personeelszaken');
+    }
+
+    public function test_financien_toont_collegegeld_en_cursusgeld_apart(): void
+    {
+        // De financiële rubriek moet ondubbelzinnig beide geldstromen tonen:
+        // collegegeld (opleidingen) én cursusgelden (cursussen), plus het totaal.
+        $this->actingAs($this->user(Rol::Bestuur))->get(route('bestuur'))
+            ->assertOk()
+            ->assertSee('Collegegeld — opleidingen', false)
+            ->assertSee('Cursusgelden — cursussen', false)
+            ->assertSee('Totaal voldaan');
     }
 
     public function test_modulekiezer_toont_systeembeheer_voor_beheerder(): void

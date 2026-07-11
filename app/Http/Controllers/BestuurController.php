@@ -5,49 +5,81 @@ namespace App\Http\Controllers;
 use App\Enums\CursusinschrijvingStatus;
 use App\Models\Cursist;
 use App\Models\Cursus;
-use App\Models\Cursusinschrijving;
+use App\Models\Medewerker;
 use App\Models\Opleiding;
+use App\Support\Cursusrapport;
+use App\Support\HrRapport;
+use App\Support\Relatierapport;
 use App\Support\Statistiek;
 use Illuminate\Contracts\View\View;
 
 /**
- * Globale bestuurspagina: een instellingsbreed overzicht voor het Schoolbestuur
- * (en Beheer). Alles is alleen-lezen en overkoepelend — studenten, onderwijs,
- * aanwezigheid, financiën én de cursussen op één plek. De onderliggende cijfers
- * komen uit dezelfde `Statistiek`-aggregaties als het dashboard.
+ * Globale bestuurspagina: één instellingsbreed overzicht voor het Schoolbestuur
+ * (en Beheer). Het bundelt de statistieken van álle modules en afdelingen —
+ * Studentenzaken, Cursussen, Relatiebeheer & Stage en HR / Personeelszaken —
+ * geordend in duidelijke rubrieken. Alles is alleen-lezen en overkoepelend
+ * (scope = null, dus instellingsbreed). De cijfers komen uit dezelfde
+ * aggregatieklassen als de losse moduledashboards.
  */
 class BestuurController extends Controller
 {
     public function index(): View
     {
-        $kern = Statistiek::kern();
-        $slaag = Statistiek::slaagpercentage();
-        $presentie = Statistiek::presentie();
-        $financieel = Statistiek::financieel();
+        // Cursussen één keer inladen (met inschrijvingen) voor zowel de aantallen
+        // als de cursusgelden.
+        $cursussen = Cursus::with('inschrijvingen')->get();
+        $actieveInschrijvingen = fn (Cursus $c) => $c->inschrijvingen
+            ->where('status', CursusinschrijvingStatus::Actief->value)->count();
 
-        // Cursussen (aparte module) — instellingsbreed meegenomen in het overzicht.
-        $cursusInschrijvingen = Cursusinschrijving::where('status', CursusinschrijvingStatus::Actief->value)->count();
-        $cursusPerCursus = Cursus::withCount([
-            'inschrijvingen as actieve_inschrijvingen' => fn ($q) => $q->where('status', CursusinschrijvingStatus::Actief->value),
-        ])->orderByDesc('actieve_inschrijvingen')->get()
-            ->map(fn (Cursus $c) => ['label' => $c->naam, 'value' => (int) $c->actieve_inschrijvingen])
-            ->all();
+        // Collegegeld (opleidingen) en cursusgelden (cursussen) — twee gescheiden
+        // geldstromen die samen het instellingsbrede financiële beeld vormen.
+        $collegegeld = Statistiek::financieel();
+        $cursusgeld = Cursusrapport::financieelTotaal($cursussen);
+        $financieelTotaal = [
+            'verschuldigd' => $collegegeld['verschuldigd'] + $cursusgeld['verschuldigd'],
+            'betaald' => $collegegeld['betaald'] + $cursusgeld['betaald'],
+            'openstaand' => $collegegeld['openstaand'] + $cursusgeld['openstaand'],
+        ];
+        $financieelTotaal['betaalgraad'] = $financieelTotaal['verschuldigd'] > 0
+            ? (int) round($financieelTotaal['betaald'] / $financieelTotaal['verschuldigd'] * 100)
+            : 0;
 
         return view('bestuur.index', [
-            'kern' => $kern,
-            'slaag' => $slaag,
-            'presentie' => $presentie,
-            'financieel' => $financieel,
+            // Rubriek 1 — Studenten & onderwijs (module Studentenzaken).
+            'kern' => Statistiek::kern(),
+            'slaag' => Statistiek::slaagpercentage(),
+            'presentie' => Statistiek::presentie(),
             'perOpleiding' => Statistiek::perOpleiding(),
             'instroom' => Statistiek::instroomPerStudiejaar(),
             'status' => Statistiek::statusVerdeling(),
             'presentiePerOpleiding' => Statistiek::presentiePerOpleiding(),
             'presentieVerdeling' => Statistiek::presentieVerdeling(),
             'aantalOpleidingen' => Opleiding::where('actief', true)->count(),
-            'aantalCursussen' => Cursus::where('actief', true)->count(),
+
+            // Rubriek 2 — Financiën. Twee geldstromen expliciet gescheiden plus totaal:
+            // collegegeld komt van de opleidingen, cursusgeld van de cursussen.
+            'collegegeld' => $collegegeld,
+            'cursusgeld' => $cursusgeld,
+            'financieelTotaal' => $financieelTotaal,
+
+            // Rubriek 3 — Cursussen (module Cursussen).
+            'aantalCursussen' => $cursussen->where('actief', true)->count(),
             'aantalCursisten' => Cursist::count(),
-            'cursusInschrijvingen' => $cursusInschrijvingen,
-            'cursusPerCursus' => $cursusPerCursus,
+            'cursusInschrijvingen' => $cursussen->sum($actieveInschrijvingen),
+            'cursusPerCursus' => $cursussen
+                ->map(fn (Cursus $c) => ['label' => $c->naam, 'value' => $actieveInschrijvingen($c)])
+                ->sortByDesc('value')->values()->all(),
+
+            // Rubriek 4 — Relatiebeheer & Stage (module Relatiebeheer).
+            'relatie' => Relatierapport::kerncijfers(),
+            'stagesPerStatus' => Relatierapport::stagesPerStatus(),
+            'organisatiesPerType' => Relatierapport::organisatiesPerType(),
+            'stageEvaluatie' => Relatierapport::evaluatie(),
+
+            // Rubriek 5 — HR / Personeelszaken (module HR).
+            'hr' => HrRapport::kerncijfers(),
+            'hrPerAfdeling' => HrRapport::perAfdeling(),
+            'aantalAfdelingen' => Medewerker::query()->whereNotNull('afdeling_id')->distinct('afdeling_id')->count('afdeling_id'),
         ]);
     }
 }

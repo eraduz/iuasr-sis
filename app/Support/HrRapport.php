@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
  * HR-rapportage-aggregaties (module HR / Personeelszaken): aantallen per afdeling,
  * FTE-overzicht en (actueel) verzuimpercentage. Alle methodes accepteren een
  * optionele lijst medewerker-ids (`$ids`); null = geen beperking (HR/Beheer/
- * Bestuur), een lijst beperkt tot het team (Manager).
+ * Bestuur), een lijst beperkt de aggregatie tot die medewerkers.
  */
 class HrRapport
 {

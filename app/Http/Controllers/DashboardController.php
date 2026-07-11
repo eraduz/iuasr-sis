@@ -21,6 +21,13 @@ class DashboardController extends Controller
     {
         $rol = auth()->user()->rol;
 
+        // Het Schoolbestuur heeft één samengevoegd overzicht: de bestuurspagina die
+        // de statistieken van álle modules en afdelingen bundelt. Het losse
+        // dashboard is daarin opgegaan; stuur het bestuur daarheen door.
+        if ($rol === Rol::Bestuur) {
+            return redirect()->route('bestuur');
+        }
+
         // Het Studentenzaken-dashboard is niet voor rollen buiten die module
         // (bijv. Cursusadministratie, Relatiebeheerder); stuur hen naar hun
         // eigen module — of naar het keuzescherm als dat er meerdere zijn.

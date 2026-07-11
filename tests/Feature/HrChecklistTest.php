@@ -14,14 +14,15 @@ use Tests\TestCase;
 
 /**
  * Module HR / Personeelszaken — Fase E (onboarding/offboarding). Bewaakt het
- * starten uit het sjabloon, het afvinken, het toevoegen en de team-scoping.
+ * starten uit het sjabloon, het afvinken en het toevoegen. HR-medewerker en
+ * Manager zijn samengevoegd tot één rol die alle medewerkers ziet.
  */
 class HrChecklistTest extends TestCase
 {
     use RefreshDatabase;
 
     private User $hr;
-    private User $manager;
+    private User $leidingg;
 
     protected function setUp(): void
     {
@@ -30,7 +31,7 @@ class HrChecklistTest extends TestCase
         $this->seed([ReferentieSeeder::class, DocentSeeder::class, GebruikerSeeder::class, HrSeeder::class]);
 
         $this->hr = User::where('email', 'n.aslan@iuasr.nl')->firstOrFail();
-        $this->manager = User::where('email', 'r.smit@iuasr.nl')->firstOrFail();
+        $this->leidingg = User::where('email', 'r.smit@iuasr.nl')->firstOrFail();
     }
 
     public function test_offboarding_starten_maakt_sjabloontaken(): void
@@ -69,10 +70,11 @@ class HrChecklistTest extends TestCase
         $this->assertDatabaseHas('hr_checklisttaken', ['medewerker_id' => $medewerker->id, 'titel' => 'Rondleiding gebouw']);
     }
 
-    public function test_manager_kan_geen_checklist_buiten_team_starten(): void
+    public function test_gecombineerde_hr_rol_start_ook_buiten_eigen_team(): void
     {
-        $fadwa = Medewerker::where('personeelsnummer', 'P260005')->firstOrFail(); // niet Rubens team
-        $this->actingAs($this->manager)->post(route('checklist.start', $fadwa), ['soort' => 'onboarding'])->assertForbidden();
+        // Zonder team-scoping mag de gecombineerde HR-rol voor iedereen een checklist starten.
+        $fadwa = Medewerker::where('personeelsnummer', 'P260005')->firstOrFail();
+        $this->actingAs($this->leidingg)->post(route('checklist.start', $fadwa), ['soort' => 'onboarding'])->assertRedirect();
     }
 
     public function test_studentenzaken_heeft_geen_toegang(): void

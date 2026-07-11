@@ -7,7 +7,6 @@ use App\Enums\Rol;
 use App\Enums\Verlofstatus;
 use App\Models\Medewerker;
 use App\Models\User;
-use App\Models\Verlofaanvraag;
 use Database\Seeders\DocentSeeder;
 use Database\Seeders\GebruikerSeeder;
 use Database\Seeders\HrSeeder;
@@ -17,14 +16,15 @@ use Tests\TestCase;
 
 /**
  * Module HR / Personeelszaken — Fase B (verlof & verzuim). Bewaakt de
- * self-service-aanvraag, de goedkeuringsworkflow (manager/HR) en de ziekmelding.
+ * self-service-aanvraag, de goedkeuringsworkflow (gecombineerde HR-rol) en de
+ * ziekmelding. HR-medewerker en Manager zijn samengevoegd tot één rol.
  */
 class HrVerlofTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $hr;       // HR-medewerker (Nadia)
-    private User $manager;  // Manager (Ruben)
+    private User $hr;         // HR-medewerker (Nadia)
+    private User $leidingg;   // HR-medewerker/leidinggevende (Ruben)
 
     protected function setUp(): void
     {
@@ -33,12 +33,12 @@ class HrVerlofTest extends TestCase
         $this->seed([ReferentieSeeder::class, DocentSeeder::class, GebruikerSeeder::class, HrSeeder::class]);
 
         $this->hr = User::where('email', 'n.aslan@iuasr.nl')->firstOrFail();
-        $this->manager = User::where('email', 'r.smit@iuasr.nl')->firstOrFail();
+        $this->leidingg = User::where('email', 'r.smit@iuasr.nl')->firstOrFail();
     }
 
     public function test_self_service_verlof_aanvragen(): void
     {
-        $this->actingAs($this->manager)->post(route('verlof.store'), [
+        $this->actingAs($this->leidingg)->post(route('verlof.store'), [
             'verloftype' => 'vakantie',
             'van' => date('Y').'-12-23',
             'tot' => date('Y').'-12-27',
@@ -46,14 +46,14 @@ class HrVerlofTest extends TestCase
         ])->assertRedirect(route('verlof.mijn'));
 
         $this->assertDatabaseHas('verlofaanvragen', [
-            'medewerker_id' => $this->manager->medewerker->id,
+            'medewerker_id' => $this->leidingg->medewerker->id,
             'status' => 'aangevraagd',
         ]);
     }
 
     public function test_mijn_verlof_toont_saldo(): void
     {
-        $this->actingAs($this->manager)->get(route('verlof.mijn'))->assertOk()->assertSee('Saldo');
+        $this->actingAs($this->leidingg)->get(route('verlof.mijn'))->assertOk()->assertSee('Saldo');
     }
 
     public function test_gebruiker_zonder_dossier_geen_selfservice(): void
@@ -62,30 +62,24 @@ class HrVerlofTest extends TestCase
         $this->actingAs($sz)->get(route('verlof.mijn'))->assertForbidden();
     }
 
-    public function test_manager_keurt_teamaanvraag_goed(): void
+    public function test_hr_keurt_aanvraag_goed(): void
     {
         $sophie = Medewerker::where('personeelsnummer', 'P260003')->firstOrFail();
         $aanvraag = $sophie->verlofaanvragen()->where('status', 'aangevraagd')->firstOrFail();
 
-        $this->actingAs($this->manager)->post(route('verlof.beoordelen', $aanvraag), ['besluit' => 'goedgekeurd'])->assertRedirect();
+        $this->actingAs($this->leidingg)->post(route('verlof.beoordelen', $aanvraag), ['besluit' => 'goedgekeurd'])->assertRedirect();
 
         $this->assertSame(Verlofstatus::Goedgekeurd, $aanvraag->fresh()->status);
     }
 
-    public function test_manager_kan_eigen_aanvraag_niet_beoordelen(): void
+    public function test_studentenzaken_kan_geen_aanvraag_beoordelen(): void
     {
-        // Een eigen aanvraag van de manager: HR is de terugval, hij mag niet zelf.
-        $eigen = Verlofaanvraag::create([
-            'medewerker_id' => $this->manager->medewerker->id,
-            'verloftype' => 'vakantie', 'van' => date('Y').'-11-01', 'tot' => date('Y').'-11-02',
-            'uren' => 16, 'status' => 'aangevraagd', 'aangevraagd_door_id' => $this->manager->id,
-        ]);
+        $sophie = Medewerker::where('personeelsnummer', 'P260003')->firstOrFail();
+        $aanvraag = $sophie->verlofaanvragen()->where('status', 'aangevraagd')->firstOrFail();
 
-        $this->actingAs($this->manager)->post(route('verlof.beoordelen', $eigen), ['besluit' => 'goedgekeurd'])->assertForbidden();
-
-        // HR mag dat wel.
-        $this->actingAs($this->hr)->post(route('verlof.beoordelen', $eigen), ['besluit' => 'goedgekeurd'])->assertRedirect();
-        $this->assertSame(Verlofstatus::Goedgekeurd, $eigen->fresh()->status);
+        $sz = User::where('rol', Rol::Studentenzaken)->firstOrFail();
+        $this->actingAs($sz)->post(route('verlof.beoordelen', $aanvraag), ['besluit' => 'goedgekeurd'])->assertForbidden();
+        $this->assertSame(Verlofstatus::Aangevraagd, $aanvraag->fresh()->status);
     }
 
     public function test_ziekmelding_en_herstel(): void

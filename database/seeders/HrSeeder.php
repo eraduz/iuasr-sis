@@ -53,17 +53,18 @@ class HrSeeder extends Seeder
             ['naam' => 'PABO-team', 'bovenliggende_afdeling_id' => $afdeling['ONDW'], 'actief' => true]
         )->id;
 
-        // Rolaccounts.
+        // Rolaccounts. HR-medewerker en Manager zijn bij IUASR één gecombineerde rol
+        // (Rol::Hrmedewerker): Ruben is leidinggevende én doet de personeelszaken.
         $hr = User::firstOrCreate(['email' => 'n.aslan@iuasr.nl'], ['naam' => 'Nadia Aslan', 'rol' => Rol::Hrmedewerker]);
-        $manager = User::firstOrCreate(['email' => 'r.smit@iuasr.nl'], ['naam' => 'Ruben Smit', 'rol' => Rol::Manager]);
+        $manager = User::firstOrCreate(['email' => 'r.smit@iuasr.nl'], ['naam' => 'Ruben Smit', 'rol' => Rol::Hrmedewerker]);
 
-        // Manager-medewerker eerst (referentiepunt voor het team).
+        // Leidinggevende-medewerker eerst (referentiepunt voor de organisatiestructuur).
         $rubenMed = $this->medewerker('P260001', 'Ruben', 'Smit', $afdeling['ONDW'], $functie['MGR'], null, $manager->id, 40, 'vast');
         Afdeling::whereIn('id', [$afdeling['ONDW'], $afdeling['ONDW-PABO']])->update(['manager_id' => $rubenMed->id]);
 
         $this->medewerker('P260002', 'Nadia', 'Aslan', $afdeling['HRB'], $functie['STAF'], null, $hr->id, 32, 'vast');
 
-        // Teamleden onder Ruben (voor de team-scoping van de Manager), in het PABO-team.
+        // Teamleden onder Ruben (organisatiestructuur), in het PABO-team.
         $this->medewerker('P260003', 'Sophie', 'Willemsen', $afdeling['ONDW-PABO'], $functie['DOC'], $rubenMed->id, null, 20, 'tijdelijk');
         $this->medewerker('P260004', 'Mehmet', 'Yilmaz', $afdeling['ONDW-PABO'], $functie['DOC'], $rubenMed->id, null, 38, 'vast');
 

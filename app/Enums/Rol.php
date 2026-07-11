@@ -33,10 +33,10 @@ enum Rol: string
     // stagecoördinator doet daarnaast de stageplaatsen en plaatsingen.
     case Relatiebeheerder = 'relatiebeheerder';
     case Stagecoordinator = 'stagecoordinator';
-    // Module HR / Personeelszaken. De HR-medewerker doet de personeelsadministratie;
-    // de Manager (leidinggevende) beheert het eigen team en keurt verlof goed.
+    // Module HR / Personeelszaken. Eén gecombineerde rol: de HR-medewerker doet de
+    // personeelsadministratie én is tevens leidinggevende (manager). Bij IUASR zijn
+    // dit dezelfde persoon; de rol ziet daarom alle medewerkers en keurt verlof goed.
     case Hrmedewerker = 'hrmedewerker';
-    case Manager = 'manager';
 
     /** Leesbare naam voor UI en documenten (Nederlands, U-vorm). */
     public function label(): string
@@ -53,7 +53,6 @@ enum Rol: string
             self::Relatiebeheerder => 'Relatiebeheerder',
             self::Stagecoordinator => 'Stagecoördinator',
             self::Hrmedewerker => 'HR-medewerker',
-            self::Manager => 'Manager',
         };
     }
 
@@ -105,7 +104,7 @@ enum Rol: string
             self::Studentenzaken, self::Bestuur, self::Beheerder,
             self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
-            self::Hrmedewerker, self::Manager => false,
+            self::Hrmedewerker => false,
         };
     }
 
@@ -127,7 +126,7 @@ enum Rol: string
             self::Docent, self::Examencommissie, self::Directie, self::Bestuur,
             self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
-            self::Hrmedewerker, self::Manager => false,
+            self::Hrmedewerker => false,
         };
     }
 
@@ -154,7 +153,7 @@ enum Rol: string
             self::Studentenzaken, self::Financien, self::Beheerder,
             self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
-            self::Hrmedewerker, self::Manager => false,
+            self::Hrmedewerker => false,
         };
     }
 
@@ -170,7 +169,7 @@ enum Rol: string
             self::Directie, self::Bestuur, self::Beheerder => true,
             self::Financien, self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
-            self::Hrmedewerker, self::Manager => false,
+            self::Hrmedewerker => false,
         };
     }
 
@@ -229,9 +228,8 @@ enum Rol: string
             // De module Relatiebeheer & Stagebeheer: de relatiebeheerder en de
             // stagecoördinator werken uitsluitend daarbinnen.
             self::Relatiebeheerder, self::Stagecoordinator => ['relatiebeheer'],
-            // Module HR / Personeelszaken: de HR-medewerker en de Manager werken
-            // uitsluitend daarbinnen (de Manager gescoped op het eigen team).
-            self::Hrmedewerker, self::Manager => ['hr'],
+            // Module HR / Personeelszaken: de HR-medewerker werkt uitsluitend daarbinnen.
+            self::Hrmedewerker => ['hr'],
             // Het Schoolbestuur heeft brede inzage en ziet naast Studentenzaken ook
             // de Cursussen-, Relatiebeheer- en HR-module (alleen-lezen).
             self::Bestuur => ['studentenzaken', 'cursussen', 'relatiebeheer', 'hr'],
@@ -256,25 +254,27 @@ enum Rol: string
     public function magHrInzien(): bool
     {
         return match ($this) {
-            self::Hrmedewerker, self::Manager, self::Beheerder, self::Bestuur => true,
+            self::Hrmedewerker, self::Beheerder, self::Bestuur => true,
             default => false,
         };
     }
 
     /**
-     * Is de zichtbaarheid binnen HR beperkt tot het eigen team? Alleen de Manager
-     * (leidinggevende) is teamgebonden; HR, Beheer en Bestuur zien alle medewerkers.
+     * Is de zichtbaarheid binnen HR beperkt tot het eigen team? Sinds het
+     * samenvoegen van HR-medewerker en Manager tot één rol is niemand meer
+     * teamgebonden; de gecombineerde HR-rol ziet alle medewerkers. Het
+     * scopingsmechanisme blijft aanwezig voor eventuele herintroductie.
      */
     public function isHrTeamBeperkt(): bool
     {
-        return $this === self::Manager;
+        return false;
     }
 
-    /** Mag deze rol verlofaanvragen beoordelen? Manager (eigen team) en HR/Beheer. */
+    /** Mag deze rol verlofaanvragen beoordelen? De HR-medewerker (tevens manager) en Beheer. */
     public function magVerlofBeoordelen(): bool
     {
         return match ($this) {
-            self::Manager, self::Hrmedewerker, self::Beheerder => true,
+            self::Hrmedewerker, self::Beheerder => true,
             default => false,
         };
     }

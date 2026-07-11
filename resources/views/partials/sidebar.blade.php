@@ -102,8 +102,7 @@
         ],
         Rol::Bestuur->value => [
             'Overzicht' => [
-                ['Bestuur', 'bestuur', 'dash', 'bestuur'],
-                ['Dashboard', 'dashboard', 'dash', 'dashboard'],
+                ['Bestuursoverzicht', 'bestuur', 'dash', 'bestuur'],
             ],
             'Studenten' => [['Alle studenten', 'studenten.index', 'students', 'studenten.*']],
             'Onderwijs' => [['Aanwezigheid', 'presentieoverzicht', 'check', 'presentieoverzicht']],
@@ -203,11 +202,11 @@
     }
 
     // Standaardmenu buiten een module. De relatiebeheerder/stagecoördinator en de
-    // HR-rollen hebben geen eigen rol-menu in $menus; hun thuisbasis is hun module.
+    // HR-medewerker hebben geen eigen rol-menu in $menus; hun thuisbasis is hun module.
     $standaardMenu = $menus[$rol]
         ?? (in_array($rol, [Rol::Relatiebeheerder->value, Rol::Stagecoordinator->value], true)
             ? $relatieMenu
-            : (in_array($rol, [Rol::Hrmedewerker->value, Rol::Manager->value], true)
+            : ($rol === Rol::Hrmedewerker->value
                 ? $hrMenu
                 : $menus[Rol::Studentenzaken->value]));
 

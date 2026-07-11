@@ -220,8 +220,8 @@ Route::middleware('auth')->group(function () {
     | Module: HR / Personeelszaken
     |--------------------------------------------------------------------------
     | Rolverdeling:
-    |  - HR-medewerker: volledige personeelsadministratie.
-    |  - Manager: eigen team (inzage + later verlof goedkeuren), teamgebonden.
+    |  - HR-medewerker: volledige personeelsadministratie én leidinggevende
+    |    (één gecombineerde rol; verlof goedkeuren, alle medewerkers).
     |  - Beheerder: alles. Schoolbestuur: instellingsbrede inzage (alleen-lezen).
     | Muteren staat in de beheergroep; inzage/downloads in de bredere inzagegroep.
     | Beheer-routes bewust vóór de inzage-routes (literal 'nieuw' vóór {medewerker}).
@@ -243,7 +243,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/medewerkers/{medewerker}/verlofsaldo', [App\Http\Controllers\Hr\VerlofsaldoController::class, 'bijwerken'])->name('verlofsaldo.bijwerken');
     });
 
-    Route::middleware('rol:hrmedewerker,manager,beheerder,bestuur')->prefix('hr')->group(function () {
+    Route::middleware('rol:hrmedewerker,beheerder,bestuur')->prefix('hr')->group(function () {
         Route::get('/', [App\Http\Controllers\Hr\HrDashboardController::class, 'index'])->name('hr.dashboard');
         Route::get('/medewerkers', [App\Http\Controllers\Hr\MedewerkerController::class, 'index'])->name('medewerkers');
         Route::get('/hr-documenten/{document}/download', [App\Http\Controllers\Hr\HrDocumentController::class, 'download'])->name('hrdocumenten.download');
@@ -255,8 +255,8 @@ Route::middleware('auth')->group(function () {
     });
 
     // Verlof & verzuim (Fase B). Overzicht + beoordelen + ziek-/herstelmelding:
-    // HR en Manager (eigen team gescoped in de controllers).
-    Route::middleware('rol:hrmedewerker,manager,beheerder')->prefix('hr')->group(function () {
+    // de HR-medewerker (tevens leidinggevende) en Beheer.
+    Route::middleware('rol:hrmedewerker,beheerder')->prefix('hr')->group(function () {
         Route::get('/verlof', [App\Http\Controllers\Hr\VerlofController::class, 'index'])->name('verlof');
         Route::post('/verlofaanvragen/{aanvraag}/beoordelen', [App\Http\Controllers\Hr\VerlofController::class, 'beoordelen'])->name('verlof.beoordelen');
         Route::get('/verzuim', [App\Http\Controllers\Hr\ZiekmeldingController::class, 'index'])->name('verzuim');

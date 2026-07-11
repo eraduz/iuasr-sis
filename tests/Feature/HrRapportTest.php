@@ -15,14 +15,15 @@ use Tests\TestCase;
 
 /**
  * Module HR / Personeelszaken — Fase D (organisatiestructuur & rapportages).
- * Bewaakt de kerncijfers, de per-afdeling-aggregatie, de scoping en de CSV-export.
+ * Bewaakt de kerncijfers, de per-afdeling-aggregatie en de CSV-export. HR-medewerker
+ * en Manager zijn samengevoegd tot één rol die alle medewerkers ziet.
  */
 class HrRapportTest extends TestCase
 {
     use RefreshDatabase;
 
     private User $hr;
-    private User $manager;
+    private User $leidingg;
 
     protected function setUp(): void
     {
@@ -31,7 +32,7 @@ class HrRapportTest extends TestCase
         $this->seed([ReferentieSeeder::class, DocentSeeder::class, GebruikerSeeder::class, HrSeeder::class]);
 
         $this->hr = User::where('email', 'n.aslan@iuasr.nl')->firstOrFail();
-        $this->manager = User::where('email', 'r.smit@iuasr.nl')->firstOrFail();
+        $this->leidingg = User::where('email', 'r.smit@iuasr.nl')->firstOrFail();
     }
 
     public function test_rapportpagina_rendert(): void
@@ -50,11 +51,11 @@ class HrRapportTest extends TestCase
         $this->assertGreaterThan(0, $kpi['fte']);
     }
 
-    public function test_rapport_is_gescoped_voor_manager(): void
+    public function test_gecombineerde_hr_rol_ziet_alle_medewerkers_in_rapport(): void
     {
-        $teamIds = Medewerker::query()->zichtbaarVoor($this->manager)->pluck('id')->all();
-        // Ruben (zelf) + Sophie + Mehmet = 3.
-        $this->assertSame(3, HrRapport::kerncijfers($teamIds)['medewerkers']);
+        // Zonder team-scoping ziet de gecombineerde HR-rol alle 6 medewerkers.
+        $ids = Medewerker::query()->zichtbaarVoor($this->leidingg)->pluck('id')->all();
+        $this->assertSame(6, HrRapport::kerncijfers($ids)['medewerkers']);
     }
 
     public function test_csv_export(): void

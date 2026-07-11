@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\Rol;
 use App\Enums\Verlofstatus;
 use App\Enums\Verloftype;
 use Illuminate\Database\Eloquent\Model;
@@ -44,21 +43,12 @@ class Verlofaanvraag extends Model
     }
 
     /**
-     * Mag deze gebruiker deze aanvraag beoordelen? HR/Beheer altijd; een Manager
-     * uitsluitend voor het eigen team (dus nooit de eigen aanvraag — dan is HR de
-     * terugval). Alleen zolang de aanvraag nog openstaat.
+     * Mag deze gebruiker deze aanvraag beoordelen? De HR-medewerker (tevens
+     * leidinggevende) en Beheer, en uitsluitend zolang de aanvraag nog openstaat.
      */
     public function beoordeelbaarVoor(User $gebruiker): bool
     {
-        if ($this->status !== Verlofstatus::Aangevraagd) {
-            return false;
-        }
-        if ($gebruiker->magHrBeheer()) {
-            return true;
-        }
-
-        return $gebruiker->rol === Rol::Manager
-            && $gebruiker->medewerker !== null
-            && $this->medewerker?->manager_id === $gebruiker->medewerker->id;
+        return $this->status === Verlofstatus::Aangevraagd
+            && $gebruiker->magVerlofBeoordelen();
     }
 }

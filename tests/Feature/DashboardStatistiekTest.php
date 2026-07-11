@@ -57,7 +57,10 @@ class DashboardStatistiekTest extends TestCase
             }
             $antwoord = $this->actingAs($user)->get(route('dashboard'));
 
-            if ($rol->magModule('studentenzaken')) {
+            if ($rol === Rol::Bestuur) {
+                // Het Schoolbestuur wordt doorgestuurd naar het samengevoegde overzicht.
+                $antwoord->assertRedirect(route('bestuur'));
+            } elseif ($rol->magModule('studentenzaken')) {
                 $antwoord->assertOk();
             } elseif ($rol->magModule('cursussen')) {
                 // Cursusadministratie wordt naar de Cursussen-module gestuurd.
@@ -90,8 +93,10 @@ class DashboardStatistiekTest extends TestCase
 
     public function test_vrijstellingslijst_zichtbaar_voor_onderwijsrollen(): void
     {
-        // De seeder legt één demo-vrijstelling vast (student 261001).
-        foreach ([Rol::Studentenzaken, Rol::Docent, Rol::Examencommissie, Rol::Directie, Rol::Bestuur] as $rol) {
+        // De seeder legt één demo-vrijstelling vast (student 261001). Het Bestuur
+        // heeft geen studentenzaken-dashboard meer (samengevoegd overzicht), dus
+        // de vrijstellingslijst wordt hier voor de onderwijsrollen getoetst.
+        foreach ([Rol::Studentenzaken, Rol::Docent, Rol::Examencommissie, Rol::Directie] as $rol) {
             $this->actingAs(User::where('rol', $rol)->first())
                 ->get(route('dashboard'))
                 ->assertOk()
