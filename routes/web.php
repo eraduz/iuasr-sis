@@ -200,7 +200,10 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('rol:relatiebeheerder,stagecoordinator,directie,bestuur,beheerder')->prefix('relatiebeheer')->group(function () {
-        Route::get('/', [App\Http\Controllers\Relatie\OrganisatieController::class, 'index'])->name('relaties');
+        Route::get('/', [App\Http\Controllers\Relatie\RelatieDashboardController::class, 'index'])->name('relatiebeheer.dashboard');
+        Route::get('/rapport', [App\Http\Controllers\Relatie\RelatieDashboardController::class, 'rapport'])->name('relatiebeheer.rapport');
+        Route::get('/rapport/export.csv', [App\Http\Controllers\Relatie\RelatieDashboardController::class, 'export'])->name('relatiebeheer.rapport.export');
+        Route::get('/organisaties', [App\Http\Controllers\Relatie\OrganisatieController::class, 'index'])->name('relaties');
         Route::get('/stages', [App\Http\Controllers\Relatie\StageController::class, 'index'])->name('stages');
         Route::get('/agenda', [App\Http\Controllers\Relatie\AfspraakController::class, 'index'])->name('agenda');
         Route::get('/relatie-documenten/{document}/download', [App\Http\Controllers\Relatie\RelatieDocumentController::class, 'download'])->name('relatiedocumenten.download');

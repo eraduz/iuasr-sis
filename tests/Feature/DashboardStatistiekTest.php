@@ -63,8 +63,8 @@ class DashboardStatistiekTest extends TestCase
                 // Cursusadministratie wordt naar de Cursussen-module gestuurd.
                 $antwoord->assertRedirect(route('cursussen.dashboard'));
             } else {
-                // Relatiebeheerder/Stagecoördinator naar de Relatiebeheer-module.
-                $antwoord->assertRedirect(route('relaties'));
+                // Relatiebeheerder/Stagecoördinator naar het Relatiebeheer-dashboard.
+                $antwoord->assertRedirect(route('relatiebeheer.dashboard'));
             }
         }
     }

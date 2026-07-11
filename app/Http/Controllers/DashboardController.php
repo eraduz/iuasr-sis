@@ -29,7 +29,7 @@ class DashboardController extends Controller
                 return redirect()->route('cursussen.dashboard');
             }
             if ($rol->magModule('relatiebeheer')) {
-                return redirect()->route('relaties');
+                return redirect()->route('relatiebeheer.dashboard');
             }
 
             return redirect()->route('modules.kiezen');

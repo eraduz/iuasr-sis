@@ -170,9 +170,11 @@
     // en Bestuur kijken mee (alleen-lezen).
     $relatieMenu = [
         'Relatiebeheer' => [
+            ['Overzicht', 'relatiebeheer.dashboard', 'dash', 'relatiebeheer.dashboard'],
             ['Organisaties', 'relaties', 'students', 'relaties,relaties.show,relaties.edit'],
             ['Stages', 'stages', 'cert', 'stages,stages.edit,stages.create,stageplaatsen.create,stageplaatsen.edit'],
             ['Agenda & taken', 'agenda', 'taak', 'agenda,afspraken.create,afspraken.edit,relatietaken.edit'],
+            ['Rapportage', 'relatiebeheer.rapport', 'report', 'relatiebeheer.rapport'],
         ],
     ];
     if ($gebruiker->magRelatiebeheer()) {
@@ -187,7 +189,7 @@
             : $menus[Rol::Studentenzaken->value]);
 
     $inCursusmodule = request()->routeIs('cursussen.*') || request()->routeIs('cursisten*');
-    $inRelatiemodule = request()->routeIs('relaties*') || request()->routeIs('contactpersonen*') || request()->routeIs('contactmomenten*') || request()->routeIs('stages*') || request()->routeIs('stageplaatsen*') || request()->routeIs('agenda*') || request()->routeIs('afspraken*') || request()->routeIs('relatietaken*') || request()->routeIs('overeenkomsten*') || request()->routeIs('relatiedocumenten*');
+    $inRelatiemodule = request()->routeIs('relatiebeheer.*') || request()->routeIs('relaties*') || request()->routeIs('contactpersonen*') || request()->routeIs('contactmomenten*') || request()->routeIs('stages*') || request()->routeIs('stageplaatsen*') || request()->routeIs('agenda*') || request()->routeIs('afspraken*') || request()->routeIs('relatietaken*') || request()->routeIs('overeenkomsten*') || request()->routeIs('relatiedocumenten*');
     $menu = $inCursusmodule
         ? $cursusMenu
         : ($inRelatiemodule ? $relatieMenu : $standaardMenu);
