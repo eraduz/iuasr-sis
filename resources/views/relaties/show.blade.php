@@ -3,7 +3,10 @@
 @section('titel', $organisatie->naam)
 
 @section('inhoud')
-@php $magBeheer = auth()->user()->magRelatiebeheer(); @endphp
+@php
+    $magBeheer = auth()->user()->magRelatiebeheer();
+    $magStage = $organisatie->stagesBeheerbaarVoor(auth()->user());
+@endphp
 
 <div class="sis-crumb"><a href="{{ route('relaties') }}">Organisaties</a><span class="sep">›</span><b>{{ $organisatie->naam }}</b></div>
 
@@ -76,6 +79,72 @@
                 </form>
               </td>
             @endif
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+  @endif
+</div>
+
+{{-- Stageplaatsen (Fase D) — het aanbod/capaciteit per opleiding. --}}
+<div class="sis-card" id="stageplaatsen" style="margin-bottom:16px;">
+  <div class="sis-card__hd" style="display:flex; align-items:center; justify-content:space-between;">
+    <b>Stageplaatsen ({{ $organisatie->stageplaatsen->count() }})</b>
+    @if ($magStage)
+      <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('stageplaatsen.create', $organisatie) }}">Stageplaats toevoegen</a>
+    @endif
+  </div>
+  @if ($organisatie->stageplaatsen->isEmpty())
+    <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Nog geen stageplaatsen vastgelegd.</p></div>
+  @else
+    <table class="iuasr-dash-tbl">
+      <thead><tr><th>Opleiding</th><th>Leerjaar</th><th>Studiejaar</th><th>Werkdagen</th><th style="text-align:center;">Bezetting</th><th style="text-align:center;">Status</th>@if($magStage)<th class="row-act"></th>@endif</tr></thead>
+      <tbody>
+        @foreach ($organisatie->stageplaatsen as $sp)
+          <tr @if(! $sp->actief) style="opacity:.55;" @endif>
+            <td class="nm">{{ $sp->opleiding?->code ?? '—' }}@if($sp->specialisaties)<br><small class="sis-muted">{{ $sp->specialisaties }}</small>@endif</td>
+            <td>{{ $sp->leerjaar ?? '—' }}</td>
+            <td>{{ $sp->periode?->code ?? '—' }}</td>
+            <td>{{ $sp->werkdagen ?? '—' }}</td>
+            <td style="text-align:center;">{{ $sp->bezetting() }}@if($sp->max_studenten) / {{ $sp->max_studenten }}@endif</td>
+            <td style="text-align:center;"><span class="iuasr-dash-status {{ $sp->actief ? 's-approved' : 's-draft' }}">{{ $sp->actief ? 'Actief' : 'Inactief' }}</span></td>
+            @if($magStage)
+              <td class="row-act" style="white-space:nowrap;">
+                <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('stageplaatsen.edit', $sp) }}">Bewerken</a>
+                <form method="POST" action="{{ route('stageplaatsen.status', $sp) }}" style="display:inline;">@csrf<button class="iuasr-dash-btn iuasr-dash-btn--sm" type="submit">{{ $sp->actief ? 'Inactiveren' : 'Activeren' }}</button></form>
+              </td>
+            @endif
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+  @endif
+</div>
+
+{{-- Stages (Fase D) — de plaatsingen van studenten. --}}
+<div class="sis-card" id="stages" style="margin-bottom:16px;">
+  <div class="sis-card__hd" style="display:flex; align-items:center; justify-content:space-between;">
+    <b>Stages ({{ $organisatie->stages->count() }})</b>
+    @if ($magStage)
+      <a class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" href="{{ route('stages.create', $organisatie) }}">Student plaatsen</a>
+    @endif
+  </div>
+  @if ($organisatie->stages->isEmpty())
+    <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Nog geen studenten geplaatst.</p></div>
+  @else
+    <table class="iuasr-dash-tbl">
+      <thead><tr><th>Stagenr.</th><th>Student</th><th>Opleiding</th><th>Begeleiders</th><th>Periode</th><th style="text-align:center;">Status</th><th>Beoordeling</th>@if($magStage)<th class="row-act"></th>@endif</tr></thead>
+      <tbody>
+        @foreach ($organisatie->stages as $stage)
+          <tr>
+            <td class="tnum">{{ $stage->stagenummer }}</td>
+            <td class="nm">{{ $stage->student?->volledigeNaam() ?? '—' }}<br><small class="sis-muted">{{ $stage->student?->studentnummer }}</small></td>
+            <td>{{ $stage->opleiding?->code ?? '—' }}</td>
+            <td><small>{{ $stage->stagebegeleider?->naam ?? '—' }}<br>{{ $stage->werkplekbegeleider?->volledigeNaam() ?? '—' }}</small></td>
+            <td class="dt"><small>{{ $stage->startdatum?->format('d-m-Y') ?? '—' }}@if($stage->einddatum)<br>t/m {{ $stage->einddatum->format('d-m-Y') }}@endif</small></td>
+            <td style="text-align:center;"><span class="iuasr-dash-status {{ $stage->status?->badge() }}">{{ $stage->status?->label() }}</span></td>
+            <td>@if($stage->beoordeling)<span class="iuasr-dash-status {{ $stage->beoordeling === 'voldoende' ? 's-approved' : 's-rejected' }}">{{ ucfirst($stage->beoordeling) }}</span>@else <span class="sis-muted">—</span> @endif</td>
+            @if($magStage)<td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('stages.edit', $stage) }}">Bewerken</a></td>@endif
           </tr>
         @endforeach
       </tbody>
@@ -173,12 +242,11 @@
   </div>
 </div>
 
-{{-- De overige panelen (stageplaatsen & stages, documenten, overeenkomsten,
-     taken, agenda) volgen in de fasen D t/m G. --}}
+{{-- De overige panelen (documenten, overeenkomsten, taken, agenda) volgen in de fasen E t/m G. --}}
 <div class="sis-card">
   <div class="sis-card__hd"><b>Overige onderdelen</b></div>
   <div style="padding:14px 16px;">
-    <p class="sis-muted" style="margin:0;">Stageplaatsen &amp; stages, documenten, overeenkomsten, taken en agenda verschijnen hier zodra de bijbehorende fasen (D t/m G) van de module Relatiebeheer &amp; Stage zijn opgeleverd.</p>
+    <p class="sis-muted" style="margin:0;">Documenten, overeenkomsten, taken en agenda verschijnen hier zodra de bijbehorende fasen (E t/m G) van de module Relatiebeheer &amp; Stage zijn opgeleverd.</p>
   </div>
 </div>
 @endsection

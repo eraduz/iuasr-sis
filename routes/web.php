@@ -156,8 +156,25 @@ Route::middleware('auth')->group(function () {
         Route::delete('/relatie-notities/{notitie}', [App\Http\Controllers\Relatie\RelatieNotitieController::class, 'destroy'])->name('relaties.notities.destroy');
     });
 
+    // Stagebeheer: stageplaatsen (aanbod) en stages (plaatsingen). Muteren is
+    // voorbehouden aan de stagecoördinator (eigen opleiding) en de Beheerder;
+    // inzage staat in de bredere module-inzagegroep hieronder (Fase D).
+    Route::middleware('rol:stagecoordinator,beheerder')->prefix('relatiebeheer')->group(function () {
+        Route::get('/organisaties/{organisatie}/stageplaatsen/nieuw', [App\Http\Controllers\Relatie\StageplaatsController::class, 'create'])->name('stageplaatsen.create');
+        Route::post('/organisaties/{organisatie}/stageplaatsen', [App\Http\Controllers\Relatie\StageplaatsController::class, 'store'])->name('stageplaatsen.store');
+        Route::get('/stageplaatsen/{stageplaats}/bewerken', [App\Http\Controllers\Relatie\StageplaatsController::class, 'edit'])->name('stageplaatsen.edit');
+        Route::put('/stageplaatsen/{stageplaats}', [App\Http\Controllers\Relatie\StageplaatsController::class, 'update'])->name('stageplaatsen.update');
+        Route::post('/stageplaatsen/{stageplaats}/status', [App\Http\Controllers\Relatie\StageplaatsController::class, 'status'])->name('stageplaatsen.status');
+
+        Route::get('/organisaties/{organisatie}/stages/nieuw', [App\Http\Controllers\Relatie\StageController::class, 'create'])->name('stages.create');
+        Route::post('/organisaties/{organisatie}/stages', [App\Http\Controllers\Relatie\StageController::class, 'store'])->name('stages.store');
+        Route::get('/stages/{stage}/bewerken', [App\Http\Controllers\Relatie\StageController::class, 'edit'])->name('stages.edit');
+        Route::put('/stages/{stage}', [App\Http\Controllers\Relatie\StageController::class, 'update'])->name('stages.update');
+    });
+
     Route::middleware('rol:relatiebeheerder,stagecoordinator,directie,bestuur,beheerder')->prefix('relatiebeheer')->group(function () {
         Route::get('/', [App\Http\Controllers\Relatie\OrganisatieController::class, 'index'])->name('relaties');
+        Route::get('/stages', [App\Http\Controllers\Relatie\StageController::class, 'index'])->name('stages');
         Route::get('/organisaties/{organisatie}', [App\Http\Controllers\Relatie\OrganisatieController::class, 'show'])->name('relaties.show');
     });
 

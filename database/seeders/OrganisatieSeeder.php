@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Rol;
+use App\Enums\Stagestatus;
 use App\Models\Contactmoment;
 use App\Models\ContactmomentType;
 use App\Models\Contactpersoon;
@@ -9,6 +11,9 @@ use App\Models\Opleiding;
 use App\Models\Organisatie;
 use App\Models\OrganisatieType;
 use App\Models\RelatieNotitie;
+use App\Models\Stage;
+use App\Models\Stageplaats;
+use App\Models\Student;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -137,6 +142,47 @@ class OrganisatieSeeder extends Seeder
             RelatieNotitie::firstOrCreate(
                 ['organisatie_id' => $regenboog->id, 'tekst' => 'Prettige samenwerking; directeur reageert snel op e-mail.'],
                 ['auteur_id' => $medewerkerId, 'categorie' => 'Samenwerking', 'tags' => 'stage']
+            );
+        }
+
+        // Stageplaatsen (Fase D) — aanbod/capaciteit per opleiding.
+        $paboId = $opl('PABO');
+        $mgvId = $opl('MGV');
+        foreach ([
+            ['R260001', $paboId, 1, 4, 4, 'ma, di, do'],
+            ['R260001', $paboId, 2, 3, 3, 'ma, wo, vr'],
+            ['R260003', $mgvId, null, 2, 2, 'in overleg'],
+        ] as [$nummer, $oplId, $leerjaar, $aantal, $max, $werkdagen]) {
+            $org = Organisatie::where('relatienummer', $nummer)->first();
+            if ($org === null || $oplId === null) {
+                continue;
+            }
+            Stageplaats::firstOrCreate(
+                ['organisatie_id' => $org->id, 'opleiding_id' => $oplId, 'leerjaar' => $leerjaar],
+                ['aantal_plaatsen' => $aantal, 'max_studenten' => $max, 'werkdagen' => $werkdagen, 'actief' => true]
+            );
+        }
+
+        // Demo-stage (Fase D): een PABO-student geplaatst op Basisschool De Regenboog.
+        $paboStudent = Student::where('studentnummer', '261003')->first();
+        if ($paboStudent !== null && $regenboog !== null && $paboId !== null) {
+            $begeleiderId = User::where('rol', Rol::Docent)->value('id');
+            $werkplekbegeleiderId = Contactpersoon::where('organisatie_id', $regenboog->id)->value('id');
+            $plaatsId = Stageplaats::where('organisatie_id', $regenboog->id)->where('opleiding_id', $paboId)->where('leerjaar', 1)->value('id');
+
+            Stage::firstOrCreate(
+                ['stagenummer' => 'S260001'],
+                [
+                    'student_id' => $paboStudent->id,
+                    'organisatie_id' => $regenboog->id,
+                    'stageplaats_id' => $plaatsId,
+                    'opleiding_id' => $paboId,
+                    'stagebegeleider_id' => $begeleiderId,
+                    'werkplekbegeleider_id' => $werkplekbegeleiderId,
+                    'startdatum' => '2026-09-01',
+                    'einddatum' => '2027-01-31',
+                    'status' => Stagestatus::Lopend->value,
+                ]
             );
         }
     }

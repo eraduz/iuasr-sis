@@ -55,6 +55,26 @@ class Organisatie extends Model
         return $this->hasMany(RelatieNotitie::class);
     }
 
+    public function stageplaatsen(): HasMany
+    {
+        return $this->hasMany(Stageplaats::class);
+    }
+
+    public function stages(): HasMany
+    {
+        return $this->hasMany(Stage::class);
+    }
+
+    /**
+     * Mag deze gebruiker de stageplaatsen/stages van deze organisatie beheren?
+     * De stagecoördinator (eigen opleiding) en de Beheerder. De relatiebeheerder
+     * beheert wél de organisatie, maar niet de stageplaatsing.
+     */
+    public function stagesBeheerbaarVoor(User $gebruiker): bool
+    {
+        return $gebruiker->magStagebeheer() && $this->zichtbaarVoor($gebruiker);
+    }
+
     /**
      * Beperk een query tot de organisaties die deze gebruiker mag zien. Een
      * opleidinggebonden gebruiker ziet uitsluitend de organisaties die aan (een

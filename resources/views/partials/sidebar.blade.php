@@ -171,6 +171,7 @@
     $relatieMenu = [
         'Relatiebeheer' => [
             ['Organisaties', 'relaties', 'students', 'relaties,relaties.show,relaties.edit'],
+            ['Stages', 'stages', 'cert', 'stages,stages.edit,stages.create,stageplaatsen.create,stageplaatsen.edit'],
         ],
     ];
     if ($gebruiker->magRelatiebeheer()) {
@@ -185,7 +186,7 @@
             : $menus[Rol::Studentenzaken->value]);
 
     $inCursusmodule = request()->routeIs('cursussen.*') || request()->routeIs('cursisten*');
-    $inRelatiemodule = request()->routeIs('relaties*') || request()->routeIs('contactpersonen*') || request()->routeIs('contactmomenten*');
+    $inRelatiemodule = request()->routeIs('relaties*') || request()->routeIs('contactpersonen*') || request()->routeIs('contactmomenten*') || request()->routeIs('stages*') || request()->routeIs('stageplaatsen*');
     $menu = $inCursusmodule
         ? $cursusMenu
         : ($inRelatiemodule ? $relatieMenu : $standaardMenu);

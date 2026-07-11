@@ -100,6 +100,8 @@ class OrganisatieController extends Controller
             'contactpersonen' => fn ($q) => $q->orderByDesc('actief')->orderBy('achternaam'),
             'contactmomenten' => fn ($q) => $q->with(['type', 'medewerker', 'contactpersoon'])->orderByDesc('datum')->orderByDesc('id'),
             'notities' => fn ($q) => $q->with('auteur')->orderByDesc('created_at'),
+            'stageplaatsen' => fn ($q) => $q->with(['opleiding', 'periode', 'stages'])->orderByDesc('actief')->orderBy('id'),
+            'stages' => fn ($q) => $q->with(['student', 'opleiding', 'stagebegeleider', 'werkplekbegeleider'])->orderByDesc('id'),
         ]);
 
         return view('relaties.show', [
