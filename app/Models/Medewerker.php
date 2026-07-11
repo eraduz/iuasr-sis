@@ -101,6 +101,11 @@ class Medewerker extends Model
         return $this->hasMany(Gesprek::class)->orderByDesc('datum');
     }
 
+    public function checklisttaken(): HasMany
+    {
+        return $this->hasMany(HrChecklisttaak::class)->orderBy('volgorde')->orderBy('id');
+    }
+
     public function volledigeNaam(): string
     {
         return trim(implode(' ', array_filter([$this->voornaam, $this->tussenvoegsel, $this->achternaam])));

@@ -236,9 +236,44 @@
   @endif
 </div>
 
-{{-- Onboarding/offboarding volgt in fase E. --}}
-<div class="sis-card">
-  <div class="sis-card__hd"><b>Overige onderdelen</b></div>
-  <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Onboarding/offboarding verschijnt hier zodra fase E van de module is opgeleverd.</p></div>
-</div>
+{{-- Onboarding/offboarding-checklists (Fase E). --}}
+@php use App\Enums\ChecklistSoort; @endphp
+@foreach ([ChecklistSoort::Onboarding, ChecklistSoort::Offboarding] as $soort)
+  @php
+    $taken = $medewerker->checklisttaken->where('soort', $soort);
+    $gereed = $taken->where('gereed', true)->count();
+    $totaal = $taken->count();
+  @endphp
+  <div class="sis-card" id="{{ $soort->value }}" style="margin-bottom:16px;">
+    <div class="sis-card__hd" style="display:flex; align-items:center; justify-content:space-between;">
+      <b>{{ $soort->label() }}@if($totaal) ({{ $gereed }}/{{ $totaal }})@endif</b>
+      @if ($totaal === 0)
+        <form method="POST" action="{{ route('checklist.start', $medewerker) }}" style="display:inline;">@csrf<input type="hidden" name="soort" value="{{ $soort->value }}"><button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">{{ $soort->label() }} starten</button></form>
+      @endif
+    </div>
+    <div style="padding:14px 16px;">
+      @if ($totaal === 0)
+        <p class="sis-muted" style="margin:0;">Nog niet gestart.</p>
+      @else
+        @foreach ($taken as $taak)
+          <div style="display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-top:1px solid var(--border,#e5e5e5); {{ $taak->gereed ? 'opacity:.6;' : '' }}">
+            <div>
+              <form method="POST" action="{{ route('checklist.toggle', $taak) }}" style="display:inline;">@csrf<button class="iuasr-dash-btn iuasr-dash-btn--sm" type="submit">{{ $taak->gereed ? '☑' : '☐' }}</button></form>
+              <span style="{{ $taak->gereed ? 'text-decoration:line-through;' : '' }}">{{ $taak->titel }}</span>
+              @if($taak->verantwoordelijke)<small class="sis-muted"> · {{ $taak->verantwoordelijke->naam }}</small>@endif
+              @if($taak->gereed && $taak->gereed_op)<small class="sis-muted"> · {{ $taak->gereed_op->format('d-m-Y') }}</small>@endif
+            </div>
+            <form method="POST" action="{{ route('checklist.destroy', $taak) }}" onsubmit="return confirm('Taak verwijderen?');" style="display:inline;">@csrf @method('DELETE')<button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" type="submit">×</button></form>
+          </div>
+        @endforeach
+        <form method="POST" action="{{ route('checklist.store', $medewerker) }}" style="margin-top:12px; display:flex; gap:8px; align-items:end; flex-wrap:wrap;">
+          @csrf
+          <input type="hidden" name="soort" value="{{ $soort->value }}">
+          <div class="sis-fld" style="flex:1; min-width:240px;"><label>Extra taak</label><input type="text" name="titel" maxlength="255" required></div>
+          <button class="iuasr-dash-btn iuasr-dash-btn--sm" type="submit">Toevoegen</button>
+        </form>
+      @endif
+    </div>
+  </div>
+@endforeach
 @endsection

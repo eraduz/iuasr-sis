@@ -274,6 +274,12 @@ Route::middleware('auth')->group(function () {
         Route::delete('/gespreksdoelen/{doel}', [App\Http\Controllers\Hr\GesprekController::class, 'doelDestroy'])->name('gesprekken.doel.destroy');
         Route::post('/gesprekken/{gesprek}/competenties', [App\Http\Controllers\Hr\GesprekController::class, 'competentieStore'])->name('gesprekken.competentie.store');
         Route::delete('/competentiescores/{score}', [App\Http\Controllers\Hr\GesprekController::class, 'competentieDestroy'])->name('gesprekken.competentie.destroy');
+
+        // Onboarding/offboarding-checklists (Fase E).
+        Route::post('/medewerkers/{medewerker}/checklist/start', [App\Http\Controllers\Hr\ChecklistController::class, 'start'])->name('checklist.start');
+        Route::post('/medewerkers/{medewerker}/checklisttaken', [App\Http\Controllers\Hr\ChecklistController::class, 'store'])->name('checklist.store');
+        Route::post('/checklisttaken/{taak}/gereed', [App\Http\Controllers\Hr\ChecklistController::class, 'toggle'])->name('checklist.toggle');
+        Route::delete('/checklisttaken/{taak}', [App\Http\Controllers\Hr\ChecklistController::class, 'destroy'])->name('checklist.destroy');
     });
 
     // Self-service verlof: elke ingelogde medewerker (met een gekoppeld dossier).

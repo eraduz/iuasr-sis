@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Enums\ChecklistSoort;
 use App\Enums\Rol;
 use App\Models\Afdeling;
 use App\Models\Competentiescore;
+use App\Models\HrChecklisttaak;
 use App\Models\Dienstverband;
 use App\Models\Functie;
 use App\Models\Gesprek;
@@ -71,6 +73,23 @@ class HrSeeder extends Seeder
 
         $this->verlofEnVerzuim();
         $this->gesprekken();
+        $this->checklist();
+    }
+
+    /** Demo-onboarding voor een recente medewerker (Fase E). */
+    private function checklist(): void
+    {
+        $johan = Medewerker::where('personeelsnummer', 'P260006')->first();
+        if ($johan === null) {
+            return;
+        }
+
+        foreach (ChecklistSoort::Onboarding->sjabloon() as $volgorde => $titel) {
+            HrChecklisttaak::firstOrCreate(
+                ['medewerker_id' => $johan->id, 'soort' => 'onboarding', 'titel' => $titel],
+                ['volgorde' => $volgorde, 'gereed' => $volgorde < 2, 'gereed_op' => $volgorde < 2 ? now() : null]
+            );
+        }
     }
 
     /** Synthetische HR-gesprekken met doelen en competenties (Fase C). */

@@ -84,7 +84,8 @@ class MedewerkerController extends Controller
             'documenten' => fn ($q) => $q->with('geuploadDoor'),
             'verlofaanvragen' => fn ($q) => $q->with('beoordelaar'),
             'ziekmeldingen' => fn ($q) => $q->with('gemeldDoor'),
-            'gesprekken' => fn ($q) => $q->with('gespreksvoerder')]);
+            'gesprekken' => fn ($q) => $q->with('gespreksvoerder'),
+            'checklisttaken' => fn ($q) => $q->with('verantwoordelijke')]);
 
         $jaar = (int) date('Y');
 
