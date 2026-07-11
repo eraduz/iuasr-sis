@@ -63,7 +63,8 @@ class Overgangsbeoordeling
                 continue;
             }
             $eigen = $resultaten->whereIn('toetsonderdeel_id', $vak->toetsonderdelen->pluck('id'));
-            $totaal += EcBerekening::bepaalEc($vak, $eigen, Cijferberekening::voldoendeGrens($vak)) ?? 0.0;
+            $totaal += EcBerekening::bepaalEc($vak, $eigen, Cijferberekening::voldoendeGrens($vak),
+                Cijferberekening::ecModel($vak)) ?? 0.0;
         }
 
         return round($totaal, 1);

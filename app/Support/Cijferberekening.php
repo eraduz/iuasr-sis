@@ -24,6 +24,19 @@ class Cijferberekening
     }
 
     /**
+     * Het EC-model voor een vak: 'knockout' of 'compensatorisch'. Opleiding-
+     * specifiek (opleidingen.ec_model), met terugval op config('sis.cijfers.ec_model').
+     */
+    public static function ecModel(Vak $vak): string
+    {
+        $model = $vak->opleiding?->ec_model;
+
+        return $model !== null && $model !== ''
+            ? $model
+            : (string) config('sis.cijfers.ec_model', 'knockout');
+    }
+
+    /**
      * Eindcijfer-status van een vak voor één student.
      *
      * @param  Collection<int, Resultaat>  $resultaten  resultaten van de student voor dit vak
@@ -85,7 +98,7 @@ class Cijferberekening
             return (float) $vak->ec;
         }
 
-        return EcBerekening::bepaalEc($vak, $resultaten, self::voldoendeGrens($vak));
+        return EcBerekening::bepaalEc($vak, $resultaten, self::voldoendeGrens($vak), self::ecModel($vak));
     }
 
     /** Beste geldige resultaat voor een toetsonderdeel (hoogste cijfer; vrijstelling wint). */

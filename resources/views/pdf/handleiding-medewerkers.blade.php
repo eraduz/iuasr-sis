@@ -105,7 +105,7 @@
   <p>Studenten van de PABO moeten de landelijke kennistoetsen halen (de RWT reken-/wiskundetoets en de LKT-kennisbasistoetsen taal en rekenen), binnen <b>twee jaar</b> na inschrijving. Zodra een student zich voor de PABO inschrijft, verschijnt op het dossier (kaart <b>Landelijke kennistoetsen</b>) automatisch de status per toets met de deadline. Registreer een behaalde toets door de datum in te vullen en op <b>Opslaan</b> te klikken. Op het dashboard van Studentenzaken staan de studenten met openstaande of verstreken toetsen — vergelijkbaar met de NT2-bewaking. De set kennistoetsen per opleiding wordt beheerd door Beheer via <b>Opzoektabellen &rarr; Landelijke kennistoetsen</b>.</p>
 
   <h3>50%-aanwezigheidsregeling</h3>
-  <p>Normaal wordt van een student <b>80%</b> aanwezigheid verwacht. Met de <b>50%-aanwezigheidsregeling</b> hoeft de student minimaal de <b>helft</b> van de lessen, practica en colleges bij te wonen. De regeling wordt <b>toegestaan door de directie</b> en door Studentenzaken vastgelegd.</p>
+  <p>Normaal wordt van een student <b>75%</b> aanwezigheid verwacht (studiegids §2.3.3). Met de <b>50%-aanwezigheidsregeling</b> hoeft de student minimaal de <b>helft</b> van de lessen, practica en colleges bij te wonen. De regeling wordt <b>toegestaan door de directie</b> en door Studentenzaken vastgelegd.</p>
   <p>Open het dossier, tabblad <b>Inschrijving &amp; klas</b>. Onder <b>Huidige inschrijving</b> staat het vinkje <b>50% Aanwezigheidsregeling</b>. Zet het aan (of uit) en klik op <b>Opslaan</b>. De wijziging wordt gelogd.</p>
   <div class="tip">De regeling hangt aan de <b>inschrijving</b>: zij geldt voor één opleiding in één studiejaar. Bij <b>herinschrijven</b> — of bij een tweede opleiding — moet de regeling dus <b>bewust opnieuw</b> worden toegekend. Zo blijft het een jaarlijks besluit van de directie en loopt zij niet stilzwijgend door.</div>
   <p>De regeling is zichtbaar voor Studentenzaken, Docenten, Examencommissie, Directie, Schoolbestuur en Beheer — op het studentdossier, op het dashboard en (voor de docent) op de aanwezigheidslijst, waar de student het label <b>50%</b> achter de naam krijgt.</p>
@@ -137,6 +137,7 @@
   <h2>6. Cijfers en aanwezigheid (Docent)</h2>
   <h3>Cijfers invoeren</h3>
   <p>Ga naar <b>Cijferinvoer</b> en kies een van uw vakken. Voer per toetsonderdeel de 1e poging en eventueel de herkansing in; het systeem berekent het gewogen eindcijfer en de EC. Als u klaar bent, <b>dient u de lijst in</b> bij de examencommissie. Daarna is de lijst vergrendeld.</p>
+  <p>De kolom <b>Aanwezigheid</b> toont per student het percentage; wie <b>onder de norm</b> zit krijgt een rode waarschuwing en bovenaan verschijnt een melding. Volgens de studiegids (§2.3.3) mag zo'n student formeel geen toets afleggen — het systeem <b>blokkeert dit niet</b>, maar signaleert het zodat u en de examencommissie het kunnen meewegen. Of de EC worden toegekend hangt af van het <b>EC-model</b> van de opleiding: bij <b>knock-out</b> moet elk meetellend onderdeel voldoende zijn, bij <b>compensatorisch</b> volstaat een voldoende gewogen eindcijfer (Beheer stelt dit per opleiding in). De voetnoot onder de cijfertabel vermeldt welk model geldt.</p>
   <div class="tip">U ziet en wijzigt uitsluitend uw eigen vakken. Bij een vrijstelling vervallen de invoervelden en geldt “VR”.</div>
 
   <h3>Aanwezigheid registreren (verplicht)</h3>
@@ -151,7 +152,7 @@
   <p>Twee dingen ziet u meteen op de lijst:</p>
   <ul>
     <li>Studenten met een <b>vrijstelling</b> voor uw vak volgen de colleges niet. Bij hen vult u <b>niets</b> in; hun rij toont “Vrijgesteld — geen aanwezigheidsplicht”.</li>
-    <li>Studenten met de <b>50%-aanwezigheidsregeling</b> hebben het label <b>50%</b> achter hun naam en worden aan de <b>50%-norm</b> getoetst in plaats van 80%. De kolom <b>Norm</b> toont per student welke norm geldt.</li>
+    <li>Studenten met de <b>50%-aanwezigheidsregeling</b> hebben het label <b>50%</b> achter hun naam en worden aan de <b>50%-norm</b> getoetst in plaats van 75%. De kolom <b>Norm</b> toont per student welke norm geldt.</li>
   </ul>
   <p>Op <b>Mijn vakken</b> en op uw dashboard ziet u per vak of de registratie <b>volledig</b> is. Een week telt pas als geregistreerd wanneer <b>álle</b> presentieplichtige studenten een waarde hebben. Ontbrekende weken worden expliciet benoemd. Uw dashboard toont daarnaast de gemiddelde aanwezigheid, het aantal studenten onder de norm, en grafieken per vak.</p>
   <div class="tip">De aanwezigheidslijst is te <b>printen</b> (knop <b>Printen</b>), bijvoorbeeld om hem tijdens het college op papier bij te houden. Verwar deze lijst niet met de <b>presentielijst voor tentamens</b> (met handtekeningvak), die u vindt onder <b>Tentamenlijst</b>.</div>

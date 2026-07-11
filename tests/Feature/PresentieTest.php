@@ -169,7 +169,8 @@ class PresentieTest extends TestCase
 
         $this->assertSame(3, $status['geregistreerd']);
         $this->assertSame(67, $status['percentage']);
-        $this->assertSame(80, $status['norm']);
+        // Norm 75% (studiegids §2.3.3); 67% blijft daarmee onvoldoende.
+        $this->assertSame(75, $status['norm']);
         $this->assertSame('onvoldoende', $status['status']);
     }
 

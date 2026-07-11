@@ -101,12 +101,26 @@ return [
     | vastgestelde norm — per opleiding te bevestigen met de opdrachtgever.
     */
     'cijfers' => [
-        'schaal_min' => 1.0,
-        'schaal_max' => 10.0,
+        // Cijferschaal. LET OP (studiegids BA ISLTH 2025-2026): sommige modules
+        // (o.a. Standaard Arabisch V/VI) hanteren een 0–100-schaal met bonuspunten;
+        // het interne systeem werkt op 1–10. Zolang de OER geen afwijkende schaal
+        // per opleiding voorschrijft, worden cijfers op 1–10 vastgelegd. De invoer-
+        // en veldvalidatie leest deze grenzen (env-overschrijfbaar).
+        'schaal_min' => (float) env('SIS_CIJFER_MIN', 1.0),
+        'schaal_max' => (float) env('SIS_CIJFER_MAX', 10.0),
         // BEVESTIGD (opdrachtgever, 2026-07-07): cesuur 5,5 voor alle opleidingen.
         // Per opleiding overschrijfbaar via opleidingen.voldoende_grens.
         'voldoende_grens_terugval' => 5.5,
         'decimalen' => 1,
+
+        // EC-model: hoe bepaalt een voldoende dat de vak-EC worden toegekend?
+        //  - 'knockout'        : ELK meetellend toetsonderdeel moet ≥ cesuur zijn.
+        //  - 'compensatorisch' : het GEWOGEN eindcijfer moet ≥ cesuur zijn (een
+        //                        onvoldoende onderdeel kan gecompenseerd worden).
+        // De studiegids beschrijft per module een gewogen toetsformule (compensatie),
+        // maar de bindende regel staat in het OER. Daarom instelbaar: terugval hier,
+        // per opleiding overschrijfbaar via opleidingen.ec_model. TE BEVESTIGEN.
+        'ec_model' => env('SIS_EC_MODEL', 'knockout'),
     ],
 
     'ec' => [
@@ -132,14 +146,20 @@ return [
     | 0 = afwezig, leeg = nog niet geregistreerd. Een blok telt een vast
     | aantal onderwijsweken; per week legt de docent één registratie vast.
     |
-    | BEVESTIGD (opdrachtgever, 2026-07-09): 8 weken per blok, één college
-    | per week; norm 80% aanwezigheid, of 50% voor studenten aan wie de
-    | 50%-aanwezigheidsregeling is toegekend.
+    | 8 weken per blok, één college per week (BEVESTIGD 2026-07-09).
+    |
+    | Norm 75% (studiegids BA ISLTH 2025-2026, §2.3.3: "Aanwezigheid is voor
+    | minimaal 75% verplicht. Wie dit percentage niet heeft behaald mag geen toets
+    | afleggen."). Eerder stond hier 80%; teruggebracht naar de studiegids-norm en
+    | env-overschrijfbaar zodat het per de OER/opdrachtgever kan worden bijgesteld.
+    | 50% geldt voor studenten aan wie de 50%-aanwezigheidsregeling is toegekend.
+    | LET OP: sommige modules eisen "100% aanwezigheid, max 25% afwezig" (= ook 75%);
+    | een per-vak-norm is nog niet gemodelleerd (zie PROGRESS, studiegids-analyse).
     */
     'presentie' => [
-        'weken_per_blok' => 8,
-        'norm' => 0.80,
-        'norm_regeling' => 0.50,
+        'weken_per_blok' => (int) env('SIS_PRESENTIE_WEKEN_PER_BLOK', 8),
+        'norm' => (float) env('SIS_PRESENTIE_NORM', 0.75),
+        'norm_regeling' => (float) env('SIS_PRESENTIE_NORM_REGELING', 0.50),
     ],
 
     /*

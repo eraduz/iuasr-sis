@@ -29,6 +29,7 @@ class Opleiding extends Model
         'ec_totaal',
         'voldoende_grens',       // TE BEVESTIGEN per opleiding
         'ec_overgang_drempel',   // TE BEVESTIGEN per opleiding
+        'ec_model',              // knockout | compensatorisch; null = config-terugval
         'actief',
     ];
 

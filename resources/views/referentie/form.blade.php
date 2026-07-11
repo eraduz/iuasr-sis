@@ -31,8 +31,9 @@
         @switch($veld['type'] ?? 'text')
           @case('select')
             <select name="{{ $naam }}">
+              @if (! empty($veld['leeg']))<option value="" @selected($waarde === null || $waarde === '')>{{ $veld['leeg'] }}</option>@endif
               @foreach ($veld['opties'] as $opt)
-                <option value="{{ $opt }}" @selected($waarde === $opt)>{{ ucfirst($opt) }}</option>
+                <option value="{{ $opt }}" @selected((string) $waarde === (string) $opt)>{{ ucfirst($opt) }}</option>
               @endforeach
             </select>
             @break

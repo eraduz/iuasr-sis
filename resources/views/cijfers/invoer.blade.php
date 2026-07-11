@@ -44,6 +44,14 @@
   </div>
 @endif
 
+@php $onderNorm = $rijen->filter(fn ($r) => ($r['aanwezigheid']['status'] ?? null) === 'onvoldoende'); @endphp
+@if ($onderNorm->isNotEmpty())
+  <div class="iuasr-dash-alert iuasr-dash-alert--warn" style="margin-bottom:16px;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span><b>{{ $onderNorm->count() }} student(en) onder de aanwezigheidsnorm.</b> Volgens de studiegids (§2.3.3) mag wie de norm niet haalt formeel geen toets afleggen. Weeg dit mee bij het invoeren/vaststellen; de app blokkeert het niet.</span>
+  </div>
+@endif
+
 <form id="cijfergrid" method="POST" action="{{ route('vakken.cijfers.opslaan', $vak) }}">
   @csrf
   <div class="iuasr-dash-tbl-card">
@@ -55,6 +63,7 @@
             <th style="text-align:center;">{{ $od->naam }}<br><span class="sis-weegcell">{{ rtrim(rtrim(number_format($od->weging*100,0),'0'),'.') }}% · 1e / herk.</span></th>
           @endforeach
           <th style="text-align:center;">Vrijstelling</th>
+          <th style="text-align:center;" title="Aanwezigheid t.o.v. de norm; onder de norm mocht de student formeel geen toets afleggen (studiegids §2.3.3)">Aanwezigheid</th>
           <th style="text-align:right;">Eindcijfer</th>
         </tr>
       </thead>
@@ -79,6 +88,18 @@
             <td style="text-align:center;">
               <label class="sis-check-inline" style="justify-content:center;"><input type="checkbox" class="vr-check" name="vrijstelling[{{ $insch->id }}]" value="1" @checked($rij['vrijstelling']) {{ $magInvoeren ? '' : 'disabled' }}></label>
             </td>
+            <td style="text-align:center;">
+              @php $aw = $rij['aanwezigheid']; @endphp
+              @if ($aw === null || $aw['percentage'] === null)
+                <span class="sis-muted" style="font-size:11px;">{{ $aw === null ? 'n.v.t.' : '—' }}</span>
+              @elseif ($aw['status'] === 'onvoldoende')
+                <span title="Onder de norm ({{ $aw['norm'] }}%) — mocht formeel geen toets afleggen" style="display:inline-flex;align-items:center;gap:3px;color:var(--secColor100,#C8102E);font-weight:700;font-size:12px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>{{ $aw['percentage'] }}%
+                </span>
+              @else
+                <span class="sis-muted" style="font-size:12px;">{{ $aw['percentage'] }}%</span>
+              @endif
+            </td>
             <td style="text-align:right;" class="final">
               @if ($eind['status']==='vr')<span class="sis-pill-soft">VR</span>
               @elseif ($eind['status']==='cijfer')<span class="sis-grade-final {{ $eind['cijfer']<$grens ? 'is-fail' : '' }}">{{ number_format($eind['cijfer'],1,',','') }}</span>
@@ -87,7 +108,7 @@
             </td>
           </tr>
         @empty
-          <tr><td colspan="{{ $vak->toetsonderdelen->count() + 3 }}"><div class="iuasr-dash-empty" style="border:0;"><h3>Geen deelnemers</h3><p>Er zijn geen actieve studenten voor dit vak in de huidige periode.</p></div></td></tr>
+          <tr><td colspan="{{ $vak->toetsonderdelen->count() + 4 }}"><div class="iuasr-dash-empty" style="border:0;"><h3>Geen deelnemers</h3><p>Er zijn geen actieve studenten voor dit vak in de huidige periode.</p></div></td></tr>
         @endforelse
       </tbody>
     </table>
@@ -142,7 +163,13 @@
   @endif
 @endif
 
-<p class="sis-tblnote">Per onderdeel vult u de <b>1e poging</b> en (indien van toepassing) de <b>herkansing</b> in; de <b>beste</b> van beide telt mee. Eindcijfer = gewogen gemiddelde van de deelresultaten (1 decimaal). Bij <b>Vrijstelling</b> vervallen de deelvelden en geldt “VR”. EC worden toegekend als álle meetellende onderdelen voldoende zijn.</p>
+<p class="sis-tblnote">Per onderdeel vult u de <b>1e poging</b> en (indien van toepassing) de <b>herkansing</b> in; de <b>beste</b> van beide telt mee. Eindcijfer = gewogen gemiddelde van de deelresultaten (1 decimaal). Bij <b>Vrijstelling</b> vervallen de deelvelden en geldt “VR”.
+@if (($ecModel ?? 'knockout') === 'compensatorisch')
+  EC-model <b>compensatorisch</b>: EC worden toegekend als het <b>gewogen eindcijfer</b> voldoende (≥ cesuur) is.
+@else
+  EC-model <b>knock-out</b>: EC worden toegekend als <b>álle</b> meetellende onderdelen voldoende zijn.
+@endif
+De <b>Aanwezigheid</b>-kolom signaleert wie onder de norm zit (studiegids §2.3.3); dit is informatief en blokkeert de invoer niet.</p>
 
 @push('scripts')
 <script>

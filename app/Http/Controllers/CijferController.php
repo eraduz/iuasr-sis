@@ -85,7 +85,14 @@ class CijferController extends Controller
         $vrijInschr = \App\Models\Vaktoewijzing::where('vak_id', $vak->id)->where('vrijgesteld', true)
             ->whereIn('inschrijving_id', $deelnemers->pluck('id'))->pluck('inschrijving_id')->flip();
 
-        $rijen = $deelnemers->map(function ($insch) use ($vak, $resultaten, $vrijInschr) {
+        // Aanwezigheidssignalering: studiegids §2.3.3 — wie de norm niet haalt mag
+        // formeel geen toets afleggen. Niet blokkerend; een waarschuwing per student
+        // zodat docent én examencommissie het bij de beoordeling kunnen meewegen.
+        $aanwezigheid = Presentiebewaking::voorVak($vak)['rijen']
+            ->keyBy(fn ($r) => $r['inschrijving']->id);
+        $ecModel = Cijferberekening::ecModel($vak);
+
+        $rijen = $deelnemers->map(function ($insch) use ($vak, $resultaten, $vrijInschr, $aanwezigheid) {
             $eigen = $resultaten->where('inschrijving_id', $insch->id);
             $vrij = isset($vrijInschr[$insch->id]);
             $perOnderdeel = [];
@@ -105,10 +112,11 @@ class CijferController extends Controller
                 'vak_vrijgesteld' => $vrij,
                 'eind' => Cijferberekening::eindcijfer($vak, $eigen, $vrij),
                 'ec' => Cijferberekening::ec($vak, $eigen, $vrij),
+                'aanwezigheid' => $aanwezigheid[$insch->id]['status'] ?? null,
             ];
         });
 
-        return view('cijfers.invoer', compact('vak', 'rijen', 'magInvoeren', 'grens', 'lijst'));
+        return view('cijfers.invoer', compact('vak', 'rijen', 'magInvoeren', 'grens', 'lijst', 'ecModel'));
     }
 
     /** Cijfers opslaan (docent bij concept, of examencommissie bij ingediend/vastgesteld). */
@@ -129,9 +137,12 @@ class CijferController extends Controller
             $request->merge([$veld => $waarden]);
         }
 
+        // Invoergrenzen volgen de cijferschaal uit config (1–10, env-overschrijfbaar).
+        $min = (float) config('sis.cijfers.schaal_min', 1);
+        $max = (float) config('sis.cijfers.schaal_max', 10);
         $request->validate([
-            'cijfer.*.*' => ['nullable', 'numeric', 'between:1,10'],
-            'herkansing.*.*' => ['nullable', 'numeric', 'between:1,10'],
+            'cijfer.*.*' => ['nullable', 'numeric', "between:$min,$max"],
+            'herkansing.*.*' => ['nullable', 'numeric', "between:$min,$max"],
         ]);
 
         $vak->load('toetsonderdelen');
