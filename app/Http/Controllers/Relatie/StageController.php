@@ -42,6 +42,12 @@ class StageController extends Controller
             ->paginate(25)
             ->withQueryString();
 
+        // Organisaties waar deze gebruiker een student mag plaatsen (voor de knop
+        // 'Student plaatsen' bovenaan). Alleen als hij stages mag beheren.
+        $organisatiesVoorPlaatsing = $request->user()->magStagebeheer()
+            ? Organisatie::query()->zichtbaarVoor($request->user())->where('actief', true)->orderBy('naam')->get()
+            : collect();
+
         return view('relaties.stages-index', [
             'stages' => $stages,
             'zoek' => (string) $request->query('q', ''),
@@ -49,6 +55,7 @@ class StageController extends Controller
             'statussen' => Stagestatus::cases(),
             'opleidingen' => $this->zichtbareOpleidingen($request),
             'opleidingFilter' => (int) $request->query('opleiding', 0),
+            'organisatiesVoorPlaatsing' => $organisatiesVoorPlaatsing,
         ]);
     }
 
