@@ -81,11 +81,18 @@ class MedewerkerController extends Controller
 
         $medewerker->load(['afdeling', 'functie', 'manager', 'user',
             'dienstverbanden' => fn ($q) => $q->with(['functie', 'afdeling']),
-            'documenten' => fn ($q) => $q->with('geuploadDoor')]);
+            'documenten' => fn ($q) => $q->with('geuploadDoor'),
+            'verlofaanvragen' => fn ($q) => $q->with('beoordelaar'),
+            'ziekmeldingen' => fn ($q) => $q->with('gemeldDoor')]);
+
+        $jaar = (int) date('Y');
 
         return view('hr.medewerker-show', [
             'medewerker' => $medewerker,
             'bsnZichtbaar' => (bool) config('sis.hr.bsn_ingeschakeld', false) && $request->user()->rol->magBsnInzien(),
+            'saldo' => \App\Support\Verlofoverzicht::voor($medewerker, $jaar),
+            'jaar' => $jaar,
+            'magBeoordelen' => $request->user()->magVerlofBeoordelen(),
         ]);
     }
 

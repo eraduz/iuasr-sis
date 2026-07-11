@@ -81,6 +81,21 @@ class Medewerker extends Model
         return $this->hasMany(HrDocument::class)->latest();
     }
 
+    public function verlofaanvragen(): HasMany
+    {
+        return $this->hasMany(Verlofaanvraag::class)->orderByDesc('van');
+    }
+
+    public function verlofsaldi(): HasMany
+    {
+        return $this->hasMany(Verlofsaldo::class);
+    }
+
+    public function ziekmeldingen(): HasMany
+    {
+        return $this->hasMany(Ziekmelding::class)->orderByDesc('ziek_van');
+    }
+
     public function volledigeNaam(): string
     {
         return trim(implode(' ', array_filter([$this->voornaam, $this->tussenvoegsel, $this->achternaam])));

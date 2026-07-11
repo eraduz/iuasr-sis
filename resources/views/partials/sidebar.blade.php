@@ -188,6 +188,11 @@
         'HR / Personeelszaken' => [
             ['Overzicht', 'hr.dashboard', 'dash', 'hr.dashboard'],
             ['Medewerkers', 'medewerkers', 'students', 'medewerkers,medewerkers.show,medewerkers.edit,dienstverbanden.edit,dienstverbanden.create'],
+            ['Verlof', 'verlof', 'cert', 'verlof'],
+            ['Verzuim', 'verzuim', 'check', 'verzuim'],
+        ],
+        'Zelfservice' => [
+            ['Mijn verlof', 'verlof.mijn', 'taak', 'verlof.mijn,verlof.create'],
         ],
     ];
     if ($gebruiker->magHrBeheer()) {
@@ -204,7 +209,7 @@
                 : $menus[Rol::Studentenzaken->value]));
 
     $inCursusmodule = request()->routeIs('cursussen.*') || request()->routeIs('cursisten*');
-    $inHrmodule = request()->routeIs('hr.*') || request()->routeIs('medewerkers*') || request()->routeIs('dienstverbanden*') || request()->routeIs('hrdocumenten*');
+    $inHrmodule = request()->routeIs('hr.*') || request()->routeIs('medewerkers*') || request()->routeIs('dienstverbanden*') || request()->routeIs('hrdocumenten*') || request()->routeIs('verlof*') || request()->routeIs('verzuim*') || request()->routeIs('ziekmeldingen*');
     $inRelatiemodule = request()->routeIs('relatiebeheer.*') || request()->routeIs('relaties*') || request()->routeIs('contactpersonen*') || request()->routeIs('contactmomenten*') || request()->routeIs('stages*') || request()->routeIs('stageplaatsen*') || request()->routeIs('agenda*') || request()->routeIs('afspraken*') || request()->routeIs('relatietaken*') || request()->routeIs('overeenkomsten*') || request()->routeIs('relatiedocumenten*');
     $menu = $inCursusmodule
         ? $cursusMenu

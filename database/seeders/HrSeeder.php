@@ -8,6 +8,9 @@ use App\Models\Dienstverband;
 use App\Models\Functie;
 use App\Models\Medewerker;
 use App\Models\User;
+use App\Models\Verlofaanvraag;
+use App\Models\Verlofsaldo;
+use App\Models\Ziekmelding;
 use Illuminate\Database\Seeder;
 
 /**
@@ -57,6 +60,46 @@ class HrSeeder extends Seeder
         // Medewerkers buiten het team van Ruben.
         $this->medewerker('P260005', 'Fadwa', 'Ben Ali', $afdeling['ADM'], $functie['ADMIN'], null, null, 24, 'vast');
         $this->medewerker('P260006', 'Johan', 'Bakker', $afdeling['ADM'], $functie['ADMIN'], null, null, 36, 'tijdelijk');
+
+        $this->verlofEnVerzuim();
+    }
+
+    /** Synthetisch verlofrecht, enkele aanvragen en een ziekmelding (Fase B). */
+    private function verlofEnVerzuim(): void
+    {
+        $jaar = (int) date('Y');
+
+        foreach (Medewerker::all() as $medewerker) {
+            $fte = $medewerker->fte() ?? 1.0;
+            Verlofsaldo::firstOrCreate(
+                ['medewerker_id' => $medewerker->id, 'jaar' => $jaar, 'verloftype' => 'vakantie'],
+                ['recht_uren' => round($fte * 200, 1)]
+            );
+            Verlofsaldo::firstOrCreate(
+                ['medewerker_id' => $medewerker->id, 'jaar' => $jaar, 'verloftype' => 'bijzonder'],
+                ['recht_uren' => 16]
+            );
+        }
+
+        // Teamlid Sophie (onder Ruben): één openstaande en één goedgekeurde aanvraag.
+        $sophie = Medewerker::where('personeelsnummer', 'P260003')->first();
+        if ($sophie !== null) {
+            Verlofaanvraag::firstOrCreate(
+                ['medewerker_id' => $sophie->id, 'van' => $jaar.'-08-05'],
+                ['verloftype' => 'vakantie', 'tot' => $jaar.'-08-09', 'uren' => 40, 'status' => 'aangevraagd', 'aangevraagd_door_id' => $sophie->user_id, 'reden' => 'Zomervakantie']
+            );
+            Verlofaanvraag::firstOrCreate(
+                ['medewerker_id' => $sophie->id, 'van' => $jaar.'-05-01'],
+                ['verloftype' => 'vakantie', 'tot' => $jaar.'-05-03', 'uren' => 24, 'status' => 'goedgekeurd', 'aangevraagd_door_id' => $sophie->user_id]
+            );
+        }
+
+        // Een open ziekmelding.
+        $fadwa = Medewerker::where('personeelsnummer', 'P260005')->first();
+        if ($fadwa !== null) {
+            Ziekmelding::firstOrCreate(['medewerker_id' => $fadwa->id, 'ziek_van' => $jaar.'-06-03'], ['percentage' => 100]);
+            $fadwa->update(['status' => 'ziek']);
+        }
     }
 
     private function medewerker(string $nummer, string $voornaam, string $achternaam, int $afdelingId, int $functieId, ?int $managerId, ?int $userId, float $uren, string $contract): Medewerker

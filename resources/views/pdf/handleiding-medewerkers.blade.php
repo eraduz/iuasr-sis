@@ -284,7 +284,11 @@
   <p>Per medewerker legt u één of meer <b>dienstverbanden</b> vast (vast/tijdelijk, start- en einddatum, uren per week, functie, afdeling). De <b>FTE</b> wordt automatisch berekend: uren per week ÷ {{ (int) config('sis.hr.voltijd_uren', 40) }} (de voltijdsnorm). Het dashboard toont het totaal aantal medewerkers, de totale FTE, de statusverdeling en de contracten die binnen 60 dagen aflopen.</p>
   <h3>Documenten</h3>
   <p>Onder <b>Documenten</b> uploadt u HR-documenten bij de medewerker (contract, diploma, identiteitsbewijs, overig). De bestanden staan op de <b>private schijf</b> en de inzage wordt gelogd (AVG).</p>
-  <div class="tip">Verlof &amp; verzuim, gesprekken (beoordelings-/functionerings-/exitgesprek), self-service ‘Mijn HR’ en de HR-rapportages worden in de volgende fasen van de module toegevoegd.</div>
+  <h3>Verlof (met self-service)</h3>
+  <p>Elke medewerker met een gekoppeld account vraagt <b>zelf</b> verlof aan via <b>Mijn verlof</b>: type (vakantie, bijzonder, ouderschap, studie), periode en aantal uren. De aanvraag gaat naar de <b>leidinggevende</b> die goedkeurt of afwijst (heeft de medewerker geen manager, dan doet HR dit). Op <b>Mijn verlof</b> ziet de medewerker het <b>saldo</b> per type (recht − opgenomen) en de status van de aanvragen; een openstaande aanvraag kan zelf worden ingetrokken. Onder <b>Verlof</b> ziet HR/Manager alle (team-)aanvragen en beoordeelt ze; het <b>recht</b> per type stelt HR in op de medewerkerkaart.</p>
+  <h3>Verzuim</h3>
+  <p>Onder <b>Verzuim</b> (of op de medewerkerkaart) registreert HR/Manager een <b>ziekmelding</b> (ziek vanaf, percentage) en later de <b>herstelmelding</b>. Zolang een melding openstaat, staat de medewerker op status ‘ziek’; bij herstel keert de status terug naar ‘actief’. Het dashboard toont de openstaande verlofaanvragen en de actuele ziekmeldingen.</p>
+  <div class="tip">Gesprekken (beoordelings-/functionerings-/exitgesprek), onboarding/offboarding en de HR-rapportages worden in de volgende fasen van de module toegevoegd.</div>
 
   <h2>14. Vragen of problemen?</h2>
   <p>Neem bij vragen contact op met de systeembeheerder of Studentenzaken (szaken@iuasr.nl). Werkt iets niet zoals verwacht, meld dan wat u deed en wat u zag.</p>

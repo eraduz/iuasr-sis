@@ -240,6 +240,7 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/medewerkers/{medewerker}/documenten', [App\Http\Controllers\Hr\HrDocumentController::class, 'store'])->name('hrdocumenten.store');
         Route::delete('/hr-documenten/{document}', [App\Http\Controllers\Hr\HrDocumentController::class, 'destroy'])->name('hrdocumenten.destroy');
+        Route::post('/medewerkers/{medewerker}/verlofsaldo', [App\Http\Controllers\Hr\VerlofsaldoController::class, 'bijwerken'])->name('verlofsaldo.bijwerken');
     });
 
     Route::middleware('rol:hrmedewerker,manager,beheerder,bestuur')->prefix('hr')->group(function () {
@@ -247,6 +248,25 @@ Route::middleware('auth')->group(function () {
         Route::get('/medewerkers', [App\Http\Controllers\Hr\MedewerkerController::class, 'index'])->name('medewerkers');
         Route::get('/hr-documenten/{document}/download', [App\Http\Controllers\Hr\HrDocumentController::class, 'download'])->name('hrdocumenten.download');
         Route::get('/medewerkers/{medewerker}', [App\Http\Controllers\Hr\MedewerkerController::class, 'show'])->name('medewerkers.show');
+    });
+
+    // Verlof & verzuim (Fase B). Overzicht + beoordelen + ziek-/herstelmelding:
+    // HR en Manager (eigen team gescoped in de controllers).
+    Route::middleware('rol:hrmedewerker,manager,beheerder')->prefix('hr')->group(function () {
+        Route::get('/verlof', [App\Http\Controllers\Hr\VerlofController::class, 'index'])->name('verlof');
+        Route::post('/verlofaanvragen/{aanvraag}/beoordelen', [App\Http\Controllers\Hr\VerlofController::class, 'beoordelen'])->name('verlof.beoordelen');
+        Route::get('/verzuim', [App\Http\Controllers\Hr\ZiekmeldingController::class, 'index'])->name('verzuim');
+        Route::post('/ziekmeldingen', [App\Http\Controllers\Hr\ZiekmeldingController::class, 'store'])->name('ziekmeldingen.store');
+        Route::post('/ziekmeldingen/{ziekmelding}/herstel', [App\Http\Controllers\Hr\ZiekmeldingController::class, 'herstel'])->name('ziekmeldingen.herstel');
+    });
+
+    // Self-service verlof: elke ingelogde medewerker (met een gekoppeld dossier).
+    // Geen rol-beperking; de controller vereist een gekoppeld personeelsrecord.
+    Route::prefix('hr')->group(function () {
+        Route::get('/mijn/verlof', [App\Http\Controllers\Hr\VerlofController::class, 'mijn'])->name('verlof.mijn');
+        Route::get('/mijn/verlof/nieuw', [App\Http\Controllers\Hr\VerlofController::class, 'create'])->name('verlof.create');
+        Route::post('/mijn/verlof', [App\Http\Controllers\Hr\VerlofController::class, 'store'])->name('verlof.store');
+        Route::post('/verlofaanvragen/{aanvraag}/intrekken', [App\Http\Controllers\Hr\VerlofController::class, 'intrekken'])->name('verlof.intrekken');
     });
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');

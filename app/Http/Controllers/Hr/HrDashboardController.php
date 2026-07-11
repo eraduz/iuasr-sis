@@ -6,6 +6,7 @@ use App\Enums\MedewerkerStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Dienstverband;
 use App\Models\Medewerker;
+use App\Models\Verlofaanvraag;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
@@ -39,11 +40,18 @@ class HrDashboardController extends Controller
             ->with(['medewerker', 'functie'])
             ->orderBy('einddatum')->limit(15)->get();
 
+        $openAanvragen = Verlofaanvraag::query()
+            ->whereIn('medewerker_id', $medewerkerIds)
+            ->where('status', 'aangevraagd')
+            ->with('medewerker')
+            ->orderBy('van')->limit(15)->get();
+
         return view('hr.dashboard', [
             'aantal' => $medewerkers->where('actief', true)->count(),
             'fteTotaal' => $fteTotaal,
             'statusVerdeling' => $statusVerdeling,
             'aflopend' => $aflopend,
+            'openAanvragen' => $openAanvragen,
         ]);
     }
 }
