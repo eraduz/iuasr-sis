@@ -26,14 +26,16 @@ class ModulekeuzeTest extends TestCase
 
     public function test_de_vijf_modules_zijn_aanwezig(): void
     {
+        // De placeholder 'stage' is uitgegroeid tot de module Relatiebeheer & Stage.
         $this->assertSame(
-            ['studentenzaken', 'cursussen', 'stage', 'scriptie', 'hr'],
+            ['studentenzaken', 'cursussen', 'relatiebeheer', 'scriptie', 'hr'],
             Module::geordend()->pluck('sleutel')->all(),
         );
-        // Studentenzaken en (sinds Fase B) Cursussen zijn gebouwd; de rest nog niet.
+        // Studentenzaken, Cursussen en Relatiebeheer zijn gebouwd; de rest nog niet.
         $this->assertTrue(Module::where('sleutel', 'studentenzaken')->value('actief'));
         $this->assertTrue(Module::where('sleutel', 'cursussen')->value('actief'));
-        $this->assertFalse(Module::where('sleutel', 'stage')->value('actief'));
+        $this->assertTrue(Module::where('sleutel', 'relatiebeheer')->value('actief'));
+        $this->assertFalse(Module::where('sleutel', 'scriptie')->value('actief'));
     }
 
     public function test_dev_login_leidt_naar_het_keuzescherm(): void

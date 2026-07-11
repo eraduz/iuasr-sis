@@ -165,10 +165,30 @@
         ];
     }
 
+    // Binnen de module Relatiebeheer & Stage geldt eveneens een eigen, rolbewust
+    // menu. De relatiebeheerder/stagecoördinator beheert organisaties; Directie
+    // en Bestuur kijken mee (alleen-lezen).
+    $relatieMenu = [
+        'Relatiebeheer' => [
+            ['Organisaties', 'relaties', 'students', 'relaties,relaties.show,relaties.edit'],
+        ],
+    ];
+    if ($gebruiker->magRelatiebeheer()) {
+        $relatieMenu['Relatiebeheer'][] = ['Organisatie toevoegen', 'relaties.create', 'plus', 'relaties.create'];
+    }
+
+    // Standaardmenu buiten een module. De relatiebeheerder en stagecoördinator
+    // hebben geen eigen rol-menu in $menus; hun thuisbasis is de Relatiebeheer-module.
+    $standaardMenu = $menus[$rol]
+        ?? (in_array($rol, [Rol::Relatiebeheerder->value, Rol::Stagecoordinator->value], true)
+            ? $relatieMenu
+            : $menus[Rol::Studentenzaken->value]);
+
     $inCursusmodule = request()->routeIs('cursussen.*') || request()->routeIs('cursisten*');
+    $inRelatiemodule = request()->routeIs('relaties*');
     $menu = $inCursusmodule
         ? $cursusMenu
-        : ($menus[$rol] ?? $menus[Rol::Studentenzaken->value]);
+        : ($inRelatiemodule ? $relatieMenu : $standaardMenu);
 @endphp
 
 @foreach ($menu as $titel => $items)

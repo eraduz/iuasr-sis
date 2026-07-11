@@ -9,6 +9,7 @@ use App\Models\Klas;
 use App\Models\Land;
 use App\Models\Nationaliteit;
 use App\Models\Opleiding;
+use App\Models\OrganisatieType;
 use App\Models\Periode;
 use App\Models\Vak;
 use Illuminate\Contracts\View\View;
@@ -148,6 +149,21 @@ class ReferentieController extends Controller
                 'kolommen' => ['Naam' => fn ($m) => $m->naam],
                 'velden' => [
                     'naam' => ['label' => 'Naam', 'type' => 'text', 'rules' => 'required|string|max:255'],
+                ],
+            ],
+            'organisatietypes' => [
+                'model' => OrganisatieType::class, 'enkel' => 'Organisatietype', 'meer' => 'Organisatietypes',
+                'kolommen' => [
+                    'Code' => fn ($m) => $m->code,
+                    'Naam' => fn ($m) => $m->naam,
+                    'Opleiding' => fn ($m) => $m->opleiding?->code ?? 'Alle',
+                    'Actief' => fn ($m) => $m->actief ? 'Ja' : 'Nee',
+                ],
+                'velden' => [
+                    'code' => ['label' => 'Code', 'type' => 'text', 'rules' => 'required|string|max:40', 'hint' => 'bv. BASISSCHOOL of ZORGINSTELLING'],
+                    'naam' => ['label' => 'Naam', 'type' => 'text', 'rules' => 'required|string|max:255'],
+                    'opleiding_id' => ['label' => 'Opleiding', 'type' => 'belongsto', 'model' => Opleiding::class, 'toon' => 'naam', 'rules' => 'nullable|exists:opleidingen,id', 'leeg' => '— alle opleidingen —', 'hint' => 'Leeg = geldt voor alle opleidingen'],
+                    'actief' => ['label' => 'Actief', 'type' => 'checkbox'],
                 ],
             ],
         ];

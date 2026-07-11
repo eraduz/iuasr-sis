@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             PresentieSeeder::class,
             CollegegeldSeeder::class,
             KennistoetsSeeder::class,
+            OrganisatieSeeder::class,
         ]);
     }
 }

@@ -52,6 +52,7 @@
   <ul>
     <li><b>Studentenzaken</b> — het huidige systeem (inschrijving, cijfers, collegegeld, documenten).</li>
     <li><b>Cursussen Administratie</b> — cursusbeheer, cursisten en cursusgelden (boekhouding).</li>
+    <li><b>Relatiebeheer &amp; Stage</b> — stagescholen en werkveldrelaties, contactpersonen en stageplaatsen (opleidingoverstijgend).</li>
     <li><b>Stage</b>, <b>Scriptie</b> en <b>HR / Personeelszaken</b> — later te ontwikkelen; nu zichtbaar als "Binnenkort".</li>
   </ul>
   <p>Welke modules u kunt openen, hangt af van uw <b>rol</b>. De meeste medewerkers zien alleen Studentenzaken; de Financiële Administratie en de Beheerder zien meerdere modules. Nog niet gebouwde modules staan grijs met de melding <b>Binnenkort</b>. Rechtsboven in elk scherm brengt de knop <b>Modules</b> u terug naar het keuzescherm.</p>
@@ -238,7 +239,15 @@
   <p>Onder <b>Rapportage</b> (op het cursusdashboard of in het menu) staat een overzicht per cursus: het aantal inschrijvingen uitgesplitst naar status (aangemeld, actief, afgerond, geannuleerd) en de cursusgelden — verschuldigd, betaald, openstaand en de betaalgraad — met grafieken (inschrijvingen en openstaand per cursus, en de verdeling naar betaalmethode). Een <b>cursusdirecteur</b> ziet alleen de eigen cursus(sen); de Financiële Administratie, de Beheerder en het Schoolbestuur zien alle cursussen. Met de knop <b>Exporteren (CSV)</b> haalt u een lijst op één regel per cursist op (te openen in Excel). Ook op het <b>dashboard</b> ziet u nu in één oogopslag de betaalgraad en het openstaande cursusgeld. Het Schoolbestuur bereikt dit overzicht ook via de knop <b>Cursusrapport</b> op de Bestuurspagina.</p>
   <div class="tip">De cursusadministratie is een aparte administratie met een lichter regime: geen BSN of DUO-gegevens. Belangrijke acties (cursus/cursist aanmaken, inschrijven, importeren, betaling registreren/wijzigen/verwijderen) worden gelogd.</div>
 
-  <h2>12. Vragen of problemen?</h2>
+  <h2>12. Relatiebeheer &amp; Stage (aparte module)</h2>
+  <p>De module <b>Relatiebeheer &amp; Stage</b> beheert de externe relaties van de hogeschool: <b>stagescholen</b> en <b>werkveldorganisaties</b> (zoals basisscholen en schoolbesturen voor de PABO, zorginstellingen en justitiële inrichtingen voor de Master IGV, en moskeeën en maatschappelijke organisaties voor de Bachelor Islamitische Theologie). U opent haar via het <b>modulekeuzescherm</b> (rechtsboven <b>Modules</b>). De module is <b>opleidingoverstijgend</b>: dezelfde functies gelden voor elke opleiding, maar de organisatietypes zijn per opleiding in te stellen.</p>
+  <p>De toegang is per rol verdeeld: de <b>Relatiebeheerder</b> en de <b>Stagecoördinator</b> beheren de organisaties van de <b>eigen opleiding(en)</b>; de <b>Directie</b> (opleidingsmanager) en het <b>Schoolbestuur</b> kijken mee (alleen-lezen); de <b>Beheerder</b> ziet en doet alles. De zichtbaarheid is <b>opleidinggebonden</b>: u ziet uitsluitend de relaties van de opleiding(en) waaraan u bent gekoppeld.</p>
+  <h3>Organisaties</h3>
+  <p>Onder <b>Organisaties</b> staat de lijst met alle relaties die u mag zien, met een filterbalk (zoeken op naam/plaats/relatienummer, filteren op type, opleiding en status). Elke organisatie krijgt automatisch een uniek, leesbaar <b>relatienummer</b> (bijvoorbeeld R260001). U legt de naam, het type, KvK- en BRIN-nummer, het adres, de contactgegevens en de opleiding(en) vast. Een organisatie wordt nooit verwijderd (historie); zet haar desgewenst op <b>inactief</b>.</p>
+  <p>Op de <b>relatiekaart</b> (het detailscherm van een organisatie) ziet u de gegevens in één oogopslag. De overige onderdelen — contactpersonen, contactmomenten, stageplaatsen en stages, documenten, overeenkomsten, taken en agenda — worden in de volgende fasen van de module toegevoegd.</p>
+  <div class="tip">Belangrijk (AVG): in deze module leggen wij uitsluitend gegevens van de <b>organisatie</b> en haar contactpersonen vast — nooit gegevens van leerlingen of cliënten van de stageplaats. De organisatietypes beheert de Beheerder via Opzoektabellen (per opleiding instelbaar). Het aanmaken en wijzigen van organisaties wordt gelogd.</div>
+
+  <h2>13. Vragen of problemen?</h2>
   <p>Neem bij vragen contact op met de systeembeheerder of Studentenzaken (szaken@iuasr.nl). Werkt iets niet zoals verwacht, meld dan wat u deed en wat u zag.</p>
 
   <div class="tip">Deze handleiding wordt bijgewerkt zodra er nieuwe functies bij komen. Kijk bij twijfel of u de meest recente versie hebt (zie de datum onderaan).</div>

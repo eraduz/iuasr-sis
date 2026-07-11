@@ -39,6 +39,19 @@ return [
 
     /*
     |----------------------------------------------------------------------
+    | Relatienummer (module Relatiebeheer & Stagebeheer)
+    |----------------------------------------------------------------------
+    | Leesbaar nummer voor een externe organisatie/relatie: prefix 'R' +
+    | 2-cijferige jaarprefix + volgnummer (bijv. R260001). Net als het
+    | studentnummer een uniek, leesbaar VELD — nooit een koppelsleutel.
+    */
+    'relatienummer' => [
+        'prefix' => 'R',
+        'volgnummer_lengte' => (int) env('SIS_RELATIENUMMER_VOLGNUMMER_LENGTE', 4),
+    ],
+
+    /*
+    |----------------------------------------------------------------------
     | Cijfer- en EC-normen
     |----------------------------------------------------------------------
     | Voldoende-grens en EC-drempels verschillen mogelijk per opleiding en

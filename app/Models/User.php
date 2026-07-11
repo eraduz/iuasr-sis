@@ -186,6 +186,33 @@ class User extends Authenticatable
         return $this->rol->magCursusInzien();
     }
 
+    // --- Module Relatiebeheer & Stagebeheer ---
+
+    public function magRelatiebeheer(): bool
+    {
+        return $this->rol->magRelatiebeheer();
+    }
+
+    public function magStagebeheer(): bool
+    {
+        return $this->rol->magStagebeheer();
+    }
+
+    public function magRelatieInzien(): bool
+    {
+        return $this->rol->magRelatieInzien();
+    }
+
+    /**
+     * Is de zichtbaarheid binnen Relatiebeheer beperkt tot de eigen opleiding(en)?
+     * De koppeling loopt via dezelfde opleiding-toewijzing als de Directie
+     * (`opleidingen()` → directie_opleidingen).
+     */
+    public function isRelatieBeperkt(): bool
+    {
+        return $this->rol->isRelatieBeperkt();
+    }
+
     public function magFinancieelInzien(): bool
     {
         return $this->rol->magFinancieelInzien();

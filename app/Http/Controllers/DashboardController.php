@@ -22,9 +22,17 @@ class DashboardController extends Controller
         $rol = auth()->user()->rol;
 
         // Het Studentenzaken-dashboard is niet voor rollen buiten die module
-        // (bijv. Cursusadministratie); stuur hen naar hun eigen module.
+        // (bijv. Cursusadministratie, Relatiebeheerder); stuur hen naar hun
+        // eigen module — of naar het keuzescherm als dat er meerdere zijn.
         if (! $rol->magModule('studentenzaken')) {
-            return redirect()->route('cursussen.dashboard');
+            if ($rol->magModule('cursussen')) {
+                return redirect()->route('cursussen.dashboard');
+            }
+            if ($rol->magModule('relatiebeheer')) {
+                return redirect()->route('relaties');
+            }
+
+            return redirect()->route('modules.kiezen');
         }
         $actievePeriodeId = Periode::where('actief', true)->value('id');
         $kern = Statistiek::kern();

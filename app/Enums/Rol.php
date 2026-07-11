@@ -28,6 +28,11 @@ enum Rol: string
     case Beheerder = 'beheerder';
     // Module Cursussen Administratie. De cursusdirecteur volgt in een latere fase.
     case Cursusadministratie = 'cursusadministratie';
+    // Module Relatiebeheer & Stagebeheer (opleidingoverstijgend: PABO, ISLTH, MGV).
+    // De relatiebeheerder onderhoudt organisaties/contactpersonen; de
+    // stagecoördinator doet daarnaast de stageplaatsen en plaatsingen.
+    case Relatiebeheerder = 'relatiebeheerder';
+    case Stagecoordinator = 'stagecoordinator';
 
     /** Leesbare naam voor UI en documenten (Nederlands, U-vorm). */
     public function label(): string
@@ -41,6 +46,8 @@ enum Rol: string
             self::Bestuur => 'Schoolbestuur',
             self::Beheerder => 'Beheerder',
             self::Cursusadministratie => 'Cursusadministratie',
+            self::Relatiebeheerder => 'Relatiebeheerder',
+            self::Stagecoordinator => 'Stagecoördinator',
         };
     }
 
@@ -90,7 +97,8 @@ enum Rol: string
         return match ($this) {
             self::Docent, self::Examencommissie, self::Directie => true,
             self::Studentenzaken, self::Bestuur, self::Beheerder,
-            self::Cursusadministratie => false,
+            self::Cursusadministratie,
+            self::Relatiebeheerder, self::Stagecoordinator => false,
         };
     }
 
@@ -110,7 +118,8 @@ enum Rol: string
         return match ($this) {
             self::Studentenzaken, self::Beheerder => true,
             self::Docent, self::Examencommissie, self::Directie, self::Bestuur,
-            self::Cursusadministratie => false,
+            self::Cursusadministratie,
+            self::Relatiebeheerder, self::Stagecoordinator => false,
         };
     }
 
@@ -135,7 +144,8 @@ enum Rol: string
         return match ($this) {
             self::Docent, self::Examencommissie, self::Directie, self::Bestuur => true,
             self::Studentenzaken, self::Financien, self::Beheerder,
-            self::Cursusadministratie => false,
+            self::Cursusadministratie,
+            self::Relatiebeheerder, self::Stagecoordinator => false,
         };
     }
 
@@ -149,7 +159,8 @@ enum Rol: string
         return match ($this) {
             self::Studentenzaken, self::Docent, self::Examencommissie,
             self::Directie, self::Bestuur, self::Beheerder => true,
-            self::Financien, self::Cursusadministratie => false,
+            self::Financien, self::Cursusadministratie,
+            self::Relatiebeheerder, self::Stagecoordinator => false,
         };
     }
 
@@ -205,11 +216,17 @@ enum Rol: string
             self::Beheerder => ['*'],
             self::Financien => ['studentenzaken', 'cursussen'],
             self::Cursusadministratie => ['cursussen'],
+            // De module Relatiebeheer & Stagebeheer: de relatiebeheerder en de
+            // stagecoördinator werken uitsluitend daarbinnen.
+            self::Relatiebeheerder, self::Stagecoordinator => ['relatiebeheer'],
             // Het Schoolbestuur heeft brede inzage en ziet naast Studentenzaken ook
-            // de Cursussen-module (dashboard/statistieken en cursisten, alleen-lezen).
-            self::Bestuur => ['studentenzaken', 'cursussen'],
-            self::Studentenzaken, self::Docent, self::Examencommissie,
-            self::Directie => ['studentenzaken'],
+            // de Cursussen- en de Relatiebeheer-module (alleen-lezen).
+            self::Bestuur => ['studentenzaken', 'cursussen', 'relatiebeheer'],
+            // De Directie (opleidingsmanager) beheert haar opleiding, inclusief de
+            // relaties/stages van die opleiding (opleidinggebonden gescoped).
+            self::Directie => ['studentenzaken', 'relatiebeheer'],
+            self::Studentenzaken, self::Docent,
+            self::Examencommissie => ['studentenzaken'],
         };
     }
 
@@ -252,6 +269,55 @@ enum Rol: string
     public function isCursusBeperkt(): bool
     {
         return $this === self::Cursusadministratie;
+    }
+
+    /**
+     * Mag deze rol organisaties/relaties beheren (aanmaken, wijzigen)?
+     * De relatiebeheerder en de stagecoördinator; Beheer voor onderhoud.
+     * Directie en Bestuur kijken mee (alleen-lezen).
+     */
+    public function magRelatiebeheer(): bool
+    {
+        return match ($this) {
+            self::Relatiebeheerder, self::Stagecoordinator, self::Beheerder => true,
+            default => false,
+        };
+    }
+
+    /**
+     * Mag deze rol de stageplaatsen en plaatsingen beheren? De stagecoördinator
+     * en Beheer. (De schermen hiervoor komen in een latere fase; de bevoegdheid
+     * staat nu al vast.)
+     */
+    public function magStagebeheer(): bool
+    {
+        return match ($this) {
+            self::Stagecoordinator, self::Beheerder => true,
+            default => false,
+        };
+    }
+
+    /** Mag deze rol de module Relatiebeheer inzien (lijsten, relatiekaart)? */
+    public function magRelatieInzien(): bool
+    {
+        return match ($this) {
+            self::Relatiebeheerder, self::Stagecoordinator,
+            self::Directie, self::Bestuur, self::Beheerder => true,
+            default => false,
+        };
+    }
+
+    /**
+     * Is de zichtbaarheid binnen Relatiebeheer beperkt tot de eigen opleiding(en)?
+     * De relatiebeheerder, de stagecoördinator en de Directie zijn
+     * opleidinggebonden; Bestuur en Beheer zien alle relaties.
+     */
+    public function isRelatieBeperkt(): bool
+    {
+        return match ($this) {
+            self::Relatiebeheerder, self::Stagecoordinator, self::Directie => true,
+            default => false,
+        };
     }
 
     /** Mag deze rol de opgegeven module benaderen? */

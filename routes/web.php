@@ -118,6 +118,33 @@ Route::middleware('auth')->group(function () {
         Route::get('/cursisten/{cursist}', [App\Http\Controllers\Cursus\CursistController::class, 'show'])->name('cursisten.show');
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | Module: Relatiebeheer & Stagebeheer
+    |--------------------------------------------------------------------------
+    | Opleidingoverstijgend (PABO, Bachelor Islamitische Theologie, Master IGV)
+    | en opleidinggebonden gescoped. Rolverdeling:
+    |  - Relatiebeheerder / Stagecoördinator: beheren organisaties (en later
+    |    contactpersonen, stages) van de eigen opleiding(en).
+    |  - Directie (opleidingsmanager) & Schoolbestuur: inzage (alleen-lezen).
+    |  - Beheerder: alles.
+    | De scoping wordt server-side afgedwongen (zichtbaarVoor / beheerbaarVoor).
+    | De beheer-routes staan bewust vóór de inzage-routes zodat '/organisaties/
+    | nieuw' niet als een organisatie-id wordt gelezen.
+    */
+    Route::middleware('rol:relatiebeheerder,stagecoordinator,beheerder')->prefix('relatiebeheer')->group(function () {
+        Route::get('/organisaties/nieuw', [App\Http\Controllers\Relatie\OrganisatieController::class, 'create'])->name('relaties.create');
+        Route::post('/organisaties', [App\Http\Controllers\Relatie\OrganisatieController::class, 'store'])->name('relaties.store');
+        Route::get('/organisaties/{organisatie}/bewerken', [App\Http\Controllers\Relatie\OrganisatieController::class, 'edit'])->name('relaties.edit');
+        Route::put('/organisaties/{organisatie}', [App\Http\Controllers\Relatie\OrganisatieController::class, 'update'])->name('relaties.update');
+        Route::post('/organisaties/{organisatie}/status', [App\Http\Controllers\Relatie\OrganisatieController::class, 'status'])->name('relaties.status');
+    });
+
+    Route::middleware('rol:relatiebeheerder,stagecoordinator,directie,bestuur,beheerder')->prefix('relatiebeheer')->group(function () {
+        Route::get('/', [App\Http\Controllers\Relatie\OrganisatieController::class, 'index'])->name('relaties');
+        Route::get('/organisaties/{organisatie}', [App\Http\Controllers\Relatie\OrganisatieController::class, 'show'])->name('relaties.show');
+    });
+
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     // Globale bestuurspagina — instellingsbreed overzicht (Schoolbestuur en Beheer).

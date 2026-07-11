@@ -59,10 +59,12 @@ class DashboardStatistiekTest extends TestCase
 
             if ($rol->magModule('studentenzaken')) {
                 $antwoord->assertOk();
-            } else {
-                // Rollen buiten Studentenzaken (bijv. Cursusadministratie) worden
-                // naar hun eigen module gestuurd.
+            } elseif ($rol->magModule('cursussen')) {
+                // Cursusadministratie wordt naar de Cursussen-module gestuurd.
                 $antwoord->assertRedirect(route('cursussen.dashboard'));
+            } else {
+                // Relatiebeheerder/Stagecoördinator naar de Relatiebeheer-module.
+                $antwoord->assertRedirect(route('relaties'));
             }
         }
     }

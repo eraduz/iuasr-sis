@@ -33,6 +33,7 @@ class Module extends Model
     private const START_ROUTES = [
         'studentenzaken' => 'dashboard',
         'cursussen' => 'cursussen.dashboard',
+        'relatiebeheer' => 'relaties',
     ];
 
     public function startRoute(): ?string

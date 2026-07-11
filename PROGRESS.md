@@ -8,8 +8,10 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
 ## Projectstatus
 
 - **Huidige fase:** Fase 5 afgerond; aanwezigheids- en collegegeldtermijnmodule
-  opgeleverd (buiten de oorspronkelijke fasering, op verzoek van de opdrachtgever)
-- **Laatst bijgewerkt:** 2026-07-10
+  opgeleverd (buiten de oorspronkelijke fasering, op verzoek van de opdrachtgever).
+  Module Cursussen Administratie afgerond; module **Relatiebeheer & Stagebeheer**
+  gestart (Fase A opgeleverd).
+- **Laatst bijgewerkt:** 2026-07-11
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 
 ---
@@ -325,6 +327,39 @@ opleverpunt aantoonbaar klaar is.
     Beheer en Bestuur = alle cursussen. Het cursusdashboard toont nu de betaalgraad
     en het openstaande cursusgeld; de Bestuurspagina linkt door. 8 tests
     (`CursusrapportTest`); 327 groen. **Module Cursussen Administratie afgerond.**
+- [~] **Module Relatiebeheer & Stagebeheer** (opleidingoverstijgend, opdrachtgever
+  2026-07-11: "Voor een pabo-relatiebeheer module.txt" + de aanvulling dat de
+  module óók voor Bachelor Islamitische Theologie en Master IGV is). Volwaardige
+  onderwijs-CRM voor stagescholen/werkveldrelaties, contactpersonen,
+  contactmomenten, stageplaatsen/plaatsingen, documenten, overeenkomsten, taken,
+  agenda en rapportage. **Ontwerp:** `docs/MODULE-RELATIEBEHEER.md` (gefaseerd
+  A–H, internetonderzoek onderwijs-CRM/Samen Opleiden/AVG verwerkt). Beslissingen:
+  twee nieuwe rollen (relatiebeheerder + stagecoördinator), stagebeoordeling
+  voldoende/onvoldoende, terminologie én organisatietypes per opleiding
+  configureerbaar. AVG-grens: geen leerling-/cliëntgegevens — de stageschool blijft
+  verwerkingsverantwoordelijke.
+  - [x] **Fase A — Fundament & organisaties.** De platform-placeholder `stage` is
+    hernoemd/uitgebouwd tot de module `relatiebeheer` (guarded migratie) en op
+    actief gezet. Twee rollen `Relatiebeheerder` + `Stagecoordinator` (enum + ALTER).
+    Tabellen `organisatie_types` (opzoektabel, per opleiding via `opleiding_id`,
+    beheerd in Opzoektabellen), `organisaties` (leesbaar `relatienummer` R+jaar+volgnr
+    via `RelatienummerGenerator`) en pivot `organisatie_opleidingen`. Modellen
+    `Organisatie`/`OrganisatieType` met `scopeZichtbaarVoor` (opleidinggebonden,
+    hergebruikt `directie_opleidingen`). `OrganisatieController` (CRUD + filterbalk
+    op type/opleiding/status + inactiveren i.p.v. verwijderen), routes onder prefix
+    `relatiebeheer` (beheer: relatiebeheerder/stagecoördinator/beheer; inzage: +
+    directie/bestuur), eigen sidebar-tak, 360°-relatiekaart (basis; overige panelen
+    volgen fase B–G). Aanmaken/wijzigen gelogd; opleidinggebonden gebruiker kan
+    alleen de eigen opleiding(en) koppelen (server-side). Synthetische seed
+    (`OrganisatieSeeder`: 9 types, 6 organisaties) + twee accounts; guarded
+    datamigratie voor de draaiende DB. 10 tests (`RelatiebeheerModuleTest`); 361 groen.
+  - [ ] **Fase B — Contactpersonen & 360°-relatiekaart.**
+  - [ ] **Fase C — Contactmomenten, notities & tijdlijn.**
+  - [ ] **Fase D — Stagebeheer (stageplaatsen + plaatsingen).**
+  - [ ] **Fase E — Taken & agenda.**
+  - [ ] **Fase F — Documenten, overeenkomsten & ondertekening.**
+  - [ ] **Fase G — Dashboards & rapportages.**
+  - [ ] **Fase H — Slimme functies & integraties (optioneel).**
 - [ ] **Fase 6 — Portaalkoppeling**
   - Koppeling met publiek aanmeldportaal (gescheiden regime).
 - [ ] **Fase 7 — Migratie**
@@ -422,6 +457,7 @@ Deze zijn nog niet vastgesteld. Vraag de opdrachtgever; verzin geen waarden.
 | 2026-07-10 | **Takenlijst voor Studentenzaken.** Model ontleend aan Outlook Taken / Microsoft Graph `todoTask` (titel, begindatum, vervaldatum, status, prioriteit), maar met **drie** statussen (open/bezig/afgerond) i.p.v. vijf — 'waitingOnOthers' en 'deferred' zijn geschrapt. Keuzes opdrachtgever: (1) **gedeelde** afdelingslijst met toewijzing (niet-toegewezen taken zijn vrij op te pakken); (2) taak **optioneel koppelbaar aan een student**, verschijnt dan op het dossier; (3) drie statussen; (4) herinnering via een **dashboardvenster** 'Mijn taken' (geen e-mail). 'Te laat' wordt AFGELEID uit vervaldatum + status en is bewust geen kolom, zodat een afgeronde taak nooit als te laat kan blijven staan. Taken zonder vervaldatum vallen buiten de signalering. Toegang alleen Studentenzaken + Beheer; geen audit-logging (werkverdeling, geen gevoelig gegeven). |
 | 2026-07-10 | **Echt curriculum ingeladen (91 vakken).** Bron: 'vakkenlijst update.xlsx' → `database/data/curriculum.csv` + `CurriculumSeeder`. Keuzes opdrachtgever: (1) `vakken.ec` wordt **decimal(4,1)** want 28 vakken hebben 2,5 EC — afronden zou de jaartotalen 11 EC laten afwijken; (2) vakcode is **uniek per opleiding**, want elf codes bestaan in zowel ISLTH als PMGV (aparte vakken, eigen cijferlijst/docent/presentielijst); (3) de keuzeruimte krijgt `vakken.keuzevak` en wordt **niet automatisch toegewezen** — anders telt bachelor jaar 4 95 EC i.p.v. 40 verplicht; (4) de 9 synthetische vakken (ISLTH-*) zijn **definitief verwijderd** met hun 90 toewijzingen, 15 cijfers, 94 presenties, 5 cijferlijsten en 3 vrijstellingsbesluiten, omdat zij naast het echte curriculum meetelden (jaar 1 werd 94 i.p.v. 60 EC) en automatisch aan elke ISLTH-student werden toegewezen. Bij tegenstrijdigheid in de bronlijst is de tekstkolom 'Blok' leidend (B-SC07 → 4, B-AR06-15 → 2); `B-FQ02-B-FQ03` blijft één vak. Vakken zonder blok lopen het hele studiejaar (stage, scriptie). De synthetische vakken zijn verhuisd naar `SynthetischVakSeeder` (uitsluitend testfixture, niet in `DatabaseSeeder`). PABO volgt later. |
 | 2026-07-10 | **Collegegeld in termijnen.** Facturering elke twee maanden: september, november, januari, maart en mei. Keuzes opdrachtgever: (1) termijnbedrag = **jaarbedrag ÷ 5**, afrondingsrestje op de laatste termijn; (2) **achterstand = onbetaalde VERVALLEN termijn** — een nog niet vervallen termijn is geen achterstand (vervangt de oude maand-pro-rata als achterstandsmaatstaf en stuurt de blokkades op herinschrijven/verklaringen); (3) bij tussentijdse uitschrijving worden de termijnen **pro rata herrekend**: termijnen ná de uitschrijfdatum vervallen, de laatste geldende termijn wordt bijgesteld; (4) de **betaalregeling** (vijf termijnen óf één factuur voor het volledige jaarbedrag) wordt door **Studentenzaken** op het dossier vastgelegd, per inschrijving en dus per studiejaar, en gelogd. Geen facturentabel: het schema is afgeleid uit jaartarief + regeling + inschrijvingsduur (`Collegegeldtermijnen`), zodat het nooit veroudert. `betalingen.termijn` (nullable) koppelt een betaling aan een termijn; leeg = FIFO naar de oudste openstaande termijn. Financiën boekt met één klik per termijn; CSV-import kreeg een optionele termijnkolom en herkent kolommen op naam (oude bestanden blijven werken). De kolom `inschrijvingen.betaalwijze` is vervallen (mengde regeling en betaalwijze) en blijft alleen voor historie. |
+| 2026-07-11 | **Module Relatiebeheer & Stagebeheer — Fase A (organisaties).** Nieuwe, opleidingoverstijgende onderwijs-CRM (PABO, Bachelor Islamitische Theologie, Master IGV) voor stagescholen/werkveldrelaties. Keuzes opdrachtgever: (1) **twee nieuwe rollen** relatiebeheerder + stagecoördinator (overige rollen hergebruikt); (2) stagebeoordeling **voldoende/onvoldoende**; (3) stageterminologie én **organisatietypes per opleiding configureerbaar** (opzoektabel `organisatie_types` met `opleiding_id`, beheerd via Opzoektabellen). Implementatie: de platform-placeholder-module `stage` is hernoemd tot `relatiebeheer` en geactiveerd (guarded migratie, geen dubbele module); rollen via enum + ALTER. Datamodel `organisaties` (leesbaar `relatienummer` R+jaar+volgnr) + pivot `organisatie_opleidingen`; **opleidinggebonden zichtbaarheid** hergebruikt de `directie_opleidingen`-koppeling (`isRelatieBeperkt`, `Organisatie::scopeZichtbaarVoor`). `OrganisatieController` (CRUD + filterbalk + inactiveren i.p.v. verwijderen), routes onder prefix `relatiebeheer`, eigen sidebar-tak, 360°-relatiekaart (basis). **AVG-grens (hard):** uitsluitend organisatie-/contactgegevens, nooit leerling-/cliëntgegevens — de stageschool blijft verwerkingsverantwoordelijke; aanmaken/wijzigen gelogd; een opleidinggebonden gebruiker kan alleen de eigen opleiding(en) koppelen (server-side). Ontwerp vastgelegd in `docs/MODULE-RELATIEBEHEER.md` (fasen A–H). Synthetische seed + guarded datamigratie voor de draaiende DB. 10 tests (`RelatiebeheerModuleTest`); 361 groen. Fasen B–H volgen. |
 | 2026-07-11 | **Eigen opleiding/cursus zichtbaar voor de ingelogde directeur/cursusdirecteur.** Een ingelogde directeur zag alleen "Directie", niet van welke opleiding. Nu staat de opleiding(en)/cursus(sen) op drie plekken: (1) de **topbalk** (`partials/header`) naast de rol als pill; (2) het **modulekeuzescherm** naast de naam, bijv. "Directie · MGV"; (3) het **dashboard** — de kop toont "Directie — <codes>" en de subtitel de volledige opleidingnaam/-namen. Voor de rol Cursusadministratie idem met de cursuscodes. Een directeur zonder toewijzing krijgt een duidelijke melding "Nog geen opleiding toegewezen" (topbalk + dashboard). 4 tests (`DirectieOpleidingZichtbaarTest`); 351 groen. |
 | 2026-07-11 | **Opleiding-/cursuscode in de gebruikerslijst.** Op verzoek (duidelijkheid): in Beheer → Gebruikers & rollen staat nu naast de rol de **afkorting (code)** van de gekoppelde opleiding(en)/cursus(sen). Voor de rol **Directie** de opleidingcodes (bijv. ISLTH, PMGV) uit `directie_opleidingen`; voor de rol **Cursusadministratie** de cursuscodes (bijv. ARAB-TAAL, HIFZ, IJAZA) uit `cursussen.directeur_id` (via `User::gedirigeerdeCursussen()`, nu mee-geëchoload in `GebruikerController` tegen N+1). Getoond als kleine pills met de volledige naam als tooltip. Ook de directie-toewijzingskaart toont de codes (pills naast de naam + code in de vinkje-labels). 3 tests (`GebruikerlijstOpleidingCodeTest`); 347 groen. |
 | 2026-07-10 | **Directie per opleiding herverdeeld (aparte directeur per opleiding).** Wens opdrachtgever: geen directie-account dat alle opleidingen ziet. Verdeling: Bachelor Islamitische Theologie (ISLTH) + Pre-Master GV (PMGV) → één directeur (Bram de Wit); Master GV (MGV) → eigen directeur (Yasin Demir); PABO → eigen directeur (Mariëlle Groen). Elke directeur ziet en beheert uitsluitend de eigen opleiding(en) (de bestaande opleidinggebonden scoping via `directie_opleidingen`). Aangepast in de `GebruikerSeeder` (fresh/tests) én via de guarded datamigratie `directie_per_opleiding_herverdelen` op de draaiende DB (maakt ontbrekende directie-accounts aan en synct de koppelingen; no-op op een verse migratie). De cursus-opleidingen KRN/ARAB blijven bewust ongekoppeld (buiten de opdracht) — Beheer kan ze desgewenst toewijzen via Gebruikers & rollen. Directie-afhankelijke tests maken hun eigen users aan of koppelen de opleiding expliciet, dus 344 groen. |
