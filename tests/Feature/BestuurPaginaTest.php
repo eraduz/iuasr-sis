@@ -100,4 +100,38 @@ class BestuurPaginaTest extends TestCase
         $this->actingAs($this->user(Rol::Studentenzaken))->get(route('modules.kiezen'))
             ->assertOk()->assertDontSee('Systeembeheer');
     }
+
+    public function test_bestuur_menu_bevat_directe_rapportagelinks(): void
+    {
+        // De rapportages van andere modules staan als directe links in het
+        // Bestuur-menu, zodat het Bestuur er niet voor in een andere module hoeft.
+        $this->actingAs($this->user(Rol::Bestuur))->get(route('bestuur'))
+            ->assertOk()
+            ->assertSee('Cursusrapportage')
+            ->assertSee('HR verzuim &amp; verlof', false);
+    }
+
+    public function test_bestuur_behoudt_eigen_menu_op_modulerapport(): void
+    {
+        // Kern van de fix: op een modulerapport (hier het HR-rapport) houdt het
+        // Bestuur zijn eigen menu en krijgt het NIET het HR-module-menu met
+        // beheerlinks te zien die 403 zouden geven.
+        $this->seed([\Database\Seeders\DocentSeeder::class, \Database\Seeders\HrSeeder::class]);
+
+        $this->actingAs($this->user(Rol::Bestuur))->get(route('hr.rapport'))
+            ->assertOk()
+            ->assertSee('Bestuursoverzicht')
+            ->assertDontSee('HR / Personeelszaken');
+    }
+
+    public function test_hr_medewerker_ziet_wel_het_modulemenu(): void
+    {
+        // Regressiecheck: voor de HR-medewerker (die de beheerlinks wél mag) blijft
+        // het HR-module-menu gewoon verschijnen.
+        $this->seed([\Database\Seeders\DocentSeeder::class, \Database\Seeders\HrSeeder::class]);
+
+        $hr = User::where('email', 'n.aslan@iuasr.nl')->firstOrFail();
+        $this->actingAs($hr)->get(route('hr.rapport'))
+            ->assertOk()->assertSee('HR / Personeelszaken');
+    }
 }

@@ -24,6 +24,7 @@
     <a class="iuasr-dash-btn" href="{{ route('presentieoverzicht') }}">Aanwezigheid</a>
     <a class="iuasr-dash-btn" href="{{ route('cursussen.rapport') }}">Cursusrapport</a>
     <a class="iuasr-dash-btn" href="{{ route('hr.rapport') }}">HR-rapport</a>
+    <a class="iuasr-dash-btn" href="{{ route('hr.verzuimverlof') }}">HR verzuim &amp; verlof</a>
     <a class="iuasr-dash-btn" href="{{ route('relatiebeheer.dashboard') }}">Relatiebeheer</a>
   </div>
 </div>

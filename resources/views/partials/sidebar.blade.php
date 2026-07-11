@@ -102,13 +102,23 @@
             'Rapporten' => [['Rapporten', 'rapporten.inzage', 'report', 'rapporten.inzage']],
             'Documenten' => [['Ondertekende documenten', 'ondertekening', 'cert', 'ondertekening*']],
         ],
+        // Het Schoolbestuur werkt uitsluitend vanuit deze ene pagina. Alle
+        // (alleen-lezen) rapportages van de andere modules staan hier als directe
+        // links, zodat het Bestuur nooit onbedoeld in een andere module belandt en
+        // geen module-menu met beheerlinks te zien krijgt die 403 geven.
         Rol::Bestuur->value => [
             'Overzicht' => [
                 ['Bestuursoverzicht', 'bestuur', 'dash', 'bestuur'],
+                ['Alle studenten', 'studenten.index', 'students', 'studenten.*'],
             ],
-            'Studenten' => [['Alle studenten', 'studenten.index', 'students', 'studenten.*']],
-            'Onderwijs' => [['Aanwezigheid', 'presentieoverzicht', 'check', 'presentieoverzicht']],
-            'Rapporten' => [['Alumni', 'rapporten.alumni', 'cert', 'rapporten.alumni']],
+            'Rapportages' => [
+                ['Alumni', 'rapporten.alumni', 'cert', 'rapporten.alumni'],
+                ['Aanwezigheid', 'presentieoverzicht', 'check', 'presentieoverzicht'],
+                ['Cursusrapportage', 'cursussen.rapport', 'report', 'cursussen.rapport'],
+                ['Relatiebeheer', 'relatiebeheer.dashboard', 'db', 'relatiebeheer.dashboard,relatiebeheer.rapport'],
+                ['HR-rapportage', 'hr.rapport', 'report', 'hr.rapport'],
+                ['HR verzuim & verlof', 'hr.verzuimverlof', 'cert', 'hr.verzuimverlof'],
+            ],
             'Documenten' => [['Ondertekende documenten', 'ondertekening', 'cert', 'ondertekening*']],
             'Handleidingen' => [
                 ['Medewerkershandleiding', 'handleiding.medewerkers', 'report', 'handleiding.medewerkers'],
@@ -219,9 +229,15 @@
     $inCursusmodule = request()->routeIs('cursussen.*') || request()->routeIs('cursisten*');
     $inHrmodule = request()->routeIs('hr.*') || request()->routeIs('medewerkers*') || request()->routeIs('dienstverbanden*') || request()->routeIs('hrdocumenten*') || request()->routeIs('verlof*') || request()->routeIs('verzuim*') || request()->routeIs('ziekmeldingen*') || request()->routeIs('gesprekken*') || request()->routeIs('gespreksdoelen*') || request()->routeIs('competentiescores*') || request()->routeIs('checklist*') || request()->routeIs('hr.*');
     $inRelatiemodule = request()->routeIs('relatiebeheer.*') || request()->routeIs('relaties*') || request()->routeIs('contactpersonen*') || request()->routeIs('contactmomenten*') || request()->routeIs('stages*') || request()->routeIs('stageplaatsen*') || request()->routeIs('agenda*') || request()->routeIs('afspraken*') || request()->routeIs('relatietaken*') || request()->routeIs('overeenkomsten*') || request()->routeIs('relatiedocumenten*');
-    $menu = $inCursusmodule
-        ? $cursusMenu
-        : ($inRelatiemodule ? $relatieMenu : ($inHrmodule ? $hrMenu : $standaardMenu));
+    // Het Schoolbestuur houdt ALTIJD het eigen Bestuur-menu, ook wanneer het een
+    // rapportage van een andere module opent. Zo verschijnt er nooit een module-menu
+    // met beheerlinks waarvoor het Bestuur geen rechten heeft (die 403 zouden geven),
+    // en blijft de gebruiker in de vertrouwde Bestuur-context.
+    $menu = ($rol === Rol::Bestuur->value)
+        ? $standaardMenu
+        : ($inCursusmodule
+            ? $cursusMenu
+            : ($inRelatiemodule ? $relatieMenu : ($inHrmodule ? $hrMenu : $standaardMenu)));
 
     // Zelfservice "Mijn HR" is er voor iedere gekoppelde medewerker, ook buiten de
     // HR-module (bv. een docent met een personeelsdossier). Voeg de groep toe aan
