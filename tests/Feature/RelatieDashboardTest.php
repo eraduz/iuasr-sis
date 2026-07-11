@@ -22,7 +22,7 @@ class RelatieDashboardTest extends TestCase
     use RefreshDatabase;
 
     private User $relatiebeheerder; // PABO
-    private User $stagecoordinator; // ISLTH + MGV
+    private User $stagecoordinator; // MGV
 
     protected function setUp(): void
     {
@@ -30,8 +30,8 @@ class RelatieDashboardTest extends TestCase
 
         $this->seed([ReferentieSeeder::class, DocentSeeder::class, GebruikerSeeder::class, SynthetischeStudentSeeder::class, OrganisatieSeeder::class]);
 
-        $this->relatiebeheerder = User::where('rol', Rol::Relatiebeheerder)->firstOrFail();
-        $this->stagecoordinator = User::where('rol', Rol::Stagecoordinator)->firstOrFail();
+        $this->relatiebeheerder = User::where('email', 'l.haddad@iuasr.nl')->firstOrFail(); // PABO
+        $this->stagecoordinator = User::where('email', 'j.prins@iuasr.nl')->firstOrFail(); // MGV
     }
 
     public function test_module_start_route_is_het_dashboard(): void
@@ -56,7 +56,7 @@ class RelatieDashboardTest extends TestCase
             ->assertSee('Basisschool De Regenboog')
             ->assertDontSee('Zorggroep Rijnmond');
 
-        // De stagecoördinator (ISLTH + MGV) ziet de MGV-organisatie wél.
+        // De stagecoördinator (MGV) ziet de MGV-organisatie wél.
         $this->actingAs($this->stagecoordinator)->get(route('relatiebeheer.rapport'))
             ->assertOk()
             ->assertSee('Zorggroep Rijnmond')

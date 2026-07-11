@@ -29,7 +29,7 @@ class RelatieSlimmeFunctiesTest extends TestCase
 
         $this->seed([ReferentieSeeder::class, DocentSeeder::class, GebruikerSeeder::class, SynthetischeStudentSeeder::class, OrganisatieSeeder::class]);
 
-        $this->relatiebeheerder = User::where('rol', Rol::Relatiebeheerder)->firstOrFail();
+        $this->relatiebeheerder = User::where('email', 'l.haddad@iuasr.nl')->firstOrFail(); // PABO
     }
 
     public function test_globaal_zoeken_vindt_en_scoopt(): void

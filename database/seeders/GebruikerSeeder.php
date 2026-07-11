@@ -56,16 +56,21 @@ class GebruikerSeeder extends Seeder
         Cursus::where('code', 'ARAB-TAAL')->update(['directeur_id' => $hafsa->id]);
         Cursus::whereIn('code', ['HIFZ', 'IJAZA'])->update(['directeur_id' => $omar->id]);
 
-        // Module Relatiebeheer & Stagebeheer (opleidingoverstijgend). Net als de
-        // Directie zijn deze rollen opleidinggebonden: zij zien/beheren uitsluitend
-        // de relaties van de eigen opleiding(en). Koppeling via dezelfde
-        // opleiding-toewijzing (`opleidingen()` → directie_opleidingen).
-        $relatiebeheerder = User::create(['naam' => 'drs. Laila Haddad', 'email' => 'l.haddad@iuasr.nl', 'rol' => Rol::Relatiebeheerder]);
-        $stagecoordinator = User::create(['naam' => 'Tarik Ozan', 'email' => 't.ozan@iuasr.nl', 'rol' => Rol::Stagecoordinator]);
+        // Module Relatiebeheer & Stagebeheer (opleidingoverstijgend). Elke opleiding
+        // wordt STRIKT GESCHEIDEN gehouden en houdt de eigen relaties én stages zelf
+        // bij: per opleiding een eigen relatiebeheerder (relaties/contactpersonen) én
+        // een eigen stagecoördinator (relaties + stageplaatsing). Elk account is aan
+        // precies één opleiding gekoppeld (via `opleidingen()` → directie_opleidingen).
+        $koppel = fn (User $user, string $code) => $user->opleidingen()->sync($opl([$code]));
 
-        // Relatiebeheerder verzorgt de PABO-stagescholen; de stagecoördinator de
-        // werkveldstages van de Bachelor Theologie en de Master IGV.
-        $relatiebeheerder->opleidingen()->sync($opl(['PABO']));
-        $stagecoordinator->opleidingen()->sync($opl(['ISLTH', 'MGV']));
+        // PABO
+        $koppel(User::create(['naam' => 'drs. Laila Haddad', 'email' => 'l.haddad@iuasr.nl', 'rol' => Rol::Relatiebeheerder]), 'PABO');
+        $koppel(User::create(['naam' => 'Ilse Vermeer', 'email' => 'i.vermeer@iuasr.nl', 'rol' => Rol::Stagecoordinator]), 'PABO');
+        // Bachelor Islamitische Theologie
+        $koppel(User::create(['naam' => 'Karim Belkacem', 'email' => 'k.belkacem@iuasr.nl', 'rol' => Rol::Relatiebeheerder]), 'ISLTH');
+        $koppel(User::create(['naam' => 'Tarik Ozan', 'email' => 't.ozan@iuasr.nl', 'rol' => Rol::Stagecoordinator]), 'ISLTH');
+        // Master Islamitische Geestelijke Verzorging
+        $koppel(User::create(['naam' => 'Amina Cherif', 'email' => 'a.cherif@iuasr.nl', 'rol' => Rol::Relatiebeheerder]), 'MGV');
+        $koppel(User::create(['naam' => 'Joost Prins', 'email' => 'j.prins@iuasr.nl', 'rol' => Rol::Stagecoordinator]), 'MGV');
     }
 }

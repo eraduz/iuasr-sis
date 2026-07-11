@@ -26,7 +26,7 @@ class StageTest extends TestCase
     use RefreshDatabase;
 
     private User $beheerder;
-    private User $stagecoordinator; // ISLTH + MGV
+    private User $stagecoordinator; // MGV
     private User $relatiebeheerder; // PABO
     private Organisatie $paboOrg;   // R260001
     private Organisatie $mgvOrg;    // R260003
@@ -38,8 +38,8 @@ class StageTest extends TestCase
         $this->seed([ReferentieSeeder::class, DocentSeeder::class, GebruikerSeeder::class, SynthetischeStudentSeeder::class, OrganisatieSeeder::class]);
 
         $this->beheerder = User::where('rol', Rol::Beheerder)->firstOrFail();
-        $this->stagecoordinator = User::where('rol', Rol::Stagecoordinator)->firstOrFail();
-        $this->relatiebeheerder = User::where('rol', Rol::Relatiebeheerder)->firstOrFail();
+        $this->stagecoordinator = User::where('email', 'j.prins@iuasr.nl')->firstOrFail(); // MGV
+        $this->relatiebeheerder = User::where('email', 'l.haddad@iuasr.nl')->firstOrFail(); // PABO
         $this->paboOrg = Organisatie::where('relatienummer', 'R260001')->firstOrFail();
         $this->mgvOrg = Organisatie::where('relatienummer', 'R260003')->firstOrFail();
     }
@@ -93,7 +93,7 @@ class StageTest extends TestCase
 
     public function test_stagecoordinator_kan_pabo_niet_beheren_maar_mgv_wel(): void
     {
-        // PABO valt buiten de opleidingen (ISLTH + MGV) van de stagecoördinator.
+        // PABO valt buiten de opleiding (MGV) van de stagecoördinator.
         $this->actingAs($this->stagecoordinator)->get(route('stageplaatsen.create', $this->paboOrg))->assertForbidden();
         $this->actingAs($this->stagecoordinator)->get(route('stages.create', $this->paboOrg))->assertForbidden();
 

@@ -32,7 +32,7 @@ class ContactmomentTest extends TestCase
 
         $this->seed([ReferentieSeeder::class, DocentSeeder::class, GebruikerSeeder::class, OrganisatieSeeder::class]);
 
-        $this->relatiebeheerder = User::where('rol', Rol::Relatiebeheerder)->firstOrFail();
+        $this->relatiebeheerder = User::where('email', 'l.haddad@iuasr.nl')->firstOrFail(); // PABO
         $this->paboOrg = Organisatie::where('relatienummer', 'R260001')->firstOrFail();
         $this->mgvOrg = Organisatie::where('relatienummer', 'R260003')->firstOrFail();
     }

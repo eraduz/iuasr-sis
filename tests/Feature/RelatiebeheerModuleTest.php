@@ -22,7 +22,7 @@ class RelatiebeheerModuleTest extends TestCase
     use RefreshDatabase;
 
     private User $relatiebeheerder; // PABO
-    private User $stagecoordinator; // ISLTH + MGV
+    private User $stagecoordinator; // MGV
     private User $beheerder;
 
     protected function setUp(): void
@@ -31,8 +31,8 @@ class RelatiebeheerModuleTest extends TestCase
 
         $this->seed([ReferentieSeeder::class, DocentSeeder::class, GebruikerSeeder::class, OrganisatieSeeder::class]);
 
-        $this->relatiebeheerder = User::where('rol', Rol::Relatiebeheerder)->firstOrFail();
-        $this->stagecoordinator = User::where('rol', Rol::Stagecoordinator)->firstOrFail();
+        $this->relatiebeheerder = User::where('email', 'l.haddad@iuasr.nl')->firstOrFail(); // PABO
+        $this->stagecoordinator = User::where('email', 'j.prins@iuasr.nl')->firstOrFail(); // MGV
         $this->beheerder = User::where('rol', Rol::Beheerder)->firstOrFail();
     }
 
@@ -67,7 +67,7 @@ class RelatiebeheerModuleTest extends TestCase
         $this->assertTrue($zichtbaar->contains('Basisschool De Regenboog'));
         $this->assertFalse($zichtbaar->contains('Zorggroep Rijnmond'));
 
-        // De stagecoördinator (ISLTH + MGV) ziet juist de MGV-relatie wel.
+        // De stagecoördinator (MGV) ziet juist de MGV-relatie wel.
         $stage = Organisatie::query()->zichtbaarVoor($this->stagecoordinator)->pluck('naam');
         $this->assertTrue($stage->contains('Zorggroep Rijnmond'));
         $this->assertFalse($stage->contains('Basisschool De Regenboog'));
