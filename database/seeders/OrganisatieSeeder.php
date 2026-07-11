@@ -2,10 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Models\Contactmoment;
+use App\Models\ContactmomentType;
 use App\Models\Contactpersoon;
 use App\Models\Opleiding;
 use App\Models\Organisatie;
 use App\Models\OrganisatieType;
+use App\Models\RelatieNotitie;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 /**
@@ -96,6 +100,43 @@ class OrganisatieSeeder extends Seeder
                     'voorkeur_communicatie' => $voorkeur,
                     'actief' => true,
                 ]
+            );
+        }
+
+        // Contactmoment-types (Fase C) — beheerd via Opzoektabellen.
+        $typeIds = [];
+        foreach ([
+            ['TELEFOON', 'Telefoongesprek', 1],
+            ['EMAIL', 'E-mail', 2],
+            ['TEAMS', 'Teams', 3],
+            ['BEZOEK', 'Bezoek', 4],
+            ['STAGEBEZOEK', 'Stagebezoek', 5],
+            ['OVERLEG', 'Overleg', 6],
+            ['NETWERK', 'Netwerkbijeenkomst', 7],
+            ['KLACHT', 'Klacht', 8],
+            ['EVALUATIE', 'Evaluatie', 9],
+        ] as [$code, $naam, $volg]) {
+            $typeIds[$code] = ContactmomentType::firstOrCreate(
+                ['code' => $code],
+                ['naam' => $naam, 'volgorde' => $volg, 'actief' => true]
+            )->id;
+        }
+
+        // Demo contactmomenten + notitie (Fase C) op de PABO-stageschool.
+        $medewerkerId = User::where('email', 'l.haddad@iuasr.nl')->value('id');
+        $regenboog = Organisatie::where('relatienummer', 'R260001')->first();
+        if ($regenboog !== null) {
+            Contactmoment::firstOrCreate(
+                ['organisatie_id' => $regenboog->id, 'onderwerp' => 'Kennismakingsgesprek nieuwe stageperiode'],
+                ['contactmoment_type_id' => $typeIds['BEZOEK'] ?? null, 'medewerker_id' => $medewerkerId, 'datum' => '2026-09-02', 'samenvatting' => 'Afspraken gemaakt over het aantal stageplaatsen en de begeleiding.', 'vervolgdatum' => '2026-10-01']
+            );
+            Contactmoment::firstOrCreate(
+                ['organisatie_id' => $regenboog->id, 'onderwerp' => 'Telefonisch: beschikbaarheid werkplekbegeleiders'],
+                ['contactmoment_type_id' => $typeIds['TELEFOON'] ?? null, 'medewerker_id' => $medewerkerId, 'datum' => '2026-09-15', 'samenvatting' => 'Twee werkplekbegeleiders beschikbaar voor het komende blok.']
+            );
+            RelatieNotitie::firstOrCreate(
+                ['organisatie_id' => $regenboog->id, 'tekst' => 'Prettige samenwerking; directeur reageert snel op e-mail.'],
+                ['auteur_id' => $medewerkerId, 'categorie' => 'Samenwerking', 'tags' => 'stage']
             );
         }
     }

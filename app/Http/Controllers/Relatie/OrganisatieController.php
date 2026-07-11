@@ -94,9 +94,18 @@ class OrganisatieController extends Controller
     {
         abort_unless($organisatie->zichtbaarVoor($request->user()), 403, 'Deze organisatie valt buiten uw toegang.');
 
-        $organisatie->load(['type', 'opleidingen', 'contactpersonen' => fn ($q) => $q->orderByDesc('actief')->orderBy('achternaam')]);
+        $organisatie->load([
+            'type',
+            'opleidingen',
+            'contactpersonen' => fn ($q) => $q->orderByDesc('actief')->orderBy('achternaam'),
+            'contactmomenten' => fn ($q) => $q->with(['type', 'medewerker', 'contactpersoon'])->orderByDesc('datum')->orderByDesc('id'),
+            'notities' => fn ($q) => $q->with('auteur')->orderByDesc('created_at'),
+        ]);
 
-        return view('relaties.show', ['organisatie' => $organisatie]);
+        return view('relaties.show', [
+            'organisatie' => $organisatie,
+            'tijdlijn' => \App\Support\Relatietijdlijn::voor($organisatie),
+        ]);
     }
 
     public function edit(Request $request, Organisatie $organisatie): View

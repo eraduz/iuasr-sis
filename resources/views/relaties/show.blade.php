@@ -83,12 +83,102 @@
   @endif
 </div>
 
-{{-- De overige panelen (contactmomenten, stageplaatsen & stages, documenten,
-     overeenkomsten, taken, agenda, historie) volgen in de fasen C t/m G. --}}
+{{-- Contactmomenten (Fase C). --}}
+<div class="sis-card" id="contactmomenten" style="margin-bottom:16px;">
+  <div class="sis-card__hd" style="display:flex; align-items:center; justify-content:space-between;">
+    <b>Contactmomenten ({{ $organisatie->contactmomenten->count() }})</b>
+    @if ($magBeheer)
+      <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('contactmomenten.create', $organisatie) }}">Contactmoment vastleggen</a>
+    @endif
+  </div>
+  @if ($organisatie->contactmomenten->isEmpty())
+    <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Nog geen contactmomenten vastgelegd.</p></div>
+  @else
+    <table class="iuasr-dash-tbl">
+      <thead><tr><th>Datum</th><th>Type</th><th>Onderwerp</th><th>Contactpersoon</th><th>Door</th><th>Vervolg</th>@if($magBeheer)<th class="row-act"></th>@endif</tr></thead>
+      <tbody>
+        @foreach ($organisatie->contactmomenten as $cm)
+          <tr>
+            <td class="dt">{{ $cm->datum?->format('d-m-Y') }}@if($cm->tijd)<br><small class="sis-muted">{{ \Illuminate\Support\Str::of($cm->tijd)->substr(0,5) }}</small>@endif</td>
+            <td>{{ $cm->type?->naam ?? '—' }}</td>
+            <td class="nm">{{ $cm->onderwerp }}@if($cm->samenvatting)<br><small class="sis-muted">{{ \Illuminate\Support\Str::limit($cm->samenvatting, 90) }}</small>@endif</td>
+            <td>{{ $cm->contactpersoon?->volledigeNaam() ?? '—' }}</td>
+            <td>{{ $cm->medewerker?->naam ?? '—' }}</td>
+            <td class="dt">{{ $cm->vervolgdatum?->format('d-m-Y') ?? '—' }}</td>
+            @if($magBeheer)<td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('contactmomenten.edit', $cm) }}">Bewerken</a></td>@endif
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+  @endif
+</div>
+
+{{-- Notities (Fase C). --}}
+<div class="sis-card" id="notities" style="margin-bottom:16px;">
+  <div class="sis-card__hd"><b>Notities ({{ $organisatie->notities->count() }})</b></div>
+  <div style="padding:14px 16px;">
+    @if ($magBeheer)
+      <form method="POST" action="{{ route('relaties.notities.store', $organisatie) }}" style="margin-bottom:14px;">
+        @csrf
+        <div class="sis-fld-row sis-fld-row--2">
+          <div class="sis-fld"><label>Categorie</label><input type="text" name="categorie" maxlength="255" placeholder="Optioneel"></div>
+          <div class="sis-fld"><label>Tags</label><input type="text" name="tags" maxlength="255" placeholder="Optioneel, bv. stage, bezoek"></div>
+        </div>
+        <div class="sis-fld"><label>Notitie <span class="req">*</span></label><textarea name="tekst" rows="2" required></textarea></div>
+        <div style="text-align:right;"><button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Notitie toevoegen</button></div>
+      </form>
+    @endif
+    @forelse ($organisatie->notities as $n)
+      <div style="border-top:1px solid var(--border,#e5e5e5); padding:10px 0;">
+        <div style="display:flex; justify-content:space-between; gap:12px;">
+          <div>
+            @if($n->categorie)<span class="sis-pill-soft">{{ $n->categorie }}</span> @endif
+            <span>{{ $n->tekst }}</span>
+            @if($n->tags)<div><small class="sis-muted">Tags: {{ $n->tags }}</small></div>@endif
+          </div>
+          <div style="white-space:nowrap; text-align:right;">
+            <small class="sis-muted">{{ $n->created_at?->format('d-m-Y') }}<br>{{ $n->auteur?->naam }}</small>
+            @if($magBeheer)
+              <form method="POST" action="{{ route('relaties.notities.destroy', $n) }}" onsubmit="return confirm('Notitie verwijderen?');" style="display:inline;">
+                @csrf @method('DELETE')
+                <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" type="submit">×</button>
+              </form>
+            @endif
+          </div>
+        </div>
+      </div>
+    @empty
+      <p class="sis-muted" style="margin:0;">Nog geen notities.</p>
+    @endforelse
+  </div>
+</div>
+
+{{-- Historie / tijdlijn (Fase C) — afgeleid uit contactmomenten, notities en de audit-log. --}}
+<div class="sis-card" id="tijdlijn" style="margin-bottom:16px;">
+  <div class="sis-card__hd"><b>Historie / tijdlijn</b></div>
+  <div style="padding:14px 16px;">
+    @forelse ($tijdlijn as $item)
+      <div style="display:flex; gap:12px; padding:8px 0; border-top:1px solid var(--border,#e5e5e5);">
+        <div style="min-width:92px;"><small class="sis-muted">{{ optional($item['moment'])->format('d-m-Y') }}</small></div>
+        <div style="flex:1;">
+          <span class="sis-pill-soft">{{ $item['label'] }}</span>
+          <b style="margin-left:6px;">{{ $item['titel'] }}</b>
+          @if($item['detail'])<div><small class="sis-muted">{{ \Illuminate\Support\Str::limit($item['detail'], 120) }}</small></div>@endif
+        </div>
+        <div style="white-space:nowrap;"><small class="sis-muted">{{ $item['door'] }}</small></div>
+      </div>
+    @empty
+      <p class="sis-muted" style="margin:0;">Nog geen gebeurtenissen.</p>
+    @endforelse
+  </div>
+</div>
+
+{{-- De overige panelen (stageplaatsen & stages, documenten, overeenkomsten,
+     taken, agenda) volgen in de fasen D t/m G. --}}
 <div class="sis-card">
   <div class="sis-card__hd"><b>Overige onderdelen</b></div>
   <div style="padding:14px 16px;">
-    <p class="sis-muted" style="margin:0;">Contactmomenten, stageplaatsen &amp; stages, documenten, overeenkomsten, taken, agenda en historie verschijnen hier zodra de bijbehorende fasen (C t/m G) van de module Relatiebeheer &amp; Stage zijn opgeleverd.</p>
+    <p class="sis-muted" style="margin:0;">Stageplaatsen &amp; stages, documenten, overeenkomsten, taken en agenda verschijnen hier zodra de bijbehorende fasen (D t/m G) van de module Relatiebeheer &amp; Stage zijn opgeleverd.</p>
   </div>
 </div>
 @endsection

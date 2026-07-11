@@ -145,6 +145,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/contactpersonen/{contactpersoon}/bewerken', [App\Http\Controllers\Relatie\ContactpersoonController::class, 'edit'])->name('contactpersonen.edit');
         Route::put('/contactpersonen/{contactpersoon}', [App\Http\Controllers\Relatie\ContactpersoonController::class, 'update'])->name('contactpersonen.update');
         Route::post('/contactpersonen/{contactpersoon}/status', [App\Http\Controllers\Relatie\ContactpersoonController::class, 'status'])->name('contactpersonen.status');
+
+        // Contactmomenten en notities bij een organisatie (Fase C).
+        Route::get('/organisaties/{organisatie}/contactmomenten/nieuw', [App\Http\Controllers\Relatie\ContactmomentController::class, 'create'])->name('contactmomenten.create');
+        Route::post('/organisaties/{organisatie}/contactmomenten', [App\Http\Controllers\Relatie\ContactmomentController::class, 'store'])->name('contactmomenten.store');
+        Route::get('/contactmomenten/{contactmoment}/bewerken', [App\Http\Controllers\Relatie\ContactmomentController::class, 'edit'])->name('contactmomenten.edit');
+        Route::put('/contactmomenten/{contactmoment}', [App\Http\Controllers\Relatie\ContactmomentController::class, 'update'])->name('contactmomenten.update');
+
+        Route::post('/organisaties/{organisatie}/notities', [App\Http\Controllers\Relatie\RelatieNotitieController::class, 'store'])->name('relaties.notities.store');
+        Route::delete('/relatie-notities/{notitie}', [App\Http\Controllers\Relatie\RelatieNotitieController::class, 'destroy'])->name('relaties.notities.destroy');
     });
 
     Route::middleware('rol:relatiebeheerder,stagecoordinator,directie,bestuur,beheerder')->prefix('relatiebeheer')->group(function () {

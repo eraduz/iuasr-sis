@@ -7,6 +7,7 @@ use App\Models\Faculteit;
 use App\Models\Kennistoets;
 use App\Models\Klas;
 use App\Models\Land;
+use App\Models\ContactmomentType;
 use App\Models\Nationaliteit;
 use App\Models\Opleiding;
 use App\Models\OrganisatieType;
@@ -163,6 +164,21 @@ class ReferentieController extends Controller
                     'code' => ['label' => 'Code', 'type' => 'text', 'rules' => 'required|string|max:40', 'hint' => 'bv. BASISSCHOOL of ZORGINSTELLING'],
                     'naam' => ['label' => 'Naam', 'type' => 'text', 'rules' => 'required|string|max:255'],
                     'opleiding_id' => ['label' => 'Opleiding', 'type' => 'belongsto', 'model' => Opleiding::class, 'toon' => 'naam', 'rules' => 'nullable|exists:opleidingen,id', 'leeg' => '— alle opleidingen —', 'hint' => 'Leeg = geldt voor alle opleidingen'],
+                    'actief' => ['label' => 'Actief', 'type' => 'checkbox'],
+                ],
+            ],
+            'contactmomenttypes' => [
+                'model' => ContactmomentType::class, 'enkel' => 'Contactmoment-type', 'meer' => 'Contactmoment-types',
+                'kolommen' => [
+                    'Code' => fn ($m) => $m->code,
+                    'Naam' => fn ($m) => $m->naam,
+                    'Volgorde' => fn ($m) => $m->volgorde,
+                    'Actief' => fn ($m) => $m->actief ? 'Ja' : 'Nee',
+                ],
+                'velden' => [
+                    'code' => ['label' => 'Code', 'type' => 'text', 'rules' => 'required|string|max:40', 'hint' => 'bv. TELEFOON of STAGEBEZOEK'],
+                    'naam' => ['label' => 'Naam', 'type' => 'text', 'rules' => 'required|string|max:255'],
+                    'volgorde' => ['label' => 'Volgorde', 'type' => 'number', 'rules' => 'nullable|integer|min:0|max:99'],
                     'actief' => ['label' => 'Actief', 'type' => 'checkbox'],
                 ],
             ],

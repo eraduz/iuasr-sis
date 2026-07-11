@@ -45,6 +45,16 @@ class Organisatie extends Model
         return $this->hasMany(Contactpersoon::class);
     }
 
+    public function contactmomenten(): HasMany
+    {
+        return $this->hasMany(Contactmoment::class);
+    }
+
+    public function notities(): HasMany
+    {
+        return $this->hasMany(RelatieNotitie::class);
+    }
+
     /**
      * Beperk een query tot de organisaties die deze gebruiker mag zien. Een
      * opleidinggebonden gebruiker ziet uitsluitend de organisaties die aan (een

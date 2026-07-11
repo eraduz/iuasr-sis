@@ -185,7 +185,7 @@
             : $menus[Rol::Studentenzaken->value]);
 
     $inCursusmodule = request()->routeIs('cursussen.*') || request()->routeIs('cursisten*');
-    $inRelatiemodule = request()->routeIs('relaties*') || request()->routeIs('contactpersonen*');
+    $inRelatiemodule = request()->routeIs('relaties*') || request()->routeIs('contactpersonen*') || request()->routeIs('contactmomenten*');
     $menu = $inCursusmodule
         ? $cursusMenu
         : ($inRelatiemodule ? $relatieMenu : $standaardMenu);
