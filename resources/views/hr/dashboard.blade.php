@@ -9,6 +9,7 @@
   <div><h1>HR / Personeelszaken</h1><div class="summary">Overzicht van uw {{ auth()->user()->isHrTeamBeperkt() ? 'team' : 'personeel' }}</div></div>
   <div class="iuasr-dash-vhead__actions">
     @if (auth()->user()->medewerker)<a class="iuasr-dash-btn" href="{{ route('hr.mijn') }}">Mijn HR</a>@endif
+    <a class="iuasr-dash-btn" href="{{ route('hr.signaleringen') }}">Signaleringen</a>
     <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('medewerkers') }}">Medewerkers</a>
   </div>
 </div>

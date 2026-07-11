@@ -260,6 +260,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/rapport', [App\Http\Controllers\Hr\HrRapportController::class, 'rapport'])->name('hr.rapport');
         Route::get('/rapport/export.csv', [App\Http\Controllers\Hr\HrRapportController::class, 'export'])->name('hr.rapport.export');
         Route::get('/organisatie', [App\Http\Controllers\Hr\HrRapportController::class, 'organisatie'])->name('hr.organisatie');
+        // Slimme functies (Fase G): globaal zoeken + signaleringen (aflopende
+        // contracten + verzuim volgens de Wet Verbetering Poortwachter).
+        Route::get('/zoeken', [App\Http\Controllers\Hr\ZoekController::class, 'index'])->name('hr.zoeken');
+        Route::get('/signaleringen', [App\Http\Controllers\Hr\SignaleringController::class, 'index'])->name('hr.signaleringen');
         Route::get('/medewerkers/{medewerker}', [App\Http\Controllers\Hr\MedewerkerController::class, 'show'])->name('medewerkers.show');
     });
 

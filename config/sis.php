@@ -66,6 +66,29 @@ return [
             'volgnummer_lengte' => (int) env('SIS_HR_PERSONEELSNUMMER_VOLGNUMMER_LENGTE', 4),
         ],
         'bsn_ingeschakeld' => (bool) env('SIS_HR_BSN_INGESCHAKELD', false), // standaard UIT
+
+        // Signalering aflopende contracten: einddatum binnen dit aantal dagen.
+        'contract_signaal_dagen' => (int) env('SIS_HR_CONTRACT_SIGNAAL_DAGEN', 60),
+
+        // Verzuimsignalering — Wet Verbetering Poortwachter (Fase G). De wettelijke
+        // re-integratiemijlpalen, geteld in weken vanaf de eerste ziektedag; het
+        // systeem leidt de mijlpaaldata af (geen aparte tabel). `venster_dagen` =
+        // een mijlpaal die binnen dit aantal dagen valt geldt als 'binnenkort'.
+        // `frequent` = het frequent-verzuimsignaal (aantal meldingen binnen N mnd).
+        'poortwachter' => [
+            'venster_dagen' => (int) env('SIS_HR_POORTWACHTER_VENSTER_DAGEN', 14),
+            'mijlpalen' => [
+                ['sleutel' => 'probleemanalyse', 'label' => 'Probleemanalyse bedrijfsarts', 'week' => 6],
+                ['sleutel' => 'plan_van_aanpak', 'label' => 'Plan van aanpak', 'week' => 8],
+                ['sleutel' => 'uwv_ziekmelding', 'label' => 'Ziekmelding UWV (42e week)', 'week' => 42],
+                ['sleutel' => 'eerstejaarsevaluatie', 'label' => 'Eerstejaarsevaluatie', 'week' => 52],
+                ['sleutel' => 'wia_aanvraag', 'label' => 'WIA-aanvraag', 'week' => 93],
+            ],
+            'frequent' => [
+                'maanden' => (int) env('SIS_HR_FREQUENT_MAANDEN', 12),
+                'drempel' => (int) env('SIS_HR_FREQUENT_DREMPEL', 3),
+            ],
+        ],
     ],
 
     /*

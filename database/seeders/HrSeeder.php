@@ -148,11 +148,24 @@ class HrSeeder extends Seeder
             );
         }
 
-        // Een open ziekmelding.
+        // Een open ziekmelding (langdurig verzuim — Poortwachter-traject, Fase G).
         $fadwa = Medewerker::where('personeelsnummer', 'P260005')->first();
         if ($fadwa !== null) {
             Ziekmelding::firstOrCreate(['medewerker_id' => $fadwa->id, 'ziek_van' => $jaar.'-06-03'], ['percentage' => 100]);
             $fadwa->update(['status' => 'ziek']);
+        }
+
+        // Frequent verzuim (Fase G): drie korte, herstelde ziekmeldingen binnen het
+        // jaar — een signaal voor een verzuimgesprek. Herstelde meldingen laten de
+        // medewerkerstatus op 'actief'.
+        $mehmet = Medewerker::where('personeelsnummer', 'P260004')->first();
+        if ($mehmet !== null) {
+            foreach ([['-01-13', '-01-15'], ['-03-04', '-03-05'], ['-05-19', '-05-21']] as [$van, $tot]) {
+                Ziekmelding::firstOrCreate(
+                    ['medewerker_id' => $mehmet->id, 'ziek_van' => $jaar.$van],
+                    ['hersteld_op' => $jaar.$tot, 'percentage' => 100]
+                );
+            }
         }
     }
 
