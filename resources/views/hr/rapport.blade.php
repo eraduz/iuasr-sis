@@ -12,7 +12,7 @@
 
 <div class="iuasr-dash-vhead">
   <div><h1>HR-rapportage</h1><div class="summary">Kerncijfers, FTE en verzuim{{ auth()->user()->isHrTeamBeperkt() ? ' (eigen team)' : '' }}</div></div>
-  <div class="iuasr-dash-vhead__actions"><a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('hr.rapport.export') }}">Exporteren (CSV)</a></div>
+  <div class="iuasr-dash-vhead__actions"><a class="iuasr-dash-btn" href="{{ route('hr.verzuimverlof') }}">Verzuim &amp; verlof per medewerker</a><a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('hr.rapport.export') }}">Exporteren (CSV)</a></div>
 </div>
 
 <div class="iuasr-dash-stats" style="grid-template-columns:repeat(4,1fr);">

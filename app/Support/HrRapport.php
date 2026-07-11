@@ -4,7 +4,10 @@ namespace App\Support;
 
 use App\Enums\MedewerkerStatus;
 use App\Models\Medewerker;
+use App\Models\Verlofaanvraag;
+use App\Models\Verlofsaldo;
 use App\Models\Ziekmelding;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 /**
@@ -79,6 +82,72 @@ class HrRapport
                 ];
             })
             ->sortByDesc('aantal')->values()->all();
+    }
+
+    /**
+     * Verzuim- én verlofoverzicht per medewerker voor een jaar. Per medewerker:
+     * het aantal ziekmeldingen, de ziektedagen en het (kalenderdag-gebaseerde)
+     * verzuimpercentage, plus het verlofrecht, het opgenomen verlof en het saldo
+     * (alle verloftypen samen) en het aantal openstaande verlofaanvragen. Zo is
+     * elke medewerker in één oogopslag te volgen op ziekte en verlof.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function perMedewerker(?array $ids = null, ?int $jaar = null): array
+    {
+        $jaar ??= (int) date('Y');
+        $medewerkers = self::medewerkers($ids)->sortBy(fn (Medewerker $m) => $m->achternaam.$m->voornaam);
+        $mIds = $medewerkers->pluck('id')->all() ?: [0];
+
+        // Verlof: recht (som per medewerker), opgenomen (goedgekeurd, dit jaar) en
+        // het aantal nog openstaande aanvragen — alle in één query per grootheid.
+        $recht = Verlofsaldo::whereIn('medewerker_id', $mIds)->where('jaar', $jaar)
+            ->selectRaw('medewerker_id, sum(recht_uren) as u')->groupBy('medewerker_id')->pluck('u', 'medewerker_id');
+        $opgenomen = Verlofaanvraag::whereIn('medewerker_id', $mIds)->where('status', 'goedgekeurd')
+            ->whereYear('van', $jaar)->selectRaw('medewerker_id, sum(uren) as u')->groupBy('medewerker_id')->pluck('u', 'medewerker_id');
+        $openAanvragen = Verlofaanvraag::whereIn('medewerker_id', $mIds)->where('status', 'aangevraagd')
+            ->selectRaw('medewerker_id, count(*) as c')->groupBy('medewerker_id')->pluck('c', 'medewerker_id');
+
+        // Verzuim: de ziekmeldingen van dit jaar, gegroepeerd per medewerker.
+        $meldingen = Ziekmelding::whereIn('medewerker_id', $mIds)->whereYear('ziek_van', $jaar)
+            ->get()->groupBy('medewerker_id');
+
+        $periode = self::verstrekenDagenInJaar($jaar);
+
+        return $medewerkers->map(function (Medewerker $m) use ($recht, $opgenomen, $openAanvragen, $meldingen, $periode) {
+            $mMeld = $meldingen->get($m->id) ?? collect();
+            $ziektedagen = (int) $mMeld->sum(fn (Ziekmelding $z) => $z->dagen());
+            $rechtU = (float) ($recht[$m->id] ?? 0);
+            $opgU = (float) ($opgenomen[$m->id] ?? 0);
+
+            return [
+                'id' => $m->id,
+                'personeelsnummer' => $m->personeelsnummer,
+                'naam' => $m->volledigeNaam(),
+                'afdeling' => $m->afdeling?->naam ?? 'Zonder afdeling',
+                'status' => $m->status,
+                'ziek_meldingen' => $mMeld->count(),
+                'ziektedagen' => $ziektedagen,
+                'momenteel_ziek' => $mMeld->contains(fn (Ziekmelding $z) => $z->isOpen()),
+                'verzuim' => $periode > 0 ? round($ziektedagen / $periode * 100, 1) : 0.0,
+                'verlof_recht' => round($rechtU, 1),
+                'verlof_opgenomen' => round($opgU, 1),
+                'verlof_saldo' => round($rechtU - $opgU, 1),
+                'verlof_open' => (int) ($openAanvragen[$m->id] ?? 0),
+            ];
+        })->values()->all();
+    }
+
+    /** Verstreken kalenderdagen in het jaar t/m vandaag (noemer voor verzuim%). */
+    private static function verstrekenDagenInJaar(int $jaar): int
+    {
+        $start = Carbon::create($jaar, 1, 1)->startOfDay();
+        $eindeJaar = Carbon::create($jaar, 12, 31)->startOfDay();
+        $vandaag = Carbon::today();
+
+        $eind = $vandaag->lt($start) ? $start : ($vandaag->gt($eindeJaar) ? $eindeJaar : $vandaag);
+
+        return (int) $start->diffInDays($eind) + 1;
     }
 
     /**

@@ -196,6 +196,7 @@
             ['Gesprekken', 'gesprekken', 'report', 'gesprekken,gesprekken.show,gesprekken.create'],
             ['Organisatie', 'hr.organisatie', 'db', 'hr.organisatie'],
             ['Rapportage', 'hr.rapport', 'report', 'hr.rapport'],
+            ['Verzuim & verlof', 'hr.verzuimverlof', 'cert', 'hr.verzuimverlof'],
         ],
         'Zelfservice' => [
             ['Mijn HR', 'hr.mijn', 'eye', 'hr.mijn'],

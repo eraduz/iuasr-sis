@@ -259,6 +259,9 @@ Route::middleware('auth')->group(function () {
         // Rapportages & organisatiestructuur (Fase D).
         Route::get('/rapport', [App\Http\Controllers\Hr\HrRapportController::class, 'rapport'])->name('hr.rapport');
         Route::get('/rapport/export.csv', [App\Http\Controllers\Hr\HrRapportController::class, 'export'])->name('hr.rapport.export');
+        // Verzuim & verlof per medewerker — elke medewerker volgen op ziekte en verlof.
+        Route::get('/verzuim-verlof', [App\Http\Controllers\Hr\HrRapportController::class, 'verzuimVerlof'])->name('hr.verzuimverlof');
+        Route::get('/verzuim-verlof/export.csv', [App\Http\Controllers\Hr\HrRapportController::class, 'verzuimVerlofExport'])->name('hr.verzuimverlof.export');
         Route::get('/organisatie', [App\Http\Controllers\Hr\HrRapportController::class, 'organisatie'])->name('hr.organisatie');
         // Slimme functies (Fase G): globaal zoeken + signaleringen (aflopende
         // contracten + verzuim volgens de Wet Verbetering Poortwachter).
