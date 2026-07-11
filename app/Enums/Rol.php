@@ -33,6 +33,10 @@ enum Rol: string
     // stagecoördinator doet daarnaast de stageplaatsen en plaatsingen.
     case Relatiebeheerder = 'relatiebeheerder';
     case Stagecoordinator = 'stagecoordinator';
+    // Module HR / Personeelszaken. De HR-medewerker doet de personeelsadministratie;
+    // de Manager (leidinggevende) beheert het eigen team en keurt verlof goed.
+    case Hrmedewerker = 'hrmedewerker';
+    case Manager = 'manager';
 
     /** Leesbare naam voor UI en documenten (Nederlands, U-vorm). */
     public function label(): string
@@ -48,6 +52,8 @@ enum Rol: string
             self::Cursusadministratie => 'Cursusadministratie',
             self::Relatiebeheerder => 'Relatiebeheerder',
             self::Stagecoordinator => 'Stagecoördinator',
+            self::Hrmedewerker => 'HR-medewerker',
+            self::Manager => 'Manager',
         };
     }
 
@@ -98,7 +104,8 @@ enum Rol: string
             self::Docent, self::Examencommissie, self::Directie => true,
             self::Studentenzaken, self::Bestuur, self::Beheerder,
             self::Cursusadministratie,
-            self::Relatiebeheerder, self::Stagecoordinator => false,
+            self::Relatiebeheerder, self::Stagecoordinator,
+            self::Hrmedewerker, self::Manager => false,
         };
     }
 
@@ -119,7 +126,8 @@ enum Rol: string
             self::Studentenzaken, self::Beheerder => true,
             self::Docent, self::Examencommissie, self::Directie, self::Bestuur,
             self::Cursusadministratie,
-            self::Relatiebeheerder, self::Stagecoordinator => false,
+            self::Relatiebeheerder, self::Stagecoordinator,
+            self::Hrmedewerker, self::Manager => false,
         };
     }
 
@@ -145,7 +153,8 @@ enum Rol: string
             self::Docent, self::Examencommissie, self::Directie, self::Bestuur => true,
             self::Studentenzaken, self::Financien, self::Beheerder,
             self::Cursusadministratie,
-            self::Relatiebeheerder, self::Stagecoordinator => false,
+            self::Relatiebeheerder, self::Stagecoordinator,
+            self::Hrmedewerker, self::Manager => false,
         };
     }
 
@@ -160,7 +169,8 @@ enum Rol: string
             self::Studentenzaken, self::Docent, self::Examencommissie,
             self::Directie, self::Bestuur, self::Beheerder => true,
             self::Financien, self::Cursusadministratie,
-            self::Relatiebeheerder, self::Stagecoordinator => false,
+            self::Relatiebeheerder, self::Stagecoordinator,
+            self::Hrmedewerker, self::Manager => false,
         };
     }
 
@@ -219,14 +229,53 @@ enum Rol: string
             // De module Relatiebeheer & Stagebeheer: de relatiebeheerder en de
             // stagecoördinator werken uitsluitend daarbinnen.
             self::Relatiebeheerder, self::Stagecoordinator => ['relatiebeheer'],
+            // Module HR / Personeelszaken: de HR-medewerker en de Manager werken
+            // uitsluitend daarbinnen (de Manager gescoped op het eigen team).
+            self::Hrmedewerker, self::Manager => ['hr'],
             // Het Schoolbestuur heeft brede inzage en ziet naast Studentenzaken ook
-            // de Cursussen- en de Relatiebeheer-module (alleen-lezen).
-            self::Bestuur => ['studentenzaken', 'cursussen', 'relatiebeheer'],
+            // de Cursussen-, Relatiebeheer- en HR-module (alleen-lezen).
+            self::Bestuur => ['studentenzaken', 'cursussen', 'relatiebeheer', 'hr'],
             // De Directie (opleidingsmanager) beheert haar opleiding, inclusief de
             // relaties/stages van die opleiding (opleidinggebonden gescoped).
             self::Directie => ['studentenzaken', 'relatiebeheer'],
             self::Studentenzaken, self::Docent,
             self::Examencommissie => ['studentenzaken'],
+        };
+    }
+
+    /** Mag deze rol de personeelsadministratie beheren (module HR)? */
+    public function magHrBeheer(): bool
+    {
+        return match ($this) {
+            self::Hrmedewerker, self::Beheerder => true,
+            default => false,
+        };
+    }
+
+    /** Mag deze rol de module HR inzien (medewerkers, dashboards)? */
+    public function magHrInzien(): bool
+    {
+        return match ($this) {
+            self::Hrmedewerker, self::Manager, self::Beheerder, self::Bestuur => true,
+            default => false,
+        };
+    }
+
+    /**
+     * Is de zichtbaarheid binnen HR beperkt tot het eigen team? Alleen de Manager
+     * (leidinggevende) is teamgebonden; HR, Beheer en Bestuur zien alle medewerkers.
+     */
+    public function isHrTeamBeperkt(): bool
+    {
+        return $this === self::Manager;
+    }
+
+    /** Mag deze rol verlofaanvragen beoordelen? Manager (eigen team) en HR/Beheer. */
+    public function magVerlofBeoordelen(): bool
+    {
+        return match ($this) {
+            self::Manager, self::Hrmedewerker, self::Beheerder => true,
+            default => false,
         };
     }
 

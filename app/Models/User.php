@@ -69,6 +69,34 @@ class User extends Authenticatable
         return $this->rol === Rol::Directie;
     }
 
+    /** Het eigen personeelsrecord (module HR), voor self-service en team-scoping. */
+    public function medewerker(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Medewerker::class);
+    }
+
+    // --- Module HR / Personeelszaken ---
+
+    public function magHrBeheer(): bool
+    {
+        return $this->rol->magHrBeheer();
+    }
+
+    public function magHrInzien(): bool
+    {
+        return $this->rol->magHrInzien();
+    }
+
+    public function isHrTeamBeperkt(): bool
+    {
+        return $this->rol->isHrTeamBeperkt();
+    }
+
+    public function magVerlofBeoordelen(): bool
+    {
+        return $this->rol->magVerlofBeoordelen();
+    }
+
     /**
      * De opleiding-ids die deze gebruiker mag zien.
      *

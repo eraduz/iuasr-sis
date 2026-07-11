@@ -34,6 +34,7 @@ class Module extends Model
         'studentenzaken' => 'dashboard',
         'cursussen' => 'cursussen.dashboard',
         'relatiebeheer' => 'relatiebeheer.dashboard',
+        'hr' => 'hr.dashboard',
     ];
 
     public function startRoute(): ?string

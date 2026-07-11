@@ -52,6 +52,24 @@ return [
 
     /*
     |----------------------------------------------------------------------
+    | HR / Personeelszaken
+    |----------------------------------------------------------------------
+    | Voltijdsnorm voor de FTE-berekening (BEVESTIGD 2026-07-11: 40 uur/week);
+    | FTE = uren_per_week ÷ voltijd_uren. Personeelsnummer = prefix + jaar(2) +
+    | volgnummer. BSN van medewerkers: veld klaar maar standaard UIT tot akkoord
+    | van de Functionaris Gegevensbescherming (zoals bij studenten).
+    */
+    'hr' => [
+        'voltijd_uren' => (float) env('SIS_HR_VOLTIJD_UREN', 40),
+        'personeelsnummer' => [
+            'prefix' => 'P',
+            'volgnummer_lengte' => (int) env('SIS_HR_PERSONEELSNUMMER_VOLGNUMMER_LENGTE', 4),
+        ],
+        'bsn_ingeschakeld' => (bool) env('SIS_HR_BSN_INGESCHAKELD', false), // standaard UIT
+    ],
+
+    /*
+    |----------------------------------------------------------------------
     | Cijfer- en EC-normen
     |----------------------------------------------------------------------
     | Voldoende-grens en EC-drempels verschillen mogelijk per opleiding en

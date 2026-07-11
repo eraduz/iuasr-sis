@@ -215,6 +215,40 @@ Route::middleware('auth')->group(function () {
         Route::get('/organisaties/{organisatie}', [App\Http\Controllers\Relatie\OrganisatieController::class, 'show'])->name('relaties.show');
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | Module: HR / Personeelszaken
+    |--------------------------------------------------------------------------
+    | Rolverdeling:
+    |  - HR-medewerker: volledige personeelsadministratie.
+    |  - Manager: eigen team (inzage + later verlof goedkeuren), teamgebonden.
+    |  - Beheerder: alles. Schoolbestuur: instellingsbrede inzage (alleen-lezen).
+    | Muteren staat in de beheergroep; inzage/downloads in de bredere inzagegroep.
+    | Beheer-routes bewust vóór de inzage-routes (literal 'nieuw' vóór {medewerker}).
+    */
+    Route::middleware('rol:hrmedewerker,beheerder')->prefix('hr')->group(function () {
+        Route::get('/medewerkers/nieuw', [App\Http\Controllers\Hr\MedewerkerController::class, 'create'])->name('medewerkers.create');
+        Route::post('/medewerkers', [App\Http\Controllers\Hr\MedewerkerController::class, 'store'])->name('medewerkers.store');
+        Route::get('/medewerkers/{medewerker}/bewerken', [App\Http\Controllers\Hr\MedewerkerController::class, 'edit'])->name('medewerkers.edit');
+        Route::put('/medewerkers/{medewerker}', [App\Http\Controllers\Hr\MedewerkerController::class, 'update'])->name('medewerkers.update');
+
+        Route::get('/medewerkers/{medewerker}/dienstverband/nieuw', [App\Http\Controllers\Hr\DienstverbandController::class, 'create'])->name('dienstverbanden.create');
+        Route::post('/medewerkers/{medewerker}/dienstverbanden', [App\Http\Controllers\Hr\DienstverbandController::class, 'store'])->name('dienstverbanden.store');
+        Route::get('/dienstverbanden/{dienstverband}/bewerken', [App\Http\Controllers\Hr\DienstverbandController::class, 'edit'])->name('dienstverbanden.edit');
+        Route::put('/dienstverbanden/{dienstverband}', [App\Http\Controllers\Hr\DienstverbandController::class, 'update'])->name('dienstverbanden.update');
+        Route::delete('/dienstverbanden/{dienstverband}', [App\Http\Controllers\Hr\DienstverbandController::class, 'destroy'])->name('dienstverbanden.destroy');
+
+        Route::post('/medewerkers/{medewerker}/documenten', [App\Http\Controllers\Hr\HrDocumentController::class, 'store'])->name('hrdocumenten.store');
+        Route::delete('/hr-documenten/{document}', [App\Http\Controllers\Hr\HrDocumentController::class, 'destroy'])->name('hrdocumenten.destroy');
+    });
+
+    Route::middleware('rol:hrmedewerker,manager,beheerder,bestuur')->prefix('hr')->group(function () {
+        Route::get('/', [App\Http\Controllers\Hr\HrDashboardController::class, 'index'])->name('hr.dashboard');
+        Route::get('/medewerkers', [App\Http\Controllers\Hr\MedewerkerController::class, 'index'])->name('medewerkers');
+        Route::get('/hr-documenten/{document}/download', [App\Http\Controllers\Hr\HrDocumentController::class, 'download'])->name('hrdocumenten.download');
+        Route::get('/medewerkers/{medewerker}', [App\Http\Controllers\Hr\MedewerkerController::class, 'show'])->name('medewerkers.show');
+    });
+
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     // Globale bestuurspagina — instellingsbreed overzicht (Schoolbestuur en Beheer).

@@ -182,18 +182,33 @@
         $relatieMenu['Relatiebeheer'][] = ['Organisatie toevoegen', 'relaties.create', 'plus', 'relaties.create'];
     }
 
-    // Standaardmenu buiten een module. De relatiebeheerder en stagecoördinator
-    // hebben geen eigen rol-menu in $menus; hun thuisbasis is de Relatiebeheer-module.
+    // Module HR / Personeelszaken — rolbewust menu. HR/Beheer beheren; Manager
+    // (eigen team) en Bestuur kijken mee.
+    $hrMenu = [
+        'HR / Personeelszaken' => [
+            ['Overzicht', 'hr.dashboard', 'dash', 'hr.dashboard'],
+            ['Medewerkers', 'medewerkers', 'students', 'medewerkers,medewerkers.show,medewerkers.edit,dienstverbanden.edit,dienstverbanden.create'],
+        ],
+    ];
+    if ($gebruiker->magHrBeheer()) {
+        $hrMenu['HR / Personeelszaken'][] = ['Medewerker toevoegen', 'medewerkers.create', 'plus', 'medewerkers.create'];
+    }
+
+    // Standaardmenu buiten een module. De relatiebeheerder/stagecoördinator en de
+    // HR-rollen hebben geen eigen rol-menu in $menus; hun thuisbasis is hun module.
     $standaardMenu = $menus[$rol]
         ?? (in_array($rol, [Rol::Relatiebeheerder->value, Rol::Stagecoordinator->value], true)
             ? $relatieMenu
-            : $menus[Rol::Studentenzaken->value]);
+            : (in_array($rol, [Rol::Hrmedewerker->value, Rol::Manager->value], true)
+                ? $hrMenu
+                : $menus[Rol::Studentenzaken->value]));
 
     $inCursusmodule = request()->routeIs('cursussen.*') || request()->routeIs('cursisten*');
+    $inHrmodule = request()->routeIs('hr.*') || request()->routeIs('medewerkers*') || request()->routeIs('dienstverbanden*') || request()->routeIs('hrdocumenten*');
     $inRelatiemodule = request()->routeIs('relatiebeheer.*') || request()->routeIs('relaties*') || request()->routeIs('contactpersonen*') || request()->routeIs('contactmomenten*') || request()->routeIs('stages*') || request()->routeIs('stageplaatsen*') || request()->routeIs('agenda*') || request()->routeIs('afspraken*') || request()->routeIs('relatietaken*') || request()->routeIs('overeenkomsten*') || request()->routeIs('relatiedocumenten*');
     $menu = $inCursusmodule
         ? $cursusMenu
-        : ($inRelatiemodule ? $relatieMenu : $standaardMenu);
+        : ($inRelatiemodule ? $relatieMenu : ($inHrmodule ? $hrMenu : $standaardMenu));
 @endphp
 
 @foreach ($menu as $titel => $items)

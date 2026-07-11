@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             CollegegeldSeeder::class,
             KennistoetsSeeder::class,
             OrganisatieSeeder::class,
+            HrSeeder::class,
         ]);
     }
 }

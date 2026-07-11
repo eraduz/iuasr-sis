@@ -227,17 +227,18 @@ dashboard.
 
 ---
 
-## 7. Openstaande parameters / te bevestigen
+## 7. Parameters
 
-1. **Voltijdsnorm** voor de FTE-berekening (uren/week bij 1,0 FTE) — bv. 40 of 38.
-2. **Verlofrechten** per verloftype (uren/jaar), en of dit per contract/FTE schaalt.
-3. **Personeelsnummerformaat** (voorstel `P` + jaar + volgnummer, bv. `P260001`).
-4. **BSN nu opslaan?** Personeels-BSN is nodig voor HR/salaris, maar valt onder het
-   AVG-regime; standaard versleuteld + gelogd, inschakelbaar via config (zoals bij
-   studenten). Te bevestigen met de FG.
-5. **Self-service reikwijdte** in de MVP: alleen eigen gegevens + verlof, of ook
-   documenten/gesprekken inzien.
-6. **Wie keurt verlof goed** bij ontbrekende manager (dan HR)?
+**Besloten (2026-07-11):**
+- **Voltijdsnorm = 40 uur/week** → FTE = uren ÷ 40 (afgeleid). Vastgelegd in
+  `config/sis.php` (`sis.hr.voltijd_uren`), per medewerker/contract berekend.
+- **BSN: veld klaar, standaard UIT** — versleuteld veld + gelogde inzage, via config
+  uitgeschakeld tot akkoord FG (`sis.hr.bsn_ingeschakeld`, default false), net als
+  bij studenten.
+- **Verlof: manager keurt goed/af; HR is terugval** wanneer er geen manager is. HR
+  ziet en registreert altijd alles.
 
-Aanbevolen defaults worden gebruikt tenzij anders bevestigd; alles is later
-aanpasbaar via Opzoektabellen/config.
+**Nog te bevestigen (defaults gebruikt):**
+- **Verlofrechten** per verloftype (uren/jaar) en of dit met FTE schaalt.
+- **Personeelsnummerformaat** — default `P` + jaar + volgnummer (bv. `P260001`).
+- **Self-service reikwijdte** in de MVP (default: eigen gegevens + verlof + saldo).

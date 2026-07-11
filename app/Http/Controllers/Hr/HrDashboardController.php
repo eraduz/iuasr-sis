@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Http\Controllers\Hr;
+
+use App\Enums\MedewerkerStatus;
+use App\Http\Controllers\Controller;
+use App\Models\Dienstverband;
+use App\Models\Medewerker;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
+
+/**
+ * Dashboard van de module HR / Personeelszaken. Cijfers zijn gescoped: een
+ * Manager ziet uitsluitend het eigen team; HR, Beheer en Bestuur zien iedereen.
+ */
+class HrDashboardController extends Controller
+{
+    public function index(Request $request): View
+    {
+        $gebruiker = $request->user();
+
+        $medewerkers = Medewerker::query()->zichtbaarVoor($gebruiker)
+            ->with('dienstverbanden')->get();
+
+        $statusVerdeling = [];
+        foreach (MedewerkerStatus::cases() as $status) {
+            $statusVerdeling[$status->value] = $medewerkers->where('status', $status)->count();
+        }
+
+        $fteTotaal = round($medewerkers->sum(fn (Medewerker $m) => $m->fte() ?? 0), 2);
+
+        // Aflopende contracten (einddatum binnen 60 dagen), binnen de scope.
+        $medewerkerIds = $medewerkers->pluck('id');
+        $aflopend = Dienstverband::query()
+            ->whereIn('medewerker_id', $medewerkerIds)
+            ->whereNotNull('einddatum')
+            ->whereDate('einddatum', '>=', now()->toDateString())
+            ->whereDate('einddatum', '<=', now()->addDays(60)->toDateString())
+            ->with(['medewerker', 'functie'])
+            ->orderBy('einddatum')->limit(15)->get();
+
+        return view('hr.dashboard', [
+            'aantal' => $medewerkers->where('actief', true)->count(),
+            'fteTotaal' => $fteTotaal,
+            'statusVerdeling' => $statusVerdeling,
+            'aflopend' => $aflopend,
+        ]);
+    }
+}

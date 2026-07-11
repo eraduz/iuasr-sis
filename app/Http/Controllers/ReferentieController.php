@@ -7,7 +7,10 @@ use App\Models\Faculteit;
 use App\Models\Kennistoets;
 use App\Models\Klas;
 use App\Models\Land;
+use App\Models\Afdeling;
 use App\Models\ContactmomentType;
+use App\Models\Functie;
+use App\Models\Medewerker;
 use App\Models\Nationaliteit;
 use App\Models\Opleiding;
 use App\Models\OrganisatieType;
@@ -179,6 +182,38 @@ class ReferentieController extends Controller
                     'code' => ['label' => 'Code', 'type' => 'text', 'rules' => 'required|string|max:40', 'hint' => 'bv. TELEFOON of STAGEBEZOEK'],
                     'naam' => ['label' => 'Naam', 'type' => 'text', 'rules' => 'required|string|max:255'],
                     'volgorde' => ['label' => 'Volgorde', 'type' => 'number', 'rules' => 'nullable|integer|min:0|max:99'],
+                    'actief' => ['label' => 'Actief', 'type' => 'checkbox'],
+                ],
+            ],
+            'functies' => [
+                'model' => Functie::class, 'enkel' => 'Functie', 'meer' => 'Functies',
+                'kolommen' => [
+                    'Code' => fn ($m) => $m->code,
+                    'Naam' => fn ($m) => $m->naam,
+                    'Categorie' => fn ($m) => ucfirst((string) $m->categorie),
+                    'Actief' => fn ($m) => $m->actief ? 'Ja' : 'Nee',
+                ],
+                'velden' => [
+                    'code' => ['label' => 'Code', 'type' => 'text', 'rules' => 'required|string|max:40'],
+                    'naam' => ['label' => 'Naam', 'type' => 'text', 'rules' => 'required|string|max:255'],
+                    'categorie' => ['label' => 'Categorie', 'type' => 'select', 'opties' => ['docent', 'staf', 'management'], 'rules' => 'required|string'],
+                    'actief' => ['label' => 'Actief', 'type' => 'checkbox'],
+                ],
+            ],
+            'afdelingen' => [
+                'model' => Afdeling::class, 'enkel' => 'Afdeling', 'meer' => 'Afdelingen',
+                'kolommen' => [
+                    'Code' => fn ($m) => $m->code,
+                    'Naam' => fn ($m) => $m->naam,
+                    'Onder' => fn ($m) => $m->bovenliggende?->code ?? '—',
+                    'Manager' => fn ($m) => $m->manager?->achternaam ?? '—',
+                    'Actief' => fn ($m) => $m->actief ? 'Ja' : 'Nee',
+                ],
+                'velden' => [
+                    'code' => ['label' => 'Code', 'type' => 'text', 'rules' => 'required|string|max:40'],
+                    'naam' => ['label' => 'Naam', 'type' => 'text', 'rules' => 'required|string|max:255'],
+                    'bovenliggende_afdeling_id' => ['label' => 'Bovenliggende afdeling', 'type' => 'belongsto', 'model' => Afdeling::class, 'toon' => 'naam', 'rules' => 'nullable|exists:afdelingen,id', 'leeg' => '— geen —'],
+                    'manager_id' => ['label' => 'Manager', 'type' => 'belongsto', 'model' => Medewerker::class, 'toon' => 'achternaam', 'rules' => 'nullable|exists:medewerkers,id', 'leeg' => '— geen —'],
                     'actief' => ['label' => 'Actief', 'type' => 'checkbox'],
                 ],
             ],

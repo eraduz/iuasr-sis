@@ -88,7 +88,8 @@ class ModulekeuzeTest extends TestCase
     {
         $this->assertSame('dashboard', Module::where('sleutel', 'studentenzaken')->first()->startRoute());
         $this->assertSame('cursussen.dashboard', Module::where('sleutel', 'cursussen')->first()->startRoute());
-        $this->assertNull(Module::where('sleutel', 'hr')->first()->startRoute());
+        // De nog niet gebouwde modules hebben geen startroute.
+        $this->assertNull(Module::where('sleutel', 'scriptie')->first()->startRoute());
     }
 
     public function test_keuzescherm_vereist_login(): void

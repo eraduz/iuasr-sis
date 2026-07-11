@@ -53,7 +53,8 @@
     <li><b>Studentenzaken</b> — het huidige systeem (inschrijving, cijfers, collegegeld, documenten).</li>
     <li><b>Cursussen Administratie</b> — cursusbeheer, cursisten en cursusgelden (boekhouding).</li>
     <li><b>Relatiebeheer &amp; Stage</b> — stagescholen en werkveldrelaties, contactpersonen en stageplaatsen (opleidingoverstijgend).</li>
-    <li><b>Stage</b>, <b>Scriptie</b> en <b>HR / Personeelszaken</b> — later te ontwikkelen; nu zichtbaar als "Binnenkort".</li>
+    <li><b>HR / Personeelszaken</b> — medewerkers, dienstverband en FTE, verlof &amp; verzuim, gesprekken en rapportages.</li>
+    <li><b>Scriptie</b> — later te ontwikkelen; nu zichtbaar als "Binnenkort".</li>
   </ul>
   <p>Welke modules u kunt openen, hangt af van uw <b>rol</b>. De meeste medewerkers zien alleen Studentenzaken; de Financiële Administratie en de Beheerder zien meerdere modules. Nog niet gebouwde modules staan grijs met de melding <b>Binnenkort</b>. Rechtsboven in elk scherm brengt de knop <b>Modules</b> u terug naar het keuzescherm.</p>
   <p>Werkt u met cursussen, dan staat op het keuzescherm onder <b>Cursussen</b> een <b>aparte knop voor elke cursus</b> die u mag openen. Zo kiest u na het inloggen meteen uw eigen cursus, zonder eerst de hele module te doorzoeken. Een <b>cursusdirecteur</b> ziet alleen de eigen cursus(sen); de Financiële Administratie, de Beheerder en het Schoolbestuur zien alle cursussen. Klikt u op een cursus, dan opent de <b>cursus-startpagina</b> met de kerncijfers (inschrijvingen, betaalgraad, openstaand), de cursisten van die cursus en knoppen naar de cursusgelden en de rapportage. Kiest u per ongeluk een cursus die niet van u is, dan houdt het systeem u tegen.</p>
@@ -275,7 +276,17 @@
   <p><b>Contactmoment → taak.</b> Heeft een contactmoment een vervolgdatum, dan maakt u er met de knop <b>→ Taak</b> in één klik een opvolgtaak van, met dezelfde vervaldatum.</p>
   <div class="tip">Belangrijk (AVG): in deze module leggen wij uitsluitend gegevens van de <b>organisatie</b> en haar contactpersonen vast — nooit gegevens van leerlingen of cliënten van de stageplaats. De organisatietypes beheert de Beheerder via Opzoektabellen (per opleiding instelbaar). Het aanmaken en wijzigen van organisaties wordt gelogd.</div>
 
-  <h2>13. Vragen of problemen?</h2>
+  <h2>13. HR / Personeelszaken (aparte module)</h2>
+  <p>De module <b>HR / Personeelszaken</b> is de personeelsadministratie. U opent haar via het <b>modulekeuzescherm</b>. Toegang: de <b>HR-medewerker</b> doet de volledige administratie; een <b>Manager</b> ziet en volgt uitsluitend het <b>eigen team</b>; het <b>Schoolbestuur</b> kijkt instellingsbreed mee (alleen-lezen); de <b>Beheerder</b> ziet en doet alles.</p>
+  <h3>Medewerkers</h3>
+  <p>Onder <b>Medewerkers</b> staat de personeelslijst met filters (afdeling, functie, status) en zoeken. Elke medewerker krijgt een uniek <b>personeelsnummer</b> (bijv. P260001). Op de <b>medewerkerkaart</b> legt u de persoons- en contactgegevens vast, de functie, afdeling en leidinggevende, en optioneel een koppeling aan een <b>login</b> voor self-service. Het <b>BSN</b> is een beschermd veld: het staat standaard uit en wordt pas na akkoord van de Functionaris Gegevensbescherming ingeschakeld (versleuteld opgeslagen, inzage gelogd).</p>
+  <h3>Dienstverband &amp; FTE</h3>
+  <p>Per medewerker legt u één of meer <b>dienstverbanden</b> vast (vast/tijdelijk, start- en einddatum, uren per week, functie, afdeling). De <b>FTE</b> wordt automatisch berekend: uren per week ÷ {{ (int) config('sis.hr.voltijd_uren', 40) }} (de voltijdsnorm). Het dashboard toont het totaal aantal medewerkers, de totale FTE, de statusverdeling en de contracten die binnen 60 dagen aflopen.</p>
+  <h3>Documenten</h3>
+  <p>Onder <b>Documenten</b> uploadt u HR-documenten bij de medewerker (contract, diploma, identiteitsbewijs, overig). De bestanden staan op de <b>private schijf</b> en de inzage wordt gelogd (AVG).</p>
+  <div class="tip">Verlof &amp; verzuim, gesprekken (beoordelings-/functionerings-/exitgesprek), self-service ‘Mijn HR’ en de HR-rapportages worden in de volgende fasen van de module toegevoegd.</div>
+
+  <h2>14. Vragen of problemen?</h2>
   <p>Neem bij vragen contact op met de systeembeheerder of Studentenzaken (szaken@iuasr.nl). Werkt iets niet zoals verwacht, meld dan wat u deed en wat u zag.</p>
 
   <div class="tip">Deze handleiding wordt bijgewerkt zodra er nieuwe functies bij komen. Kijk bij twijfel of u de meest recente versie hebt (zie de datum onderaan).</div>
