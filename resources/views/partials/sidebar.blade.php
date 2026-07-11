@@ -174,6 +174,7 @@
             ['Organisaties', 'relaties', 'students', 'relaties,relaties.show,relaties.edit'],
             ['Stages', 'stages', 'cert', 'stages,stages.edit,stages.create,stageplaatsen.create,stageplaatsen.edit'],
             ['Agenda & taken', 'agenda', 'taak', 'agenda,afspraken.create,afspraken.edit,relatietaken.edit'],
+            ['Zoeken', 'relatiebeheer.zoeken', 'eye', 'relatiebeheer.zoeken'],
             ['Rapportage', 'relatiebeheer.rapport', 'report', 'relatiebeheer.rapport'],
         ],
     ];

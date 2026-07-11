@@ -251,7 +251,14 @@
             <td>{{ $cm->contactpersoon?->volledigeNaam() ?? '—' }}</td>
             <td>{{ $cm->medewerker?->naam ?? '—' }}</td>
             <td class="dt">{{ $cm->vervolgdatum?->format('d-m-Y') ?? '—' }}</td>
-            @if($magBeheer)<td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('contactmomenten.edit', $cm) }}">Bewerken</a></td>@endif
+            @if($magBeheer)
+              <td class="row-act" style="white-space:nowrap;">
+                @if($cm->vervolgdatum)
+                  <form method="POST" action="{{ route('contactmomenten.taak', $cm) }}" style="display:inline;" title="Maak een opvolgtaak met deze vervolgdatum">@csrf<button class="iuasr-dash-btn iuasr-dash-btn--sm" type="submit">→ Taak</button></form>
+                @endif
+                <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('contactmomenten.edit', $cm) }}">Bewerken</a>
+              </td>
+            @endif
           </tr>
         @endforeach
       </tbody>

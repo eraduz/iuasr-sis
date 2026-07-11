@@ -54,6 +54,58 @@ class AfspraakController extends Controller
         return view('relaties.agenda-index', compact('afspraken', 'taken', 'overeenkomsten'));
     }
 
+    /**
+     * iCal-export (.ics) van de aankomende afspraken binnen het bereik van de
+     * gebruiker. Intranet-veilig: een standaard bestand-download (geen externe
+     * koppeling), te importeren in Outlook, Google Agenda of Apple Agenda.
+     */
+    public function ical(Request $request)
+    {
+        $afspraken = Afspraak::query()
+            ->zichtbaarVoor($request->user())
+            ->with('organisatie')
+            ->where('status', 'gepland')
+            ->whereDate('datum', '>=', now()->subDay()->toDateString())
+            ->orderBy('datum')->limit(200)->get();
+
+        $regels = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//IUASR//Relatiebeheer//NL', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH'];
+        $stamp = now()->format('Ymd\THis');
+
+        foreach ($afspraken as $af) {
+            $datum = $af->datum->format('Ymd');
+            $regels[] = 'BEGIN:VEVENT';
+            $regels[] = 'UID:afspraak-'.$af->id.'@iuasr-sis';
+            $regels[] = 'DTSTAMP:'.$stamp;
+            if ($af->tijd_van) {
+                $van = $datum.'T'.str_replace(':', '', substr((string) $af->tijd_van, 0, 5)).'00';
+                $tot = $af->tijd_tot ? $datum.'T'.str_replace(':', '', substr((string) $af->tijd_tot, 0, 5)).'00' : $van;
+                $regels[] = 'DTSTART:'.$van;
+                $regels[] = 'DTEND:'.$tot;
+            } else {
+                $regels[] = 'DTSTART;VALUE=DATE:'.$datum;
+            }
+            $regels[] = 'SUMMARY:'.$this->icalEscape(($af->type?->label() ?? 'Afspraak').' — '.($af->organisatie?->naam ?? ''));
+            if ($af->locatie) {
+                $regels[] = 'LOCATION:'.$this->icalEscape($af->locatie);
+            }
+            if ($af->omschrijving) {
+                $regels[] = 'DESCRIPTION:'.$this->icalEscape($af->omschrijving);
+            }
+            $regels[] = 'END:VEVENT';
+        }
+        $regels[] = 'END:VCALENDAR';
+
+        return response(implode("\r\n", $regels)."\r\n", 200, [
+            'Content-Type' => 'text/calendar; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="relatiebeheer-agenda.ics"',
+        ]);
+    }
+
+    private function icalEscape(string $tekst): string
+    {
+        return str_replace(["\\", "\n", ',', ';'], ['\\\\', '\\n', '\\,', '\\;'], $tekst);
+    }
+
     public function store(Request $request, Organisatie $organisatie): RedirectResponse
     {
         abort_unless($organisatie->beheerbaarVoor($request->user()), 403, 'Deze organisatie valt buiten uw beheer.');

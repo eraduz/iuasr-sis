@@ -5,7 +5,10 @@
 @section('inhoud')
 <div class="sis-crumb"><b>Relatiebeheer</b><span class="sep">›</span><b>Agenda &amp; taken</b></div>
 
-<div class="iuasr-dash-vhead"><div><h1>Agenda &amp; taken</h1><div class="summary">Aankomende afspraken en openstaande taken binnen uw bereik</div></div></div>
+<div class="iuasr-dash-vhead">
+  <div><h1>Agenda &amp; taken</h1><div class="summary">Aankomende afspraken en openstaande taken binnen uw bereik</div></div>
+  <div class="iuasr-dash-vhead__actions"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('relatiebeheer.agenda.ics') }}">Exporteren naar agenda (.ics)</a></div>
+</div>
 
 <div class="sis-card" style="margin-bottom:16px;">
   <div class="sis-card__hd"><b>Aankomende afspraken ({{ $afspraken->count() }})</b></div>

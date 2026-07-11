@@ -151,6 +151,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/organisaties/{organisatie}/contactmomenten', [App\Http\Controllers\Relatie\ContactmomentController::class, 'store'])->name('contactmomenten.store');
         Route::get('/contactmomenten/{contactmoment}/bewerken', [App\Http\Controllers\Relatie\ContactmomentController::class, 'edit'])->name('contactmomenten.edit');
         Route::put('/contactmomenten/{contactmoment}', [App\Http\Controllers\Relatie\ContactmomentController::class, 'update'])->name('contactmomenten.update');
+        // Actiepunt -> taak: maak een opvolgtaak van een contactmoment (Fase H).
+        Route::post('/contactmomenten/{contactmoment}/taak', [App\Http\Controllers\Relatie\ContactmomentController::class, 'maakTaak'])->name('contactmomenten.taak');
 
         Route::post('/organisaties/{organisatie}/notities', [App\Http\Controllers\Relatie\RelatieNotitieController::class, 'store'])->name('relaties.notities.store');
         Route::delete('/relatie-notities/{notitie}', [App\Http\Controllers\Relatie\RelatieNotitieController::class, 'destroy'])->name('relaties.notities.destroy');
@@ -206,6 +208,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/organisaties', [App\Http\Controllers\Relatie\OrganisatieController::class, 'index'])->name('relaties');
         Route::get('/stages', [App\Http\Controllers\Relatie\StageController::class, 'index'])->name('stages');
         Route::get('/agenda', [App\Http\Controllers\Relatie\AfspraakController::class, 'index'])->name('agenda');
+        Route::get('/agenda.ics', [App\Http\Controllers\Relatie\AfspraakController::class, 'ical'])->name('relatiebeheer.agenda.ics');
+        Route::get('/zoeken', [App\Http\Controllers\Relatie\ZoekController::class, 'index'])->name('relatiebeheer.zoeken');
         Route::get('/relatie-documenten/{document}/download', [App\Http\Controllers\Relatie\RelatieDocumentController::class, 'download'])->name('relatiedocumenten.download');
         Route::get('/overeenkomsten/{overeenkomst}/download', [App\Http\Controllers\Relatie\OvereenkomstController::class, 'download'])->name('overeenkomsten.download');
         Route::get('/organisaties/{organisatie}', [App\Http\Controllers\Relatie\OrganisatieController::class, 'show'])->name('relaties.show');

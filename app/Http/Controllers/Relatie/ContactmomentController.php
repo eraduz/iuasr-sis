@@ -68,6 +68,30 @@ class ContactmomentController extends Controller
         return redirect()->route('relaties.show', $organisatie)->with('status', 'Contactmoment bijgewerkt.');
     }
 
+    /**
+     * Maak een opvolgtaak van een contactmoment met een vervolgdatum. De taak
+     * krijgt de vervaldatum van het contactmoment en verwijst naar dezelfde
+     * organisatie (actiepunt → taak).
+     */
+    public function maakTaak(Request $request, Contactmoment $contactmoment): RedirectResponse
+    {
+        $organisatie = $contactmoment->organisatie;
+        abort_unless($organisatie->beheerbaarVoor($request->user()), 403, 'Deze organisatie valt buiten uw beheer.');
+        abort_unless($contactmoment->vervolgdatum !== null, 422, 'Dit contactmoment heeft geen vervolgdatum.');
+
+        $organisatie->relatietaken()->create([
+            'titel' => 'Opvolging: '.$contactmoment->onderwerp,
+            'omschrijving' => $contactmoment->samenvatting,
+            'vervaldatum' => $contactmoment->vervolgdatum,
+            'prioriteit' => 'normaal',
+            'status' => 'open',
+            'toegewezen_aan_id' => $request->user()->id,
+            'aangemaakt_door_id' => $request->user()->id,
+        ]);
+
+        return redirect()->route('relaties.show', $organisatie)->with('status', 'Opvolgtaak aangemaakt.');
+    }
+
     private function valideer(Request $request, Organisatie $organisatie): array
     {
         $contactpersoonIds = $organisatie->contactpersonen()->pluck('id')->all();
