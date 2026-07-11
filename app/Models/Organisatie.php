@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Een externe organisatie/relatie binnen de module Relatiebeheer & Stagebeheer
@@ -37,6 +38,11 @@ class Organisatie extends Model
     public function opleidingen(): BelongsToMany
     {
         return $this->belongsToMany(Opleiding::class, 'organisatie_opleidingen');
+    }
+
+    public function contactpersonen(): HasMany
+    {
+        return $this->hasMany(Contactpersoon::class);
     }
 
     /**

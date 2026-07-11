@@ -138,6 +138,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/organisaties/{organisatie}/bewerken', [App\Http\Controllers\Relatie\OrganisatieController::class, 'edit'])->name('relaties.edit');
         Route::put('/organisaties/{organisatie}', [App\Http\Controllers\Relatie\OrganisatieController::class, 'update'])->name('relaties.update');
         Route::post('/organisaties/{organisatie}/status', [App\Http\Controllers\Relatie\OrganisatieController::class, 'status'])->name('relaties.status');
+
+        // Contactpersonen bij een organisatie (Fase B).
+        Route::get('/organisaties/{organisatie}/contactpersonen/nieuw', [App\Http\Controllers\Relatie\ContactpersoonController::class, 'create'])->name('contactpersonen.create');
+        Route::post('/organisaties/{organisatie}/contactpersonen', [App\Http\Controllers\Relatie\ContactpersoonController::class, 'store'])->name('contactpersonen.store');
+        Route::get('/contactpersonen/{contactpersoon}/bewerken', [App\Http\Controllers\Relatie\ContactpersoonController::class, 'edit'])->name('contactpersonen.edit');
+        Route::put('/contactpersonen/{contactpersoon}', [App\Http\Controllers\Relatie\ContactpersoonController::class, 'update'])->name('contactpersonen.update');
+        Route::post('/contactpersonen/{contactpersoon}/status', [App\Http\Controllers\Relatie\ContactpersoonController::class, 'status'])->name('contactpersonen.status');
     });
 
     Route::middleware('rol:relatiebeheerder,stagecoordinator,directie,bestuur,beheerder')->prefix('relatiebeheer')->group(function () {

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Contactpersoon;
 use App\Models\Opleiding;
 use App\Models\Organisatie;
 use App\Models\OrganisatieType;
@@ -67,6 +68,35 @@ class OrganisatieSeeder extends Seeder
 
             $ids = collect($opleidingCodes)->map($opl)->filter()->all();
             $organisatie->opleidingen()->sync($ids);
+        }
+
+        // Synthetische contactpersonen per organisatie (Fase B). Idempotent op
+        // organisatie + achternaam.
+        $contactpersonen = [
+            ['R260001', 'Miriam', 'Bakker', 'Directeur', 'm.bakker@deregenboog-po.nl', 'e-mail'],
+            ['R260001', 'Youssef', 'El Amrani', 'Stagecoördinator', 'y.elamrani@deregenboog-po.nl', 'telefoon'],
+            ['R260002', 'Peter', 'Van Dijk', 'Bestuurssecretaris', 'p.vandijk@sipo.nl', 'e-mail'],
+            ['R260003', 'Fatima', 'Ouali', 'Manager zorg', 'f.ouali@zorggroeprijnmond.nl', 'teams'],
+            ['R260004', 'Hendrik', 'De Vries', 'Hoofd geestelijke verzorging', 'h.devries@dji.nl', 'e-mail'],
+            ['R260005', 'Abdullah', 'Yaman', 'Voorzitter', 'voorzitter@moskee-annasr.nl', 'telefoon'],
+        ];
+
+        foreach ($contactpersonen as [$nummer, $voornaam, $achternaam, $functie, $email, $voorkeur]) {
+            $organisatie = Organisatie::where('relatienummer', $nummer)->first();
+            if ($organisatie === null) {
+                continue;
+            }
+
+            Contactpersoon::firstOrCreate(
+                ['organisatie_id' => $organisatie->id, 'achternaam' => $achternaam],
+                [
+                    'voornaam' => $voornaam,
+                    'functie' => $functie,
+                    'email' => $email,
+                    'voorkeur_communicatie' => $voorkeur,
+                    'actief' => true,
+                ]
+            );
         }
     }
 }

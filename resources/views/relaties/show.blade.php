@@ -45,13 +45,50 @@
   @endif
 </div>
 
-{{-- 360°-relatiekaart: de overige panelen (contactpersonen, contactmomenten,
-     stageplaatsen & stages, documenten, overeenkomsten, taken, agenda, historie)
-     worden in de volgende fasen van de module toegevoegd. --}}
+{{-- 360°-relatiekaart — Contactpersonen (Fase B). --}}
+<div class="sis-card" id="contactpersonen" style="margin-bottom:16px;">
+  <div class="sis-card__hd" style="display:flex; align-items:center; justify-content:space-between;">
+    <b>Contactpersonen ({{ $organisatie->contactpersonen->count() }})</b>
+    @if ($magBeheer)
+      <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('contactpersonen.create', $organisatie) }}">Contactpersoon toevoegen</a>
+    @endif
+  </div>
+  @if ($organisatie->contactpersonen->isEmpty())
+    <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Nog geen contactpersonen vastgelegd.</p></div>
+  @else
+    <table class="iuasr-dash-tbl">
+      <thead><tr><th>Naam</th><th>Functie</th><th>E-mail</th><th>Telefoon</th><th>Voorkeur</th><th style="text-align:center;">Status</th>@if($magBeheer)<th class="row-act"></th>@endif</tr></thead>
+      <tbody>
+        @foreach ($organisatie->contactpersonen as $cp)
+          <tr @if(! $cp->actief) style="opacity:.55;" @endif>
+            <td class="nm">{{ $cp->volledigeNaam() }}</td>
+            <td>{{ $cp->functie ?? '—' }}@if($cp->afdeling)<br><small class="sis-muted">{{ $cp->afdeling }}</small>@endif</td>
+            <td>@if($cp->email)<a href="mailto:{{ $cp->email }}">{{ $cp->email }}</a>@else — @endif</td>
+            <td>{{ $cp->mobiel ?? $cp->telefoon ?? '—' }}</td>
+            <td>{{ $cp->voorkeur_communicatie ? ucfirst($cp->voorkeur_communicatie) : '—' }}</td>
+            <td style="text-align:center;"><span class="iuasr-dash-status {{ $cp->actief ? 's-approved' : 's-draft' }}">{{ $cp->actief ? 'Actief' : 'Inactief' }}</span></td>
+            @if($magBeheer)
+              <td class="row-act" style="white-space:nowrap;">
+                <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('contactpersonen.edit', $cp) }}">Bewerken</a>
+                <form method="POST" action="{{ route('contactpersonen.status', $cp) }}" style="display:inline;">
+                  @csrf
+                  <button class="iuasr-dash-btn iuasr-dash-btn--sm" type="submit">{{ $cp->actief ? 'Inactiveren' : 'Activeren' }}</button>
+                </form>
+              </td>
+            @endif
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+  @endif
+</div>
+
+{{-- De overige panelen (contactmomenten, stageplaatsen & stages, documenten,
+     overeenkomsten, taken, agenda, historie) volgen in de fasen C t/m G. --}}
 <div class="sis-card">
-  <div class="sis-card__hd"><b>Relatiekaart (360°)</b></div>
+  <div class="sis-card__hd"><b>Overige onderdelen</b></div>
   <div style="padding:14px 16px;">
-    <p class="sis-muted" style="margin:0;">De onderdelen contactpersonen, contactmomenten, stageplaatsen &amp; stages, documenten, overeenkomsten, taken, agenda en historie verschijnen hier zodra de bijbehorende fasen (B t/m G) van de module Relatiebeheer &amp; Stage zijn opgeleverd.</p>
+    <p class="sis-muted" style="margin:0;">Contactmomenten, stageplaatsen &amp; stages, documenten, overeenkomsten, taken, agenda en historie verschijnen hier zodra de bijbehorende fasen (C t/m G) van de module Relatiebeheer &amp; Stage zijn opgeleverd.</p>
   </div>
 </div>
 @endsection

@@ -94,7 +94,7 @@ class OrganisatieController extends Controller
     {
         abort_unless($organisatie->zichtbaarVoor($request->user()), 403, 'Deze organisatie valt buiten uw toegang.');
 
-        $organisatie->load(['type', 'opleidingen']);
+        $organisatie->load(['type', 'opleidingen', 'contactpersonen' => fn ($q) => $q->orderByDesc('actief')->orderBy('achternaam')]);
 
         return view('relaties.show', ['organisatie' => $organisatie]);
     }
