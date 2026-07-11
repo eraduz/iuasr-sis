@@ -1,0 +1,91 @@
+opleiding;vakcode;volgorde;code;naam;type;weging;telt_mee
+ISLTH;B-AR01-15;1;GRA;Grammatica;tentamen;0.40;ja
+ISLTH;B-AR01-15;2;VER;Vertalen;tentamen;0.40;ja
+ISLTH;B-AR01-15;3;MON;Mondeling;mondeling;0.20;ja
+ISLTH;B-AR02-15;1;GRA;Grammatica;tentamen;0.40;ja
+ISLTH;B-AR02-15;2;VER;Vertalen;tentamen;0.40;ja
+ISLTH;B-AR02-15;3;MON;Mondeling;mondeling;0.20;ja
+ISLTH;B-AR03-15;1;GRA;Grammatica;tentamen;0.40;ja
+ISLTH;B-AR03-15;2;VER;Vertalen;tentamen;0.40;ja
+ISLTH;B-AR03-15;3;MON;Mondeling;mondeling;0.20;ja
+ISLTH;B-AR04-15;1;GRA;Grammatica;tentamen;0.40;ja
+ISLTH;B-AR04-15;2;VER;Vertalen;tentamen;0.40;ja
+ISLTH;B-AR04-15;3;MON;Mondeling;mondeling;0.20;ja
+ISLTH;B-AR05-15;1;GRA;Grammatica;tentamen;0.50;ja
+ISLTH;B-AR05-15;2;VER;Vertalen;tentamen;0.50;ja
+ISLTH;B-AR06-15;1;GRA;Grammatica;tentamen;0.50;ja
+ISLTH;B-AR06-15;2;VER;Vertalen;tentamen;0.50;ja
+ISLTH;B-AR07-15;1;GRA;Grammatica;tentamen;0.50;ja
+ISLTH;B-AR07-15;2;VER;Vertalen;tentamen;0.50;ja
+ISLTH;B-AR08-15;1;GRA;Grammatica;tentamen;0.50;ja
+ISLTH;B-AR08-15;2;VER;Vertalen;tentamen;0.50;ja
+ISLTH;B-QR01;1;TEN;Schriftelijk tentamen;tentamen;0.80;ja
+ISLTH;B-QR01;2;WST;Werkstuk;werkstuk;0.20;ja
+ISLTH;B-QR02;1;MEM;Memorisatie;mondeling;0.40;ja
+ISLTH;B-QR02;2;REC;Recitatie;mondeling;0.40;ja
+ISLTH;B-QR02;3;SCH;Schriftelijk;tentamen;0.20;ja
+ISLTH;B-QR03;1;MEM;Memorisatie;mondeling;0.40;ja
+ISLTH;B-QR03;2;REC;Recitatie;mondeling;0.40;ja
+ISLTH;B-QR03;3;SCH;Schriftelijk;tentamen;0.20;ja
+ISLTH;B-QR04;1;MEM;Memorisatie;mondeling;0.40;ja
+ISLTH;B-QR04;2;REC;Recitatie;mondeling;0.40;ja
+ISLTH;B-QR04;3;SCH;Schriftelijk;tentamen;0.20;ja
+ISLTH;B-QR05;1;MEM;Memorisatie;mondeling;0.40;ja
+ISLTH;B-QR05;2;REC;Recitatie;mondeling;0.40;ja
+ISLTH;B-QR05;3;SCH;Schriftelijk;tentamen;0.20;ja
+ISLTH;B-QR06;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+ISLTH;B-QR07;1;TEN;Schriftelijk tentamen;tentamen;0.75;ja
+ISLTH;B-QR07;2;WST;Werkstuk;werkstuk;0.25;ja
+ISLTH;B-QR08-15;1;MEM;Memorisatie;mondeling;0.60;ja
+ISLTH;B-QR08-15;2;REC;Recitatie;mondeling;0.40;ja
+ISLTH;B-QR09-15;1;MEM;Memorisatie;mondeling;0.60;ja
+ISLTH;B-QR09-15;2;REC;Recitatie;mondeling;0.40;ja
+ISLTH;B-HD01;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+ISLTH;B-HD02;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+ISLTH;B-KL01;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+ISLTH;B-KL02;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+ISLTH;B-KL03;1;TEN;Schriftelijke toets;tentamen;0.75;ja
+ISLTH;B-KL03;2;WST;Werkstuk;werkstuk;0.25;ja
+ISLTH;B-KL04;1;TEN;Schriftelijk tentamen;tentamen;0.80;ja
+ISLTH;B-KL04;2;RSP;Rollenspel;presentatie;0.20;ja
+ISLTH;B-SG01;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+ISLTH;B-SG03;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+ISLTH;B-SG04-15;1;TEN;Schriftelijk tentamen;tentamen;0.75;ja
+ISLTH;B-SG04-15;2;WST;Werkstuk;werkstuk;0.25;ja
+ISLTH;B-SG05-15;1;TEN;Schriftelijk tentamen;tentamen;0.75;ja
+ISLTH;B-SG05-15;2;WST;Werkstuk;werkstuk;0.25;ja
+ISLTH;B-FQ01;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+ISLTH;B-FQ02;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+ISLTH;B-FQ03;1;TEN;Schriftelijk tentamen;tentamen;0.80;ja
+ISLTH;B-FQ03;2;VDR;Voordracht;presentatie;0.20;ja
+ISLTH;B-FQ04;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+ISLTH;B-FQ05;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+ISLTH;B-FQ06;1;TEN;Schriftelijk tentamen;tentamen;0.70;ja
+ISLTH;B-FQ06;2;WST;Werkstuk;werkstuk;0.30;ja
+ISLTH;B-FQ07a;1;TEN;Schriftelijk tentamen;tentamen;0.60;ja
+ISLTH;B-FQ07a;2;WST;Werkstuk;werkstuk;0.40;ja
+ISLTH;B-FQ07c;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+ISLTH;B-MT01;1;OPD;Schrijfopdrachten;werkstuk;0.80;ja
+ISLTH;B-MT01;2;PRE;Presentatie;presentatie;0.20;ja
+ISLTH;B-MT02;1;DLN;Actieve deelname;portfolio;0.40;ja
+ISLTH;B-MT02;2;PRE;Presentatie;presentatie;0.40;ja
+ISLTH;B-MT02;3;REF;Reflectieverslag;werkstuk;0.20;ja
+ISLTH;B-MT03;1;POR;Portfolio;portfolio;1.00;ja
+ISLTH;B-MT04-A;1;TEN;Schriftelijk tentamen;tentamen;0.70;ja
+ISLTH;B-MT04-A;2;OPD;Opdracht;werkstuk;0.30;ja
+ISLTH;B-MT04-B;1;TEN;Schriftelijk tentamen;tentamen;0.70;ja
+ISLTH;B-MT04-B;2;OPD;Opdracht;werkstuk;0.30;ja
+ISLTH;B-GF01;1;TEN;Schriftelijk tentamen;tentamen;0.80;ja
+ISLTH;B-GF01;2;ESS;Essay;werkstuk;0.20;ja
+ISLTH;B-SC02;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+ISLTH;B-SC03;1;POR;Portfolio;portfolio;1.00;ja
+ISLTH;B-SC04;1;TEN;Schriftelijk tentamen;tentamen;0.70;ja
+ISLTH;B-SC04;2;WST;Werkstuk;werkstuk;0.30;ja
+ISLTH;B-SC07;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+ISLTH;B-SC05-15;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+ISLTH;B-SC06-15;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+ISLTH;B-CD01;1;WST;Eindwerkstuk;werkstuk;1.00;ja
+ISLTH;B-BR01;1;SCR;Scriptie;overig;1.00;ja
+ISLTH;B-ST01;1;STV;Stageverslag en portfolio;portfolio;1.00;ja
+ISLTH;B-ST02;1;STV;Stageverslag en portfolio;portfolio;1.00;ja
+ISLTH;B-ST04;1;STV;Stageverslag en portfolio;portfolio;1.00;ja

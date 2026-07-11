@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ReferentieSeeder::class,
             CurriculumSeeder::class,
+            ToetsonderdeelSeeder::class,
             DocentSeeder::class,
             GebruikerSeeder::class,
             SynthetischeStudentSeeder::class,

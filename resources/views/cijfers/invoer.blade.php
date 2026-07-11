@@ -31,7 +31,7 @@
   <div class="sis-card__hd"><h3>Toetsopbouw</h3><span class="hint">Weging telt op tot 100%</span></div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;">
     @foreach ($vak->toetsonderdelen as $od)
-      <span class="sis-pill-soft" style="font-size:12px;padding:5px 12px;">{{ $od->naam }} · <b style="color:var(--priColor100);">{{ rtrim(rtrim(number_format($od->weging*100,0),'0'),'.') }}%</b></span>
+      <span class="sis-pill-soft" style="font-size:12px;padding:5px 12px;">{{ $od->naam }} · <b style="color:var(--priColor100);">{{ rtrim(rtrim(number_format($od->weging*100,1),'0'),'.') }}%</b></span>
     @endforeach
     <span class="sis-pill-soft" style="font-size:12px;padding:5px 12px;">Cesuur · <b style="color:var(--priColor100);">{{ number_format($grens,1,',','') }}</b></span>
   </div>
@@ -60,7 +60,7 @@
         <tr>
           <th style="width:190px;">Student</th>
           @foreach ($vak->toetsonderdelen as $od)
-            <th style="text-align:center;">{{ $od->naam }}<br><span class="sis-weegcell">{{ rtrim(rtrim(number_format($od->weging*100,0),'0'),'.') }}% · 1e / herk.</span></th>
+            <th style="text-align:center;">{{ $od->naam }}<br><span class="sis-weegcell">{{ rtrim(rtrim(number_format($od->weging*100,1),'0'),'.') }}% · 1e / herk.</span></th>
           @endforeach
           <th style="text-align:center;">Vrijstelling</th>
           <th style="text-align:center;" title="Aanwezigheid t.o.v. de norm; onder de norm mocht de student formeel geen toets afleggen (studiegids §2.3.3)">Aanwezigheid</th>
