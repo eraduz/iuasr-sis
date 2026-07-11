@@ -12,6 +12,7 @@ use App\Models\Functie;
 use App\Models\Gesprek;
 use App\Models\Gespreksdoel;
 use App\Models\Medewerker;
+use App\Models\MedewerkerNotitie;
 use App\Models\User;
 use App\Models\Verlofaanvraag;
 use App\Models\Verlofsaldo;
@@ -75,6 +76,25 @@ class HrSeeder extends Seeder
         $this->verlofEnVerzuim();
         $this->gesprekken();
         $this->checklist();
+        $this->notities();
+    }
+
+    /** Synthetische contactmoment-notities (logboek per medewerker). */
+    private function notities(): void
+    {
+        $auteur = User::where('email', 'n.aslan@iuasr.nl')->value('id');
+
+        $sophie = Medewerker::where('personeelsnummer', 'P260003')->first();
+        if ($sophie !== null) {
+            MedewerkerNotitie::firstOrCreate(
+                ['medewerker_id' => $sophie->id, 'tekst' => 'Telefonisch contact over de contractverlenging; medewerker wil graag uitbreiden naar 0,6 fte. Teruggekoppeld dat de leidinggevende dit in het functioneringsgesprek bespreekt.'],
+                ['gebruiker_id' => $auteur]
+            );
+            MedewerkerNotitie::firstOrCreate(
+                ['medewerker_id' => $sophie->id, 'tekst' => 'E-mail ontvangen met vraag over het verlofsaldo; per e-mail beantwoord met het actuele saldo.'],
+                ['gebruiker_id' => $auteur]
+            );
+        }
     }
 
     /** Demo-onboarding voor een recente medewerker (Fase E). */

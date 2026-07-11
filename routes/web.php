@@ -288,6 +288,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/gesprekken/{gesprek}/competenties', [App\Http\Controllers\Hr\GesprekController::class, 'competentieStore'])->name('gesprekken.competentie.store');
         Route::delete('/competentiescores/{score}', [App\Http\Controllers\Hr\GesprekController::class, 'competentieDestroy'])->name('gesprekken.competentie.destroy');
 
+        // Interne notities per medewerker (contactmomenten/gespreksverslagen).
+        Route::post('/medewerkers/{medewerker}/notities', [App\Http\Controllers\Hr\MedewerkerController::class, 'notitieStore'])->name('medewerkers.notities.store');
+        Route::delete('/medewerkers/{medewerker}/notities/{notitie}', [App\Http\Controllers\Hr\MedewerkerController::class, 'notitieDestroy'])->name('medewerkers.notities.destroy');
+
         // Onboarding/offboarding-checklists (Fase E).
         Route::post('/medewerkers/{medewerker}/checklist/start', [App\Http\Controllers\Hr\ChecklistController::class, 'start'])->name('checklist.start');
         Route::post('/medewerkers/{medewerker}/checklisttaken', [App\Http\Controllers\Hr\ChecklistController::class, 'store'])->name('checklist.store');

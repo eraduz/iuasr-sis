@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Afdeling;
 use App\Models\Functie;
 use App\Models\Medewerker;
+use App\Models\MedewerkerNotitie;
 use App\Models\User;
 use App\Support\AuditLogger;
 use App\Support\PersoneelsnummerGenerator;
@@ -85,7 +86,8 @@ class MedewerkerController extends Controller
             'verlofaanvragen' => fn ($q) => $q->with('beoordelaar'),
             'ziekmeldingen' => fn ($q) => $q->with('gemeldDoor'),
             'gesprekken' => fn ($q) => $q->with('gespreksvoerder'),
-            'checklisttaken' => fn ($q) => $q->with('verantwoordelijke')]);
+            'checklisttaken' => fn ($q) => $q->with('verantwoordelijke'),
+            'notities' => fn ($q) => $q->with('gebruiker')]);
 
         $jaar = (int) date('Y');
 
@@ -113,6 +115,41 @@ class MedewerkerController extends Controller
         AuditLogger::log(AuditLogger::WIJZIGING, $medewerker, veld: 'medewerker', context: ['personeelsnummer' => $medewerker->personeelsnummer]);
 
         return redirect()->route('medewerkers.show', $medewerker)->with('status', 'Medewerker bijgewerkt.');
+    }
+
+    /**
+     * Interne notitie toevoegen bij een medewerker (HR/Beheer): een logboekregel
+     * voor een contactmoment — e-mail, telefoongesprek of gespreksverslag.
+     */
+    public function notitieStore(Request $request, Medewerker $medewerker): RedirectResponse
+    {
+        abort_unless($medewerker->beheerbaarVoor($request->user()), 403, 'U mag hier geen notities toevoegen.');
+
+        $data = $request->validate([
+            'tekst' => ['required', 'string', 'max:5000'],
+        ]);
+
+        $medewerker->notities()->create([
+            'gebruiker_id' => auth()->id(),
+            'tekst' => $data['tekst'],
+        ]);
+
+        return redirect()
+            ->to(route('medewerkers.show', $medewerker).'#notities')
+            ->with('status', 'Notitie toegevoegd.');
+    }
+
+    /** Interne notitie verwijderen (HR/Beheer). */
+    public function notitieDestroy(Request $request, Medewerker $medewerker, MedewerkerNotitie $notitie): RedirectResponse
+    {
+        abort_unless($medewerker->beheerbaarVoor($request->user()), 403, 'U mag deze notitie niet verwijderen.');
+        abort_unless($notitie->medewerker_id === $medewerker->id, 404);
+
+        $notitie->delete();
+
+        return redirect()
+            ->to(route('medewerkers.show', $medewerker).'#notities')
+            ->with('status', 'Notitie verwijderd.');
     }
 
     private function formData(Medewerker $medewerker): array

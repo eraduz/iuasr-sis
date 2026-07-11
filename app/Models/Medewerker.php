@@ -106,6 +106,12 @@ class Medewerker extends Model
         return $this->hasMany(HrChecklisttaak::class)->orderBy('volgorde')->orderBy('id');
     }
 
+    /** Interne notities (contactmomenten/gespreksverslagen), nieuwste eerst. */
+    public function notities(): HasMany
+    {
+        return $this->hasMany(MedewerkerNotitie::class)->latest();
+    }
+
     public function volledigeNaam(): string
     {
         return trim(implode(' ', array_filter([$this->voornaam, $this->tussenvoegsel, $this->achternaam])));
