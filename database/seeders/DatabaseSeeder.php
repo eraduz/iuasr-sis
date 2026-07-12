@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             CurriculumSeeder::class,
             ToetsonderdeelSeeder::class,
             DocentSeeder::class,
+            VakDocentSeeder::class,
             GebruikerSeeder::class,
             SynthetischeStudentSeeder::class,
             VaktoewijzingSeeder::class,

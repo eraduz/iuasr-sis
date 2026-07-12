@@ -39,6 +39,9 @@ class DocentSeeder extends Seeder
             ['Yasin', 'Mol'],
             ['Selim', 'Kocadağ'],
             ['George', 'Muishout'],
+            // Docent uit de studiegidsen (ISLTH B-KL03; diverse MGV-modules).
+            // Alleen de initiaal 'H.' is bekend uit de gids; niet zelf ingevuld.
+            ['H.', 'Bouyazdouzen'],
         ];
 
         foreach ($docenten as [$voornaam, $achternaam]) {
