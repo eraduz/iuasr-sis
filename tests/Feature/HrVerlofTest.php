@@ -154,7 +154,29 @@ class HrVerlofTest extends TestCase
 
         $this->assertFalse($typen->contains('zwangerschap'));
         $this->assertFalse($typen->contains('geboorte'));
+        $this->assertFalse($typen->contains('ouderschap')); // wettelijk, loopt via UWV
         $this->assertTrue($typen->contains('vakantie'));
+    }
+
+    public function test_ouderschapsverlof_rekenregel_en_aanvraag(): void
+    {
+        // 26x weekuren totaal, waarvan 9 weken (9x) deels betaald via UWV.
+        $uren = \App\Support\Wettelijkverlof::ouderschapsverlofUren(36);
+        $this->assertSame(936.0, $uren['totaal']);   // 26 x 36
+        $this->assertSame(324.0, $uren['betaald']);  // 9 x 36
+        $this->assertSame(612.0, $uren['onbetaald']); // rest
+
+        $this->actingAs($this->leidingg)->post(route('verlof.store'), [
+            'verloftype' => 'ouderschap',
+            'van' => date('Y').'-09-01',
+            'tot' => date('Y').'-11-03',
+            'uren' => 324,
+        ])->assertRedirect(route('verlof.mijn'));
+
+        $this->assertDatabaseHas('verlofaanvragen', [
+            'medewerker_id' => $this->leidingg->medewerker->id,
+            'verloftype' => 'ouderschap',
+        ]);
     }
 
     public function test_wettelijkverlof_helper_berekent_zwangerschapsperiode(): void

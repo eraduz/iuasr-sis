@@ -211,6 +211,16 @@ class HrSeeder extends Seeder
             );
         }
 
+        // Ouderschapsverlof (gespreid): Johan neemt de 9 betaalde weken op.
+        $johan = Medewerker::where('personeelsnummer', 'P260006')->first();
+        if ($johan !== null) {
+            $ouder = \App\Support\Wettelijkverlof::ouderschapsverlofUren($johan->huidigDienstverband()?->uren_per_week ?? 36);
+            Verlofaanvraag::firstOrCreate(
+                ['medewerker_id' => $johan->id, 'verloftype' => 'ouderschap', 'van' => $jaar.'-09-01'],
+                ['tot' => $jaar.'-11-03', 'uren' => $ouder['betaald'], 'status' => 'goedgekeurd', 'aangevraagd_door_id' => $johan->user_id, 'reden' => 'Betaald ouderschapsverlof (9 weken)']
+            );
+        }
+
         // Een open ziekmelding (langdurig verzuim — Poortwachter-traject, Fase G).
         $fadwa = Medewerker::where('personeelsnummer', 'P260005')->first();
         if ($fadwa !== null) {

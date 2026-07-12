@@ -307,6 +307,7 @@
     <li><b>Zwangerschaps- en bevallingsverlof</b>: samen minimaal <b>16 weken</b>. Vul de <b>uitgerekende datum</b> in, dan vult het systeem automatisch de periode (6 weken vóór t/m 10 weken ná die datum). De uitkering loopt via het UWV.</li>
     <li><b>Geboorteverlof (partner)</b>: <b>1× het aantal werkuren per week</b>, volledig doorbetaald, binnen 4 weken na de geboorte. Het systeem stelt de uren voor op basis van het dienstverband.</li>
     <li><b>Aanvullend geboorteverlof</b>: daarna <b>maximaal 5× de weekuren</b> binnen 6 maanden (70% via UWV).</li>
+    <li><b>Ouderschapsverlof</b>: totaal <b>26× de weekuren</b> per kind, op te nemen tot het kind 8 jaar is. Daarvan zijn <b>9 weken (9× de weekuren) deels betaald</b> (70% via UWV) als ze in het eerste levensjaar worden opgenomen; de overige 17 weken zijn onbetaald. In één keer of gespreid op te nemen. Het formulier toont het totale recht en het betaalde deel op basis van het dienstverband.</li>
   </ul>
   <p>Dit wettelijke verlof loopt via een UWV-uitkering en staat daarom los van het vakantiesaldo; het verschijnt niet in de saldotabel maar wel in het overzicht van aanvragen. HR kan de voorgestelde data altijd aanpassen (bijvoorbeeld bij een vroege of late bevalling, of bij gespreid opnemen).</p>
   <h3>Verzuim</h3>

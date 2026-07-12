@@ -20,6 +20,12 @@ class Wettelijkverlof
     /** Aanvullend geboorteverlof: maximaal 5× de weekuren. */
     public const AANVULLEND_GEBOORTE_MAX_WEKEN = 5;
 
+    /** Ouderschapsverlof: totaal recht van 26× de weekuren per kind. */
+    public const OUDERSCHAP_TOTAAL_WEKEN = 26;
+
+    /** Ouderschapsverlof: 9 weken deels betaald (70% via UWV) in het eerste levensjaar. */
+    public const OUDERSCHAP_BETAALD_WEKEN = 9;
+
     /**
      * Voorstel voor zwangerschaps- en bevallingsverlof op basis van de
      * uitgerekende datum: 6 weken ervoor tot 10 weken erna (samen 16 weken).
@@ -48,5 +54,23 @@ class Wettelijkverlof
     public static function aanvullendGeboorteverlofUren(float $urenPerWeek): float
     {
         return round($urenPerWeek * self::AANVULLEND_GEBOORTE_MAX_WEKEN, 1);
+    }
+
+    /**
+     * Ouderschapsverlof: totaal 26× de weekuren, waarvan 9 weken deels betaald
+     * (70% via UWV) en de rest onbetaald.
+     *
+     * @return array{totaal: float, betaald: float, onbetaald: float}
+     */
+    public static function ouderschapsverlofUren(float $urenPerWeek): array
+    {
+        $totaal = round($urenPerWeek * self::OUDERSCHAP_TOTAAL_WEKEN, 1);
+        $betaald = round($urenPerWeek * self::OUDERSCHAP_BETAALD_WEKEN, 1);
+
+        return [
+            'totaal' => $totaal,
+            'betaald' => $betaald,
+            'onbetaald' => round($totaal - $betaald, 1),
+        ];
     }
 }

@@ -79,11 +79,15 @@
         if (t === 'geboorte') { uren.value = weekuren; }
         else if (t === 'aanvullend_geboorte') { uren.value = weekuren * 5; }
       }
-      urenHint.textContent = (t === 'geboorte')
-        ? 'Voorstel: 1× de weekuren (' + weekuren + ' uur).'
-        : (t === 'aanvullend_geboorte')
-          ? 'Voorstel: max. 5× de weekuren (' + (weekuren * 5) + ' uur).'
-          : 'Het aantal verlofuren dat u wilt opnemen.';
+      if (t === 'geboorte') {
+        urenHint.textContent = 'Voorstel: 1× de weekuren (' + weekuren + ' uur).';
+      } else if (t === 'aanvullend_geboorte') {
+        urenHint.textContent = 'Voorstel: max. 5× de weekuren (' + (weekuren * 5) + ' uur).';
+      } else if (t === 'ouderschap') {
+        urenHint.textContent = 'Totaal recht: 26× de weekuren (' + (weekuren * 26) + ' uur), waarvan 9 weken (' + (weekuren * 9) + ' uur) deels betaald via UWV. Op te nemen in één keer of gespreid.';
+      } else {
+        urenHint.textContent = 'Het aantal verlofuren dat u wilt opnemen.';
+      }
     }
 
     function berekenZwangerschap() {

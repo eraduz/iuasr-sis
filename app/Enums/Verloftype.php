@@ -33,7 +33,7 @@ enum Verloftype: string
     public function wettelijk(): bool
     {
         return match ($this) {
-            self::Zwangerschap, self::Geboorte, self::AanvullendGeboorte => true,
+            self::Zwangerschap, self::Geboorte, self::AanvullendGeboorte, self::Ouderschap => true,
             default => false,
         };
     }
@@ -45,6 +45,7 @@ enum Verloftype: string
             self::Zwangerschap => 'Zwangerschaps- en bevallingsverlof duren samen minimaal 16 weken. Het zwangerschapsverlof begint 6 weken vóór de uitgerekende datum (uiterlijk 4 weken ervoor); het bevallingsverlof duurt minimaal 10 weken na de bevalling. De uitkering (100% dagloon, gemaximeerd) loopt via het UWV (WAZO).',
             self::Geboorte => 'De partner heeft recht op eenmaal het aantal werkuren per week aan geboorteverlof, volledig doorbetaald door de werkgever, op te nemen binnen 4 weken na de geboorte.',
             self::AanvullendGeboorte => 'De partner kan daarna maximaal 5× het aantal werkuren per week aanvullend geboorteverlof opnemen, binnen 6 maanden na de geboorte en ná het gewone geboorteverlof. De uitkering is 70% van het dagloon via het UWV.',
+            self::Ouderschap => 'Het recht op ouderschapsverlof is 26× het aantal werkuren per week, op te nemen tot het kind 8 jaar is. Hiervan zijn 9 weken (9× de weekuren) deels betaald: 70% van het dagloon via het UWV, mits opgenomen in het eerste levensjaar van het kind. De overige 17 weken zijn onbetaald. Op te nemen in één keer of gespreid.',
             default => null,
         };
     }
