@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             CollegegeldSeeder::class,
             KennistoetsSeeder::class,
             OrganisatieSeeder::class,
+            NieuwsbronSeeder::class,
             HrSeeder::class,
             HrDocentenSeeder::class,
             // Echte personeelslijst (lokaal, gitignored; no-op als het bestand ontbreekt).

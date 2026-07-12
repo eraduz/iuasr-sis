@@ -134,6 +134,7 @@
             'Beheer' => [
                 ['Gebruikers & rollen', 'gebruikers', 'users', 'gebruikers'],
                 ['Opzoektabellen', 'opzoektabellen', 'db', 'opzoektabellen'],
+                ['Nieuwsbronnen', 'nieuws', 'report', 'nieuws'],
                 ['Audit-log', 'audit-log', 'log', 'audit-log'],
                 ['Back-up & herstel', 'backup', 'db', 'backup'],
                 ['Technische handleiding', 'handleiding.technisch', 'report', 'handleiding.technisch'],

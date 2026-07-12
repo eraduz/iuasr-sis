@@ -29,6 +29,36 @@
   </div>
 </div>
 
+{{-- Onderwijsnieuws (informatief; lokaal opgeslagen, dagelijks bijgewerkt). --}}
+<div class="sis-card" style="margin-bottom:18px;border-left:3px solid var(--priColor300,#D69A2D);">
+  <div class="sis-card__hd">
+    <h3>Onderwijsnieuws</h3>
+    <span class="hint">Belangrijke berichten uit het onderwijsveld — automatisch bijgewerkt (dagelijks)</span>
+  </div>
+  @if ($nieuws->isEmpty())
+    <p class="sis-muted" style="font-size:13px;margin:0;">Nog geen nieuws opgehaald. Beheer kan het handmatig ophalen via <b>Beheer → Nieuwsbronnen</b>.</p>
+  @else
+    <div style="display:flex;flex-direction:column;">
+      @foreach ($nieuws as $bericht)
+        <a href="{{ $bericht->link }}" target="_blank" rel="noopener noreferrer"
+           style="display:flex;gap:12px;align-items:baseline;padding:10px 2px;border-top:1px solid var(--borderSubtleColor);text-decoration:none;color:inherit;">
+          <span style="flex:0 0 74px;font-size:11.5px;color:var(--blackAltText,#6b6b6b);white-space:nowrap;">
+            {{ $bericht->gepubliceerd_op?->format('d-m-Y') ?? '—' }}
+          </span>
+          <span style="flex:1 1 auto;">
+            <b style="font-weight:600;color:var(--priColor100,#1E1446);">{{ $bericht->titel }}</b>
+            @if ($bericht->samenvatting)
+              <span style="display:block;font-size:12.5px;color:var(--blackAltText,#6b6b6b);margin-top:2px;">{{ $bericht->samenvatting }}</span>
+            @endif
+          </span>
+          <span class="sis-pill-soft" style="flex:0 0 auto;font-size:10.5px;align-self:center;">{{ $bericht->bron?->naam }}</span>
+        </a>
+      @endforeach
+    </div>
+    <p class="sis-tblnote" style="margin-top:10px;">Alleen ter informatie. Klik voor het volledige bericht op de bron. Bronnen: {{ \App\Models\Nieuwsbron::where('actief', true)->pluck('naam')->implode(' · ') }}.</p>
+  @endif
+</div>
+
 {{-- ===================== RUBRIEK A — STUDENTEN & ONDERWIJS ===================== --}}
 <h2 style="{{ $rubriekStijl }}">A · Studenten &amp; onderwijs</h2>
 <p style="{{ $subStijl }}">Module Studentenzaken — inschrijving, rendement en aanwezigheid over {{ $aantalOpleidingen }} opleidingen.</p>

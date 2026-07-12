@@ -131,6 +131,28 @@ return [
         'herbeoordeling' => ['juli', 'januari'],
     ],
 
+    /*
+    |----------------------------------------------------------------------
+    | Onderwijsnieuws (bestuursdashboard)
+    |----------------------------------------------------------------------
+    | Nieuws wordt op een schema (dagelijks 23:00) op de achtergrond opgehaald
+    | en lokaal opgeslagen; het dashboard leest alleen uit de lokale tabel.
+    | Uitgaand verkeer is beperkt tot de WHITELIST hieronder (alleen deze hosts
+    | mogen worden benaderd — voorkomt misbruik/SSRF en houdt het intern-beheersbaar).
+    */
+    'nieuws' => [
+        'toegestane_hosts' => array_filter(array_map('trim', explode(',', (string) env(
+            'SIS_NIEUWS_HOSTS',
+            'www.vereniginghogescholen.nl,www.onderwijsinspectie.nl'
+        )))),
+        'timeout' => (int) env('SIS_NIEUWS_TIMEOUT', 15),
+        'max_per_bron' => (int) env('SIS_NIEUWS_MAX_PER_BRON', 15),
+        'toon_aantal' => (int) env('SIS_NIEUWS_TOON_AANTAL', 6),
+        // Pad naar een CA-bundel (cacert.pem) voor SSL-verificatie, als de server
+        // die niet globaal in php.ini heeft. SSL-verificatie blijft altijd AAN.
+        'cacert' => env('SIS_NIEUWS_CACERT'),
+    ],
+
     'kennistoetsen' => [
         // Landelijke kennistoetsen (bv. PABO: RWT reken-/wiskundetoets + LKT
         // taal en rekenen). Termijn waarbinnen de student ze moet halen,

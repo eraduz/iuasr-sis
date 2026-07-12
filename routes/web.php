@@ -535,6 +535,13 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');
 
+        // Onderwijsnieuws — bronnenbeheer + handmatig ophalen/toevoegen.
+        Route::get('/beheer/nieuws', [App\Http\Controllers\NieuwsController::class, 'index'])->name('nieuws');
+        Route::post('/beheer/nieuws/ophalen', [App\Http\Controllers\NieuwsController::class, 'ophalen'])->name('nieuws.ophalen');
+        Route::put('/beheer/nieuws/bron/{bron}/toggle', [App\Http\Controllers\NieuwsController::class, 'bronToggle'])->name('nieuws.bron.toggle');
+        Route::post('/beheer/nieuws/bericht', [App\Http\Controllers\NieuwsController::class, 'berichtToevoegen'])->name('nieuws.bericht');
+        Route::delete('/beheer/nieuws/bericht/{bericht}', [App\Http\Controllers\NieuwsController::class, 'berichtVerwijderen'])->name('nieuws.bericht.verwijderen');
+
         // Student VOLLEDIG verwijderen (foutieve records) — uitsluitend Beheerder.
         Route::delete('/studenten/{student}', [StudentController::class, 'destroy'])->name('studenten.destroy');
 

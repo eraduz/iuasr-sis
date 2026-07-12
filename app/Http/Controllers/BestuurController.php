@@ -80,6 +80,11 @@ class BestuurController extends Controller
             'hr' => HrRapport::kerncijfers(),
             'hrPerAfdeling' => HrRapport::perAfdeling(),
             'aantalAfdelingen' => Medewerker::query()->whereNotNull('afdeling_id')->distinct('afdeling_id')->count('afdeling_id'),
+
+            // Onderwijsnieuws (lokaal opgeslagen; opgehaald door de scheduler).
+            'nieuws' => \App\Models\Nieuwsbericht::with('bron')
+                ->orderByDesc('gepubliceerd_op')->orderByDesc('id')
+                ->limit((int) config('sis.nieuws.toon_aantal', 6))->get(),
         ]);
     }
 }
