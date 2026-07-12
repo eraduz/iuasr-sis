@@ -10,7 +10,7 @@
 <div class="iuasr-dash-vhead">
   <div>
     <h1>{{ $medewerker->volledigeNaam() }}</h1>
-    <div class="summary">Personeelsnummer <b>{{ $medewerker->personeelsnummer }}</b> · <span class="iuasr-dash-status {{ $medewerker->status?->badge() }}">{{ $medewerker->status?->label() }}</span>@if($medewerker->fte() !== null) · {{ number_format($medewerker->fte(), 2, ',', '.') }} FTE @endif</div>
+    <div class="summary">Personeelsnummer <b>{{ $medewerker->personeelsnummer }}</b> · <span class="iuasr-dash-status {{ $medewerker->status?->badge() }}">{{ $medewerker->status?->label() }}</span>@if($medewerker->status === \App\Enums\MedewerkerStatus::UitDienst && $medewerker->uit_dienst_datum) <span class="sis-muted">per {{ $medewerker->uit_dienst_datum->format('d-m-Y') }}</span>@endif @if($medewerker->fte() !== null) · {{ number_format($medewerker->fte(), 2, ',', '.') }} FTE @endif</div>
   </div>
   @if ($magBeheer)
     <div class="iuasr-dash-vhead__actions"><a class="iuasr-dash-btn" href="{{ route('medewerkers.edit', $medewerker) }}">Bewerken</a></div>
@@ -28,6 +28,10 @@
     <div><small class="sis-muted">E-mail</small><div>{{ $medewerker->email ?? '—' }}</div></div>
     <div><small class="sis-muted">Adres</small><div>{{ trim(($medewerker->adres ?? '').' '.($medewerker->postcode ?? '').' '.($medewerker->woonplaats ?? '')) ?: '—' }}</div></div>
     <div><small class="sis-muted">Self-service login</small><div>{{ $medewerker->user?->naam ?? '—' }}</div></div>
+    @if ($medewerker->status === \App\Enums\MedewerkerStatus::UitDienst)
+      <div><small class="sis-muted">Uit dienst per</small><div>{{ $medewerker->uit_dienst_datum?->format('d-m-Y') ?? '—' }}</div></div>
+      <div><small class="sis-muted">Reden uitdiensttreding</small><div>{{ $medewerker->uit_dienst_reden ?? '—' }}</div></div>
+    @endif
     @if ($bsnZichtbaar)<div><small class="sis-muted">BSN</small><div>{{ $medewerker->bsn ?? '—' }}</div></div>@endif
   </div>
   @if ($medewerker->opmerkingen)

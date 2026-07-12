@@ -30,7 +30,7 @@
       <tr><th style="width:38%;">Functie</th><td>{{ $medewerker->functie?->naam ?? '—' }}</td></tr>
       <tr><th>Afdeling</th><td>{{ $medewerker->afdeling?->naam ?? '—' }}</td></tr>
       <tr><th>Leidinggevende</th><td>{{ $medewerker->manager?->volledigeNaam() ?? '—' }}</td></tr>
-      <tr><th>Status</th><td><span class="iuasr-dash-status {{ $medewerker->status?->badge() }}">{{ $medewerker->status?->label() }}</span></td></tr>
+      <tr><th>Status</th><td><span class="iuasr-dash-status {{ $medewerker->status?->badge() }}">{{ $medewerker->status?->label() }}</span>@if ($medewerker->status === \App\Enums\MedewerkerStatus::UitDienst && $medewerker->uit_dienst_datum) <span class="sis-muted">per {{ $medewerker->uit_dienst_datum->format('d-m-Y') }}</span>@endif</td></tr>
       @if ($huidig)
         <tr><th>Contract</th><td>{{ $huidig->contracttype?->label() }} · {{ number_format((float) $huidig->uren_per_week, 1, ',', '.') }} uur/week · {{ number_format($huidig->fte(), 2, ',', '.') }} FTE</td></tr>
         <tr><th>In dienst sinds</th><td class="dt">{{ $huidig->startdatum?->format('d-m-Y') }}@if ($huidig->einddatum) <span class="sis-muted">t/m {{ $huidig->einddatum->format('d-m-Y') }}</span>@endif</td></tr>

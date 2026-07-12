@@ -25,7 +25,7 @@ class Medewerker extends Model
         'personeelsnummer', 'user_id', 'docent_id', 'manager_id', 'afdeling_id', 'functie_id',
         'aanhef', 'voornaam', 'tussenvoegsel', 'achternaam', 'geboortedatum',
         'bsn', 'bsn_hash', 'adres', 'postcode', 'woonplaats', 'telefoon',
-        'email', 'email_prive', 'status', 'actief', 'opmerkingen',
+        'email', 'email_prive', 'status', 'uit_dienst_datum', 'uit_dienst_reden', 'actief', 'opmerkingen',
     ];
 
     protected $hidden = ['bsn', 'bsn_hash'];
@@ -34,6 +34,7 @@ class Medewerker extends Model
     {
         return [
             'geboortedatum' => 'date',
+            'uit_dienst_datum' => 'date',
             'status' => MedewerkerStatus::class,
             'actief' => 'boolean',
             'bsn' => VersleuteldGevoeligVeld::class,

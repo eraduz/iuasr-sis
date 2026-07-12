@@ -71,6 +71,7 @@ class MedewerkerController extends Controller
         }
         abort_if($medewerker === null, 500, 'Kon geen uniek personeelsnummer bepalen.');
 
+        $this->sluitLopendDienstverband($medewerker);
         AuditLogger::log(AuditLogger::AANMAAK, $medewerker, veld: 'medewerker', context: ['personeelsnummer' => $medewerker->personeelsnummer]);
 
         return redirect()->route('medewerkers.show', $medewerker)->with('status', 'Medewerker toegevoegd.');
@@ -112,6 +113,7 @@ class MedewerkerController extends Controller
         abort_unless($medewerker->beheerbaarVoor($request->user()), 403, 'U mag deze medewerker niet wijzigen.');
 
         $medewerker->update($this->valideer($request, $medewerker->id));
+        $this->sluitLopendDienstverband($medewerker);
         AuditLogger::log(AuditLogger::WIJZIGING, $medewerker, veld: 'medewerker', context: ['personeelsnummer' => $medewerker->personeelsnummer]);
 
         return redirect()->route('medewerkers.show', $medewerker)->with('status', 'Medewerker bijgewerkt.');
@@ -187,6 +189,9 @@ class MedewerkerController extends Controller
             'email' => ['nullable', 'email', 'max:255'],
             'email_prive' => ['nullable', 'email', 'max:255'],
             'status' => ['required', Rule::in(MedewerkerStatus::waarden())],
+            // Offboarding: de uit-dienstdatum is verplicht zodra de status 'uit dienst' is.
+            'uit_dienst_datum' => ['nullable', 'date', 'required_if:status,'.MedewerkerStatus::UitDienst->value],
+            'uit_dienst_reden' => ['nullable', 'string', 'max:255'],
             'opmerkingen' => ['nullable', 'string', 'max:2000'],
         ];
 
@@ -197,6 +202,15 @@ class MedewerkerController extends Controller
         $data = $request->validate($regels);
         $data['actief'] = $request->boolean('actief', true);
 
+        // Offboarding-logica: uit-dienstdatum/-reden horen alleen bij status 'uit dienst',
+        // en wie uit dienst is, is per definitie niet meer actief.
+        if (($data['status'] ?? null) === MedewerkerStatus::UitDienst->value) {
+            $data['actief'] = false;
+        } else {
+            $data['uit_dienst_datum'] = null;
+            $data['uit_dienst_reden'] = null;
+        }
+
         // BSN alleen verwerken als het is ingeschakeld; hash voor zoeken/uniciteit.
         if (config('sis.hr.bsn_ingeschakeld', false) && ! empty($data['bsn'])) {
             $data['bsn_hash'] = hash('sha256', $data['bsn']);
@@ -205,5 +219,24 @@ class MedewerkerController extends Controller
         }
 
         return $data;
+    }
+
+    /**
+     * Sluit het lopende dienstverband op de uit-dienstdatum. Cruciaal bij een VAST
+     * contract: dat heeft geen eigen einddatum, dus zonder deze stap zou het
+     * dienstverband "lopend" blijven terwijl de medewerker uit dienst is. Bestaande
+     * einddata worden niet overschreven.
+     */
+    private function sluitLopendDienstverband(Medewerker $medewerker): void
+    {
+        if ($medewerker->status !== MedewerkerStatus::UitDienst || $medewerker->uit_dienst_datum === null) {
+            return;
+        }
+
+        $medewerker->load('dienstverbanden');
+        $lopend = $medewerker->huidigDienstverband();
+        if ($lopend && $lopend->einddatum === null) {
+            $lopend->update(['einddatum' => $medewerker->uit_dienst_datum]);
+        }
     }
 }

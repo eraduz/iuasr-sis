@@ -95,6 +95,58 @@ class HrModuleTest extends TestCase
         $this->actingAs($this->leidingg)->get(route('medewerkers.create'))->assertOk();
     }
 
+    public function test_uit_dienst_vereist_een_uitdienstdatum(): void
+    {
+        $m = Medewerker::where('personeelsnummer', 'P260005')->firstOrFail();
+
+        $this->actingAs($this->hr)->put(route('medewerkers.update', $m), [
+            'voornaam' => $m->voornaam, 'achternaam' => $m->achternaam, 'status' => 'uit_dienst',
+        ])->assertSessionHasErrors('uit_dienst_datum');
+    }
+
+    public function test_offboarding_sluit_vast_contract_en_zet_niet_actief(): void
+    {
+        // Verse medewerker met een VAST contract zonder einddatum.
+        $this->actingAs($this->hr)->post(route('medewerkers.store'), [
+            'voornaam' => 'Vast', 'achternaam' => 'Contract', 'status' => 'actief', 'actief' => '1',
+        ])->assertRedirect();
+        $m = Medewerker::where('achternaam', 'Contract')->firstOrFail();
+
+        $this->actingAs($this->hr)->post(route('dienstverbanden.store', $m), [
+            'contracttype' => 'vast', 'startdatum' => '2020-01-01', 'uren_per_week' => 40,
+        ])->assertRedirect();
+
+        // Uit dienst zetten — met datum en reden; 'actief' aangevinkt moet toch false worden.
+        $this->actingAs($this->hr)->put(route('medewerkers.update', $m), [
+            'voornaam' => 'Vast', 'achternaam' => 'Contract', 'status' => 'uit_dienst',
+            'uit_dienst_datum' => '2026-08-31', 'uit_dienst_reden' => 'eigen verzoek', 'actief' => '1',
+        ])->assertRedirect(route('medewerkers.show', $m));
+
+        $m->refresh();
+        $this->assertSame('2026-08-31', $m->uit_dienst_datum?->toDateString());
+        $this->assertSame('eigen verzoek', $m->uit_dienst_reden);
+        $this->assertFalse((bool) $m->actief);
+
+        // Het lopende (vaste) contract is afgesloten op de uit-dienstdatum.
+        $dv = $m->dienstverbanden()->where('startdatum', '2020-01-01')->firstOrFail();
+        $this->assertSame('2026-08-31', $dv->einddatum?->toDateString());
+    }
+
+    public function test_terug_in_dienst_wist_de_uitdienstgegevens(): void
+    {
+        $m = Medewerker::where('personeelsnummer', 'P260005')->firstOrFail();
+        $m->update(['status' => 'uit_dienst', 'uit_dienst_datum' => '2026-08-31', 'uit_dienst_reden' => 'x', 'actief' => false]);
+
+        $this->actingAs($this->hr)->put(route('medewerkers.update', $m), [
+            'voornaam' => $m->voornaam, 'achternaam' => $m->achternaam, 'status' => 'actief', 'actief' => '1',
+        ])->assertRedirect();
+
+        $m->refresh();
+        $this->assertNull($m->uit_dienst_datum);
+        $this->assertNull($m->uit_dienst_reden);
+        $this->assertTrue((bool) $m->actief);
+    }
+
     public function test_document_uploaden(): void
     {
         Storage::fake('local');

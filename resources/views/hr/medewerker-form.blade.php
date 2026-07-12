@@ -30,7 +30,21 @@
     <div class="sis-fld">
       <label>Status</label>
       @php $st = old('status', $medewerker->status?->value ?? 'actief'); @endphp
-      <select name="status">@foreach ($statussen as $s)<option value="{{ $s->value }}" @selected($st===$s->value)>{{ $s->label() }}</option>@endforeach</select>
+      <select name="status" id="mw-status">@foreach ($statussen as $s)<option value="{{ $s->value }}" @selected($st===$s->value)>{{ $s->label() }}</option>@endforeach</select>
+    </div>
+  </div>
+
+  {{-- Offboarding: alleen relevant bij status 'uit dienst'. De uit-dienstdatum
+       sluit ook een vast contract af (dat heeft geen eigen einddatum). --}}
+  <div id="mw-uitdienst" class="sis-fld-row sis-fld-row--2" style="{{ $st === 'uit_dienst' ? '' : 'display:none;' }}">
+    <div class="sis-fld">
+      <label>Uit-dienstdatum <span class="req">*</span></label>
+      <input type="date" name="uit_dienst_datum" value="{{ old('uit_dienst_datum', $medewerker->uit_dienst_datum?->toDateString()) }}">
+      <small class="sis-muted">Laatste dienstdag. Sluit ook een lopend (vast) contract af.</small>
+    </div>
+    <div class="sis-fld">
+      <label>Reden uitdiensttreding</label>
+      <input type="text" name="uit_dienst_reden" value="{{ old('uit_dienst_reden', $medewerker->uit_dienst_reden) }}" maxlength="255" placeholder="bv. eigen verzoek, einde contract, pensioen">
     </div>
   </div>
 
@@ -68,4 +82,15 @@
     <div class="right"><button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit">Opslaan</button></div>
   </div>
 </form>
+
+<script>
+  (function () {
+    var status = document.getElementById('mw-status');
+    var blok = document.getElementById('mw-uitdienst');
+    if (!status || !blok) return;
+    function sync() { blok.style.display = status.value === 'uit_dienst' ? '' : 'none'; }
+    status.addEventListener('change', sync);
+    sync();
+  })();
+</script>
 @endsection
