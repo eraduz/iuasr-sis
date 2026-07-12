@@ -26,8 +26,8 @@ class HandleidingenGenereren extends Command
         }
 
         $bestanden = [
-            'IUASR-SIS-Handleiding-Medewerkers.pdf' => Handleiding::MEDEWERKERS,
-            'IUASR-SIS-Technische-Handleiding.pdf' => Handleiding::TECHNISCH,
+            'IUASR-Management-Systeem-Handleiding-Medewerkers.pdf' => Handleiding::MEDEWERKERS,
+            'IUASR-Management-Systeem-Technische-Handleiding.pdf' => Handleiding::TECHNISCH,
         ];
 
         foreach ($bestanden as $naam => $view) {

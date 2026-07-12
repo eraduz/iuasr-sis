@@ -1,4 +1,4 @@
-# Ontwikkelomgeving — IUASR SIS
+# Ontwikkelomgeving — IUASR Management Systeem
 
 Dit document beschrijft de lokale ontwikkelopstelling en — belangrijk — hoe de
 lokale omgeving zich verhoudt tot de latere **intranetserver**. Alles hier draait

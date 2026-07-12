@@ -61,7 +61,7 @@
     </table>
 
     <div class="sis-a4__foot">
-      <span>Alumni-rapport · bevat geen cijfers of BSN · gegenereerd via IUASR SIS op {{ now()->format('d-m-Y') }}</span>
+      <span>Alumni-rapport · bevat geen cijfers of BSN · gegenereerd via IUASR Management Systeem op {{ now()->format('d-m-Y') }}</span>
       <span class="sis-a4__watermark">Intern document</span>
     </div>
   </div>

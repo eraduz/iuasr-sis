@@ -34,7 +34,7 @@ class BetalingsafspraakTest extends TestCase
         parent::setUp();
         $this->seed([ReferentieSeeder::class, SynthetischVakSeeder::class,
             GebruikerSeeder::class, SynthetischeStudentSeeder::class]);
-        Carbon::setTestNow('2026-01-15'); // sep, nov en jan zijn vervallen
+        Carbon::setTestNow('2026-01-25'); // sep, nov en jan zijn vervallen (24e)
 
         CollegegeldTarief::create([
             'periode_id' => Periode::where('actief', true)->value('id'),

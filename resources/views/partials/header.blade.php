@@ -6,7 +6,7 @@
 <header class="iuasr-dash-header">
   <div class="iuasr-dash-header__inner">
     <div class="iuasr-dash-header__brand">
-      <a class="iuasr-dash-header__logo" href="{{ route('dashboard') }}" aria-label="IUASR SIS">
+      <a class="iuasr-dash-header__logo" href="{{ route('dashboard') }}" aria-label="IUASR Management Systeem">
         <img src="{{ asset('assets/img/logo-dark.png') }}" alt="IUASR">
       </a>
       <span class="role role--{{ $rol->value }}">{{ $rol->label() }}</span>
@@ -20,7 +20,7 @@
         <span class="sis-pill-soft" style="letter-spacing:.03em;" title="Uw cursus(sen)">{{ $u->gedirigeerdeCursussen->sortBy('code')->pluck('code')->implode(' · ') }}</span>
       @endif
       @php $inCursus = request()->routeIs('cursussen.*') || request()->routeIs('cursisten*'); @endphp
-      <span class="sis-pill-soft" style="letter-spacing:0.04em;">{{ $inCursus ? 'Cursussen Administratie' : 'SIS · Studentbeheer' }}</span>
+      <span class="sis-pill-soft" style="letter-spacing:0.04em;">{{ $inCursus ? 'Cursussen Administratie' : 'Studentbeheer' }}</span>
       <a class="sis-help-link" href="{{ route('modules.kiezen') }}" title="Naar het modulekeuzescherm">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         <span>Modules</span>

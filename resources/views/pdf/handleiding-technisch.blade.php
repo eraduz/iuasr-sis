@@ -35,7 +35,7 @@
 <body>
   <div id="footer">
     <table style="width:100%;"><tr>
-      <td>IUASR SIS — Technische handleiding &amp; herstel · VERTROUWELIJK · {{ now()->format('d-m-Y') }}</td>
+      <td>IUASR Management Systeem — Technische handleiding &amp; herstel · VERTROUWELIJK · {{ now()->format('d-m-Y') }}</td>
       <td class="r">Pagina <span class="num"></span></td>
     </tr></table>
   </div>
@@ -43,7 +43,7 @@
   <div class="cover">
     @if ($logo)<img src="{{ $logo }}" alt="IUASR">@endif
     <h1>Technische handleiding &amp; data-recovery</h1>
-    <p class="sub">Voor technisch beheer · Intern Studentbeheersysteem (SIS) · IUASR</p>
+    <p class="sub">Voor technisch beheer · Intern managementsysteem · IUASR</p>
   </div>
 
   <div class="let">Dit document is bestemd voor <b>technisch personeel/beheerders</b>. Het beschrijft de architectuur, het maken van back-ups en de <b>herstelprocedure</b>. Bewaar het vertrouwelijk.</div>
@@ -211,7 +211,8 @@ MAIL_FROM_NAME="IUASR Studentenzaken"</span>
   <p>Er is bewust <b>geen facturentabel</b>. Het termijnschema wordt volledig afgeleid uit het jaartarief, de betaalregeling en de inschrijvingsduur, zodat het nooit kan verouderen ten opzichte van de inschrijving (bijvoorbeeld na een gewijzigde uitschrijfdatum).</p>
   <table class="kv">
     <tr><td class="k">Schema</td><td><code>App\Support\Collegegeldtermijnen</code> — vervalmaanden 9, 11, 1, 3, 5; bedrag = jaarbedrag ÷ n, restje op de laatste termijn.</td></tr>
-    <tr><td class="k">Regeling</td><td><code>inschrijvingen.betaalregeling</code>: <code>termijnen</code> (5 facturen) of <code>volledig</code> (1 factuur, vervalt 1 september).</td></tr>
+    <tr><td class="k">Vervaldatum</td><td>Factuurdag + betaaltermijn = de <b>24e</b> van de vervalmaand (factuur op de 14e, 10 dagen betaaltermijn). Instelbaar via <code>config/sis.php</code> (<code>sis.collegegeld.factuurdag</code> / <code>betaaltermijn_dagen</code>; env <code>SIS_COLLEGEGELD_FACTUURDAG</code> / <code>SIS_COLLEGEGELD_BETAALTERMIJN_DAGEN</code>).</td></tr>
+    <tr><td class="k">Regeling</td><td><code>inschrijvingen.betaalregeling</code>: <code>termijnen</code> (5 facturen) of <code>volledig</code> (1 factuur, vervalt de 24e van september).</td></tr>
     <tr><td class="k">Betaling &rarr; termijn</td><td><code>betalingen.termijn</code> (1..5, nullable). Leeg = automatisch toerekenen aan de oudste openstaande termijn (FIFO).</td></tr>
     <tr><td class="k">Achterstand</td><td>Som van het openstaande deel van de termijnen waarvan de <b>vervaldatum verstreken</b> is. Dit stuurt de blokkades op herinschrijven en verklaringen.</td></tr>
   </table>
@@ -249,14 +250,14 @@ MAIL_FROM_NAME="IUASR Studentenzaken"</span>
     <li><b>Logs:</b> <code>storage/logs/</code> (zitten niet in de back-up).</li>
     <li><b>Tests:</b> <code>php artisan test</code> moet groen zijn vóór uitrol.</li>
     <li><b>Scheduler (vereist voor automatische e-mails).</b> Zorg dat er een <b>cron</b> draait die elke minuut <code>php artisan schedule:run</code> aanroept (of <code>php artisan schedule:work</code>). Geplande taken (<code>routes/console.php</code>): <code>nieuws:ophalen</code> (dagelijks 23:00) en <code>hr:notificaties</code> (dagelijks 07:00). Die laatste stuurt de <b>verjaardagsfelicitaties</b> en de meldingen van <b>startend wettelijk verlof</b>; hij is idempotent (log in <code>hr_notificaties</code>), dus meerdere runs op een dag versturen niets dubbel.</li>
-    <li><b>E-mail &amp; afdelings-CC.</b> Elke automatische SIS-e-mail krijgt een CC naar de afdelingspostbus (config <code>sis.mail.cc</code>: HR/Studentenzaken/Examencommissie; env <code>SIS_MAIL_CC_*</code>). De self-service-verlofmelding gaat naar <code>sis.hr.notificatie_email</code>. Controleer dat de <b>mailconfiguratie</b> (<code>MAIL_*</code>) klopt; e-mailfouten worden gelogd maar blokkeren de gebruikersactie niet.</li>
+    <li><b>E-mail &amp; afdelings-CC.</b> Elke automatische systeem-e-mail krijgt een CC naar de afdelingspostbus (config <code>sis.mail.cc</code>: HR/Studentenzaken/Examencommissie; env <code>SIS_MAIL_CC_*</code>). De self-service-verlofmelding gaat naar <code>sis.hr.notificatie_email</code>. Controleer dat de <b>mailconfiguratie</b> (<code>MAIL_*</code>) klopt; e-mailfouten worden gelogd maar blokkeren de gebruikersactie niet.</li>
   </ul>
 
   <h2>12. Migratie uit de oude Access-database (tijdelijk)</h2>
   <p>De historische studentgegevens uit het oude Access-systeem (<code>IUTSTD…mdb</code>, sinds ca. 2009) worden in twee stappen overgezet. De bronbestanden blijven <b>buiten de repository</b> (AVG): de per-jaar geëxporteerde CSV's staan lokaal onder <code>Documents\IUASR-migratie-export\</code>.</p>
   <ul>
-    <li><b>Export (buiten SIS):</b> de Access-tabellen zijn met een PowerShell/OLEDB-script (<code>Microsoft.ACE.OLEDB.16.0</code>) geëxporteerd naar semikolon-gescheiden UTF-8-CSV's: referentietabellen plus <code>cijfers-JJJJ-JJJJ.csv</code> per studiejaar (2009-2010 t/m 2025-2026). Grondgetallen: 3.461 studenten, 27.214 cijferregels.</li>
-    <li><b>Import in SIS — tijdelijk scherm <code>Studentenzaken → Migratie (import)</code></b> met drie stappen (volgorde: 1 studenten → 2 vakken → 3 cijfers). Draai per bestand <b>altijd eerst een controle (preview)</b>; die schrijft niets en toont aantallen plus een voorbeeldtabel. Pas daarna <b>Nu importeren</b>. Alle stappen zijn idempotent (bestaande gegevens worden niet overschreven of verdubbeld).</li>
+    <li><b>Export (buiten het systeem):</b> de Access-tabellen zijn met een PowerShell/OLEDB-script (<code>Microsoft.ACE.OLEDB.16.0</code>) geëxporteerd naar semikolon-gescheiden UTF-8-CSV's: referentietabellen plus <code>cijfers-JJJJ-JJJJ.csv</code> per studiejaar (2009-2010 t/m 2025-2026). Grondgetallen: 3.461 studenten, 27.214 cijferregels.</li>
+    <li><b>Import in het systeem — tijdelijk scherm <code>Studentenzaken → Migratie (import)</code></b> met drie stappen (volgorde: 1 studenten → 2 vakken → 3 cijfers). Draai per bestand <b>altijd eerst een controle (preview)</b>; die schrijft niets en toont aantallen plus een voorbeeldtabel. Pas daarna <b>Nu importeren</b>. Alle stappen zijn idempotent (bestaande gegevens worden niet overschreven of verdubbeld).</li>
     <li><b>Fase 1 — studenten (<code>_studenten.csv</code>):</b> <code>SDT-NR → studentnummer</code>, naam, geboortedatum/-plaats, nationaliteit (gematcht of aangemaakt), adres, e-mail, <code>Opleiding → vooropleiding</code> (let op: in Access is "Opleiding" de vooropleiding), diploma. <b>BSN en rekeningnummer worden bewust niet meegenomen.</b> Junk-/naamloze rijen worden overgeslagen.</li>
     <li><b>Fase 2a — vakken (<code>_vaklijsten.csv</code>):</b> elk oud vak wordt een (inactief) historisch vak met de EC-punten uit de vaklijst, onder de aparte opleiding <b>“Bachelor Islamitische Theologie (historisch t/m 2025)”</b> (code <code>BA-HIST</code>). Zo blijft de historische data volledig gescheiden van het huidige curriculum.</li>
     <li><b>Fase 2b — cijfers (<code>cijfers-JJJJ-JJJJ.csv</code>, één bestand per studiejaar):</b> per regel één eindcijfer (<code>cl-gemmid</code>, 0–100 → 0–10) voor student+vak+periode, opgeslagen als resultaat op het onderdeel “Eindcijfer (gemigreerd)”. De periode (studiejaar) en de inschrijving per student+jaar worden automatisch aangemaakt/hergebruikt; ontbrekende vakken worden alsnog aangemaakt. Vrijstellingen komen als resultaat zonder cijfer. Regels zonder cijfer, met onbekende student of onleesbare periode worden overgeslagen en geteld. Voldoende-grens 5,5.</li>

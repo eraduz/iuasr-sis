@@ -8,7 +8,7 @@
 <div class="iuasr-dash-vhead">
   <div>
     <h1>Migratie uit de oude database</h1>
-    <div class="summary">Zet studenten, vakken en cijfers uit het oude Access-systeem over naar het SIS via de per-jaar geëxporteerde CSV-bestanden. <b>Tijdelijk hulpmiddel.</b></div>
+    <div class="summary">Zet studenten, vakken en cijfers uit het oude Access-systeem over naar het managementsysteem via de per-jaar geëxporteerde CSV-bestanden. <b>Tijdelijk hulpmiddel.</b></div>
   </div>
 </div>
 

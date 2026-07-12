@@ -61,10 +61,13 @@ class CollegegeldtermijnenTest extends TestCase
         $termijnen = Collegegeldtermijnen::voor($this->inschrijving());
 
         $this->assertCount(5, $termijnen);
+        // Vervaldatum = factuurdag (14e) + betaaltermijn (10 dagen) = de 24e.
         $this->assertSame(
-            ['01-09-2025', '01-11-2025', '01-01-2026', '01-03-2026', '01-05-2026'],
+            ['24-09-2025', '24-11-2025', '24-01-2026', '24-03-2026', '24-05-2026'],
             $termijnen->map(fn ($t) => $t['vervaldatum']->format('d-m-Y'))->all(),
         );
+        // Het maandlabel blijft de vervalmaand, ook al valt de deadline op de 24e.
+        $this->assertSame('September 2025', $termijnen[0]['naam']);
     }
 
     public function test_termijnbedragen_tellen_op_tot_het_jaarbedrag(): void
@@ -94,7 +97,7 @@ class CollegegeldtermijnenTest extends TestCase
 
         $this->assertCount(1, $termijnen);
         $this->assertSame(4000.0, $termijnen[0]['bedrag']);
-        $this->assertSame('01-09-2025', $termijnen[0]['vervaldatum']->format('d-m-Y'));
+        $this->assertSame('24-09-2025', $termijnen[0]['vervaldatum']->format('d-m-Y'));
         $this->assertSame('Volledig jaarbedrag', $termijnen[0]['naam']);
     }
 
@@ -224,9 +227,10 @@ class CollegegeldtermijnenTest extends TestCase
 
     public function test_achterstand_ontstaat_pas_bij_een_vervallen_termijn(): void
     {
-        // Half september: alleen termijn 1 is vervallen. Betaalt de student die,
-        // dan is er GEEN achterstand, ook al staat er nog € 3.200 open.
-        Carbon::setTestNow(Carbon::parse('2025-09-20'));
+        // Eind september: termijn 1 is vervallen (factuur 14 sep + 10 dagen = 24 sep).
+        // Betaalt de student die, dan is er GEEN achterstand, ook al staat er nog
+        // € 3.200 open voor de rest van het jaar.
+        Carbon::setTestNow(Carbon::parse('2025-09-30'));
         $insch = $this->inschrijving();
         Betaling::create(['student_id' => $insch->student_id, 'inschrijving_id' => $insch->id,
             'termijn' => 1, 'bedrag' => 800, 'datum' => '2025-09-05']);

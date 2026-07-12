@@ -32,7 +32,7 @@
 <body>
   <div id="footer">
     <table style="width:100%;"><tr>
-      <td>IUASR SIS — Handleiding voor medewerkers · {{ now()->format('d-m-Y') }}</td>
+      <td>IUASR Management Systeem — Handleiding voor medewerkers · {{ now()->format('d-m-Y') }}</td>
       <td class="r">Pagina <span class="num"></span></td>
     </tr></table>
   </div>
@@ -40,11 +40,11 @@
   <div class="cover">
     @if ($logo)<img src="{{ $logo }}" alt="IUASR">@endif
     <h1>Handleiding voor medewerkers</h1>
-    <p class="sub">Intern Studentbeheersysteem (SIS) · Islamic University of Applied Sciences Rotterdam</p>
+    <p class="sub">Intern managementsysteem · Islamic University of Applied Sciences Rotterdam</p>
   </div>
 
   <h2>1. Waarvoor is dit systeem?</h2>
-  <p>Het Studentbeheersysteem (SIS) is de interne administratie voor Studentenzaken en de opleidingen. U beheert er studenten, inschrijvingen, cijfers, collegegeld, documenten en rapporten. Het systeem draait uitsluitend op het interne netwerk en is gescheiden van het publieke aanmeldportaal.</p>
+  <p>Het IUASR Management Systeem is de interne administratie van de hogeschool. U beheert er — afhankelijk van uw rol — studenten, inschrijvingen, cijfers, collegegeld, cursussen, relatiebeheer &amp; stage, personeelszaken (HR), documenten en rapporten. Het systeem draait uitsluitend op het interne netwerk en is gescheiden van het publieke aanmeldportaal.</p>
   <div class="let">Alle gegevens in de ontwikkel-/testomgeving zijn <b>synthetisch</b> (verzonnen). Ga zorgvuldig om met echte persoonsgegevens; deze vallen onder de AVG.</div>
 
   <h2>2. Inloggen &amp; een module kiezen</h2>
@@ -170,6 +170,7 @@
   <h2>8. Collegegeld &amp; betalingen</h2>
   <h3>Termijnen: vijf facturen per jaar</h3>
   <p>Het collegegeld wordt elke twee maanden gefactureerd: in <b>september, november, januari, maart en mei</b>. Elke termijn is het jaarbedrag gedeeld door vijf; een afrondingsverschil van enkele centen komt op de laatste termijn, zodat de som exact het jaarbedrag is.</p>
+  <p>De <b>factuur</b> gaat op de <b>14e</b> van de vervalmaand naar de student; die heeft daarna <b>10 dagen</b> om te betalen. De <b>vervaldatum</b> van een termijn valt dus op de <b>24e</b> van de maand. Een onbetaalde termijn telt pas ná die datum als achterstallig.</p>
   <p>Op het studentdossier (kaart <b>Collegegeld</b>) staat een tabel met alle termijnen: vervaldatum, bedrag, betaald, openstaand en de status. Zo ziet u in één oogopslag welke termijn wel en niet is voldaan.</p>
   <table class="rol">
     <tr><th>Status</th><th>Betekenis</th></tr>
@@ -182,7 +183,7 @@
   <div class="tip">Een student heeft pas een <b>betalingsachterstand</b> wanneer een <b>vervallen</b> termijn niet is voldaan. Dat een student in oktober nog € 3.200 openstaan heeft voor de rest van het jaar is dus geen achterstand — die termijnen moeten immers nog vervallen. Bij een echte achterstand worden herinschrijven en verklaringen geblokkeerd.</div>
 
   <h3>Eén factuur voor het hele jaar</h3>
-  <p>Wil een student het volledige jaarbedrag in één keer betalen, dan legt <b>Studentenzaken</b> dat vast op het dossier onder <b>Collegegeld &rarr; Betaalregeling</b>: kies <b>Eén factuur (volledig)</b> en klik op <b>Opslaan</b>. Er ontstaat dan één termijn die op 1 september vervalt. De keuze staat ook in het inschrijfformulier. De regeling hangt aan de <b>inschrijving</b> en geldt dus per studiejaar: bij herinschrijving stelt u haar opnieuw vast. Elke wijziging wordt gelogd.</p>
+  <p>Wil een student het volledige jaarbedrag in één keer betalen, dan legt <b>Studentenzaken</b> dat vast op het dossier onder <b>Collegegeld &rarr; Betaalregeling</b>: kies <b>Eén factuur (volledig)</b> en klik op <b>Opslaan</b>. Er ontstaat dan één termijn die op 24 september vervalt. De keuze staat ook in het inschrijfformulier. De regeling hangt aan de <b>inschrijving</b> en geldt dus per studiejaar: bij herinschrijving stelt u haar opnieuw vast. Elke wijziging wordt gelogd.</p>
 
   <h3>Betalingen boeken (Financiële Administratie)</h3>
   <p>Op het financiële scherm van een student staat per studiejaar hetzelfde termijnoverzicht, met achter elke openstaande termijn de knop <b>Boek € …</b>. Eén klik boekt die termijn volledig op de datum van vandaag. Voor een deelbetaling of een afwijkend bedrag gebruikt u het formulier <b>Betaling registreren</b>; daar kiest u de termijn, of laat u <b>automatisch</b> staan — dan gaat de betaling naar de <b>oudste openstaande</b> termijn.</p>
@@ -322,7 +323,7 @@
     <li><b>Verjaardagen</b>: op het HR-dashboard staat het venster <b>Verjaardagen</b> met de jarigen van de komende {{ (int) config('sis.hr.verjaardag_venster_dagen', 30) }} dagen. Op de dag zelf stuurt het systeem de medewerker automatisch een <b>felicitatie-e-mail</b>.</li>
     <li><b>Startend wettelijk verlof</b>: op de dag dat een zwangerschaps-/bevallings-, geboorte- of ouderschapsverlof ingaat, krijgt Personeelszaken automatisch een melding, zodat de UWV-uitkering en vervanging op tijd geregeld worden.</li>
   </ul>
-  <p>Van <b>elke</b> automatische SIS-e-mail gaat er een kopie (CC) naar de postbus van de betrokken afdeling — <b>Personeelszaken</b> voor HR, <b>Studentenzaken</b> en de <b>Examencommissie</b> voor hun berichten — zodat de afdeling altijd kan zien welke post is verstuurd. Deze e-mails worden verstuurd door een dagelijkse achtergrondtaak; daarvoor moet de <b>scheduler</b> draaien (zie de technische handleiding).</p>
+  <p>Van <b>elke</b> automatische systeem-e-mail gaat er een kopie (CC) naar de postbus van de betrokken afdeling — <b>Personeelszaken</b> voor HR, <b>Studentenzaken</b> en de <b>Examencommissie</b> voor hun berichten — zodat de afdeling altijd kan zien welke post is verstuurd. Deze e-mails worden verstuurd door een dagelijkse achtergrondtaak; daarvoor moet de <b>scheduler</b> draaien (zie de technische handleiding).</p>
   <h3>Gesprekken &amp; performance</h3>
   <p>Onder <b>Gesprekken</b> (of op de medewerkerkaart) plant de HR-medewerker een <b>beoordelings-</b>, <b>functionerings-</b> of <b>exitgesprek</b>: kies datum, gespreksvoerder en status (gepland, gehouden, afgerond). Op het gespreksscherm legt u de <b>samenvatting</b> en <b>feedback</b> vast en beheert u de <b>doelen/KPI's</b> (met status open/behaald/niet behaald) en de <b>competentiebeoordelingen</b> (onvoldoende t/m uitstekend, met toelichting). De gesprekken blijven als <b>historie</b> bij de medewerker staan; het dashboard toont de aankomende geplande gesprekken.</p>
   <h3>Organisatie &amp; rapportage</h3>

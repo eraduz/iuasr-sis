@@ -123,13 +123,15 @@ class Collegegeldtermijnen
             $laatste = $index === $aantal - 1;
             // De laatste termijn vangt het afrondingsverschil op.
             $bedrag = $laatste ? round($jaarbedrag - ($per * ($aantal - 1)), 2) : $per;
-            $vervaldatum = self::vervaldatum($start, $maand);
+            // Het label volgt de vervalMAAND; de vervalDATUM is factuurdag + betaaltermijn.
+            $vervalmaand = self::vervalmaand($start, $maand);
+            $vervaldatum = self::vervaldatum($vervalmaand);
 
             $termijnen->push([
                 'nr' => $index + 1,
                 'naam' => $aantal === 1
                     ? 'Volledig jaarbedrag'
-                    : ucfirst($vervaldatum->locale('nl')->translatedFormat('F Y')),
+                    : ucfirst($vervalmaand->locale('nl')->translatedFormat('F Y')),
                 'vervaldatum' => $vervaldatum,
                 'bedrag' => $bedrag,
                 'vervallen' => false,
@@ -249,12 +251,30 @@ class Collegegeldtermijnen
         return null;
     }
 
-    /** September/november vallen in het startjaar; januari/maart/mei in het jaar erna. */
-    private static function vervaldatum(Carbon $start, int $maand): Carbon
+    /**
+     * Eerste dag van de vervalmaand binnen het studiejaar — dient als het
+     * termijnlabel ("September 2025"). September/november vallen in het startjaar;
+     * januari/maart/mei in het jaar erna.
+     */
+    private static function vervalmaand(Carbon $start, int $maand): Carbon
     {
         $jaar = $maand >= 9 ? $start->year : $start->year + 1;
 
         return Carbon::create($jaar, $maand, 1)->startOfDay();
+    }
+
+    /**
+     * De vervaldatum (betaaldeadline) van een termijn. IUASR verstuurt de factuur
+     * op de FACTUURDAG van de vervalmaand en geeft de student daarna
+     * BETAALTERMIJN_DAGEN de tijd om te betalen; de deadline is dus factuurdag +
+     * betaaltermijn (standaard 14 + 10 = de 24e). Instelbaar via `sis.collegegeld`.
+     */
+    private static function vervaldatum(Carbon $vervalmaand): Carbon
+    {
+        $factuurdag = (int) config('sis.collegegeld.factuurdag', 14);
+        $dagen = (int) config('sis.collegegeld.betaaltermijn_dagen', 10);
+
+        return $vervalmaand->copy()->day($factuurdag)->addDays($dagen)->startOfDay();
     }
 
     /** Leesbare status voor de UI. */

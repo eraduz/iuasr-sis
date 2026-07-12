@@ -34,8 +34,9 @@ class FinancienTest extends TestCase
         $this->sz = User::where('rol', Rol::Studentenzaken)->first();
         $this->fin = User::where('rol', Rol::Financien)->first();
         // Vast peilmoment binnen het studiejaar (jan 2026 = 5e maand) voor
-        // deterministische pro rata-berekeningen.
-        Carbon::setTestNow('2026-01-15');
+        // deterministische pro rata-berekeningen. Ná de 24e, zodat de
+        // januari-termijn (vervaldatum de 24e) is vervallen.
+        Carbon::setTestNow('2026-01-25');
     }
 
     protected function tearDown(): void
@@ -77,7 +78,7 @@ class FinancienTest extends TestCase
         $insch = $student->inschrijvingen()->first();
 
         // Verschuldigd is het VOLLEDIGE jaarbedrag; de achterstand betreft alleen
-        // de termijnen die al vervallen zijn. Op 15 januari zijn dat september,
+        // de termijnen die al vervallen zijn. Op 25 januari zijn dat september,
         // november en januari: 3 x 506,00.
         $status = Collegegeldstatus::voor($student->fresh());
         $this->assertEqualsWithDelta(2530.00, $status['verschuldigd'], 0.01);

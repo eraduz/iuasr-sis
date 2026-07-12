@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Webroutes — IUASR SIS
+| Webroutes — IUASR Management Systeem
 |--------------------------------------------------------------------------
 | Authenticatie: tijdelijk via dev-login (alleen lokaal), later Entra ID SSO.
 | Rolscheiding wordt server-side afgedwongen via de 'rol'-middleware en Gates.

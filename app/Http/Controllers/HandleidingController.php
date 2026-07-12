@@ -15,14 +15,14 @@ class HandleidingController extends Controller
 {
     public function medewerkers(): Response
     {
-        return $this->toon(Handleiding::MEDEWERKERS, 'IUASR-SIS-Handleiding-Medewerkers.pdf');
+        return $this->toon(Handleiding::MEDEWERKERS, 'IUASR-Management-Systeem-Handleiding-Medewerkers.pdf');
     }
 
     public function technisch(): Response
     {
         abort_unless(in_array(auth()->user()->rol, [Rol::Beheerder, Rol::Bestuur], true), 403);
 
-        return $this->toon(Handleiding::TECHNISCH, 'IUASR-SIS-Technische-Handleiding.pdf');
+        return $this->toon(Handleiding::TECHNISCH, 'IUASR-Management-Systeem-Technische-Handleiding.pdf');
     }
 
     private function toon(string $view, string $bestandsnaam): Response

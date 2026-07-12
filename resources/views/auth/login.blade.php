@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Inloggen — IUASR SIS</title>
+<title>Inloggen — IUASR Management Systeem</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
@@ -15,8 +15,8 @@
 <div class="sis-login">
   <div class="sis-login__card">
     <img class="sis-login__logo" src="{{ asset('assets/img/logo-dark.png') }}" alt="IUASR">
-    <h1>Studentbeheersysteem</h1>
-    <p class="sub">Intern systeem van Studentenzaken. Log in met uw IUASR-account.</p>
+    <h1>Managementsysteem</h1>
+    <p class="sub">Intern beheersysteem van IUASR. Log in met uw IUASR-account.</p>
 
     {{-- Echte authenticatie verloopt via Microsoft Entra ID (SSO/OIDC). --}}
     <a class="sis-sso-btn" href="#" aria-disabled="true" title="Wordt gekoppeld in een latere fase">
