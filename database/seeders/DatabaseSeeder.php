@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             KennistoetsSeeder::class,
             OrganisatieSeeder::class,
             HrSeeder::class,
+            HrDocentenSeeder::class,
         ]);
     }
 }
