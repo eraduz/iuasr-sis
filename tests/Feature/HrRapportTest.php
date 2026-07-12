@@ -46,7 +46,9 @@ class HrRapportTest extends TestCase
     public function test_kerncijfers_en_verzuim(): void
     {
         $kpi = HrRapport::kerncijfers();
-        $this->assertSame(6, $kpi['medewerkers']);
+        $this->assertSame(6, $kpi['medewerkers']); // alleen betaald personeel (formatie)
+        $this->assertSame(3, $kpi['vrijwilligers']); // apart geteld, niet in medewerkers/FTE
+        $this->assertSame(2, $kpi['zzp']);
         $this->assertSame(1, $kpi['ziek']); // Fadwa is ziek gemeld
         $this->assertGreaterThan(0, $kpi['fte']);
     }

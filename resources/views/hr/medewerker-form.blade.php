@@ -30,7 +30,7 @@
       <label>Soort</label>
       @php $srt = old('soort', $medewerker->soort?->value ?? 'personeel'); @endphp
       <select name="soort">@foreach ($soorten as $s)<option value="{{ $s->value }}" @selected($srt===$s->value)>{{ $s->label() }}</option>@endforeach</select>
-      <small class="sis-muted">Vrijwilligers tellen niet mee in de FTE.</small>
+      <small class="sis-muted">Profiel, los van de functie. Vrijwilligers en ZZP'ers tellen niet mee in de FTE.</small>
     </div>
     <div class="sis-fld"><label>Geboortedatum</label><input type="date" name="geboortedatum" value="{{ old('geboortedatum', $medewerker->geboortedatum?->toDateString()) }}"></div>
   </div>

@@ -35,6 +35,13 @@ class HrSeeder extends Seeder
             ['STAF', 'Stafmedewerker', 'staf'],
             ['ADMIN', 'Administratief medewerker', 'staf'],
             ['MGR', 'Afdelingsmanager', 'management'],
+            // Functies zijn de ROL (los van de soort personeel/vrijwilliger/zzp):
+            // een vrijwilliger kan kok of schoonmaker zijn, een ZZP'er trainer.
+            ['KOK', 'Kok', 'facilitair'],
+            ['SCHM', 'Schoonmaker', 'facilitair'],
+            ['GASTV', 'Gastvrouw/gastheer', 'facilitair'],
+            ['TRAINER', 'Trainer', 'onderwijs'],
+            ['ICT', 'ICT-consultant', 'staf'],
         ] as [$code, $naam, $cat]) {
             $functie[$code] = Functie::firstOrCreate(['code' => $code], ['naam' => $naam, 'categorie' => $cat, 'actief' => true])->id;
         }
@@ -72,6 +79,19 @@ class HrSeeder extends Seeder
         // Medewerkers buiten het team van Ruben.
         $this->medewerker('P260005', 'Fadwa', 'Ben Ali', $afdeling['ADM'], $functie['ADMIN'], null, null, 24, 'vast');
         $this->medewerker('P260006', 'Johan', 'Bakker', $afdeling['ADM'], $functie['ADMIN'], null, null, 36, 'tijdelijk');
+
+        // Vrijwilligers (stichting): een PROFIEL (soort), los van de functie. Zij
+        // worden geregistreerd maar tellen NIET mee in de FTE. Hun functie is hun
+        // echte rol (kok, schoonmaker, gastvrouw). Amina heeft afgesproken uren op een
+        // dienstverband — die FTE telt bewust toch niet mee.
+        $this->medewerker('P260007', 'Amina', 'El Idrissi', $afdeling['ONDW'], $functie['KOK'], $rubenMed->id, null, 8, 'tijdelijk', 'vrijwilliger');
+        $this->medewerker('P260008', 'Karim', 'Ait Bella', $afdeling['ADM'], $functie['SCHM'], null, null, 0, 'tijdelijk', 'vrijwilliger', metDienstverband: false);
+        $this->medewerker('P260009', 'Latifa', 'Ouhadi', $afdeling['HRB'], $functie['GASTV'], null, null, 0, 'tijdelijk', 'vrijwilliger', metDienstverband: false);
+
+        // ZZP'ers / freelancers: eveneens een apart profiel, niet in de FTE. Zij
+        // werken op opdrachtbasis (geen dienstverband), met hun eigen functie/rol.
+        $this->medewerker('P260010', 'Driss', 'Haddad', $afdeling['ONDW'], $functie['TRAINER'], null, null, 0, 'tijdelijk', 'zzp', metDienstverband: false);
+        $this->medewerker('P260011', 'Sanne', 'de Groot', $afdeling['ADM'], $functie['ICT'], null, null, 0, 'tijdelijk', 'zzp', metDienstverband: false);
 
         $this->verlofEnVerzuim();
         $this->gesprekken();
@@ -144,6 +164,10 @@ class HrSeeder extends Seeder
         $jaar = (int) date('Y');
 
         foreach (Medewerker::all() as $medewerker) {
+            // Vrijwilligers en ZZP'ers bouwen in deze demo geen betaald verlofrecht op.
+            if (! $medewerker->teltVoorFte()) {
+                continue;
+            }
             $fte = $medewerker->fte() ?? 1.0;
             Verlofsaldo::firstOrCreate(
                 ['medewerker_id' => $medewerker->id, 'jaar' => $jaar, 'verloftype' => 'vakantie'],
@@ -189,13 +213,14 @@ class HrSeeder extends Seeder
         }
     }
 
-    private function medewerker(string $nummer, string $voornaam, string $achternaam, int $afdelingId, int $functieId, ?int $managerId, ?int $userId, float $uren, string $contract): Medewerker
+    private function medewerker(string $nummer, string $voornaam, string $achternaam, int $afdelingId, int $functieId, ?int $managerId, ?int $userId, float $uren, string $contract, string $soort = 'personeel', bool $metDienstverband = true): Medewerker
     {
         $medewerker = Medewerker::firstOrCreate(
             ['personeelsnummer' => $nummer],
             [
                 'voornaam' => $voornaam,
                 'achternaam' => $achternaam,
+                'soort' => $soort,
                 'afdeling_id' => $afdelingId,
                 'functie_id' => $functieId,
                 'manager_id' => $managerId,
@@ -206,10 +231,12 @@ class HrSeeder extends Seeder
             ]
         );
 
-        Dienstverband::firstOrCreate(
-            ['medewerker_id' => $medewerker->id, 'startdatum' => '2024-09-01'],
-            ['contracttype' => $contract, 'uren_per_week' => $uren, 'functie_id' => $functieId, 'afdeling_id' => $afdelingId]
-        );
+        if ($metDienstverband) {
+            Dienstverband::firstOrCreate(
+                ['medewerker_id' => $medewerker->id, 'startdatum' => '2024-09-01'],
+                ['contracttype' => $contract, 'uren_per_week' => $uren, 'functie_id' => $functieId, 'afdeling_id' => $afdelingId]
+            );
+        }
 
         return $medewerker;
     }

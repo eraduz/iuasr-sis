@@ -10,7 +10,7 @@
 <div class="iuasr-dash-vhead">
   <div>
     <h1>{{ $medewerker->volledigeNaam() }}</h1>
-    <div class="summary">Personeelsnummer <b>{{ $medewerker->personeelsnummer }}</b> · @if($medewerker->isVrijwilliger())<span class="iuasr-dash-status {{ $medewerker->soort?->badge() }}">Vrijwilliger</span> · @endif<span class="iuasr-dash-status {{ $medewerker->status?->badge() }}">{{ $medewerker->status?->label() }}</span>@if($medewerker->status === \App\Enums\MedewerkerStatus::UitDienst && $medewerker->uit_dienst_datum) <span class="sis-muted">per {{ $medewerker->uit_dienst_datum->format('d-m-Y') }}</span>@endif @if($medewerker->fte() !== null) · {{ number_format($medewerker->fte(), 2, ',', '.') }} FTE @endif</div>
+    <div class="summary">Personeelsnummer <b>{{ $medewerker->personeelsnummer }}</b> · @if($medewerker->soort && ! $medewerker->soort->teltVoorFte())<span class="iuasr-dash-status {{ $medewerker->soort->badge() }}">{{ $medewerker->soort->label() }}</span> · @endif<span class="iuasr-dash-status {{ $medewerker->status?->badge() }}">{{ $medewerker->status?->label() }}</span>@if($medewerker->status === \App\Enums\MedewerkerStatus::UitDienst && $medewerker->uit_dienst_datum) <span class="sis-muted">per {{ $medewerker->uit_dienst_datum->format('d-m-Y') }}</span>@endif @if($medewerker->fte() !== null) · {{ number_format($medewerker->fte(), 2, ',', '.') }} FTE @endif</div>
   </div>
   @if ($magBeheer)
     <div class="iuasr-dash-vhead__actions"><a class="iuasr-dash-btn" href="{{ route('medewerkers.edit', $medewerker) }}">Bewerken</a></div>
@@ -20,7 +20,7 @@
 <div class="sis-card" style="margin-bottom:16px;">
   <div class="sis-card__hd"><b>Gegevens</b></div>
   <div style="padding:14px 16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px 24px;">
-    <div><small class="sis-muted">Soort</small><div>{{ $medewerker->soort?->label() ?? 'Personeel' }}@if($medewerker->isVrijwilliger()) <small class="sis-muted">(telt niet mee in FTE)</small>@endif</div></div>
+    <div><small class="sis-muted">Soort (profiel)</small><div>{{ $medewerker->soort?->label() ?? 'Personeel' }}@if($medewerker->soort && ! $medewerker->soort->teltVoorFte()) <small class="sis-muted">(telt niet mee in FTE)</small>@endif</div></div>
     <div><small class="sis-muted">Functie</small><div>{{ $medewerker->functie?->naam ?? '—' }}</div></div>
     <div><small class="sis-muted">Afdeling</small><div>{{ $medewerker->afdeling?->naam ?? '—' }}</div></div>
     <div><small class="sis-muted">Leidinggevende</small><div>{{ $medewerker->manager?->volledigeNaam() ?? '—' }}</div></div>

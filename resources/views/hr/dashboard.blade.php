@@ -15,7 +15,7 @@
 </div>
 
 <div class="iuasr-dash-stats" style="grid-template-columns:repeat(4,1fr);">
-  <div class="iuasr-dash-stat"><span class="lbl">Actief personeel</span><span class="val">{{ $aantal }}</span><span class="delta">{{ $vrijwilligers }} vrijwilliger{{ $vrijwilligers === 1 ? '' : 's' }} · {{ $statusVerdeling['uit_dienst'] ?? 0 }} uit dienst</span></div>
+  <div class="iuasr-dash-stat"><span class="lbl">Actief personeel</span><span class="val">{{ $aantal }}</span><span class="delta">{{ $vrijwilligers }} vrijwilliger{{ $vrijwilligers === 1 ? '' : 's' }} · {{ $zzp }} zzp</span></div>
   <div class="iuasr-dash-stat iuasr-dash-stat--ok"><span class="lbl">Totaal FTE</span><span class="val">{{ number_format($fteTotaal, 2, ',', '.') }}</span><span class="delta">excl. vrijwilligers</span></div>
   <div class="iuasr-dash-stat {{ ($statusVerdeling['ziek'] ?? 0) > 0 ? 'iuasr-dash-stat--alert' : '' }}"><span class="lbl">Ziek gemeld</span><span class="val">{{ $statusVerdeling['ziek'] ?? 0 }}</span><span class="delta">{{ $statusVerdeling['verlof'] ?? 0 }} met verlof</span></div>
   <div class="iuasr-dash-stat {{ $openAanvragen->count() > 0 ? 'iuasr-dash-stat--alert' : '' }}"><span class="lbl">Openstaande verlofaanvragen</span><span class="val">{{ $openAanvragen->count() }}</span><span class="delta"><a href="{{ route('verlof') }}">beoordelen</a></span></div>

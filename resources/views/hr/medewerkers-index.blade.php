@@ -30,7 +30,7 @@
       @forelse ($medewerkers as $m)
         <tr>
           <td class="tnum">{{ $m->personeelsnummer }}</td>
-          <td class="nm"><a href="{{ route('medewerkers.show', $m) }}">{{ $m->volledigeNaam() }}</a>@if($m->isVrijwilliger()) <span class="iuasr-dash-status {{ $m->soort?->badge() }}" style="font-size:10px;">Vrijwilliger</span>@endif</td>
+          <td class="nm"><a href="{{ route('medewerkers.show', $m) }}">{{ $m->volledigeNaam() }}</a>@if($m->soort && ! $m->soort->teltVoorFte()) <span class="iuasr-dash-status {{ $m->soort->badge() }}" style="font-size:10px;">{{ $m->soort->label() }}</span>@endif</td>
           <td>{{ $m->functie?->naam ?? '—' }}</td>
           <td>{{ $m->afdeling?->naam ?? '—' }}</td>
           <td class="tnum" style="text-align:right;">{{ $m->fte() !== null ? number_format($m->fte(), 2, ',', '.') : '—' }}</td>

@@ -127,19 +127,31 @@ class Medewerker extends Model
             ?? $this->dienstverbanden->first();
     }
 
-    /** Is dit een vrijwilliger? (Telt niet mee in de FTE / personeelsformatie.) */
+    /** Is dit een vrijwilliger? */
     public function isVrijwilliger(): bool
     {
         return $this->soort === MedewerkerSoort::Vrijwilliger;
     }
 
+    /** Is dit een ZZP'er / freelancer? */
+    public function isZzp(): bool
+    {
+        return $this->soort === MedewerkerSoort::Zzp;
+    }
+
+    /** Telt deze medewerker mee in de FTE / personeelsformatie? (Alleen betaald personeel.) */
+    public function teltVoorFte(): bool
+    {
+        return $this->soort?->teltVoorFte() ?? true;
+    }
+
     /**
-     * Actuele FTE uit het lopende dienstverband, of null. Vrijwilligers tellen
-     * bewust NIET mee in de FTE — ook niet als er uren zijn vastgelegd.
+     * Actuele FTE uit het lopende dienstverband, of null. Vrijwilligers én ZZP'ers
+     * tellen bewust NIET mee in de FTE — ook niet als er uren zijn vastgelegd.
      */
     public function fte(): ?float
     {
-        if ($this->isVrijwilliger()) {
+        if (! $this->teltVoorFte()) {
             return null;
         }
 

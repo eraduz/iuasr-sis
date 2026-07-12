@@ -30,19 +30,24 @@ class HrRapport
     public static function kerncijfers(?array $ids = null): array
     {
         $medewerkers = self::medewerkers($ids);
-        $actief = $medewerkers->where('actief', true);
+        // De kerncijfers gaan over de personeelsformatie: vrijwilligers en ZZP'ers
+        // worden apart geteld en tellen niet mee in medewerkers/FTE/verzuim.
+        $formatie = $medewerkers->filter(fn (Medewerker $m) => $m->teltVoorFte());
+        $actief = $formatie->where('actief', true);
         $fte = round($actief->sum(fn (Medewerker $m) => $m->fte() ?? 0), 2);
-        $ziek = $medewerkers->where('status', MedewerkerStatus::Ziek)->count();
-        $totaal = $medewerkers->count();
+        $ziek = $formatie->where('status', MedewerkerStatus::Ziek)->count();
+        $totaal = $formatie->count();
 
         return [
             'medewerkers' => $totaal,
             'actief' => $actief->count(),
+            'vrijwilligers' => $medewerkers->filter->isVrijwilliger()->count(),
+            'zzp' => $medewerkers->filter->isZzp()->count(),
             'fte' => $fte,
             'gem_fte' => $actief->count() > 0 ? round($fte / $actief->count(), 2) : 0.0,
             'ziek' => $ziek,
             'verzuim' => $totaal > 0 ? round($ziek / $totaal * 100, 1) : 0.0,
-            'verzuim_dagen' => self::verzuimDagen($medewerkers->pluck('id')->all()),
+            'verzuim_dagen' => self::verzuimDagen($formatie->pluck('id')->all()),
         ];
     }
 

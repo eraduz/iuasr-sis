@@ -20,7 +20,9 @@ class HrDocument extends Model
     }
 
     public const CATEGORIEEN = [
-        'contract' => 'Contract',
+        'contract' => 'Arbeidscontract',
+        'vrijwilligersovereenkomst' => 'Vrijwilligersovereenkomst',
+        'zzp_overeenkomst' => 'ZZP-/opdrachtovereenkomst',
         'diploma' => 'Diploma',
         'identiteitsbewijs' => 'Identiteitsbewijs',
         'correspondentie' => 'Correspondentie',

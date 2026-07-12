@@ -174,6 +174,23 @@ class HrModuleTest extends TestCase
         $this->assertNull($m->fte());
     }
 
+    public function test_zzp_telt_niet_mee_in_fte(): void
+    {
+        $this->actingAs($this->hr)->post(route('medewerkers.store'), [
+            'voornaam' => 'Zelf', 'achternaam' => 'Standig', 'soort' => 'zzp', 'status' => 'actief', 'actief' => '1',
+        ])->assertRedirect();
+        $m = Medewerker::where('achternaam', 'Standig')->firstOrFail();
+
+        $this->actingAs($this->hr)->post(route('dienstverbanden.store', $m), [
+            'contracttype' => 'tijdelijk', 'startdatum' => '2026-01-01', 'uren_per_week' => 40,
+        ])->assertRedirect();
+
+        $m->refresh()->load('dienstverbanden');
+        $this->assertTrue($m->isZzp());
+        $this->assertFalse($m->teltVoorFte());
+        $this->assertNull($m->fte());
+    }
+
     public function test_lijst_filtert_op_soort(): void
     {
         $this->actingAs($this->hr)->post(route('medewerkers.store'), [
