@@ -82,3 +82,6 @@ Desktop.ini
 
 # Echte personeelslijst (AVG): namen/functies van medewerkers — niet in Git.
 database/data/personeel.csv
+
+# DB-snapshots (testdata; buiten Git)
+/storage/app/db-snapshots/
