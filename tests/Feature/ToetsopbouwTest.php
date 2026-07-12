@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Opleiding;
 use App\Models\Vak;
 use Database\Seeders\CurriculumSeeder;
 use Database\Seeders\ReferentieSeeder;
@@ -24,9 +25,12 @@ class ToetsopbouwTest extends TestCase
         $this->seed([ReferentieSeeder::class, CurriculumSeeder::class, ToetsonderdeelSeeder::class]);
     }
 
-    private function onderdelen(string $code)
+    private function onderdelen(string $code, string $opleiding = 'ISLTH')
     {
-        return Vak::where('code', $code)->firstOrFail()->toetsonderdelen()->orderBy('volgorde')->get();
+        $opleidingId = Opleiding::where('code', $opleiding)->value('id');
+
+        return Vak::where('code', $code)->where('opleiding_id', $opleidingId)
+            ->firstOrFail()->toetsonderdelen()->orderBy('volgorde')->get();
     }
 
     public function test_arabisch_i_heeft_grammatica_vertalen_mondeling(): void
@@ -53,13 +57,17 @@ class ToetsopbouwTest extends TestCase
 
     public function test_weging_telt_per_vak_op_tot_honderd_procent(): void
     {
-        // Alle vakken uit de bron (ISLTH + MGV): de som van de weging is 1,00
-        // (afgevlakte nesting).
-        $codes = ['B-AR05-15', 'B-QR01', 'B-QR07', 'B-QR08-15', 'B-KL03', 'B-KL04',
-            'B-MT01', 'B-MT02', 'B-GF01', 'B-SC04', 'B-FQ03', 'B-FQ06', 'B-FQ07a',
-            'M-GV02', 'M-GV07', 'M-GV08', 'M-GV13', 'M-GV14', 'M-GV16a'];
-        foreach ($codes as $code) {
+        // Alle vakken uit de bron: de som van de weging is 1,00 (afgevlakte nesting).
+        $islth = ['B-AR05-15', 'B-QR01', 'B-QR07', 'B-QR08-15', 'B-KL03', 'B-KL04',
+            'B-MT01', 'B-MT02', 'B-GF01', 'B-SC04', 'B-FQ03', 'B-FQ06', 'B-FQ07a'];
+        $mgv = ['M-GV02', 'M-GV07', 'M-GV08', 'M-GV13', 'M-GV14', 'M-GV16a'];
+
+        foreach ($islth as $code) {
             $som = (float) $this->onderdelen($code)->sum(fn ($o) => (float) $o->weging);
+            $this->assertEqualsWithDelta(1.00, $som, 0.001, "Weging {$code} telt niet op tot 1,00");
+        }
+        foreach ($mgv as $code) {
+            $som = (float) $this->onderdelen($code, 'MGV')->sum(fn ($o) => (float) $o->weging);
             $this->assertEqualsWithDelta(1.00, $som, 0.001, "Weging {$code} telt niet op tot 1,00");
         }
     }
@@ -67,7 +75,7 @@ class ToetsopbouwTest extends TestCase
     public function test_mgv_module_met_vier_onderdelen(): void
     {
         // M-GV07: Werkstuk 40% + Voordracht 20% + Rollenspel 25% + Moreel beraad 15%.
-        $od = $this->onderdelen('M-GV07');
+        $od = $this->onderdelen('M-GV07', 'MGV');
         $this->assertSame(['Werkstuk', 'Voordracht', 'Rollenspel', 'Moreel beraad'], $od->pluck('naam')->all());
         $this->assertEqualsWithDelta(0.40, (float) $od[0]->weging, 0.001);
         $this->assertEqualsWithDelta(0.15, (float) $od[3]->weging, 0.001);
@@ -75,9 +83,22 @@ class ToetsopbouwTest extends TestCase
 
     public function test_mgv_scriptie_en_stage_enkelvoudig(): void
     {
-        $this->assertCount(1, $this->onderdelen('M-GV17')); // Masterscriptie 100%
-        $this->assertCount(1, $this->onderdelen('M-GV18')); // Stagebeoordeling 100%
-        $this->assertSame('Masterscriptie', $this->onderdelen('M-GV17')->first()->naam);
+        $this->assertCount(1, $this->onderdelen('M-GV17', 'MGV')); // Masterscriptie 100%
+        $this->assertCount(1, $this->onderdelen('M-GV18', 'MGV')); // Stagebeoordeling 100%
+        $this->assertSame('Masterscriptie', $this->onderdelen('M-GV17', 'MGV')->first()->naam);
+    }
+
+    public function test_pmgv_volgt_dezelfde_logica_als_islth(): void
+    {
+        // PMGV deelt vakcodes met ISLTH en krijgt exact dezelfde toetsopbouw.
+        foreach (['B-QR02', 'B-KL03', 'B-FQ06'] as $code) {
+            $islth = $this->onderdelen($code, 'ISLTH')
+                ->map(fn ($o) => $o->naam.':'.number_format((float) $o->weging, 2))->all();
+            $pmgv = $this->onderdelen($code, 'PMGV')
+                ->map(fn ($o) => $o->naam.':'.number_format((float) $o->weging, 2))->all();
+
+            $this->assertSame($islth, $pmgv, "PMGV {$code} wijkt af van ISLTH");
+        }
     }
 
     public function test_keuzevak_buiten_de_bron_houdt_standaardopbouw(): void

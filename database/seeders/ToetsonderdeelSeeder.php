@@ -19,9 +19,10 @@ use Illuminate\Database\Seeder;
  * wordt: grammatica 0,40 / vertalen 0,40 / mondeling 0,20).
  *
  * Idempotent en dataveilig: een vak waarvan de huidige onderdelen al
- * resultaten hebben wordt OVERGESLAGEN (vervangen zou cijfers wissen). ISLTH
- * (studiegids BA 2025-2026) en MGV (studiegids MIGV 2024-2025) staan in de bron;
- * PMGV/PABO volgen met hun eigen studiegids.
+ * resultaten hebben wordt OVERGESLAGEN (vervangen zou cijfers wissen). In de bron:
+ * ISLTH (studiegids BA 2025-2026), MGV (studiegids MIGV 2024-2025) en PMGV (volgt
+ * per vakcode dezelfde toetslogica als de gelijknamige ISLTH-vakken). PABO volgt
+ * met de eigen studiegids.
  */
 class ToetsonderdeelSeeder extends Seeder
 {

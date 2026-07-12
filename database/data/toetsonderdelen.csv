@@ -127,3 +127,25 @@ MGV;M-GV16b;1;OPD;Opdracht;werkstuk;0.30;ja
 MGV;M-GV16b;2;TOE;Schriftelijke toets;tentamen;0.70;ja
 MGV;M-GV17;1;SCR;Masterscriptie;overig;1.00;ja
 MGV;M-GV18;1;STG;Stagebeoordeling;overig;1.00;ja
+PMGV;B-QR02;1;MEM;Memorisatie;mondeling;0.40;ja
+PMGV;B-QR02;2;REC;Recitatie;mondeling;0.40;ja
+PMGV;B-QR02;3;SCH;Schriftelijk;tentamen;0.20;ja
+PMGV;B-QR03;1;MEM;Memorisatie;mondeling;0.40;ja
+PMGV;B-QR03;2;REC;Recitatie;mondeling;0.40;ja
+PMGV;B-QR03;3;SCH;Schriftelijk;tentamen;0.20;ja
+PMGV;B-QR04;1;MEM;Memorisatie;mondeling;0.40;ja
+PMGV;B-QR04;2;REC;Recitatie;mondeling;0.40;ja
+PMGV;B-QR04;3;SCH;Schriftelijk;tentamen;0.20;ja
+PMGV;B-QR05;1;MEM;Memorisatie;mondeling;0.40;ja
+PMGV;B-QR05;2;REC;Recitatie;mondeling;0.40;ja
+PMGV;B-QR05;3;SCH;Schriftelijk;tentamen;0.20;ja
+PMGV;B-QR06;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+PMGV;B-HD02;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+PMGV;B-KL01;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+PMGV;B-KL03;1;TEN;Schriftelijke toets;tentamen;0.75;ja
+PMGV;B-KL03;2;WST;Werkstuk;werkstuk;0.25;ja
+PMGV;B-SG01;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+PMGV;B-SG03;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
+PMGV;B-FQ06;1;TEN;Schriftelijk tentamen;tentamen;0.70;ja
+PMGV;B-FQ06;2;WST;Werkstuk;werkstuk;0.30;ja
+PMGV;B-FQ02-B-FQ03;1;TEN;Schriftelijk tentamen;tentamen;1.00;ja
