@@ -97,6 +97,19 @@
   <p>Bij <b>Herinschrijven</b> maakt u een nieuwe inschrijving terwijl het studentnummer en de persoonsgegevens gelijk blijven. U kiest de <b>opleiding</b>: dezelfde opleiding (vervolg naar een volgend leerjaar of hetzelfde jaar overdoen) óf een <b>andere opleiding</b> (studiewissel — bijvoorbeeld van een cursus naar een bacheloropleiding). Kiest u een andere opleiding, dan wordt het leerjaar automatisch 1 en verschijnen alleen de klassen van die opleiding. De vakken worden op de gekozen opleiding en het gekozen leerjaar toegewezen; eerder behaalde resultaten blijven op de vorige inschrijving bewaard.</p>
   <h3>Twee opleidingen tegelijk (dubbele inschrijving)</h3>
   <p>Een student mag twee opleidingen tegelijk volgen. Kies op het dossier onder <b>Acties</b> de knop <b>Tweede opleiding</b>, selecteer een <b>andere</b> opleiding en (meestal) het huidige studiejaar. Er ontstaat een tweede actieve inschrijving; beide opleidingen staan bovenaan het dossier met de vermelding <b>dubbele inschrijving</b>. Dezelfde opleiding twee keer in hetzelfde studiejaar is niet mogelijk. Het <b>collegegeld wordt per studiejaar één keer</b> berekend, ook bij twee opleidingen.</p>
+  <h3>Afstuderen (alumnus)</h3>
+  <p>Rondt een student de opleiding af, kies dan op het dossier onder <b>Acties</b> de knop <b>Afgestudeerd markeren</b>. U kiest de opleiding en de <b>afstudeerdatum</b>. De inschrijving krijgt de status <b>Afgestudeerd</b> en wordt daarmee <b>afgerond</b>: korting, betaalregeling, aanwezigheidsregeling en de vaktoewijzing zijn voor die opleiding niet meer wijzigbaar. De student krijgt de markering <b>Alumnus</b>. Het <b>studentnummer blijft behouden</b> en de afgeronde opleiding blijft als historie op het dossier staan. Wil de student later een <b>andere</b> opleiding volgen, dan schrijft u die als nieuwe inschrijving in (<b>Herinschrijven</b>); dezelfde (afgeronde) opleiding opnieuw kan niet.</p>
+  <div class="tip"><b>Afstuderen kan alleen in het laatste leerjaar.</b> Studeert een student bij hoge uitzondering een jaar eerder af (wegens vrijstellingen of eerder behaalde EC), dan geeft de <b>examencommissie</b> dit eerst vrij: op het dossier (tabblad <b>Inschrijving &amp; klas</b>, kaart <b>Vervroegd afstuderen</b>) klikt de examencommissie op <b>Vrijgeven</b>. Pas daarna verschijnt de knop <b>Afgestudeerd markeren</b> voor Studentenzaken.</div>
+  <h3>Afstudeerproces (examencommissie)</h3>
+  <p>Naast het losse <b>Afgestudeerd markeren</b> kent het systeem een volledig <b>afstudeerproces</b> in vijf stappen, gestart door de <b>examencommissie</b>. Onder <b>Afstuderen &rarr; Kandidaten</b> staan de studenten in het laatste leerjaar; de examencommissie klikt op <b>Start proces</b>. Op het studentdossier (kaart <b>Afstudeerproces</b>) worden de stappen afgevinkt — <b>strikt per rol</b>:</p>
+  <ol>
+    <li><b>Afstudeerverzoek ingediend</b> — examencommissie</li>
+    <li><b>Alle vakken gecontroleerd</b> — examencommissie</li>
+    <li><b>Stage en scriptie gecontroleerd</b> — examencommissie</li>
+    <li><b>Diploma klaarmaken</b> — Studentenzaken</li>
+    <li><b>Diploma uitgereikt</b> — Studentenzaken</li>
+  </ol>
+  <p>De stappen worden <b>op volgorde</b> doorlopen; elke rol vinkt alleen de eigen stap(pen) af (een optionele opmerking legt bevindingen vast). Zodra de laatste stap (<b>Diploma uitgereikt</b>) is afgevinkt, wordt de student automatisch <b>Afgestudeerd</b> (alumnus) en is de inschrijving afgerond. Een lopend proces kan de examencommissie afbreken. Alle stappen worden gelogd met datum en naam.</p>
   <h3>Interne notities</h3>
   <p>Op het dossier staat een kaart met <b>interne notities</b> voor de onderlinge communicatie. <b>Studentenzaken</b> en <b>Beheer</b> kunnen notities <b>toevoegen en verwijderen</b>; <b>Directie</b> en <b>Schoolbestuur</b> kunnen ze <b>meelezen</b> (alleen-lezen). Directie ziet uiteraard alleen notities van studenten binnen de eigen opleiding(en).</p>
   <h3>Documenten</h3>

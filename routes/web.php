@@ -356,6 +356,27 @@ Route::middleware('auth')->group(function () {
         Route::get('/studenten/{student}/bsn', [StudentController::class, 'bsn'])->name('studenten.bsn');
     });
 
+    // --- Vervroegd afstuderen VRIJGEVEN: uitsluitend de Examencommissie (+ Beheerder).
+    // Een academisch besluit bij vrijstellingen/eerder behaalde EC; Studentenzaken
+    // voert het afstuderen daarna administratief uit.
+    Route::middleware('rol:examencommissie,beheerder')->group(function () {
+        Route::post('/inschrijvingen/{inschrijving}/vervroegd-afstuderen', [App\Http\Controllers\VervroegdAfstuderenController::class, 'bijwerken'])->name('inschrijving.vervroegd-afstuderen');
+    });
+
+    // --- Afstudeerproces (examencommissie-gedreven, 5 stappen). Kandidatenlijst is
+    // inzage voor EC/SZ/Directie/Beheer; starten/afbreken doet de examencommissie;
+    // elke stap wordt STRIKT door de verantwoordelijke rol afgevinkt (controller).
+    Route::middleware('rol:examencommissie,studentenzaken,directie,beheerder')->group(function () {
+        Route::get('/afstuderen/kandidaten', [App\Http\Controllers\AfstudeerprocesController::class, 'kandidaten'])->name('afstuderen.kandidaten');
+    });
+    Route::middleware('rol:examencommissie,studentenzaken,beheerder')->group(function () {
+        Route::post('/afstudeerstappen/{stap}/afvinken', [App\Http\Controllers\AfstudeerprocesController::class, 'stapAfvinken'])->name('afstuderen.stap.afvinken');
+    });
+    Route::middleware('rol:examencommissie,beheerder')->group(function () {
+        Route::post('/inschrijvingen/{inschrijving}/afstudeerproces', [App\Http\Controllers\AfstudeerprocesController::class, 'start'])->name('afstuderen.proces.start');
+        Route::post('/afstudeerprocessen/{proces}/afbreken', [App\Http\Controllers\AfstudeerprocesController::class, 'afbreken'])->name('afstuderen.proces.afbreken');
+    });
+
     // --- Historisch studentdossier (gemigreerde cijfers): cijfer-bevoegde rollen
     // + Beheerder (verificatie). NIET voor Studentenzaken — rolscheiding op cijfers.
     Route::middleware('rol:examencommissie,directie,beheerder')->group(function () {
@@ -417,6 +438,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/uitschrijven', [InschrijvingActiesController::class, 'kiesUitschrijven'])->name('uitschrijven');
         Route::get('/studenten/{student}/uitschrijven', [InschrijvingActiesController::class, 'uitschrijvenForm'])->name('uitschrijven.form');
         Route::post('/studenten/{student}/uitschrijven', [InschrijvingActiesController::class, 'uitschrijven'])->name('uitschrijven.store');
+
+        // Afstuderen (terminale eindstatus → alumnus; alleen vanuit het laatste leerjaar)
+        Route::get('/studenten/{student}/afstuderen', [InschrijvingActiesController::class, 'afstuderenForm'])->name('afstuderen.form');
+        Route::post('/studenten/{student}/afstuderen', [InschrijvingActiesController::class, 'afstuderen'])->name('afstuderen.store');
 
         // Verklaringen (A4) — preview + ondertekende PDF genereren
         Route::get('/verklaringen', [VerklaringController::class, 'index'])->name('verklaringen');

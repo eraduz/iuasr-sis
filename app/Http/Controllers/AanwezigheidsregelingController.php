@@ -22,6 +22,11 @@ class AanwezigheidsregelingController extends Controller
     {
         abort_unless($request->user()->can('aanwezigheidsregeling-beheren'), 403);
 
+        // Een afgestudeerde inschrijving is afgerond en bevroren.
+        if ($inschrijving->isAfgestudeerd()) {
+            return back()->with('status', 'De opleiding is afgerond (afgestudeerd); de aanwezigheidsregeling kan niet meer worden gewijzigd.');
+        }
+
         $toegekend = $request->boolean('aanwezigheidsregeling_50');
 
         if ($inschrijving->aanwezigheidsregeling_50 !== $toegekend) {

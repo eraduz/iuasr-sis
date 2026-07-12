@@ -131,6 +131,16 @@ enum Rol: string
     }
 
     /**
+     * Mag deze rol vervroegd afstuderen VRIJGEVEN? Dat is een academisch besluit van
+     * de EXAMENCOMMISSIE (bij vrijstellingen/eerder behaalde EC); de Beheerder kan
+     * corrigeren. Studentenzaken voert het afstuderen daarna administratief uit.
+     */
+    public function magVervroegdAfstuderenVrijgeven(): bool
+    {
+        return in_array($this, [self::Examencommissie, self::Beheerder], true);
+    }
+
+    /**
      * Mag deze rol de aanwezigheid registreren? Alleen de Docent, en uitsluitend
      * voor het EIGEN vak (die vakcontrole staat in de Gate 'presentie-registreren').
      * Registreren is voor de docent verplicht, niet optioneel.

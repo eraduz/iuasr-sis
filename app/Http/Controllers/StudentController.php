@@ -68,6 +68,8 @@ class StudentController extends Controller
         $student->load([
             'inschrijvingen.opleiding', 'inschrijvingen.klas', 'inschrijvingen.periode',
             'inschrijvingen.vaktoewijzingen.vak',
+            'inschrijvingen.afstudeerproces.stappen.gereedDoor',
+            'inschrijvingen.afstudeerproces.gestartDoor',
             'nationaliteit', 'land', 'notities.gebruiker',
         ]);
 

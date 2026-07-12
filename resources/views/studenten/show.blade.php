@@ -43,6 +43,10 @@
           <span>{{ $huidige?->opleiding?->naam ?? 'Geen inschrijving' }}</span>
         @endif
         @if ($huidige?->klas)<span class="dot"></span><span>Klas <b>{{ $huidige->klas->code }}</b></span>@endif
+        @if ($student->isAlumnus())
+          <span class="dot"></span>
+          <span class="sis-pill-soft" style="color:#8a6100;background:rgba(214,154,45,0.16);" title="Afgestudeerd van {{ $student->afgerondeOpleidingen()->map(fn ($o) => $o->naam)->implode(', ') }}">Alumnus</span>
+        @endif
       </div>
     </div>
     @if ($huidige)
@@ -81,8 +85,9 @@
           @endif
           <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('verklaringen', ['student' => $student->id]) }}">Verklaring</a>
         @endif
-        @if ($huidige)
-          {{-- Schorsen / opheffen met één klik --}}
+        @php $afstudeerbaar = $student->inschrijvingen->contains(fn ($i) => $i->magAfstuderen()); @endphp
+        @if ($huidige && $huidige->isLopend())
+          {{-- Schorsen / opheffen met één klik (alleen bij een lopende inschrijving) --}}
           <form method="POST" action="{{ route('studenten.schors', $student) }}" style="display:inline;">
             @csrf
             @if ($huidige->status === App\Enums\InschrijvingStatus::Geschorst)
@@ -91,9 +96,11 @@
               <button type="submit" class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger">Schorsen</button>
             @endif
           </form>
-          @if ($huidige->status !== App\Enums\InschrijvingStatus::Uitgeschreven)
-            <a class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" href="{{ route('uitschrijven.form', $student) }}">Uitschrijven</a>
-          @endif
+          <a class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" href="{{ route('uitschrijven.form', $student) }}">Uitschrijven</a>
+        @endif
+        @if ($afstudeerbaar)
+          {{-- Afstuderen: alleen in het laatste leerjaar, of eerder na vrijgave van de examencommissie. --}}
+          <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('afstuderen.form', $student) }}" title="De student rondt de opleiding af en wordt alumnus">Afgestudeerd markeren</a>
         @endif
       </div>
     </div>
@@ -343,6 +350,11 @@
           @endif
 
           @if ($cgi && auth()->user()->magCollegegeldBeheren())
+            @if ($cgi->isAfgestudeerd())
+              <p class="sis-muted" style="margin-top:14px;border-top:1px solid var(--borderColor);padding-top:12px;font-size:12.5px;">
+                <b>Afgerond (afgestudeerd).</b> Korting en betaalregeling van deze opleiding zijn niet meer wijzigbaar.
+              </p>
+            @else
             {{-- Korting op het collegegeld van DEZE opleiding (bv. tweede opleiding). --}}
             <form method="POST" action="{{ route('inschrijving.korting', $cgi) }}" style="margin-top:14px;border-top:1px solid var(--borderColor);padding-top:12px;">
               @csrf
@@ -376,6 +388,7 @@
               @endforeach
               <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit" style="margin-top:8px;">Opslaan</button>
             </form>
+            @endif
           @endif
         </div>
       @endif
@@ -575,6 +588,9 @@
           @if ($huidige->uitschrijfdatum && $huidige->status === App\Enums\InschrijvingStatus::Uitgeschreven)
             <dt>Uitschrijfdatum</dt><dd>{{ $huidige->uitschrijfdatum->format('d-m-Y') }}</dd>
           @endif
+          @if ($huidige->isAfgestudeerd())
+            <dt>Afgestudeerd op</dt><dd>{{ $huidige->afstudeerdatum?->format('d-m-Y') ?? '—' }}</dd>
+          @endif
           <dt>Status</dt><dd><span class="iuasr-dash-status {{ $huidige->status->badge() }}">{{ $huidige->status->label() }}</span></dd>
           <dt>Studentnummer</dt><dd class="tnum">{{ $student->studentnummer }}</dd>
           @if (auth()->user()->magAanwezigheidsregelingZien())
@@ -590,6 +606,11 @@
         </dl>
 
         @if (auth()->user()->magAanwezigheidsregelingBeheren())
+          @if ($huidige->isAfgestudeerd())
+          <p class="sis-muted" style="margin-top:14px;border-top:1px solid var(--borderColor);padding-top:12px;font-size:12.5px;">
+            <b>Afgerond (afgestudeerd).</b> De aanwezigheidsregeling is niet meer wijzigbaar.
+          </p>
+          @else
           {{-- De regeling geldt per opleiding én studiejaar: zij hangt aan DEZE inschrijving
                en moet bij herinschrijving bewust opnieuw worden toegekend. --}}
           <form method="POST" action="{{ route('inschrijving.aanwezigheidsregeling', $huidige) }}" style="margin-top:14px;border-top:1px solid var(--borderColor);padding-top:12px;">
@@ -604,6 +625,7 @@
             </p>
             <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Opslaan</button>
           </form>
+          @endif
         @endif
       @else
         <p class="sis-muted">Geen actieve inschrijving.</p>
@@ -623,6 +645,103 @@
     </div>
   </div>
 
+  {{-- Vervroegd afstuderen — besluit van de examencommissie (zeldzaam). Geeft de
+       afstudeeractie van Studentenzaken vrij buiten het laatste leerjaar. --}}
+  @if (auth()->user()->magVervroegdAfstuderenVrijgeven())
+    @php $vervroegdKandidaten = $student->inschrijvingen->filter(fn ($i) => $i->isLopend() && (! $i->isLaatsteLeerjaar() || $i->vervroegd_afstuderen)); @endphp
+    @if ($vervroegdKandidaten->isNotEmpty())
+      <div class="sis-card" style="margin-top:16px;">
+        <div class="sis-card__hd"><h3>Vervroegd afstuderen</h3><span class="hint">besluit examencommissie</span></div>
+        <p class="sis-muted" style="font-size:12.5px;margin:0 0 6px;">
+          Geef vervroegd afstuderen vrij wanneer de student — wegens vrijstellingen of eerder behaalde EC — eerder afstudeert dan het laatste leerjaar. Studentenzaken kan de student daarna afstuderen (Acties → Afgestudeerd markeren). De vrijgave wordt gelogd.
+        </p>
+        @foreach ($vervroegdKandidaten as $vk)
+          <form method="POST" action="{{ route('inschrijving.vervroegd-afstuderen', $vk) }}" style="border-top:1px solid var(--borderColor);padding-top:10px;margin-top:8px;">
+            @csrf
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:200px;">
+                <b>{{ $vk->opleiding?->naam }}</b>
+                <span class="sis-muted" style="font-size:12px;"> · jaar {{ $vk->leerjaar }} van {{ $vk->opleiding?->nominale_jaren ?? '?' }} · {{ $vk->periode?->naam ?? $vk->periode?->code }}</span>
+                @if ($vk->vervroegd_afstuderen)<span class="iuasr-dash-status s-approved" style="margin-left:6px;">Vrijgegeven</span>@endif
+              </div>
+              @if ($vk->vervroegd_afstuderen)
+                <button type="submit" name="vervroegd_afstuderen" value="0" class="iuasr-dash-btn iuasr-dash-btn--sm">Vrijgave intrekken</button>
+              @else
+                <input type="text" name="reden" maxlength="255" placeholder="Reden (bv. vrijstellingen / behaalde EC)" style="flex:1;min-width:180px;">
+                <button type="submit" name="vervroegd_afstuderen" value="1" class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary">Vrijgeven</button>
+              @endif
+            </div>
+          </form>
+        @endforeach
+      </div>
+    @endif
+  @endif
+
+  {{-- Afstudeerproces (examencommissie → studentenzaken). Per afstudeerbare of
+       reeds-gestarte inschrijving de 5 stappen; strikt per rol afvinkbaar. --}}
+  @php $afstProcInschrijvingen = $student->inschrijvingen->filter(fn ($i) => $i->afstudeerproces || $i->magAfstuderen()); @endphp
+  @if ($afstProcInschrijvingen->isNotEmpty())
+    @php $magStartenProc = auth()->user()->heeftRol(App\Enums\Rol::Examencommissie) || auth()->user()->heeftRol(App\Enums\Rol::Beheerder); @endphp
+    <div class="sis-card" id="afstuderen" style="margin-top:16px;">
+      <div class="sis-card__hd"><h3>Afstudeerproces</h3><span class="hint">examencommissie &rarr; studentenzaken</span></div>
+      @foreach ($afstProcInschrijvingen as $i)
+        @php $proces = $i->afstudeerproces; @endphp
+        <div style="border-top:1px solid var(--borderColor);padding-top:12px;margin-top:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+            <b>{{ $i->opleiding?->naam }}</b>
+            @if (! $proces)
+              <span style="display:flex;gap:8px;align-items:center;">
+                <span class="sis-muted" style="font-size:12px;">Nog geen afstudeerproces</span>
+                @if ($magStartenProc)
+                  <form method="POST" action="{{ route('afstuderen.proces.start', $i) }}">@csrf<button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Afstudeerproces starten</button></form>
+                @endif
+              </span>
+            @elseif ($proces->status === App\Models\Afstudeerproces::AFGEBROKEN)
+              <span class="iuasr-dash-status s-rejected">Afgebroken</span>
+            @else
+              <span class="iuasr-dash-status {{ $proces->isAfgerond() ? 's-approved' : 's-incomplete' }}">{{ $proces->isAfgerond() ? 'Afgerond' : 'Lopend' }} · {{ $proces->aantalGereed() }}/5</span>
+            @endif
+          </div>
+
+          @if ($proces)
+            <ol style="list-style:none;margin:10px 0 0;padding:0;">
+              @foreach ($proces->stappen->sortBy('volgorde') as $stap)
+                @php $enum = $stap->stap; $magIk = $proces->isLopend() && $enum->magAfvinkenDoor(auth()->user()); @endphp
+                <li style="display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px dashed var(--borderColor);">
+                  <div style="width:24px;flex:none;text-align:center;">
+                    @if ($stap->gereed)<span style="color:var(--heritageGroen,#285C4D);font-weight:700;">&#10003;</span>@else<span class="sis-muted">{{ $enum->volgorde() }}</span>@endif
+                  </div>
+                  <div style="flex:1;min-width:160px;">
+                    <div><b>{{ $enum->label() }}</b> <span class="sis-pill-soft" style="font-size:10px;">{{ $enum->verantwoordelijke()->label() }}</span></div>
+                    <div class="sis-muted" style="font-size:11.5px;">{{ $enum->omschrijving() }}</div>
+                    @if ($stap->gereed)
+                      <div class="sis-muted" style="font-size:11px;">Afgevinkt {{ $stap->gereed_op?->format('d-m-Y') }} door {{ $stap->gereedDoor?->naam ?? '—' }}@if($stap->opmerking) · {{ $stap->opmerking }}@endif</div>
+                    @endif
+                  </div>
+                  @if ($magIk)
+                    <form method="POST" action="{{ route('afstuderen.stap.afvinken', $stap) }}" style="flex:none;display:flex;gap:6px;align-items:center;">
+                      @csrf
+                      @unless ($stap->gereed)<input type="text" name="opmerking" maxlength="255" value="{{ $stap->opmerking }}" placeholder="Opmerking" style="width:120px;">@endunless
+                      <button class="iuasr-dash-btn iuasr-dash-btn--sm {{ $stap->gereed ? '' : 'iuasr-dash-btn--primary' }}" type="submit">{{ $stap->gereed ? 'Heropenen' : 'Afvinken' }}</button>
+                    </form>
+                  @endif
+                </li>
+              @endforeach
+            </ol>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;">
+              @if ($proces->gestartDoor)
+                <p class="sis-muted" style="font-size:11px;margin:0;">Gestart door {{ $proces->gestartDoor->naam }} op {{ $proces->gestart_op?->format('d-m-Y') }}.</p>
+              @else<span></span>@endif
+              @if ($proces->isLopend() && $magStartenProc)
+                <form method="POST" action="{{ route('afstuderen.proces.afbreken', $proces) }}" onsubmit="return confirm('Afstudeerproces afbreken?');">@csrf<button class="iuasr-dash-btn iuasr-dash-btn--sm" type="submit">Proces afbreken</button></form>
+              @endif
+            </div>
+          @endif
+        </div>
+      @endforeach
+    </div>
+  @endif
+
   {{-- Toegewezen vakken — volledige studiehistorie per studiejaar en periode --}}
   <div class="sis-card" style="margin-top:16px;">
     <div class="sis-card__hd"><h3>Toegewezen vakken</h3><span class="hint">studiehistorie per studiejaar en periode (blok)</span></div>
@@ -637,7 +756,7 @@
 
       @foreach ($vakHistorie as $i => $h)
         <div class="vh-panel" data-vhpanel="vh{{ $i }}" @if($i!==0) hidden @endif>
-          @if (auth()->user()->magInschrijvingBeheren())
+          @if (auth()->user()->magInschrijvingBeheren() && ! $h['inschrijving']->isAfgestudeerd())
             <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
               <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('inschrijving.vakken', $h['inschrijving']) }}">Vakken aanpassen</a>
             </div>

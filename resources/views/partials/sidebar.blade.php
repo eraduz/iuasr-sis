@@ -42,6 +42,7 @@
                 ['Bulk inschrijven', 'bulk-inschrijven', 'plus', 'bulk-inschrijven*'],
                 ['Herinschrijven', 'herinschrijven', 'refresh', 'herinschrijven'],
                 ['Uitschrijven', 'uitschrijven', 'userx', 'uitschrijven'],
+                ['Afstuderen', 'afstuderen.kandidaten', 'cert', 'afstuderen.kandidaten'],
                 ['Migratie (import)', 'migratie', 'db', 'migratie'],
             ],
             'Onderwijs' => [
@@ -77,6 +78,9 @@
                 // kiezen en meteen bij het vrijstellingsformulier op het dossier
                 // uit te komen.
                 ['Vrijstelling', 'studenten.index', 'cert', 'studenten.*', ['doel' => 'vrijstelling']],
+            ],
+            'Afstuderen' => [
+                ['Kandidaten', 'afstuderen.kandidaten', 'cert', 'afstuderen.kandidaten'],
             ],
             'Cijfers' => [
                 ['Cijferoverzicht', 'cijferoverzicht', 'grade', 'cijferoverzicht'],

@@ -16,8 +16,13 @@ use Illuminate\Validation\Rule;
  */
 class VaktoewijzingController extends Controller
 {
-    public function edit(Inschrijving $inschrijving): View
+    public function edit(Inschrijving $inschrijving): View|RedirectResponse
     {
+        if ($inschrijving->isAfgestudeerd()) {
+            return redirect()->route('studenten.show', $inschrijving->student_id)
+                ->with('status', 'De opleiding is afgerond (afgestudeerd); de vaktoewijzing kan niet meer worden gewijzigd.');
+        }
+
         $inschrijving->load(['student', 'opleiding', 'periode', 'vaktoewijzingen']);
         $toegewezen = $inschrijving->vaktoewijzingen->pluck('vak_id')->all();
 
@@ -33,6 +38,11 @@ class VaktoewijzingController extends Controller
 
     public function update(Request $request, Inschrijving $inschrijving): RedirectResponse
     {
+        if ($inschrijving->isAfgestudeerd()) {
+            return redirect()->route('studenten.show', $inschrijving->student_id)
+                ->with('status', 'De opleiding is afgerond (afgestudeerd); de vaktoewijzing kan niet meer worden gewijzigd.');
+        }
+
         $data = $request->validate([
             'vak_ids' => ['array'],
             'vak_ids.*' => [Rule::exists('vakken', 'id')],
