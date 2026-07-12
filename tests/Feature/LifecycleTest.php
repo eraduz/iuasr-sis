@@ -51,6 +51,37 @@ class LifecycleTest extends TestCase
         $this->assertDatabaseHas('audit_logs', ['veld' => 'uitschrijving', 'actie' => 'wijziging']);
     }
 
+    public function test_uitschrijflijst_toont_alleen_studenten_met_lopende_inschrijving(): void
+    {
+        // Een student zonder inschrijving en een reeds uitgeschreven student horen
+        // NIET in de keuzelijst: hun uitschrijfformulier zou terecht 404 geven.
+        Student::create(['studentnummer' => '260600', 'voornaam' => 'Zonder', 'achternaam' => 'Inschrijving']);
+
+        $uitgeschreven = Student::create(['studentnummer' => '260700', 'voornaam' => 'Al', 'achternaam' => 'Weg']);
+        Inschrijving::create([
+            'student_id' => $uitgeschreven->id,
+            'opleiding_id' => Opleiding::where('code', 'ISLTH')->value('id'),
+            'periode_id' => Periode::where('actief', true)->value('id'),
+            'leerjaar' => 1,
+            'status' => InschrijvingStatus::Uitgeschreven,
+            'inschrijfdatum' => '2025-09-01',
+            'uitschrijfdatum' => '2026-01-31',
+        ]);
+
+        $this->actingAs($this->sz)->get(route('uitschrijven'))
+            ->assertOk()
+            ->assertSee('260500')        // actieve student: wel
+            ->assertDontSee('260600')    // zonder inschrijving: niet
+            ->assertDontSee('260700');   // reeds uitgeschreven: niet
+    }
+
+    public function test_uitschrijfformulier_geeft_404_zonder_lopende_inschrijving(): void
+    {
+        $zonder = Student::create(['studentnummer' => '260601', 'voornaam' => 'Zonder', 'achternaam' => 'Inschrijving']);
+
+        $this->actingAs($this->sz)->get(route('uitschrijven.form', $zonder))->assertNotFound();
+    }
+
     public function test_schorsen_is_een_klik_en_omkeerbaar(): void
     {
         $this->actingAs($this->sz)->post(route('studenten.schors', $this->student));

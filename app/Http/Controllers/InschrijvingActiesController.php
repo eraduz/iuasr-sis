@@ -34,16 +34,27 @@ class InschrijvingActiesController extends Controller
 
     public function kiesUitschrijven(Request $request): View
     {
-        return $this->kies($request, 'uitschrijven', 'Uitschrijven', 'uitschrijven.form');
+        // Alleen een student met een LOPENDE inschrijving (actief of geschorst) is
+        // uitschrijfbaar; zonder zo'n inschrijving geeft het formulier terecht een
+        // 404 ("Geen inschrijving om uit te schrijven"). Filter die studenten dus
+        // al uit de keuzelijst, zodat de knop nooit naar een 404 wijst.
+        return $this->kies($request, 'uitschrijven', 'Uitschrijven', 'uitschrijven.form',
+            fn ($q) => $q->whereHas('inschrijvingen', fn ($i) => $i->whereIn('status', [
+                InschrijvingStatus::Actief->value, InschrijvingStatus::Geschorst->value,
+            ])));
     }
 
-    private function kies(Request $request, string $sleutel, string $titel, string $doelRoute): View
+    private function kies(Request $request, string $sleutel, string $titel, string $doelRoute, ?\Closure $filter = null): View
     {
         $zoek = trim((string) $request->query('q', ''));
         $studenten = Student::query()
             ->with(['inschrijvingen' => fn ($q) => $q->latest('inschrijfdatum')->with('opleiding')])
-            ->when($zoek !== '', fn ($q) => $q->where('studentnummer', 'like', $zoek.'%')
-                ->orWhere('achternaam', 'like', '%'.$zoek.'%'))
+            ->when($filter !== null, $filter)
+            // De zoekvoorwaarden worden gegroepeerd, zodat het OR nooit buiten een
+            // eventueel statusfilter lekt (anders zou het filter worden omzeild).
+            ->when($zoek !== '', fn ($q) => $q->where(fn ($w) => $w
+                ->where('studentnummer', 'like', $zoek.'%')
+                ->orWhere('achternaam', 'like', '%'.$zoek.'%')))
             ->orderBy('studentnummer')
             ->paginate(15)
             ->withQueryString();
