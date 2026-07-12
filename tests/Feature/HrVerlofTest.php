@@ -121,4 +121,52 @@ class HrVerlofTest extends TestCase
 
         $this->assertSame(24.0, $vakantie['opgenomen']);
     }
+
+    public function test_verlofformulier_toont_wettelijke_verloftypen(): void
+    {
+        $this->actingAs($this->leidingg)->get(route('verlof.create'))
+            ->assertOk()
+            ->assertSee('Zwangerschaps- en bevallingsverlof')
+            ->assertSee('Geboorteverlof (partner)')
+            ->assertSee('vf-toelichting', false);
+    }
+
+    public function test_zwangerschapsverlof_aanvragen(): void
+    {
+        $this->actingAs($this->leidingg)->post(route('verlof.store'), [
+            'verloftype' => 'zwangerschap',
+            'van' => date('Y').'-08-20',
+            'tot' => date('Y').'-12-10',
+            'uren' => 512,
+        ])->assertRedirect(route('verlof.mijn'));
+
+        $this->assertDatabaseHas('verlofaanvragen', [
+            'medewerker_id' => $this->leidingg->medewerker->id,
+            'verloftype' => 'zwangerschap',
+        ]);
+    }
+
+    public function test_wettelijk_verlof_staat_niet_in_het_saldo(): void
+    {
+        // WAZO-verlof loopt via UWV en hoort niet in de recht/opgenomen/saldo-tabel.
+        $sophie = Medewerker::where('personeelsnummer', 'P260003')->firstOrFail();
+        $typen = collect(\App\Support\Verlofoverzicht::voor($sophie))->map(fn ($r) => $r['type']->value);
+
+        $this->assertFalse($typen->contains('zwangerschap'));
+        $this->assertFalse($typen->contains('geboorte'));
+        $this->assertTrue($typen->contains('vakantie'));
+    }
+
+    public function test_wettelijkverlof_helper_berekent_zwangerschapsperiode(): void
+    {
+        $wazo = \App\Support\Wettelijkverlof::zwangerschapEnBevalling(
+            \Illuminate\Support\Carbon::create(2026, 10, 1)
+        );
+
+        $this->assertSame('2026-08-20', $wazo['van']->toDateString()); // 6 weken ervoor
+        $this->assertSame('2026-12-10', $wazo['tot']->toDateString()); // 10 weken erna
+        $this->assertSame(16, $wazo['weken']);
+        $this->assertSame(38.0, \App\Support\Wettelijkverlof::geboorteverlofUren(38));      // 1× weekuren
+        $this->assertSame(190.0, \App\Support\Wettelijkverlof::aanvullendGeboorteverlofUren(38)); // 5× weekuren
+    }
 }

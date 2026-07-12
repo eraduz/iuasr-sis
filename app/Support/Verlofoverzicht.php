@@ -32,6 +32,11 @@ class Verlofoverzicht
 
         $rijen = [];
         foreach (Verloftype::cases() as $type) {
+            // Wettelijk verlof (WAZO) loopt via een UWV-uitkering en kent geen
+            // vakantiesaldo; het hoort niet in deze recht/opgenomen/saldo-tabel.
+            if ($type->wettelijk()) {
+                continue;
+            }
             $r = (float) ($recht[$type->value] ?? 0);
             $o = (float) ($opgenomen[$type->value] ?? 0);
             $rijen[] = ['type' => $type, 'recht' => $r, 'opgenomen' => $o, 'saldo' => round($r - $o, 1)];

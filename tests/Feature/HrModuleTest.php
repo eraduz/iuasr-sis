@@ -215,4 +215,21 @@ class HrModuleTest extends TestCase
 
         $this->assertDatabaseHas('hr_documenten', ['medewerker_id' => $medewerker->id, 'categorie' => 'contract']);
     }
+
+    public function test_zzp_overeenkomst_uploaden(): void
+    {
+        Storage::fake('local');
+        // Verse ZZP'er; de ZZP-/opdrachtovereenkomst als document opslaan.
+        $this->actingAs($this->hr)->post(route('medewerkers.store'), [
+            'voornaam' => 'Zelf', 'achternaam' => 'Standig', 'soort' => 'zzp', 'status' => 'actief', 'actief' => '1',
+        ])->assertRedirect();
+        $zzp = Medewerker::where('achternaam', 'Standig')->firstOrFail();
+
+        $this->actingAs($this->hr)->post(route('hrdocumenten.store', $zzp), [
+            'categorie' => 'zzp_overeenkomst',
+            'bestand' => UploadedFile::fake()->create('opdrachtovereenkomst.pdf', 40, 'application/pdf'),
+        ])->assertRedirect(route('medewerkers.show', $zzp));
+
+        $this->assertDatabaseHas('hr_documenten', ['medewerker_id' => $zzp->id, 'categorie' => 'zzp_overeenkomst']);
+    }
 }

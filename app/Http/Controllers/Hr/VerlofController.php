@@ -52,9 +52,12 @@ class VerlofController extends Controller
 
     public function create(Request $request): View
     {
-        $this->eigenMedewerker($request);
+        $medewerker = $this->eigenMedewerker($request);
 
-        return view('hr.verlof-form', ['types' => Verloftype::opties()]);
+        return view('hr.verlof-form', [
+            'types' => Verloftype::opties(),
+            'weekuren' => (float) ($medewerker->huidigDienstverband()?->uren_per_week ?? 0),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse

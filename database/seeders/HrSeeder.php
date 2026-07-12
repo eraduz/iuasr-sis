@@ -192,6 +192,25 @@ class HrSeeder extends Seeder
             );
         }
 
+        // Wettelijk verlof (WAZO) als voorbeeld: zwangerschaps-/bevallingsverlof voor
+        // Nadia (berekend uit de uitgerekende datum) en geboorteverlof voor Mehmet.
+        $nadia = Medewerker::where('personeelsnummer', 'P260002')->first();
+        if ($nadia !== null) {
+            $wazo = \App\Support\Wettelijkverlof::zwangerschapEnBevalling(\Illuminate\Support\Carbon::create($jaar, 10, 1));
+            Verlofaanvraag::firstOrCreate(
+                ['medewerker_id' => $nadia->id, 'verloftype' => 'zwangerschap', 'van' => $wazo['van']->toDateString()],
+                ['tot' => $wazo['tot']->toDateString(), 'uren' => round(($nadia->huidigDienstverband()?->uren_per_week ?? 32) * $wazo['weken'], 1), 'status' => 'goedgekeurd', 'aangevraagd_door_id' => $nadia->user_id, 'reden' => 'Zwangerschaps- en bevallingsverlof']
+            );
+        }
+
+        $mehmet = Medewerker::where('personeelsnummer', 'P260004')->first();
+        if ($mehmet !== null) {
+            Verlofaanvraag::firstOrCreate(
+                ['medewerker_id' => $mehmet->id, 'verloftype' => 'geboorte', 'van' => $jaar.'-04-08'],
+                ['tot' => $jaar.'-04-12', 'uren' => \App\Support\Wettelijkverlof::geboorteverlofUren($mehmet->huidigDienstverband()?->uren_per_week ?? 38), 'status' => 'goedgekeurd', 'aangevraagd_door_id' => $mehmet->user_id, 'reden' => 'Geboorteverlof partner']
+            );
+        }
+
         // Een open ziekmelding (langdurig verzuim — Poortwachter-traject, Fase G).
         $fadwa = Medewerker::where('personeelsnummer', 'P260005')->first();
         if ($fadwa !== null) {

@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Support;
+
+use Illuminate\Support\Carbon;
+
+/**
+ * Rekenregels voor wettelijk verlof (Wet arbeid en zorg / WAZO).
+ * Bron: rijksoverheid.nl. Levert een voorstel; HR kan het altijd aanpassen
+ * (bijv. bij een vroege/late bevalling of gespreid opnemen).
+ */
+class Wettelijkverlof
+{
+    /** Standaard zwangerschapsverlof: 6 weken vóór de uitgerekende datum. */
+    public const ZWANGERSCHAP_WEKEN_VOOR = 6;
+
+    /** Standaard bevallingsverlof: 10 weken na de bevalling. */
+    public const BEVALLING_WEKEN_NA = 10;
+
+    /** Aanvullend geboorteverlof: maximaal 5× de weekuren. */
+    public const AANVULLEND_GEBOORTE_MAX_WEKEN = 5;
+
+    /**
+     * Voorstel voor zwangerschaps- en bevallingsverlof op basis van de
+     * uitgerekende datum: 6 weken ervoor tot 10 weken erna (samen 16 weken).
+     *
+     * @return array{van: Carbon, tot: Carbon, weken: int}
+     */
+    public static function zwangerschapEnBevalling(Carbon $uitgerekend): array
+    {
+        $van = $uitgerekend->copy()->subWeeks(self::ZWANGERSCHAP_WEKEN_VOOR);
+        $tot = $uitgerekend->copy()->addWeeks(self::BEVALLING_WEKEN_NA);
+
+        return [
+            'van' => $van,
+            'tot' => $tot,
+            'weken' => self::ZWANGERSCHAP_WEKEN_VOOR + self::BEVALLING_WEKEN_NA,
+        ];
+    }
+
+    /** Geboorteverlof (partner): eenmaal het aantal werkuren per week. */
+    public static function geboorteverlofUren(float $urenPerWeek): float
+    {
+        return round($urenPerWeek, 1);
+    }
+
+    /** Aanvullend geboorteverlof (partner): maximaal 5× de weekuren. */
+    public static function aanvullendGeboorteverlofUren(float $urenPerWeek): float
+    {
+        return round($urenPerWeek * self::AANVULLEND_GEBOORTE_MAX_WEKEN, 1);
+    }
+}

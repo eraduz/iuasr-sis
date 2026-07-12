@@ -301,6 +301,14 @@
   <p>Onder <b>Documenten</b> uploadt u HR-documenten bij de medewerker (contract, diploma, identiteitsbewijs, overig). De bestanden staan op de <b>private schijf</b> en de inzage wordt gelogd (AVG).</p>
   <h3>Verlof (met self-service)</h3>
   <p>Elke medewerker met een gekoppeld account vraagt <b>zelf</b> verlof aan via <b>Mijn verlof</b>: type (vakantie, bijzonder, ouderschap, studie), periode en aantal uren. De aanvraag gaat naar de <b>HR-medewerker</b> (tevens leidinggevende), die goedkeurt of afwijst. Op <b>Mijn verlof</b> ziet de medewerker het <b>saldo</b> per type (recht − opgenomen) en de status van de aanvragen; een openstaande aanvraag kan zelf worden ingetrokken. Onder <b>Verlof</b> ziet de HR-medewerker alle aanvragen en beoordeelt ze; het <b>recht</b> per type stelt HR in op de medewerkerkaart.</p>
+  <h3>Zwangerschaps-, bevallings- en geboorteverlof (WAZO)</h3>
+  <p>Naast vakantie en bijzonder verlof registreert u ook het wettelijk verlof uit de Wet arbeid en zorg. Bij <b>Verlof aanvragen</b> kiest u het type; het formulier toont dan de wettelijke toelichting en een rekenhulp:</p>
+  <ul>
+    <li><b>Zwangerschaps- en bevallingsverlof</b>: samen minimaal <b>16 weken</b>. Vul de <b>uitgerekende datum</b> in, dan vult het systeem automatisch de periode (6 weken vóór t/m 10 weken ná die datum). De uitkering loopt via het UWV.</li>
+    <li><b>Geboorteverlof (partner)</b>: <b>1× het aantal werkuren per week</b>, volledig doorbetaald, binnen 4 weken na de geboorte. Het systeem stelt de uren voor op basis van het dienstverband.</li>
+    <li><b>Aanvullend geboorteverlof</b>: daarna <b>maximaal 5× de weekuren</b> binnen 6 maanden (70% via UWV).</li>
+  </ul>
+  <p>Dit wettelijke verlof loopt via een UWV-uitkering en staat daarom los van het vakantiesaldo; het verschijnt niet in de saldotabel maar wel in het overzicht van aanvragen. HR kan de voorgestelde data altijd aanpassen (bijvoorbeeld bij een vroege of late bevalling, of bij gespreid opnemen).</p>
   <h3>Verzuim</h3>
   <p>Onder <b>Verzuim</b> (of op de medewerkerkaart) registreert de HR-medewerker een <b>ziekmelding</b> (ziek vanaf, percentage) en later de <b>herstelmelding</b>. Zolang een melding openstaat, staat de medewerker op status ‘ziek’; bij herstel keert de status terug naar ‘actief’. Het dashboard toont de openstaande verlofaanvragen en de actuele ziekmeldingen.</p>
   <h3>Signaleringen</h3>
