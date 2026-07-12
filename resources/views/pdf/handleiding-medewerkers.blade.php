@@ -141,14 +141,14 @@
   <div class="tip">U ziet en wijzigt uitsluitend uw eigen vakken. Bij een vrijstelling vervallen de invoervelden en geldt “VR”.</div>
 
   <h3>Aanwezigheid registreren (verplicht)</h3>
-  <p>Tijdens elk college registreert u de aanwezigheid van uw studenten. <b>Dit is verplicht.</b> Een blok telt <b>acht onderwijsweken</b>; per week legt u per student één waarde vast:</p>
+  <p>Tijdens elk college registreert u de aanwezigheid van uw studenten. <b>Dit is verplicht.</b> Een blok telt <b>acht onderwijsweken</b>. Per student en per week klikt u op een <b>vakje</b> dat wisselt tussen drie standen:</p>
   <table class="rol">
-    <tr><th>Waarde</th><th>Betekenis</th></tr>
-    <tr><td><b>1</b></td><td>De student was aanwezig.</td></tr>
-    <tr><td><b>0</b></td><td>De student was afwezig.</td></tr>
-    <tr><td><b>–</b></td><td>Nog niet geregistreerd. Dit telt <b>niet</b> als afwezigheid.</td></tr>
+    <tr><th>Vakje</th><th>Betekenis</th></tr>
+    <tr><td><b>groen &#10003;</b></td><td>De student was aanwezig.</td></tr>
+    <tr><td><b>rood &#10007;</b></td><td>De student was afwezig.</td></tr>
+    <tr><td><b>leeg</b></td><td>Nog niet geregistreerd. Dit telt <b>niet</b> als afwezigheid.</td></tr>
   </table>
-  <p>Ga naar <b>Mijn vakken</b> en klik bij een vak op <b>Aanwezigheid</b> (of kies <b>Aanwezigheid</b> in het menu voor een overzicht van al uw vakken). U ziet een tabel met uw studenten en de acht weken. Met het knopje <b>alle 1</b> boven een week zet u die hele week in één klik op aanwezig; daarna past u de uitzonderingen aan. Klik op <b>Aanwezigheid opslaan</b>. Het percentage per student wordt direct berekend.</p>
+  <p>Ga naar <b>Mijn vakken</b> en klik bij een vak op <b>Aanwezigheid</b> (of kies <b>Aanwezigheid</b> in het menu voor een overzicht van al uw vakken). U ziet een tabel met uw studenten en de acht weken. <b>Eén klik</b> op een leeg vakje zet de student op <b>aanwezig</b> (groen &#10003;); nog een klik maakt er <b>afwezig</b> (rood &#10007;) van, en een derde klik maakt het weer leeg. Met het knopje <b>alle 1</b> boven een week zet u die hele week in één keer op aanwezig; daarna klikt u alleen de afwezige studenten aan. Klik op <b>Aanwezigheid opslaan</b>. Het percentage per student wordt direct berekend.</p>
   <p>Twee dingen ziet u meteen op de lijst:</p>
   <ul>
     <li>Studenten met een <b>vrijstelling</b> voor uw vak volgen de colleges niet. Bij hen vult u <b>niets</b> in; hun rij toont “Vrijgesteld — geen aanwezigheidsplicht”.</li>
