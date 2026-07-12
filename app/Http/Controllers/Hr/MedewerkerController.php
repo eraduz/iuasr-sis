@@ -15,6 +15,7 @@ use App\Support\PersoneelsnummerGenerator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 /**
@@ -121,6 +122,39 @@ class MedewerkerController extends Controller
         AuditLogger::log(AuditLogger::WIJZIGING, $medewerker, veld: 'medewerker', context: ['personeelsnummer' => $medewerker->personeelsnummer]);
 
         return redirect()->route('medewerkers.show', $medewerker)->with('status', 'Medewerker bijgewerkt.');
+    }
+
+    /**
+     * Medewerker VOLLEDIG en onherstelbaar verwijderen — voor foutieve records
+     * (bijvoorbeeld een dubbel aangemaakte medewerker). Alle gekoppelde HR-gegevens
+     * (dienstverbanden, verlof, verzuim, documenten, notities, gesprekken,
+     * checklists) cascaden mee; een gekoppeld login-account blijft bestaan.
+     * Dubbele beveiliging: bevestiging + exact personeelsnummer intypen.
+     */
+    public function destroy(Request $request, Medewerker $medewerker): RedirectResponse
+    {
+        abort_unless($medewerker->beheerbaarVoor($request->user()), 403, 'U mag deze medewerker niet verwijderen.');
+
+        $request->validate(['bevestig_nummer' => ['required', 'string']]);
+        if ($request->input('bevestig_nummer') !== $medewerker->personeelsnummer) {
+            return back()->with('fout', 'Verwijderen afgebroken: het ingevoerde personeelsnummer komt niet overeen.');
+        }
+
+        // Fysieke documentbestanden van de private schijf verwijderen (DB-rijen cascaden).
+        foreach ($medewerker->documenten as $document) {
+            if ($document->pad) {
+                Storage::disk('local')->delete($document->pad);
+            }
+        }
+
+        $nummer = $medewerker->personeelsnummer;
+        AuditLogger::log(AuditLogger::VERWIJDERING, 'Medewerker', $medewerker->id, veld: 'medewerker', context: [
+            'personeelsnummer' => $nummer, 'naam' => $medewerker->volledigeNaam(),
+        ]);
+
+        $medewerker->delete();
+
+        return redirect()->route('medewerkers')->with('status', "Medewerker {$nummer} is volledig verwijderd.");
     }
 
     /**

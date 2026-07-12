@@ -231,6 +231,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/medewerkers', [App\Http\Controllers\Hr\MedewerkerController::class, 'store'])->name('medewerkers.store');
         Route::get('/medewerkers/{medewerker}/bewerken', [App\Http\Controllers\Hr\MedewerkerController::class, 'edit'])->name('medewerkers.edit');
         Route::put('/medewerkers/{medewerker}', [App\Http\Controllers\Hr\MedewerkerController::class, 'update'])->name('medewerkers.update');
+        // Definitief verwijderen (foutieve/dubbele records) — met bevestiging.
+        Route::delete('/medewerkers/{medewerker}', [App\Http\Controllers\Hr\MedewerkerController::class, 'destroy'])->name('medewerkers.destroy');
 
         Route::get('/medewerkers/{medewerker}/dienstverband/nieuw', [App\Http\Controllers\Hr\DienstverbandController::class, 'create'])->name('dienstverbanden.create');
         Route::post('/medewerkers/{medewerker}/dienstverbanden', [App\Http\Controllers\Hr\DienstverbandController::class, 'store'])->name('dienstverbanden.store');

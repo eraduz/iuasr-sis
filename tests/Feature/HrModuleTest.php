@@ -203,6 +203,50 @@ class HrModuleTest extends TestCase
             ->assertDontSee('Willemsen'); // seeded personeelslid
     }
 
+    public function test_medewerker_definitief_verwijderen_met_bevestiging(): void
+    {
+        // Verse (dubbel aangemaakte) medewerker mét een dienstverband.
+        $this->actingAs($this->hr)->post(route('medewerkers.store'), [
+            'voornaam' => 'Dubbel', 'achternaam' => 'Record', 'status' => 'actief', 'actief' => '1',
+        ])->assertRedirect();
+        $m = Medewerker::where('achternaam', 'Record')->firstOrFail();
+
+        $this->actingAs($this->hr)->post(route('dienstverbanden.store', $m), [
+            'contracttype' => 'vast', 'startdatum' => '2026-01-01', 'uren_per_week' => 40,
+        ])->assertRedirect();
+        $dvId = $m->dienstverbanden()->firstOrFail()->id;
+
+        $this->actingAs($this->hr)->delete(route('medewerkers.destroy', $m), [
+            'bevestig_nummer' => $m->personeelsnummer,
+        ])->assertRedirect(route('medewerkers'));
+
+        $this->assertDatabaseMissing('medewerkers', ['id' => $m->id]);
+        $this->assertDatabaseMissing('dienstverbanden', ['id' => $dvId]); // cascade
+    }
+
+    public function test_verwijderen_afgebroken_bij_verkeerd_nummer(): void
+    {
+        $m = Medewerker::where('personeelsnummer', 'P260005')->firstOrFail();
+
+        $this->actingAs($this->hr)->delete(route('medewerkers.destroy', $m), [
+            'bevestig_nummer' => 'FOUT-NUMMER',
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('medewerkers', ['id' => $m->id]); // niet verwijderd
+    }
+
+    public function test_studentenzaken_kan_medewerker_niet_verwijderen(): void
+    {
+        $m = Medewerker::where('personeelsnummer', 'P260005')->firstOrFail();
+        $sz = User::where('rol', Rol::Studentenzaken)->firstOrFail();
+
+        $this->actingAs($sz)->delete(route('medewerkers.destroy', $m), [
+            'bevestig_nummer' => $m->personeelsnummer,
+        ])->assertForbidden();
+
+        $this->assertDatabaseHas('medewerkers', ['id' => $m->id]);
+    }
+
     public function test_document_uploaden(): void
     {
         Storage::fake('local');

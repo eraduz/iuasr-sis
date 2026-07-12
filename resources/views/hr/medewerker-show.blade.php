@@ -323,4 +323,19 @@
     @endforelse
   </div>
 </div>
+
+@if ($magBeheer)
+  {{-- Gevaarlijke actie — medewerker volledig verwijderen (foutieve/dubbele records). --}}
+  <div class="sis-card" style="margin-top:16px;border:1px solid var(--secColor100);">
+    <div class="sis-card__hd"><h3 style="color:var(--secColor100);">Medewerker volledig verwijderen</h3><span class="hint">alleen voor foutieve of dubbel aangemaakte records</span></div>
+    <div style="padding:14px 16px;">
+      <p style="margin:0 0 12px;">Verwijdert <b>{{ $medewerker->volledigeNaam() }}</b> ({{ $medewerker->personeelsnummer }}) en <b>alle</b> gekoppelde HR-gegevens (dienstverbanden, verlof, verzuim, documenten, notities, gesprekken) <b>onherstelbaar</b>. Een eventueel gekoppeld login-account blijft bestaan. Deze actie kan niet ongedaan worden gemaakt.</p>
+      <form method="POST" action="{{ route('medewerkers.destroy', $medewerker) }}" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;" onsubmit="return confirm('Weet u zeker dat u {{ $medewerker->volledigeNaam() }} ({{ $medewerker->personeelsnummer }}) VOLLEDIG en ONHERSTELBAAR wilt verwijderen?');">
+        @csrf @method('DELETE')
+        <input type="text" name="bevestig_nummer" required autocomplete="off" placeholder="Typ {{ $medewerker->personeelsnummer }} ter bevestiging" style="padding:8px 10px;border:1px solid var(--secColor100);border-radius:6px;min-width:240px;">
+        <button class="iuasr-dash-btn iuasr-dash-btn--sm" style="background:var(--secColor100);color:#fff;border-color:var(--secColor100);" type="submit">Definitief verwijderen</button>
+      </form>
+    </div>
+  </div>
+@endif
 @endsection
