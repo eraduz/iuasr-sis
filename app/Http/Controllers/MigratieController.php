@@ -12,8 +12,9 @@ use Illuminate\Http\Request;
  * oude Access-database naar het SIS via de per-jaar geëxporteerde CSV's. Werkt
  * altijd met een DRY-RUN (preview) vóór het echt importeren.
  *
- * Fase 1: studenten (studentnummer + persoonsgegevens). Cijfers/inschrijvingen
- * volgen in een aparte, gevalideerde stap.
+ * Fase 1: studenten (studentnummer + persoonsgegevens).
+ * Fase 2: vakken (uit _vaklijsten.csv) en cijfers (per studiejaar cijfers-JJJJ-JJJJ.csv),
+ * onder een aparte historische opleiding, als één eindcijfer per vak.
  */
 class MigratieController extends Controller
 {
@@ -25,8 +26,8 @@ class MigratieController extends Controller
     public function verwerk(Request $request, MigratieImport $import): View
     {
         $request->validate([
-            'bestand' => ['required', 'file', 'max:20480'],
-            'type' => ['required', 'in:studenten'],
+            'bestand' => ['required', 'file', 'max:51200'],
+            'type' => ['required', 'in:studenten,vakken,cijfers'],
             'modus' => ['required', 'in:preview,import'],
         ]);
 
@@ -34,7 +35,11 @@ class MigratieController extends Controller
         $rijen = CsvLezer::associatief($pad);
         $dryRun = $request->input('modus') === 'preview';
 
-        $rapport = $import->verwerkStudenten($rijen, $dryRun);
+        $rapport = match ($request->input('type')) {
+            'vakken' => $import->verwerkVakken($rijen, $dryRun),
+            'cijfers' => $import->verwerkCijfers($rijen, $dryRun),
+            default => $import->verwerkStudenten($rijen, $dryRun),
+        };
 
         return view('migratie.index', [
             'rapport' => $rapport,
