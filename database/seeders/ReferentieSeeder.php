@@ -84,9 +84,13 @@ class ReferentieSeeder extends Seeder
             );
         }
 
-        // Docenten (synthetisch — komen overeen met de mockups).
-        $aydin = Docent::create(['code' => 'DOC-001', 'aanhef' => 'dr.', 'voornaam' => 'Yusuf', 'achternaam' => 'Aydın', 'email' => 'y.aydin@iuasr.nl']);
-        Docent::create(['code' => 'DOC-002', 'aanhef' => 'dr.', 'voornaam' => 'Salima', 'achternaam' => 'Boujat', 'email' => 's.boujat@iuasr.nl']);
+        // Twee echte basis-docenten (Galal Ali + Mhamed Aarab), hier alvast
+        // aangemaakt zodat de testfixtures en het docent-login een docent hebben
+        // zonder DocentSeeder; DocentSeeder ziet ze dan als bestaand. Galal Ali is
+        // het docent-login voor het testen van "Mijn vakken".
+        // E-mailconventie: {achternaam}@iuasr.nl, met uitzonderingen (Ali → amer).
+        Docent::create(['code' => 'DOC-001', 'aanhef' => 'drs.', 'voornaam' => 'Galal', 'achternaam' => 'Ali', 'email' => 'amer@iuasr.nl']);
+        Docent::create(['code' => 'DOC-002', 'aanhef' => 'dhr.', 'voornaam' => 'Mhamed', 'achternaam' => 'Aarab', 'email' => 'aarab@iuasr.nl']);
 
         // Opleidingen. voldoende_grens = 5,5. EC-overgangsdrempel voor bachelors:
         // 30 EC (landelijke BSA-norm vanaf studiejaar 2026-2027) als vertrekpunt;

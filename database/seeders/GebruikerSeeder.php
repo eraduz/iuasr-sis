@@ -20,8 +20,10 @@ class GebruikerSeeder extends Seeder
         User::create(['naam' => 'Fatima Yıldız', 'email' => 'f.yildiz@iuasr.nl', 'rol' => Rol::Studentenzaken]);
         User::create(['naam' => 'Sanne Visser', 'email' => 's.visser@iuasr.nl', 'rol' => Rol::Financien]);
 
-        $aydin = Docent::where('code', 'DOC-001')->first();
-        User::create(['naam' => 'dr. Yusuf Aydın', 'email' => 'y.aydin@iuasr.nl', 'rol' => Rol::Docent, 'docent_id' => $aydin?->id]);
+        // Docent-login: Galal Ali (echte docent). Zo kan de rol Docent met een
+        // echt docentprofiel worden getest ("Mijn vakken" = zijn eigen vakken).
+        $ali = Docent::where('achternaam', 'Ali')->first();
+        User::create(['naam' => 'drs. Galal Ali', 'email' => 'amer@iuasr.nl', 'rol' => Rol::Docent, 'docent_id' => $ali?->id]);
 
         User::create(['naam' => 'prof. Karima Nassar', 'email' => 'k.nassar@iuasr.nl', 'rol' => Rol::Examencommissie]);
 

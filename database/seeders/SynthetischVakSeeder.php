@@ -23,8 +23,10 @@ class SynthetischVakSeeder extends Seeder
     public function run(): void
     {
         $theologie = Opleiding::where('code', 'ISLTH')->first();
-        $aydin = Docent::where('code', 'DOC-001')->first();
-        $boujat = Docent::where('code', 'DOC-002')->first();
+        // Twee testfixture-docenten: Galal Ali (= het docent-login) en Mhamed Aarab,
+        // zodat er ook een vak met een ANDERE docent bestaat (rolscheiding-tests).
+        $ali = Docent::where('achternaam', 'Ali')->first();
+        $aarab = Docent::where('achternaam', 'Aarab')->first();
 
         if (! $theologie) {
             return;
@@ -32,7 +34,7 @@ class SynthetischVakSeeder extends Seeder
 
         // Voorbeeldvak met genormaliseerde toetsstructuur (deelresultaten + weging).
         $vak = Vak::create([
-            'opleiding_id' => $theologie->id, 'docent_id' => $aydin?->id,
+            'opleiding_id' => $theologie->id, 'docent_id' => $ali?->id,
             'code' => 'ISLTH-ARA-201', 'naam' => 'Arabische grammatica II',
             'ec' => 6, 'leerjaar' => 2, 'blok' => 1, 'actief' => true,
         ]);
@@ -43,7 +45,7 @@ class SynthetischVakSeeder extends Seeder
         // Leerjaar-1 vak (waar de meeste synthetische studenten zitten), met de
         // toetsopbouw uit het design: schriftelijk 40% / mondeling 25% / tentamen 35%.
         $vak1 = Vak::create([
-            'opleiding_id' => $theologie->id, 'docent_id' => $aydin?->id,
+            'opleiding_id' => $theologie->id, 'docent_id' => $ali?->id,
             'code' => 'ISLTH-ARA-101', 'naam' => 'Arabische grammatica I',
             'ec' => 6, 'leerjaar' => 1, 'blok' => 1, 'actief' => true,
         ]);
@@ -53,13 +55,13 @@ class SynthetischVakSeeder extends Seeder
 
         $overig = [
             // [code, naam, ec, leerjaar, blok, docent]
-            ['ISLTH-KRN-110', 'Inleiding Koranwetenschappen', 6, 1, 1, $boujat],
-            ['ISLTH-FIQ-110', 'Islamitisch recht I', 6, 1, 2, $boujat],
-            ['ISLTH-HIS-120', 'Geschiedenis van de Islam', 5, 1, 2, $aydin],
-            ['ISLTH-ARA-102', 'Arabische grammatica I-b', 6, 1, 3, $aydin],
-            ['ISLTH-SIR-140', 'Sīra (biografie van de Profeet)', 5, 1, 4, $boujat],
-            ['ISLTH-FIQ-210', 'Usul al-Fiqh', 6, 2, 2, $aydin],
-            ['ISLTH-TAF-220', 'Tafsīr I', 6, 2, 3, $boujat],
+            ['ISLTH-KRN-110', 'Inleiding Koranwetenschappen', 6, 1, 1, $aarab],
+            ['ISLTH-FIQ-110', 'Islamitisch recht I', 6, 1, 2, $aarab],
+            ['ISLTH-HIS-120', 'Geschiedenis van de Islam', 5, 1, 2, $ali],
+            ['ISLTH-ARA-102', 'Arabische grammatica I-b', 6, 1, 3, $ali],
+            ['ISLTH-SIR-140', 'Sīra (biografie van de Profeet)', 5, 1, 4, $aarab],
+            ['ISLTH-FIQ-210', 'Usul al-Fiqh', 6, 2, 2, $ali],
+            ['ISLTH-TAF-220', 'Tafsīr I', 6, 2, 3, $aarab],
         ];
         foreach ($overig as [$code, $naam, $ec, $leerjaar, $blok, $docent]) {
             $v = Vak::create([
