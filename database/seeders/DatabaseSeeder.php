@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             DocentSeeder::class,
             VakDocentSeeder::class,
             GebruikerSeeder::class,
+            DocentLoginSeeder::class,
             SynthetischeStudentSeeder::class,
             ExtraStudentenSeeder::class,
             VaktoewijzingSeeder::class,
