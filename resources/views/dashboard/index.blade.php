@@ -92,6 +92,35 @@
     <span>Als Studentenzaken heeft u <b>geen inzage in cijfers</b>. Dit wordt server-side afgedwongen (rolscheiding), niet alleen in de interface.</span>
   </div>
 
+  @if ($afstudeerSignaal->isNotEmpty())
+    @php $afstActie = $afstudeerSignaal->where('wachtOpSz', true); @endphp
+    <div class="sis-card" style="margin-top:16px;@if($afstActie->isNotEmpty())border-left:3px solid var(--secColor100);@endif">
+      <div class="sis-card__hd"><h3>Afstudeerprocessen</h3><span class="hint">{{ $afstudeerSignaal->count() }} lopend@if($afstActie->isNotEmpty()) · {{ $afstActie->count() }} wacht op u@endif</span></div>
+      <p class="sis-muted" style="font-size:12px;margin:0 0 8px;">Door de examencommissie gestart. Zodra het uw beurt is (diploma klaarmaken of uitreiken) staat er <b>Actie: Studentenzaken</b> — zo mist u geen afstudeeraanvraag.</p>
+      <div class="iuasr-dash-tbl-card" style="border:0;">
+        <table class="iuasr-dash-tbl">
+          <thead><tr><th>Student</th><th>Opleiding</th><th>Voortgang</th><th>Huidige stap</th><th></th></tr></thead>
+          <tbody>
+            @foreach ($afstudeerSignaal->take(10) as $r)
+              @php $p = $r['proces']; @endphp
+              <tr>
+                <td class="nm"><a href="{{ route('studenten.show', $p->student) }}#afstuderen">{{ $p->student->volledigeNaam() }}</a><small>{{ $p->student->studentnummer }}</small></td>
+                <td>{{ $p->inschrijving?->opleiding?->naam ?? '—' }}</td>
+                <td class="tnum">{{ $p->aantalGereed() }}/5</td>
+                <td>
+                  {{ $r['huidigeStap']?->label() ?? '—' }}
+                  @if ($r['wachtOpSz'])<span class="iuasr-dash-status s-rejected" style="margin-left:4px;">Actie: Studentenzaken</span>@else<span class="sis-muted" style="font-size:11px;">wacht op examencommissie</span>@endif
+                </td>
+                <td style="text-align:right;"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('studenten.show', $p->student) }}#afstuderen">Openen</a></td>
+              </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+      @if ($afstudeerSignaal->count() > 10)<p class="sis-muted" style="font-size:12px;margin:8px 2px 0;">+ {{ $afstudeerSignaal->count() - 10 }} meer…</p>@endif
+    </div>
+  @endif
+
   @if ($openBesluiten->isNotEmpty())
     <div class="sis-card" style="margin-top:16px;border-left:3px solid var(--secColor100);">
       <div class="sis-card__hd"><h3>Vrijstellingsbesluiten van de examencommissie</h3><span class="hint">{{ $openBesluiten->count() }} te verwerken</span></div>

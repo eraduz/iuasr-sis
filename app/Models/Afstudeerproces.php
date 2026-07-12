@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Afstudeerstap;
+use App\Enums\Rol;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -74,5 +76,17 @@ class Afstudeerproces extends Model
         $totaal = $this->stappen->count() ?: 1;
 
         return (int) round($this->aantalGereed() / $totaal * 100);
+    }
+
+    /** De eerstvolgende nog niet afgevinkte stap (of null als alles af is). */
+    public function huidigeStap(): ?Afstudeerstap
+    {
+        return $this->stappen->sortBy('volgorde')->firstWhere('gereed', false)?->stap;
+    }
+
+    /** Bij welke rol ligt de eerstvolgende openstaande stap? Stuurt de dashboardsignalering. */
+    public function wachtOpRol(): ?Rol
+    {
+        return $this->huidigeStap()?->verantwoordelijke();
     }
 }

@@ -137,6 +137,26 @@ class AfstudeerprocesTest extends TestCase
             ->assertDontSee('260901');  // eerste jaar: niet
     }
 
+    public function test_studentenzaken_ziet_afstudeerproces_op_dashboard(): void
+    {
+        $proces = $this->startProces();
+
+        // Net gestart: stap 1 is aan de examencommissie -> "wacht op examencommissie".
+        $this->actingAs($this->sz)->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('Afstudeerprocessen')
+            ->assertSee('260900')
+            ->assertSee('wacht op examencommissie');
+
+        // Examencommissie rondt stap 1-3 af -> nu is het de beurt van Studentenzaken.
+        foreach ([Afstudeerstap::Verzoek, Afstudeerstap::Vakken, Afstudeerstap::StageScriptie] as $s) {
+            $this->actingAs($this->ec)->post(route('afstuderen.stap.afvinken', $this->stap($proces, $s)));
+        }
+        $this->actingAs($this->sz)->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('Actie: Studentenzaken');
+    }
+
     public function test_examencommissie_breekt_proces_af(): void
     {
         $proces = $this->startProces();

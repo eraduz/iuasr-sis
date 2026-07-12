@@ -212,6 +212,7 @@ class DashboardController extends Controller
         $docLater = collect();
         $openBesluiten = collect();
         $kennistoetsBewaking = collect();
+        $afstudeerSignaal = collect();
         if ($rol === Rol::Studentenzaken) {
             $openBesluiten = \App\Models\Vrijstellingsbesluit::where('status', 'open')
                 ->with(['student', 'vak', 'aangemaaktDoor'])->latest()->get();
@@ -241,11 +242,26 @@ class DashboardController extends Controller
                 ->values();
 
             $docLater = Student::where('documenten_later', true)->orderBy('achternaam')->get();
+
+            // Afstudeerprocessen die de examencommissie heeft gestart: Studentenzaken
+            // moet ze zien om de eigen stappen (diploma klaarmaken/uitreiken) niet te
+            // missen. 'wachtOpSz' = het is nu de beurt van Studentenzaken.
+            $afstudeerSignaal = \App\Models\Afstudeerproces::where('status', \App\Models\Afstudeerproces::LOPEND)
+                ->with(['student', 'inschrijving.opleiding', 'stappen'])
+                ->get()
+                ->filter(fn ($p) => $p->student !== null)
+                ->map(fn ($p) => [
+                    'proces' => $p,
+                    'huidigeStap' => $p->huidigeStap(),
+                    'wachtOpSz' => $p->wachtOpRol() === Rol::Studentenzaken,
+                ])
+                ->sortByDesc('wachtOpSz')
+                ->values();
         }
 
         return view('dashboard.index', compact('kpi', 'nt2', 'docLater', 'stat', 'openBesluiten',
             'vrijstellingLijst', 'kennistoetsBewaking', 'dubbeleInschrijving',
-            'regelingLijst', 'presentieAchterstand', 'mijnTaken', 'afspraken'));
+            'regelingLijst', 'presentieAchterstand', 'mijnTaken', 'afspraken', 'afstudeerSignaal'));
     }
 
     /**
