@@ -112,6 +112,7 @@
   <p>De stappen worden <b>op volgorde</b> doorlopen; elke rol vinkt alleen de eigen stap(pen) af (een optionele opmerking legt bevindingen vast). Zodra de laatste stap (<b>Diploma uitgereikt</b>) is afgevinkt, wordt de student automatisch <b>Afgestudeerd</b> (alumnus) en is de inschrijving afgerond. Een lopend proces kan de examencommissie afbreken. Alle stappen worden gelogd met datum en naam.</p>
   <h3>Interne notities</h3>
   <p>Op het dossier staat een kaart met <b>interne notities</b> voor de onderlinge communicatie. <b>Studentenzaken</b> en <b>Beheer</b> kunnen notities <b>toevoegen en verwijderen</b>; <b>Directie</b> en <b>Schoolbestuur</b> kunnen ze <b>meelezen</b> (alleen-lezen). Directie ziet uiteraard alleen notities van studenten binnen de eigen opleiding(en).</p>
+  <p>De <b>examencommissie</b> heeft daarnaast een <b>eigen</b> notitieblok op het dossier (kaart <b>Notities examencommissie</b>) voor haar werkaantekeningen — bevindingen en overwegingen, bijvoorbeeld rondom het afstuderen. Deze notities zijn <b>uitsluitend voor de examencommissie</b> zichtbaar en worden niet gedeeld met Studentenzaken, Directie of Bestuur. Elke notitie krijgt automatisch datum en auteur.</p>
   <h3>Documenten</h3>
   <p>In het dossier uploadt u documenten (identiteitsbewijs, diploma, cijferlijst, pasfoto, overig). Ontbreekt iets nog, zet dan <b>“levert later aan”</b> aan — de student verschijnt dan als herinnering op het dashboard.</p>
   <h3>Landelijke kennistoetsen (PABO)</h3>

@@ -82,6 +82,12 @@ class Student extends Model
         return $this->hasMany(Afstudeerproces::class);
     }
 
+    /** Notities van de examencommissie (hun eigen werkaantekeningen); nieuwste eerst. */
+    public function examencommissieNotities(): HasMany
+    {
+        return $this->hasMany(ExamencommissieNotitie::class)->latest();
+    }
+
     public function inschrijvingen(): HasMany
     {
         return $this->hasMany(Inschrijving::class);

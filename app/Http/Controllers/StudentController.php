@@ -76,6 +76,11 @@ class StudentController extends Controller
         // Directie ziet alleen dossiers binnen de eigen opleiding(en).
         abort_unless($student->zichtbaarVoor(auth()->user()), 403,
             'Deze student valt buiten uw opleiding(en).');
+
+        // Eigen notities van de examencommissie: alleen laden (en tonen) voor de commissie.
+        if (auth()->user()->magExamencommissieNotities()) {
+            $student->load('examencommissieNotities.gebruiker');
+        }
         // Huidige inschrijving: bij voorkeur de ACTIEVE, anders de meest recente.
         // Deterministisch bij gelijke inschrijfdatum door te tie-breaken op id.
         $sorteerKey = fn ($i) => sprintf('%s-%010d', optional($i->inschrijfdatum)->format('Y-m-d') ?? '0000-00-00', $i->id);

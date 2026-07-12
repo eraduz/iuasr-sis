@@ -375,6 +375,10 @@ Route::middleware('auth')->group(function () {
     Route::middleware('rol:examencommissie,beheerder')->group(function () {
         Route::post('/inschrijvingen/{inschrijving}/afstudeerproces', [App\Http\Controllers\AfstudeerprocesController::class, 'start'])->name('afstuderen.proces.start');
         Route::post('/afstudeerprocessen/{proces}/afbreken', [App\Http\Controllers\AfstudeerprocesController::class, 'afbreken'])->name('afstuderen.proces.afbreken');
+
+        // Eigen notities van de examencommissie per student (niet gedeeld met SZ/Directie/Bestuur).
+        Route::post('/studenten/{student}/ec-notities', [App\Http\Controllers\ExamencommissieNotitieController::class, 'store'])->name('studenten.ec-notities.store');
+        Route::delete('/studenten/{student}/ec-notities/{notitie}', [App\Http\Controllers\ExamencommissieNotitieController::class, 'destroy'])->name('studenten.ec-notities.destroy');
     });
 
     // --- Historisch studentdossier (gemigreerde cijfers): cijfer-bevoegde rollen
