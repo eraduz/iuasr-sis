@@ -31,6 +31,27 @@
     <p>De migratie uit de oude Access-database is nog niet uitgevoerd. Zodra studenten, vakken en cijfers zijn geïmporteerd, verschijnen de dossiers hier.</p>
   </div>
 @else
+  @if ($studiejaren->isNotEmpty())
+    <div class="sis-card" style="margin-bottom:16px;">
+      <div class="sis-card__hd"><h3>Bulk-export (PDF)</h3><span class="hint">Cijferoverzicht van een heel studiejaar, of de hele opleiding als ZIP</span></div>
+      <form method="GET" action="{{ route('historisch.bulk') }}" style="display:flex;flex-wrap:wrap;gap:12px 16px;align-items:flex-end;">
+        <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;">Selectie
+          <select name="scope" style="font-size:13px;min-width:260px;">
+            <option value="alle">Hele opleiding — ZIP (kan enkele minuten duren)</option>
+            @foreach ($studiejaren as $jaar)
+              <option value="{{ $jaar }}">Studiejaar {{ $jaar }}</option>
+            @endforeach
+          </select>
+        </label>
+        <button type="submit" class="iuasr-dash-btn iuasr-dash-btn--primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Genereren
+        </button>
+      </form>
+      <p class="sis-tblnote" style="margin-top:10px;">Een studiejaar bevat maximaal enkele honderden studenten (één gecombineerde PDF). Voor de hele opleiding wordt per studiejaar een aparte PDF gemaakt en samen als ZIP aangeboden. Alle documenten zijn <b>informatief, niet gewaarmerkt</b>.</p>
+    </div>
+  @endif
+
   <form method="GET" action="{{ route('historisch.index') }}">
     <div class="iuasr-dash-filters">
       <div class="search" style="grid-column:1 / -1;">

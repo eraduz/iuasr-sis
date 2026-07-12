@@ -49,7 +49,9 @@ class HistorischDossierController extends Controller
                 ->withQueryString();
         }
 
-        return view('historisch.index', compact('studenten', 'zoek', 'opleiding'));
+        $studiejaren = $opleiding ? $this->historischeStudiejaren($opleiding) : collect();
+
+        return view('historisch.index', compact('studenten', 'zoek', 'opleiding', 'studiejaren'));
     }
 
     /** Cijferlijst van één student, gegroepeerd per studiejaar. */
@@ -87,6 +89,137 @@ class HistorischDossierController extends Controller
             'historisch-dossier-'.$student->studentnummer.'.pdf',
             ['Content-Type' => 'application/pdf'],
         );
+    }
+
+    /**
+     * Bulk-export: cijferoverzicht van een heel studiejaar (één gecombineerde PDF)
+     * of van de hele opleiding (ZIP met één PDF per studiejaar).
+     */
+    public function bulk(Request $request): StreamedResponse
+    {
+        $opleiding = $this->opleiding();
+        abort_unless($opleiding !== null, 404, 'Er is nog geen gemigreerde historische data.');
+
+        $scope = (string) $request->query('scope', '');
+        $jaren = $this->historischeStudiejaren($opleiding);
+        abort_if($jaren->isEmpty(), 404, 'Geen historische cijfers gevonden.');
+
+        // dompdf is geheugen-/tijdintensief; render per studiejaar in brokken van CHUNK
+        // studenten (±1,6s en <100 MB per stuk) en ruim budget voor de hele export.
+        @ini_set('memory_limit', '768M');
+        @set_time_limit(600);
+
+        if ($request->user() && in_array($request->user()->rol, [Rol::Examencommissie, Rol::Directie], true)) {
+            AuditLogger::log(AuditLogger::UITGIFTE, 'HistorischDossier', $opleiding->id,
+                veld: 'bulk-cijfers (historisch)', context: ['scope' => $scope ?: 'onbekend']);
+        }
+
+        // Hele opleiding → ZIP met per studiejaar (en zo nodig per deel) een PDF.
+        if ($scope === 'alle') {
+            return $this->zipDownload('historische-cijferlijsten-'.$opleiding->code.'.zip',
+                function ($zip) use ($opleiding, $jaren) {
+                    foreach ($jaren as $code) {
+                        $this->voegJaarToe($zip, $opleiding, $code);
+                    }
+                });
+        }
+
+        // Eén studiejaar.
+        abort_unless($jaren->contains($scope), 404, 'Onbekend of leeg studiejaar.');
+        $delen = $this->jaarBlokken($opleiding, $scope)->chunk(self::CHUNK)->values();
+
+        // Past het in één deel? Dan een gewone PDF; anders een ZIP met de delen.
+        if ($delen->count() <= 1) {
+            $bytes = $this->overzichtPdf($opleiding, $scope, $delen->first() ?? collect(), null);
+
+            return response()->streamDownload(fn () => print($bytes),
+                'cijferoverzicht-'.$scope.'.pdf', ['Content-Type' => 'application/pdf']);
+        }
+
+        return $this->zipDownload('cijferoverzicht-'.$scope.'.zip',
+            fn ($zip) => $this->voegJaarToe($zip, $opleiding, $scope));
+    }
+
+    /** Aantal studenten per gecombineerde PDF (dompdf-veilig). */
+    private const CHUNK = 50;
+
+    /** Voegt de PDF('s) van één studiejaar toe aan een open ZIP-archief. */
+    private function voegJaarToe(\ZipArchive $zip, Opleiding $opleiding, string $code): void
+    {
+        $delen = $this->jaarBlokken($opleiding, $code)->chunk(self::CHUNK)->values();
+        $aantal = $delen->count();
+        foreach ($delen as $i => $deel) {
+            $naam = $aantal > 1 ? "cijferoverzicht-{$code}-deel".($i + 1).".pdf" : "cijferoverzicht-{$code}.pdf";
+            $label = $aantal > 1 ? 'deel '.($i + 1).' van '.$aantal : null;
+            $zip->addFromString($naam, $this->overzichtPdf($opleiding, $code, $deel, $label));
+        }
+    }
+
+    /** Bouwt een ZIP in een tempbestand, leest hem in en biedt hem als download aan. */
+    private function zipDownload(string $bestandsnaam, callable $vul): StreamedResponse
+    {
+        $pad = tempnam(sys_get_temp_dir(), 'histzip');
+        $zip = new \ZipArchive;
+        $zip->open($pad, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        $vul($zip);
+        $zip->close();
+        $bytes = (string) file_get_contents($pad);
+        @unlink($pad);
+
+        return response()->streamDownload(fn () => print($bytes), $bestandsnaam,
+            ['Content-Type' => 'application/zip']);
+    }
+
+    /** De studentblokken (met cijfers van dat jaar) voor één studiejaar, op studentnummer. */
+    private function jaarBlokken(Opleiding $opleiding, string $periodeCode): \Illuminate\Support\Collection
+    {
+        return Resultaat::query()
+            ->whereHas('inschrijving', fn ($q) => $q->where('opleiding_id', $opleiding->id)
+                ->whereHas('periode', fn ($p) => $p->where('code', $periodeCode)))
+            ->with(['toetsonderdeel.vak', 'student'])
+            ->get()
+            ->groupBy('student_id')
+            ->map(function ($rs) {
+                $rijen = $rs->sortBy(fn ($r) => optional($r->toetsonderdeel->vak)->code)->values();
+                $cijfers = $rijen->filter(fn ($r) => $r->cijfer !== null);
+
+                return [
+                    'student' => $rs->first()->student,
+                    'rijen' => $rijen,
+                    'ec_behaald' => $rijen->filter(fn ($r) => $r->voldoende)
+                        ->sum(fn ($r) => (float) optional($r->toetsonderdeel->vak)->ec),
+                    'gemiddelde' => $cijfers->isNotEmpty() ? round($cijfers->avg('cijfer'), 1) : null,
+                ];
+            })
+            ->filter(fn ($blok) => $blok['student'] !== null)
+            ->sortBy(fn ($blok) => $blok['student']->studentnummer)
+            ->values();
+    }
+
+    /** Rendert één (deel van een) jaaroverzicht naar PDF-bytes. */
+    private function overzichtPdf(Opleiding $opleiding, string $periodeCode, \Illuminate\Support\Collection $blokken, ?string $deelLabel): string
+    {
+        $html = view('pdf.historisch-jaaroverzicht', [
+            'opleiding' => $opleiding,
+            'periodeCode' => $periodeCode,
+            'studenten' => $blokken,
+            'deelLabel' => $deelLabel,
+            'uitgegevenDoor' => auth()->user()?->naam ?? 'IUASR',
+        ])->render();
+
+        return Documentondertekening::pdfVanHtml($html);
+    }
+
+    /** Studiejaarcodes (periodes) waarvoor historische resultaten bestaan, oplopend. */
+    private function historischeStudiejaren(Opleiding $opleiding): \Illuminate\Support\Collection
+    {
+        return Resultaat::query()
+            ->join('inschrijvingen', 'inschrijvingen.id', '=', 'resultaten.inschrijving_id')
+            ->join('perioden', 'perioden.id', '=', 'inschrijvingen.periode_id')
+            ->where('inschrijvingen.opleiding_id', $opleiding->id)
+            ->orderBy('perioden.code')
+            ->distinct()
+            ->pluck('perioden.code');
     }
 
     /**

@@ -78,12 +78,37 @@ class HistorischDossierTest extends TestCase
         $this->assertStringStartsWith('%PDF', $response->streamedContent());
     }
 
+    public function test_bulk_per_studiejaar_levert_een_pdf(): void
+    {
+        $this->seedDossier(); // 1 student → 1 deel → losse PDF
+
+        $response = $this->actingAs($this->examencommissie())
+            ->get(route('historisch.bulk', ['scope' => '2016-2017']));
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'application/pdf');
+        $this->assertStringStartsWith('%PDF', $response->streamedContent());
+    }
+
+    public function test_bulk_hele_opleiding_levert_een_zip(): void
+    {
+        $this->seedDossier();
+
+        $response = $this->actingAs($this->examencommissie())
+            ->get(route('historisch.bulk', ['scope' => 'alle']));
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'application/zip');
+        $this->assertStringStartsWith('PK', $response->streamedContent()); // ZIP-magic
+    }
+
     public function test_studentenzaken_heeft_geen_toegang(): void
     {
         $sz = User::create(['naam' => 'SZ', 'email' => 'sz@iuasr.test', 'rol' => Rol::Studentenzaken]);
         $this->actingAs($sz)->get(route('historisch.index'))->assertForbidden();
         $student = $this->seedDossier();
         $this->actingAs($sz)->get(route('historisch.pdf', $student))->assertForbidden();
+        $this->actingAs($sz)->get(route('historisch.bulk', ['scope' => 'alle']))->assertForbidden();
     }
 
     public function test_beheerder_heeft_wel_toegang(): void

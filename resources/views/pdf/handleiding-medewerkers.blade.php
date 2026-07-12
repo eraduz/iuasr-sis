@@ -165,6 +165,7 @@
 
   <h3>Historisch dossier (oude cijfers uit Access)</h3>
   <p>Onder <b>Cijfers &rarr; Historisch dossier</b> vindt u de cijferlijsten van studenten die zijn overgezet uit het oude Access-systeem (tot en met studiejaar 2024&ndash;2025). Zoek op studentnummer of naam en open de <b>cijferlijst</b>: die toont per <b>studiejaar</b> de vakken met eindcijfer, resultaat (voldoende / onvoldoende / vrijstelling) en behaalde EC. Deze schermen zijn <b>alleen-lezen</b>; de oude cijfers stonden op een 0&ndash;100-schaal en zijn omgezet naar 0&ndash;10 (voldoende vanaf 5,5). Het oude systeem kende geen deeltoetsen, dus er is per vak één eindcijfer. Met de knop <b>Printbare PDF</b> downloadt u de cijferlijst als A4-document om te printen of te archiveren; die is duidelijk gemarkeerd als <b>informatief, niet gewaarmerkt</b> (de oude cijfers zijn niet opnieuw door de examencommissie vastgesteld). Toegang: <b>Examencommissie</b>, <b>Directie</b> en <b>Beheer</b> (niet Studentenzaken &mdash; rolscheiding op cijfers). Inzage en het afdrukken worden gelogd.</p>
+  <p>Voor een <b>bulk-export</b> staat op het lijstscherm het blok <b>Bulk-export (PDF)</b>. Kies een <b>studiejaar</b> voor één gecombineerd cijferoverzicht van alle studenten van dat jaar (bij veel studenten opgesplitst in delen, samen als ZIP), of <b>Hele opleiding</b> voor een ZIP met per studiejaar een overzicht &mdash; dat laatste kan enkele minuten duren. Ook deze documenten zijn informatief en niet gewaarmerkt.</p>
 
   <h2>8. Collegegeld &amp; betalingen</h2>
   <h3>Termijnen: vijf facturen per jaar</h3>

@@ -358,6 +358,7 @@ Route::middleware('auth')->group(function () {
     // + Beheerder (verificatie). NIET voor Studentenzaken — rolscheiding op cijfers.
     Route::middleware('rol:examencommissie,directie,beheerder')->group(function () {
         Route::get('/historisch-dossier', [App\Http\Controllers\HistorischDossierController::class, 'index'])->name('historisch.index');
+        Route::get('/historisch-dossier/bulk', [App\Http\Controllers\HistorischDossierController::class, 'bulk'])->name('historisch.bulk');
         Route::get('/historisch-dossier/{student}', [App\Http\Controllers\HistorischDossierController::class, 'show'])->name('historisch.show');
         Route::get('/historisch-dossier/{student}/pdf', [App\Http\Controllers\HistorischDossierController::class, 'pdf'])->name('historisch.pdf');
     });
