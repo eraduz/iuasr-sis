@@ -79,3 +79,6 @@ Desktop.ini
 !/IUASR/iuasr-sis/
 !/IUASR/assets/
 !/IUASR/IUASR Design System.html
+
+# Echte personeelslijst (AVG): namen/functies van medewerkers — niet in Git.
+database/data/personeel.csv

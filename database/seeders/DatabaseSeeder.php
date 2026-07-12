@@ -30,6 +30,8 @@ class DatabaseSeeder extends Seeder
             OrganisatieSeeder::class,
             HrSeeder::class,
             HrDocentenSeeder::class,
+            // Echte personeelslijst (lokaal, gitignored; no-op als het bestand ontbreekt).
+            PersoneelSeeder::class,
         ]);
     }
 }
