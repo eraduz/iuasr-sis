@@ -89,3 +89,41 @@ ISLTH;B-BR01;1;SCR;Scriptie;overig;1.00;ja
 ISLTH;B-ST01;1;STV;Stageverslag en portfolio;portfolio;1.00;ja
 ISLTH;B-ST02;1;STV;Stageverslag en portfolio;portfolio;1.00;ja
 ISLTH;B-ST04;1;STV;Stageverslag en portfolio;portfolio;1.00;ja
+MGV;M-GV01;1;TOE;Schriftelijke toets;tentamen;1.00;ja
+MGV;M-GV02;1;TOE;Schriftelijke toets;tentamen;0.75;ja
+MGV;M-GV02;2;RSP;Rollenspel;mondeling;0.25;ja
+MGV;M-GV03;1;TOE;Schriftelijke toets;tentamen;0.80;ja
+MGV;M-GV03;2;RSP;Rollenspel;mondeling;0.20;ja
+MGV;M-GV04;1;TOE;Schriftelijke toets;tentamen;0.75;ja
+MGV;M-GV04;2;WST;Werkstuk;werkstuk;0.25;ja
+MGV;M-GV05;1;TOE;Schriftelijke toets;tentamen;1.00;ja
+MGV;M-GV06;1;TOE;Schriftelijke toets;tentamen;0.80;ja
+MGV;M-GV06;2;ESS;Essay;werkstuk;0.20;ja
+MGV;M-GV07;1;WST;Werkstuk;werkstuk;0.40;ja
+MGV;M-GV07;2;VDR;Voordracht;presentatie;0.20;ja
+MGV;M-GV07;3;RSP;Rollenspel;mondeling;0.25;ja
+MGV;M-GV07;4;MBR;Moreel beraad;werkstuk;0.15;ja
+MGV;M-GV08;1;WST;Werkstuk;werkstuk;0.50;ja
+MGV;M-GV08;2;PRE;Presentatie;presentatie;0.20;ja
+MGV;M-GV08;3;RSP;Rollenspel;mondeling;0.20;ja
+MGV;M-GV08;4;REF;Reflectieverslag;werkstuk;0.10;ja
+MGV;M-GV09;1;TOE;Schriftelijke toets;tentamen;0.60;ja
+MGV;M-GV09;2;RSP;Rollenspel;mondeling;0.40;ja
+MGV;M-GV10;1;TOE;Schriftelijke toets;tentamen;0.70;ja
+MGV;M-GV10;2;RSP;Rollenspel;mondeling;0.30;ja
+MGV;M-GV11;1;TOE;Schriftelijke toets;tentamen;1.00;ja
+MGV;M-GV12;1;TOE;Schriftelijke toets;tentamen;0.50;ja
+MGV;M-GV12;2;RSP;Rollenspel;mondeling;0.50;ja
+MGV;M-GV13;1;TOE;Schriftelijke toets;tentamen;0.50;ja
+MGV;M-GV13;2;RSP;Rollenspel;mondeling;0.30;ja
+MGV;M-GV13;3;REF;Reflectieverslag;werkstuk;0.20;ja
+MGV;M-GV14;1;WST;Werkstuk;werkstuk;0.50;ja
+MGV;M-GV14;2;TEN;Schriftelijk tentamen;tentamen;0.50;ja
+MGV;M-GV15;1;WST;Werkstuk;werkstuk;0.75;ja
+MGV;M-GV15;2;VDR;Voordracht;presentatie;0.25;ja
+MGV;M-GV16a;1;OPD;Opdracht;werkstuk;0.30;ja
+MGV;M-GV16a;2;TOE;Schriftelijke toets;tentamen;0.70;ja
+MGV;M-GV16b;1;OPD;Opdracht;werkstuk;0.30;ja
+MGV;M-GV16b;2;TOE;Schriftelijke toets;tentamen;0.70;ja
+MGV;M-GV17;1;SCR;Masterscriptie;overig;1.00;ja
+MGV;M-GV18;1;STG;Stagebeoordeling;overig;1.00;ja
