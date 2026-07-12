@@ -1,0 +1,144 @@
+/* =====================================================================
+   IUASR SIS — thema & header-tools (aanvullend op het design system).
+   Wijzigt sis.css niet; voegt de donkere modus en de weekkalender toe.
+   ===================================================================== */
+
+/* ---- Header-tools: icoonknoppen + weekkalender-popover ---- */
+.sis-headtools { display: flex; align-items: center; gap: 6px; }
+
+.sis-iconbtn {
+  width: 34px; height: 34px; border-radius: 9px;
+  border: 1px solid var(--borderColor); background: #FFFFFF; color: var(--priColor100);
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: background .12s, border-color .12s, color .12s; padding: 0;
+}
+.sis-iconbtn:hover { background: var(--priColor102); border-color: var(--priColor100); }
+.sis-iconbtn:focus-visible { outline: 2px solid var(--priColor100); outline-offset: 2px; }
+
+/* Zon/maan wisselen op basis van het actieve thema. */
+.sis-theme-btn .ic-moon { display: inline-flex; }
+.sis-theme-btn .ic-sun { display: none; }
+html[data-theme="dark"] .sis-theme-btn .ic-moon { display: none; }
+html[data-theme="dark"] .sis-theme-btn .ic-sun { display: inline-flex; }
+
+.sis-weekcal-wrap { position: relative; }
+.sis-weekcal-pop {
+  position: absolute; right: 0; top: 44px; z-index: 60; width: 320px;
+  background: #FFFFFF; border: 1px solid var(--borderColor); border-radius: 12px;
+  box-shadow: var(--shadow-card), rgba(30,20,70,.10) 0 12px 32px; padding: 12px 14px;
+}
+.sis-weekcal-pop[hidden] { display: none; }
+
+.sis-weekcal__hd { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
+.sis-weekcal__hd .ttl { font-family: var(--serif-font); font-size: 15px; color: var(--priColor100); }
+.sis-weekcal__hd .rng { font-size: 11.5px; color: var(--blackAltText); }
+
+.sis-weekcal__tbl { border-collapse: collapse; width: 100%; font-size: 12px; font-variant-numeric: tabular-nums; }
+.sis-weekcal__tbl th {
+  font-weight: 600; color: var(--blackAltText); padding: 4px 0; text-align: center;
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em;
+}
+.sis-weekcal__tbl th.wk, .sis-weekcal__tbl td.wk { width: 30px; }
+.sis-weekcal__tbl td {
+  text-align: center; padding: 4px 0; color: var(--priColor100); border-top: 1px solid var(--borderSubtleColor);
+}
+.sis-weekcal__tbl td.wk {
+  color: var(--priColor200); font-weight: 700; background: var(--priColor101);
+  border-right: 1px solid var(--borderSubtleColor); font-size: 11px;
+}
+.sis-weekcal__tbl td.weekend { color: var(--blackAltText); }
+.sis-weekcal__tbl td.eerste { color: var(--priColor300); font-weight: 600; font-size: 10.5px; }
+.sis-weekcal__tbl tr.is-nu td.wk { color: var(--secColor100); }
+.sis-weekcal__tbl td.vandaag {
+  background: var(--priColor100); color: #FFFFFF; border-radius: 6px; font-weight: 700;
+}
+.sis-weekcal__ft { margin-top: 8px; font-size: 11px; color: var(--blackAltText); }
+
+/* =====================================================================
+   Donkere modus. Geactiveerd door data-theme="dark" op <html>.
+   priColor100 wordt de (lichte) tekstkleur; merk-VULvlakken die priColor100
+   als achtergrond gebruikten worden apart naar een accent gezet.
+   ===================================================================== */
+html[data-theme="dark"] { color-scheme: dark; }
+
+html[data-theme="dark"] {
+  --priColor100: #e9e7f5;               /* was donker indigo → nu lichte tekst */
+  --priColor101: rgba(255,255,255,.03);
+  --priColor102: rgba(255,255,255,.06);
+  --priColor103: #14121e;               /* lichte bg → donkere basis */
+  --priColor200: #57c39c;               /* heritage groen, lichter voor contrast */
+  --priColor300: #e2b552;               /* goud, lichter */
+  --secColor100: #ff5d74;               /* rood, lichter op donker */
+  --secColor300: #ffd2b0;
+  --borderSubtleColor: rgba(255,255,255,.09);
+  --borderColor: rgba(255,255,255,.20);
+  --blackAltText: #a9a4c2;
+  --shadow-card: rgba(0,0,0,.5) 0 2px 14px 0;
+}
+
+/* Accentkleur voor knoppen/actieve elementen (vervangt de vroegere priColor100-vulling). */
+html[data-theme="dark"] { --accent: #7c6cf0; --accent-hover: #6a58e8; }
+
+html[data-theme="dark"] body { background: #14121e; color: var(--priColor100); }
+
+/* Oppervlakken die hard #FFFFFF waren → donker. */
+html[data-theme="dark"] .iuasr-dash-header,
+html[data-theme="dark"] .iuasr-dash-sidebar,
+html[data-theme="dark"] .sis-card,
+html[data-theme="dark"] .sis-chart-card,
+html[data-theme="dark"] .iuasr-dash-stat,
+html[data-theme="dark"] .iuasr-dash-filters,
+html[data-theme="dark"] .iuasr-dash-tbl-card,
+html[data-theme="dark"] .iuasr-dash-empty,
+html[data-theme="dark"] .iuasr-dash-candidate,
+html[data-theme="dark"] .iuasr-dash-panel,
+html[data-theme="dark"] .iuasr-dash-note,
+html[data-theme="dark"] .iuasr-dash-modal,
+html[data-theme="dark"] .sis-login__card,
+html[data-theme="dark"] .sis-weekcal-pop,
+html[data-theme="dark"] .sis-iconbtn {
+  background: #1f1b30; border-color: rgba(255,255,255,.12); color: var(--priColor100);
+}
+html[data-theme="dark"] .iuasr-dash-sidebar { background: #1a1728; }
+html[data-theme="dark"] .iuasr-dash-header { background: #1a1728; }
+
+/* Formuliervelden. */
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] .sis-grade-input {
+  background: #26223a; color: var(--priColor100); border-color: rgba(255,255,255,.20);
+}
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder { color: #7f7a99; }
+
+/* Tabellen. */
+html[data-theme="dark"] .iuasr-dash-tbl th { color: var(--blackAltText); }
+html[data-theme="dark"] .iuasr-dash-tbl td,
+html[data-theme="dark"] .iuasr-dash-tbl th { border-color: rgba(255,255,255,.10); }
+html[data-theme="dark"] .iuasr-dash-tbl tbody tr:hover { background: rgba(255,255,255,.04); }
+
+/* Icoonknop-hover. */
+html[data-theme="dark"] .sis-iconbtn:hover { background: #2a2540; border-color: var(--accent); }
+
+/* Merk-VULvlakken (voorheen background: var(--priColor100)) → accent. */
+html[data-theme="dark"] .iuasr-dash-btn--primary,
+html[data-theme="dark"] .iuasr-dash-sidenav.is-active,
+html[data-theme="dark"] .iuasr-dash-sidenav.is-active:hover,
+html[data-theme="dark"] .sis-subtab.is-active,
+html[data-theme="dark"] .sis-help-link:hover,
+html[data-theme="dark"] .sis-attempt button.is-on,
+html[data-theme="dark"] .iuasr-dash-header__brand .avatar,
+html[data-theme="dark"] .sis-weekcal__tbl td.vandaag {
+  background: var(--accent); color: #ffffff; border-color: var(--accent);
+}
+html[data-theme="dark"] .iuasr-dash-btn--primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+html[data-theme="dark"] .iuasr-dash-sidenav.is-active .count { color: #fff; }
+
+/* Secundaire knoppen / pills iets lichter dan de kaart. */
+html[data-theme="dark"] .iuasr-dash-btn,
+html[data-theme="dark"] .sis-pill-soft { background: #2a2540; color: var(--priColor100); border-color: rgba(255,255,255,.14); }
+html[data-theme="dark"] .iuasr-dash-btn:hover { background: #332d4d; }
+
+/* Logo: het donkere logo is op donker onzichtbaar → licht filter. */
+html[data-theme="dark"] .iuasr-dash-header__logo img { filter: brightness(0) invert(1); opacity: .92; }
