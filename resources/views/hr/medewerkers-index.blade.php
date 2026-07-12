@@ -19,6 +19,7 @@
   <select name="afdeling"><option value="">Alle afdelingen</option>@foreach ($afdelingen as $a)<option value="{{ $a->id }}" @selected($afdelingFilter === $a->id)>{{ $a->naam }}</option>@endforeach</select>
   <select name="functie"><option value="">Alle functies</option>@foreach ($functies as $f)<option value="{{ $f->id }}" @selected($functieFilter === $f->id)>{{ $f->naam }}</option>@endforeach</select>
   <select name="status"><option value="">Alle statussen</option>@foreach ($statussen as $s)<option value="{{ $s->value }}" @selected($statusFilter === $s->value)>{{ $s->label() }}</option>@endforeach</select>
+  <select name="soort"><option value="">Personeel + vrijwilligers</option>@foreach ($soorten as $s)<option value="{{ $s->value }}" @selected($soortFilter === $s->value)>{{ $s->label() }}</option>@endforeach</select>
   <button class="iuasr-dash-btn iuasr-dash-btn--sm" type="submit">Filteren</button>
 </form>
 
@@ -29,7 +30,7 @@
       @forelse ($medewerkers as $m)
         <tr>
           <td class="tnum">{{ $m->personeelsnummer }}</td>
-          <td class="nm"><a href="{{ route('medewerkers.show', $m) }}">{{ $m->volledigeNaam() }}</a></td>
+          <td class="nm"><a href="{{ route('medewerkers.show', $m) }}">{{ $m->volledigeNaam() }}</a>@if($m->isVrijwilliger()) <span class="iuasr-dash-status {{ $m->soort?->badge() }}" style="font-size:10px;">Vrijwilliger</span>@endif</td>
           <td>{{ $m->functie?->naam ?? '—' }}</td>
           <td>{{ $m->afdeling?->naam ?? '—' }}</td>
           <td class="tnum" style="text-align:right;">{{ $m->fte() !== null ? number_format($m->fte(), 2, ',', '.') : '—' }}</td>

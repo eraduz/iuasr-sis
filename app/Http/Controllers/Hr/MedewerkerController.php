@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Hr;
 
+use App\Enums\MedewerkerSoort;
 use App\Enums\MedewerkerStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Afdeling;
@@ -37,6 +38,7 @@ class MedewerkerController extends Controller
             ->when($request->filled('afdeling'), fn ($q) => $q->where('afdeling_id', (int) $request->query('afdeling')))
             ->when($request->filled('functie'), fn ($q) => $q->where('functie_id', (int) $request->query('functie')))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->query('status')))
+            ->when($request->filled('soort'), fn ($q) => $q->where('soort', $request->query('soort')))
             ->orderBy('achternaam')->orderBy('voornaam')
             ->paginate(25)->withQueryString();
 
@@ -44,11 +46,13 @@ class MedewerkerController extends Controller
             'medewerkers' => $medewerkers,
             'zoek' => (string) $request->query('q', ''),
             'statusFilter' => (string) $request->query('status', ''),
+            'soortFilter' => (string) $request->query('soort', ''),
             'afdelingFilter' => (int) $request->query('afdeling', 0),
             'functieFilter' => (int) $request->query('functie', 0),
             'afdelingen' => Afdeling::orderBy('naam')->get(),
             'functies' => Functie::orderBy('naam')->get(),
             'statussen' => MedewerkerStatus::cases(),
+            'soorten' => MedewerkerSoort::cases(),
         ]);
     }
 
@@ -166,6 +170,7 @@ class MedewerkerController extends Controller
             'managers' => Medewerker::where('id', '!=', $medewerker->id ?? 0)->orderBy('achternaam')->get(),
             'gebruikers' => User::whereNotIn('id', $gekoppeld)->orderBy('naam')->get(),
             'statussen' => MedewerkerStatus::cases(),
+            'soorten' => MedewerkerSoort::cases(),
             'bsnInschakelen' => (bool) config('sis.hr.bsn_ingeschakeld', false),
         ];
     }
@@ -188,6 +193,7 @@ class MedewerkerController extends Controller
             'telefoon' => ['nullable', 'string', 'max:30'],
             'email' => ['nullable', 'email', 'max:255'],
             'email_prive' => ['nullable', 'email', 'max:255'],
+            'soort' => ['nullable', Rule::in(MedewerkerSoort::waarden())],
             'status' => ['required', Rule::in(MedewerkerStatus::waarden())],
             // Offboarding: de uit-dienstdatum is verplicht zodra de status 'uit dienst' is.
             'uit_dienst_datum' => ['nullable', 'date', 'required_if:status,'.MedewerkerStatus::UitDienst->value],
@@ -201,6 +207,12 @@ class MedewerkerController extends Controller
 
         $data = $request->validate($regels);
         $data['actief'] = $request->boolean('actief', true);
+
+        // Soort alleen wegschrijven als die is meegegeven: bij aanmaken geldt anders
+        // de databasestandaard 'personeel', bij wijzigen blijft de bestaande soort staan.
+        if (empty($data['soort'])) {
+            unset($data['soort']);
+        }
 
         // Offboarding-logica: uit-dienstdatum/-reden horen alleen bij status 'uit dienst',
         // en wie uit dienst is, is per definitie niet meer actief.

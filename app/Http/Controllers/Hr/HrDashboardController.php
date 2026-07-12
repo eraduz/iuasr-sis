@@ -62,8 +62,12 @@ class HrDashboardController extends Controller
             ->with('medewerker')
             ->orderByDesc('ziek_van')->limit(15)->get();
 
+        // Vrijwilligers tellen apart (stichting): niet in de personeelsformatie/FTE.
+        $actief = $medewerkers->where('actief', true);
+
         return view('hr.dashboard', [
-            'aantal' => $medewerkers->where('actief', true)->count(),
+            'aantal' => $actief->reject->isVrijwilliger()->count(),
+            'vrijwilligers' => $actief->filter->isVrijwilliger()->count(),
             'fteTotaal' => $fteTotaal,
             'statusVerdeling' => $statusVerdeling,
             'aflopend' => $aflopend,

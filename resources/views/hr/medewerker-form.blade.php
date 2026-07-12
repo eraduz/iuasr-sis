@@ -26,7 +26,15 @@
     <div class="sis-fld"><label>Aanhef</label><input type="text" name="aanhef" value="{{ old('aanhef', $medewerker->aanhef) }}" maxlength="20" placeholder="dhr. / mevr. / dr."></div>
   </div>
   <div class="sis-fld-row sis-fld-row--2">
+    <div class="sis-fld">
+      <label>Soort</label>
+      @php $srt = old('soort', $medewerker->soort?->value ?? 'personeel'); @endphp
+      <select name="soort">@foreach ($soorten as $s)<option value="{{ $s->value }}" @selected($srt===$s->value)>{{ $s->label() }}</option>@endforeach</select>
+      <small class="sis-muted">Vrijwilligers tellen niet mee in de FTE.</small>
+    </div>
     <div class="sis-fld"><label>Geboortedatum</label><input type="date" name="geboortedatum" value="{{ old('geboortedatum', $medewerker->geboortedatum?->toDateString()) }}"></div>
+  </div>
+  <div class="sis-fld-row sis-fld-row--2">
     <div class="sis-fld">
       <label>Status</label>
       @php $st = old('status', $medewerker->status?->value ?? 'actief'); @endphp

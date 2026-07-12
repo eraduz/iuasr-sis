@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Casts\VersleuteldGevoeligVeld;
+use App\Enums\MedewerkerSoort;
 use App\Enums\MedewerkerStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,7 +23,7 @@ class Medewerker extends Model
     protected $table = 'medewerkers';
 
     protected $fillable = [
-        'personeelsnummer', 'user_id', 'docent_id', 'manager_id', 'afdeling_id', 'functie_id',
+        'personeelsnummer', 'soort', 'user_id', 'docent_id', 'manager_id', 'afdeling_id', 'functie_id',
         'aanhef', 'voornaam', 'tussenvoegsel', 'achternaam', 'geboortedatum',
         'bsn', 'bsn_hash', 'adres', 'postcode', 'woonplaats', 'telefoon',
         'email', 'email_prive', 'status', 'uit_dienst_datum', 'uit_dienst_reden', 'actief', 'opmerkingen',
@@ -35,6 +36,7 @@ class Medewerker extends Model
         return [
             'geboortedatum' => 'date',
             'uit_dienst_datum' => 'date',
+            'soort' => MedewerkerSoort::class,
             'status' => MedewerkerStatus::class,
             'actief' => 'boolean',
             'bsn' => VersleuteldGevoeligVeld::class,
@@ -125,9 +127,22 @@ class Medewerker extends Model
             ?? $this->dienstverbanden->first();
     }
 
-    /** Actuele FTE uit het lopende dienstverband, of null. */
+    /** Is dit een vrijwilliger? (Telt niet mee in de FTE / personeelsformatie.) */
+    public function isVrijwilliger(): bool
+    {
+        return $this->soort === MedewerkerSoort::Vrijwilliger;
+    }
+
+    /**
+     * Actuele FTE uit het lopende dienstverband, of null. Vrijwilligers tellen
+     * bewust NIET mee in de FTE — ook niet als er uren zijn vastgelegd.
+     */
     public function fte(): ?float
     {
+        if ($this->isVrijwilliger()) {
+            return null;
+        }
+
         return $this->huidigDienstverband()?->fte();
     }
 

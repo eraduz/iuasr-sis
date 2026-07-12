@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\MedewerkerSoort;
 use App\Enums\Rol;
 use App\Models\Medewerker;
 use App\Models\User;
@@ -145,6 +146,44 @@ class HrModuleTest extends TestCase
         $this->assertNull($m->uit_dienst_datum);
         $this->assertNull($m->uit_dienst_reden);
         $this->assertTrue((bool) $m->actief);
+    }
+
+    public function test_nieuwe_medewerker_is_standaard_personeel(): void
+    {
+        $this->actingAs($this->hr)->post(route('medewerkers.store'), [
+            'voornaam' => 'Gewoon', 'achternaam' => 'Personeelslid', 'soort' => 'personeel', 'status' => 'actief', 'actief' => '1',
+        ])->assertRedirect();
+
+        $this->assertSame(MedewerkerSoort::Personeel, Medewerker::where('achternaam', 'Personeelslid')->firstOrFail()->soort);
+    }
+
+    public function test_vrijwilliger_telt_niet_mee_in_fte(): void
+    {
+        $this->actingAs($this->hr)->post(route('medewerkers.store'), [
+            'voornaam' => 'Vrij', 'achternaam' => 'Williger', 'soort' => 'vrijwilliger', 'status' => 'actief', 'actief' => '1',
+        ])->assertRedirect();
+        $m = Medewerker::where('achternaam', 'Williger')->firstOrFail();
+
+        // Zelfs mét een volledig dienstverband telt de FTE van een vrijwilliger niet mee.
+        $this->actingAs($this->hr)->post(route('dienstverbanden.store', $m), [
+            'contracttype' => 'vast', 'startdatum' => '2026-01-01', 'uren_per_week' => 40,
+        ])->assertRedirect();
+
+        $m->refresh()->load('dienstverbanden');
+        $this->assertTrue($m->isVrijwilliger());
+        $this->assertNull($m->fte());
+    }
+
+    public function test_lijst_filtert_op_soort(): void
+    {
+        $this->actingAs($this->hr)->post(route('medewerkers.store'), [
+            'voornaam' => 'Vrij', 'achternaam' => 'Williger', 'soort' => 'vrijwilliger', 'status' => 'actief', 'actief' => '1',
+        ])->assertRedirect();
+
+        $this->actingAs($this->hr)->get(route('medewerkers', ['soort' => 'vrijwilliger']))
+            ->assertOk()
+            ->assertSee('Williger')
+            ->assertDontSee('Willemsen'); // seeded personeelslid
     }
 
     public function test_document_uploaden(): void
