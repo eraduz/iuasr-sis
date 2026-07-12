@@ -142,9 +142,14 @@ class MigratieImport
 
         $verwerk = function () use ($rijen, &$nieuw, &$overgeslagen, &$leeg, &$fouten, &$voorbeeld, $dryRun) {
             $opleiding = $this->historischeOpleiding(! $dryRun);
-            $bestaand = $opleiding?->id
-                ? Vak::where('opleiding_id', $opleiding->id)->pluck('id', 'code')->all()
-                : [];
+            // Sleutel hoofdletter-ongevoelig: de MySQL unique-index op (opleiding, code)
+            // is dat ook, dus "B-FQ04" en "b-fq04" zijn hetzelfde vak.
+            $bestaand = [];
+            if ($opleiding?->id) {
+                foreach (Vak::where('opleiding_id', $opleiding->id)->get(['id', 'code']) as $v) {
+                    $bestaand[mb_strtoupper($v->code)] = $v->id;
+                }
+            }
 
             foreach ($rijen as $index => $rij) {
                 $code = trim($this->veld($rij, 'Vak id'));
@@ -155,7 +160,8 @@ class MigratieImport
 
                     continue;
                 }
-                if (array_key_exists($code, $bestaand)) {
+                $sleutel = mb_strtoupper($code);
+                if (array_key_exists($sleutel, $bestaand)) {
                     $overgeslagen++;
 
                     continue;
@@ -172,9 +178,9 @@ class MigratieImport
                             'keuzevak' => false,
                             'actief' => false,
                         ]);
-                        $bestaand[$code] = $vak->id;
+                        $bestaand[$sleutel] = $vak->id;
                     } else {
-                        $bestaand[$code] = true; // voorkom dubbeltelling binnen dezelfde preview
+                        $bestaand[$sleutel] = true; // voorkom dubbeltelling binnen dezelfde preview
                     }
                     $nieuw++;
                     if (count($voorbeeld) < 8) {
@@ -218,7 +224,14 @@ class MigratieImport
 
             // Caches om per bestand niet honderden queries te doen.
             $studenten = Student::pluck('id', 'studentnummer')->all();
-            $vakken = $oplId ? Vak::where('opleiding_id', $oplId)->pluck('id', 'code')->all() : [];
+            // Vak-cache hoofdletter-ongevoelig (zie verwerkVakken): oude cijferregels
+            // verwijzen soms met andere casing naar hetzelfde vak ("b-fq04" vs "B-FQ04").
+            $vakken = [];
+            if ($oplId) {
+                foreach (Vak::where('opleiding_id', $oplId)->get(['id', 'code']) as $v) {
+                    $vakken[mb_strtoupper($v->code)] = $v->id;
+                }
+            }
             $onderdelen = [];   // vak_id => toetsonderdeel_id
             $perioden = [];     // code => periode_id
             $inschr = [];       // "student_id|periode_id" => inschrijving_id
@@ -257,17 +270,18 @@ class MigratieImport
                 try {
                     $studentId = $studenten[$nummer];
 
-                    // Vak (maak aan als het nog niet bestaat).
-                    if (! array_key_exists($vakcode, $vakken)) {
+                    // Vak (maak aan als het nog niet bestaat; hoofdletter-ongevoelig).
+                    $vaksleutel = mb_strtoupper($vakcode);
+                    if (! array_key_exists($vaksleutel, $vakken)) {
                         if (! $dryRun && $oplId) {
                             $vak = Vak::create(['opleiding_id' => $oplId, 'code' => $vakcode, 'naam' => $vaknaam !== '' ? $vaknaam : $vakcode, 'ec' => 0, 'keuzevak' => false, 'actief' => false]);
-                            $vakken[$vakcode] = $vak->id;
+                            $vakken[$vaksleutel] = $vak->id;
                         } else {
-                            $vakken[$vakcode] = 'nieuw:'.$vakcode;
+                            $vakken[$vaksleutel] = 'nieuw:'.$vakcode;
                         }
                         $vakkenBij++;
                     }
-                    $vakId = $vakken[$vakcode];
+                    $vakId = $vakken[$vaksleutel];
 
                     // Periode (find/create op code).
                     if (! array_key_exists($periodeCode, $perioden)) {
@@ -440,11 +454,18 @@ class MigratieImport
      */
     private function normaliseerPeriode(string $raw): ?string
     {
-        if (! preg_match('/(\d{4})-(\d{4})/', $raw, $m)) {
-            return null;
+        // Voorkeur: een volledig studiejaar "JJJJ-JJJJ" met opeenvolgende jaren.
+        if (preg_match('/(\d{4})-(\d{4})/', $raw, $m) && (int) $m[2] === (int) $m[1] + 1) {
+            return $m[1].'-'.$m[2];
+        }
+        // Terugval: een los (start)jaar "JJJJ" → studiejaar JJJJ-(JJJJ+1).
+        if (preg_match('/\b((?:19|20)\d{2})\b/', $raw, $m)) {
+            $start = (int) $m[1];
+
+            return $start.'-'.($start + 1);
         }
 
-        return (int) $m[2] === (int) $m[1] + 1 ? $m[1].'-'.$m[2] : null;
+        return null;
     }
 
     /** Getal uit een Access-cel; accepteert zowel "2,5" als "2.5" en negeert lege/0-waarden niet. */

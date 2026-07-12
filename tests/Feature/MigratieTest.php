@@ -187,6 +187,38 @@ CSV;
         $this->assertTrue((bool) $resultaat->voldoende);
     }
 
+    public function test_cijfers_vakcode_is_hoofdletter_ongevoelig(): void
+    {
+        Faculteit::create(['code' => 'FIW', 'naam' => 'FIW']);
+        $this->student('131516');
+        $this->student('131517');
+        // Twee regels naar hetzelfde vak, met verschillende casing.
+        $csv = $this->cijfersCsv([
+            $this->cijferRij('131516', 'B-FQ04', '2016-2017', '70'),
+            $this->cijferRij('131517', 'b-fq04', '2016-2017', '80'),
+        ]);
+
+        $rapport = (new MigratieImport)->verwerkCijfers($this->rijen($csv), dryRun: false);
+
+        $this->assertSame(2, $rapport['nieuw']);
+        $this->assertSame(1, $rapport['vakken_bij']); // slechts één vak aangemaakt
+        $this->assertSame(1, Vak::count());
+        $this->assertSame(2, Resultaat::count());
+    }
+
+    public function test_cijfers_los_startjaar_wordt_studiejaar(): void
+    {
+        Faculteit::create(['code' => 'FIW', 'naam' => 'FIW']);
+        $this->student('121469');
+        $csv = $this->cijfersCsv([$this->cijferRij('121469', 'B1-HD01', '2012', '60')]);
+
+        $rapport = (new MigratieImport)->verwerkCijfers($this->rijen($csv), dryRun: false);
+
+        $this->assertSame(1, $rapport['nieuw']);
+        $this->assertSame(0, count($rapport['fouten']));
+        $this->assertTrue(\App\Models\Periode::where('code', '2012-2013')->exists());
+    }
+
     public function test_cijfers_preview_schrijft_niets(): void
     {
         Faculteit::create(['code' => 'FIW', 'naam' => 'FIW']);
