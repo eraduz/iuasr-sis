@@ -354,6 +354,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/studenten/{student}/bsn', [StudentController::class, 'bsn'])->name('studenten.bsn');
     });
 
+    // --- Historisch studentdossier (gemigreerde cijfers): cijfer-bevoegde rollen
+    // + Beheerder (verificatie). NIET voor Studentenzaken — rolscheiding op cijfers.
+    Route::middleware('rol:examencommissie,directie,beheerder')->group(function () {
+        Route::get('/historisch-dossier', [App\Http\Controllers\HistorischDossierController::class, 'index'])->name('historisch.index');
+        Route::get('/historisch-dossier/{student}', [App\Http\Controllers\HistorischDossierController::class, 'show'])->name('historisch.show');
+    });
+
     // --- Identiteit & inschrijving beheren: SZ, Beheerder ---
     Route::middleware('rol:studentenzaken,beheerder')->group(function () {
         // Vrijstellingsbesluit van de examencommissie verwerken (één klik).

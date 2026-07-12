@@ -83,6 +83,7 @@
                 ['Cijferlijst', 'cijferlijst', 'report', 'cijferlijst'],
                 ['Leerjaar-herbeoordeling', 'overgang', 'grade', 'overgang'],
                 ['EC-rapport', 'ec-rapport', 'report', 'ec-rapport'],
+                ['Historisch dossier', 'historisch.index', 'db', 'historisch.*'],
             ],
             'Onderwijs' => [['Aanwezigheid', 'presentieoverzicht', 'check', 'presentieoverzicht']],
             'Rapporten' => [
@@ -98,6 +99,7 @@
                 ['Cijferlijst', 'cijferlijst', 'report', 'cijferlijst'],
                 ['Leerjaar-herbeoordeling', 'overgang', 'grade', 'overgang'],
                 ['EC-rapport', 'ec-rapport', 'report', 'ec-rapport'],
+                ['Historisch dossier', 'historisch.index', 'db', 'historisch.*'],
             ],
             'Onderwijs' => [['Aanwezigheid', 'presentieoverzicht', 'check', 'presentieoverzicht']],
             'Rapporten' => [['Rapporten', 'rapporten.inzage', 'report', 'rapporten.inzage']],
@@ -131,7 +133,10 @@
                 ['Dashboard', 'dashboard', 'dash', 'dashboard'],
                 ['Bestuursoverzicht', 'bestuur', 'dash', 'bestuur'],
             ],
-            'Studenten' => [['Alle studenten', 'studenten.index', 'students', 'studenten.*']],
+            'Studenten' => [
+                ['Alle studenten', 'studenten.index', 'students', 'studenten.*'],
+                ['Historisch dossier', 'historisch.index', 'db', 'historisch.*'],
+            ],
             'Beheer' => [
                 ['Gebruikers & rollen', 'gebruikers', 'users', 'gebruikers'],
                 ['Opzoektabellen', 'opzoektabellen', 'db', 'opzoektabellen'],
