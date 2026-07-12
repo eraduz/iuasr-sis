@@ -250,6 +250,16 @@ MAIL_FROM_NAME="IUASR Studentenzaken"</span>
     <li><b>Tests:</b> <code>php artisan test</code> moet groen zijn vóór uitrol.</li>
   </ul>
 
+  <h2>12. Migratie uit de oude Access-database (tijdelijk)</h2>
+  <p>De historische studentgegevens uit het oude Access-systeem (<code>IUTSTD…mdb</code>, sinds ca. 2009) worden in twee stappen overgezet. De bronbestanden blijven <b>buiten de repository</b> (AVG): de per-jaar geëxporteerde CSV's staan lokaal onder <code>Documents\IUASR-migratie-export\</code>.</p>
+  <ul>
+    <li><b>Export (buiten SIS):</b> de Access-tabellen zijn met een PowerShell/OLEDB-script (<code>Microsoft.ACE.OLEDB.16.0</code>) geëxporteerd naar semikolon-gescheiden UTF-8-CSV's: referentietabellen plus <code>cijfers-JJJJ-JJJJ.csv</code> per studiejaar (2009-2010 t/m 2025-2026). Grondgetallen: 3.461 studenten, 27.214 cijferregels.</li>
+    <li><b>Import in SIS (fase 1 — studenten):</b> tijdelijk scherm <b>Studentenzaken → Migratie (import)</b>. Upload <code>_studenten.csv</code> en draai <b>altijd eerst een controle (preview)</b>; die schrijft niets en toont aantallen (nieuw / bestaat al / lege-junk / fouten) plus een voorbeeldtabel. Pas daarna <b>Nu importeren</b>. De import is idempotent: een bestaand studentnummer wordt nooit overschreven, junk-/naamloze rijen worden overgeslagen.</li>
+    <li><b>Veldmapping:</b> <code>SDT-NR → studentnummer</code>, naam, geboortedatum/-plaats, nationaliteit (gematcht of aangemaakt), adres, e-mail, <code>Opleiding → vooropleiding</code> (let op: in Access is "Opleiding" de vooropleiding), diploma. <b>BSN en rekeningnummer worden bewust niet meegenomen.</b> Cijfers op de oude 0–100-schaal.</li>
+    <li><b>Fase 2 — cijfers/inschrijvingen:</b> nog te bouwen. De oude blok-kolommen (BL1–BL4) worden omgezet naar genormaliseerde resultaatregels; 0–100 wordt 0–10; EC verbatim overgenomen. Wordt pas uitgevoerd na validatie van de blok-semantiek en onder toezicht van de Functionaris Gegevensbescherming.</li>
+    <li><b>Code:</b> <code>App\Support\MigratieImport</code>, <code>MigratieController</code>, view <code>migratie/index</code>; tests in <code>tests/Feature/MigratieTest.php</code>. Het scherm en de route (<code>rol:studentenzaken,beheerder</code>) zijn <b>tijdelijk</b> en kunnen na de migratie worden verwijderd.</li>
+  </ul>
+
   <div class="tip">Deze handleiding wordt bijgewerkt zodra er functies of infrastructuur wijzigen. Controleer de datum onderaan op actualiteit.</div>
 </body>
 </html>

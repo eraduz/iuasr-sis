@@ -42,6 +42,7 @@
                 ['Bulk inschrijven', 'bulk-inschrijven', 'plus', 'bulk-inschrijven*'],
                 ['Herinschrijven', 'herinschrijven', 'refresh', 'herinschrijven'],
                 ['Uitschrijven', 'uitschrijven', 'userx', 'uitschrijven'],
+                ['Migratie (import)', 'migratie', 'db', 'migratie'],
             ],
             'Onderwijs' => [
                 ['Vakstructuur', 'vakstructuur', 'book', 'vakstructuur*'],

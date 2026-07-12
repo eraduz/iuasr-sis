@@ -359,6 +359,10 @@ Route::middleware('auth')->group(function () {
         // Vrijstellingsbesluit van de examencommissie verwerken (één klik).
         Route::post('/vrijstellingsbesluiten/{besluit}/verwerken', [App\Http\Controllers\VrijstellingsbesluitController::class, 'verwerk'])->name('vrijstellingsbesluiten.verwerken');
 
+        // TIJDELIJK: migratie uit de oude Access-database (per-jaar CSV's).
+        Route::get('/migratie', [App\Http\Controllers\MigratieController::class, 'index'])->name('migratie');
+        Route::post('/migratie', [App\Http\Controllers\MigratieController::class, 'verwerk'])->name('migratie.verwerk');
+
         // Inschrijven
         Route::get('/inschrijven', [InschrijvingController::class, 'create'])->name('inschrijven');
         Route::post('/inschrijven', [InschrijvingController::class, 'store'])->name('inschrijven.store');
