@@ -7,9 +7,11 @@ use App\Models\Opleiding;
 use App\Models\Resultaat;
 use App\Models\Student;
 use App\Support\AuditLogger;
+use App\Support\Documentondertekening;
 use App\Support\MigratieImport;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Historisch studentdossier — alleen-lezen inzage in de uit het oude Access-
@@ -53,6 +55,47 @@ class HistorischDossierController extends Controller
     /** Cijferlijst van één student, gegroepeerd per studiejaar. */
     public function show(Student $student): View
     {
+        [$opleiding, $data] = $this->dossierOf404($student);
+
+        // Inzage door de examen-/directierollen wordt gelogd (zoals bij het reguliere dossier).
+        if (in_array(auth()->user()->rol, [Rol::Examencommissie, Rol::Directie], true)) {
+            AuditLogger::log(AuditLogger::INZAGE, $student, veld: 'cijfers (historisch)');
+        }
+
+        return view('historisch.show', ['student' => $student, 'opleiding' => $opleiding] + $data);
+    }
+
+    /** Printbare, informatieve PDF van de historische cijferlijst (niet gewaarmerkt). */
+    public function pdf(Student $student): StreamedResponse
+    {
+        [$opleiding, $data] = $this->dossierOf404($student);
+
+        if (in_array(auth()->user()->rol, [Rol::Examencommissie, Rol::Directie], true)) {
+            AuditLogger::log(AuditLogger::UITGIFTE, $student, veld: 'cijfers (historisch, PDF)');
+        }
+
+        $html = view('pdf.historisch-cijferlijst', [
+            'student' => $student,
+            'opleiding' => $opleiding,
+            'uitgegevenDoor' => auth()->user()->naam,
+        ] + $data)->render();
+
+        $bytes = Documentondertekening::pdfVanHtml($html);
+
+        return response()->streamDownload(
+            fn () => print($bytes),
+            'historisch-dossier-'.$student->studentnummer.'.pdf',
+            ['Content-Type' => 'application/pdf'],
+        );
+    }
+
+    /**
+     * Bouwt het historische dossier (per studiejaar) of stopt met 404.
+     *
+     * @return array{0:Opleiding,1:array{jaren:\Illuminate\Support\Collection,totaalEcBehaald:float,resultaten:\Illuminate\Support\Collection}}
+     */
+    private function dossierOf404(Student $student): array
+    {
         $opleiding = $this->opleiding();
         abort_unless($opleiding !== null, 404, 'Er is nog geen gemigreerde historische data.');
 
@@ -83,11 +126,6 @@ class HistorischDossierController extends Controller
         $totaalEcBehaald = $resultaten->filter(fn ($r) => $r->voldoende)
             ->sum(fn ($r) => (float) optional($r->toetsonderdeel->vak)->ec);
 
-        // Inzage door de examen-/directierollen wordt gelogd (zoals bij het reguliere dossier).
-        if (in_array(auth()->user()->rol, [Rol::Examencommissie, Rol::Directie], true)) {
-            AuditLogger::log(AuditLogger::INZAGE, $student, veld: 'cijfers (historisch)');
-        }
-
-        return view('historisch.show', compact('student', 'opleiding', 'jaren', 'totaalEcBehaald', 'resultaten'));
+        return [$opleiding, compact('jaren', 'totaalEcBehaald', 'resultaten')];
     }
 }

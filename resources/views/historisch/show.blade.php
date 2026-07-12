@@ -11,6 +11,10 @@
     <div class="summary">Studentnummer <b>{{ $student->studentnummer }}</b> · gemigreerde cijferlijst ({{ $opleiding->naam }})</div>
   </div>
   <div class="iuasr-dash-vhead__actions">
+    <a class="iuasr-dash-btn iuasr-dash-btn--primary" href="{{ route('historisch.pdf', $student) }}">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Printbare PDF
+    </a>
     <span class="sis-role-note"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg> Alleen-lezen</span>
   </div>
 </div>

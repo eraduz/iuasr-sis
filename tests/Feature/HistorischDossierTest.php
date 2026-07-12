@@ -66,10 +66,24 @@ class HistorischDossierTest extends TestCase
         $response->assertSee('Vrijstelling');
     }
 
+    public function test_pdf_levert_een_pdf_op(): void
+    {
+        $student = $this->seedDossier();
+
+        $response = $this->actingAs($this->examencommissie())
+            ->get(route('historisch.pdf', $student));
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'application/pdf');
+        $this->assertStringStartsWith('%PDF', $response->streamedContent());
+    }
+
     public function test_studentenzaken_heeft_geen_toegang(): void
     {
         $sz = User::create(['naam' => 'SZ', 'email' => 'sz@iuasr.test', 'rol' => Rol::Studentenzaken]);
         $this->actingAs($sz)->get(route('historisch.index'))->assertForbidden();
+        $student = $this->seedDossier();
+        $this->actingAs($sz)->get(route('historisch.pdf', $student))->assertForbidden();
     }
 
     public function test_beheerder_heeft_wel_toegang(): void

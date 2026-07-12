@@ -359,6 +359,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('rol:examencommissie,directie,beheerder')->group(function () {
         Route::get('/historisch-dossier', [App\Http\Controllers\HistorischDossierController::class, 'index'])->name('historisch.index');
         Route::get('/historisch-dossier/{student}', [App\Http\Controllers\HistorischDossierController::class, 'show'])->name('historisch.show');
+        Route::get('/historisch-dossier/{student}/pdf', [App\Http\Controllers\HistorischDossierController::class, 'pdf'])->name('historisch.pdf');
     });
 
     // --- Identiteit & inschrijving beheren: SZ, Beheerder ---

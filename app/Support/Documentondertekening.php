@@ -117,6 +117,16 @@ class Documentondertekening
         return hash_equals($document->sha256, hash('sha256', $bytes));
     }
 
+    /**
+     * Rendert HTML naar PDF-bytes ZONDER waarmerk/handtekening. Voor informatieve,
+     * niet-officiële documenten (bv. een gemigreerd historisch overzicht) die geen
+     * verificatiecode en geen archivering als ondertekend document nodig hebben.
+     */
+    public static function pdfVanHtml(string $html): string
+    {
+        return self::renderPdf($html);
+    }
+
     private static function renderPdf(string $html): string
     {
         $options = new Options();
