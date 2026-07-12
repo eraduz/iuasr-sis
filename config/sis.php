@@ -59,6 +59,22 @@ return [
     | volgnummer. BSN van medewerkers: veld klaar maar standaard UIT tot akkoord
     | van de Functionaris Gegevensbescherming (zoals bij studenten).
     */
+    /*
+    |--------------------------------------------------------------------------
+    | E-mail — afdelings-CC
+    |--------------------------------------------------------------------------
+    | Elke automatische SIS-e-mail krijgt een CC naar de postbus van de
+    | verantwoordelijke afdeling, zodat medewerkers zien welke berichten zijn
+    | verstuurd. Per module: HR, Studentenzaken, Examencommissie.
+    */
+    'mail' => [
+        'cc' => [
+            'hr' => env('SIS_MAIL_CC_HR', 'personeelszaken@iuasr.nl'),
+            'studentenzaken' => env('SIS_MAIL_CC_STUDENTENZAKEN', 'szaken@iuasr.nl'),
+            'examencommissie' => env('SIS_MAIL_CC_EXAMENCOMMISSIE', 'examencommissie@iuasr.nl'),
+        ],
+    ],
+
     'hr' => [
         'voltijd_uren' => (float) env('SIS_HR_VOLTIJD_UREN', 40),
         'personeelsnummer' => [
@@ -69,6 +85,13 @@ return [
 
         // Signalering aflopende contracten: einddatum binnen dit aantal dagen.
         'contract_signaal_dagen' => (int) env('SIS_HR_CONTRACT_SIGNAAL_DAGEN', 60),
+
+        // Postbus van Personeelszaken: hierheen gaan automatische meldingen van
+        // self-service-acties (verlofaanvragen) en van startend wettelijk verlof.
+        'notificatie_email' => env('SIS_HR_NOTIFICATIE_EMAIL', 'personeelszaken@iuasr.nl'),
+
+        // Verjaardagvenster op het HR-dashboard: komende X dagen.
+        'verjaardag_venster_dagen' => (int) env('SIS_HR_VERJAARDAG_VENSTER_DAGEN', 30),
 
         // Verzuimsignalering — Wet Verbetering Poortwachter (Fase G). De wettelijke
         // re-integratiemijlpalen, geteld in weken vanaf de eerste ziektedag; het

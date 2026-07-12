@@ -5,8 +5,10 @@ namespace Tests\Feature;
 use App\Enums\MedewerkerStatus;
 use App\Enums\Rol;
 use App\Enums\Verlofstatus;
+use App\Mail\VerlofaanvraagMelding;
 use App\Models\Medewerker;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 use Database\Seeders\DocentSeeder;
 use Database\Seeders\GebruikerSeeder;
 use Database\Seeders\HrSeeder;
@@ -49,6 +51,20 @@ class HrVerlofTest extends TestCase
             'medewerker_id' => $this->leidingg->medewerker->id,
             'status' => 'aangevraagd',
         ]);
+    }
+
+    public function test_self_service_aanvraag_mailt_personeelszaken(): void
+    {
+        Mail::fake();
+
+        $this->actingAs($this->leidingg)->post(route('verlof.store'), [
+            'verloftype' => 'vakantie',
+            'van' => date('Y').'-12-23',
+            'tot' => date('Y').'-12-27',
+            'uren' => 24,
+        ])->assertRedirect(route('verlof.mijn'));
+
+        Mail::assertSent(VerlofaanvraagMelding::class, fn ($mail) => $mail->hasTo('personeelszaken@iuasr.nl'));
     }
 
     public function test_mijn_verlof_toont_saldo(): void

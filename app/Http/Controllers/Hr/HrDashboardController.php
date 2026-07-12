@@ -65,10 +65,28 @@ class HrDashboardController extends Controller
         // Vrijwilligers en ZZP'ers tellen apart (stichting): niet in de formatie/FTE.
         $actief = $medewerkers->where('actief', true);
 
+        // Aankomende verjaardagen (binnen het ingestelde venster), eerstvolgende bovenaan.
+        $vensterDagen = (int) config('sis.hr.verjaardag_venster_dagen', 30);
+        $vandaag = now()->startOfDay();
+        $verjaardagen = $actief
+            ->filter(fn (Medewerker $m) => $m->geboortedatum !== null)
+            ->map(function (Medewerker $m) use ($vandaag) {
+                $volgende = $m->geboortedatum->copy()->year($vandaag->year)->startOfDay();
+                if ($volgende->lt($vandaag)) {
+                    $volgende->addYear();
+                }
+
+                return ['medewerker' => $m, 'datum' => $volgende, 'dagen' => (int) $vandaag->diffInDays($volgende)];
+            })
+            ->filter(fn ($r) => $r['dagen'] <= $vensterDagen)
+            ->sortBy('dagen')
+            ->values();
+
         return view('hr.dashboard', [
             'aantal' => $actief->filter->teltVoorFte()->count(),
             'vrijwilligers' => $actief->filter->isVrijwilliger()->count(),
             'zzp' => $actief->filter->isZzp()->count(),
+            'verjaardagen' => $verjaardagen,
             'fteTotaal' => $fteTotaal,
             'statusVerdeling' => $statusVerdeling,
             'aflopend' => $aflopend,

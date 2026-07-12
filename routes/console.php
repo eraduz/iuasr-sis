@@ -12,3 +12,7 @@ Artisan::command('inspire', function () {
 // ophalen (whitelist-hosts). Vereist een draaiende scheduler (`php artisan schedule:work`
 // of een cron die `schedule:run` elke minuut aanroept).
 Schedule::command('nieuws:ophalen')->dailyAt('23:00')->withoutOverlapping();
+
+// HR: verjaardagsfelicitaties en meldingen van startend wettelijk verlof.
+// 's Ochtends, zodat Personeelszaken meteen bij aanvang van de dag op de hoogte is.
+Schedule::command('hr:notificaties')->dailyAt('07:00')->withoutOverlapping();

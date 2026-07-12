@@ -248,6 +248,8 @@ MAIL_FROM_NAME="IUASR Studentenzaken"</span>
     <li><b>Cache:</b> <code>php artisan optimize:clear</code> bij onverwacht gedrag na wijzigingen.</li>
     <li><b>Logs:</b> <code>storage/logs/</code> (zitten niet in de back-up).</li>
     <li><b>Tests:</b> <code>php artisan test</code> moet groen zijn vóór uitrol.</li>
+    <li><b>Scheduler (vereist voor automatische e-mails).</b> Zorg dat er een <b>cron</b> draait die elke minuut <code>php artisan schedule:run</code> aanroept (of <code>php artisan schedule:work</code>). Geplande taken (<code>routes/console.php</code>): <code>nieuws:ophalen</code> (dagelijks 23:00) en <code>hr:notificaties</code> (dagelijks 07:00). Die laatste stuurt de <b>verjaardagsfelicitaties</b> en de meldingen van <b>startend wettelijk verlof</b>; hij is idempotent (log in <code>hr_notificaties</code>), dus meerdere runs op een dag versturen niets dubbel.</li>
+    <li><b>E-mail &amp; afdelings-CC.</b> Elke automatische SIS-e-mail krijgt een CC naar de afdelingspostbus (config <code>sis.mail.cc</code>: HR/Studentenzaken/Examencommissie; env <code>SIS_MAIL_CC_*</code>). De self-service-verlofmelding gaat naar <code>sis.hr.notificatie_email</code>. Controleer dat de <b>mailconfiguratie</b> (<code>MAIL_*</code>) klopt; e-mailfouten worden gelogd maar blokkeren de gebruikersactie niet.</li>
   </ul>
 
   <h2>12. Migratie uit de oude Access-database (tijdelijk)</h2>

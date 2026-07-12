@@ -73,7 +73,8 @@ class ResultatenMailTest extends TestCase
 
         // Precies één student (261001) komt in aanmerking; de rest heeft geen definitieve resultaten.
         Mail::assertSent(ResultatenCijferlijstMail::class, 1);
-        Mail::assertSent(ResultatenCijferlijstMail::class, fn ($m) => $m->hasTo('yasmin@example.test'));
+        Mail::assertSent(ResultatenCijferlijstMail::class, fn ($m) => $m->hasTo('yasmin@example.test')
+            && $m->hasCc('examencommissie@iuasr.nl')); // afdelings-CC: zichtbaarheid van verzonden post
         $this->assertDatabaseHas('audit_logs', ['veld' => 'resultaten-email', 'actie' => 'uitgifte']);
     }
 

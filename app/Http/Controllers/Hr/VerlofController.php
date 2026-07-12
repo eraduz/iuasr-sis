@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Hr;
 use App\Enums\Verlofstatus;
 use App\Enums\Verloftype;
 use App\Http\Controllers\Controller;
+use App\Mail\VerlofaanvraagMelding;
 use App\Models\Verlofaanvraag;
 use App\Support\AuditLogger;
 use App\Support\Verlofoverzicht;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 /**
@@ -72,12 +74,27 @@ class VerlofController extends Controller
             'reden' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $medewerker->verlofaanvragen()->create($data + [
+        $aanvraag = $medewerker->verlofaanvragen()->create($data + [
             'status' => Verlofstatus::Aangevraagd->value,
             'aangevraagd_door_id' => $request->user()->id,
         ]);
 
-        return redirect()->route('verlof.mijn')->with('status', 'Verlofaanvraag ingediend.');
+        // Personeelszaken direct op de hoogte stellen van de self-service-aanvraag.
+        // Een mailfout mag de aanvraag zelf niet blokkeren.
+        try {
+            Mail::to(config('sis.hr.notificatie_email'))->send(new VerlofaanvraagMelding(
+                $medewerker->volledigeNaam(),
+                $aanvraag->verloftype->label(),
+                $aanvraag->van->format('d-m-Y'),
+                $aanvraag->tot->format('d-m-Y'),
+                (float) $aanvraag->uren,
+                $aanvraag->reden,
+            ));
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('verlof.mijn')->with('status', 'Verlofaanvraag ingediend. Personeelszaken is op de hoogte gesteld.');
     }
 
     /** Self-service: eigen openstaande aanvraag intrekken. */

@@ -28,6 +28,27 @@
 </div>
 
 <div class="sis-card" style="margin-top:16px;">
+  <div class="sis-card__hd"><b>Verjaardagen (komende {{ (int) config('sis.hr.verjaardag_venster_dagen', 30) }} dagen)</b><span class="hint">Personeelszaken ontvangt automatisch een felicitatie-e-mail op de dag zelf</span></div>
+  @if ($verjaardagen->isEmpty())
+    <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Geen verjaardagen in deze periode.</p></div>
+  @else
+    <table class="iuasr-dash-tbl">
+      <thead><tr><th>Medewerker</th><th>Functie</th><th>Datum</th><th>Wanneer</th></tr></thead>
+      <tbody>
+        @foreach ($verjaardagen as $v)
+          <tr>
+            <td class="nm"><a href="{{ route('medewerkers.show', $v['medewerker']) }}">{{ $v['medewerker']->volledigeNaam() }}</a></td>
+            <td>{{ $v['medewerker']->functie?->naam ?? '—' }}</td>
+            <td class="dt">{{ $v['datum']->format('d-m') }}</td>
+            <td>@if ($v['dagen'] === 0)<span class="iuasr-dash-status s-approved">vandaag jarig 🎉</span>@elseif ($v['dagen'] === 1)morgen @else over {{ $v['dagen'] }} dagen @endif</td>
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+  @endif
+</div>
+
+<div class="sis-card" style="margin-top:16px;">
   <div class="sis-card__hd"><b>Aflopende contracten ({{ $aflopend->count() }})</b></div>
   @if ($aflopend->isEmpty())
     <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Geen contracten die binnen 60 dagen aflopen.</p></div>
