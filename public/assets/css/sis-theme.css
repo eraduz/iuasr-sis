@@ -141,4 +141,14 @@ html[data-theme="dark"] .sis-pill-soft { background: #2a2540; color: var(--priCo
 html[data-theme="dark"] .iuasr-dash-btn:hover { background: #332d4d; }
 
 /* Logo: het donkere logo is op donker onzichtbaar → licht filter. */
-html[data-theme="dark"] .iuasr-dash-header__logo img { filter: brightness(0) invert(1); opacity: .92; }
+html[data-theme="dark"] .iuasr-dash-header__logo img,
+html[data-theme="dark"] .sis-modulepage__brand img,
+html[data-theme="dark"] .sis-login__logo { filter: brightness(0) invert(1); opacity: .92; }
+
+/* Modulekeuzescherm (platform) — donker. */
+html[data-theme="dark"] .sis-modulepage { background: #14121e; }
+html[data-theme="dark"] .sis-modulepage__bar { background: #1a1728; border-color: rgba(255,255,255,.12); }
+html[data-theme="dark"] .sis-moduletile { background: #1f1b30; border-color: rgba(255,255,255,.12); }
+html[data-theme="dark"] a.sis-moduletile:hover { border-color: var(--accent); box-shadow: rgba(0,0,0,.5) 0 10px 26px; }
+html[data-theme="dark"] .sis-moduletile.is-disabled { background: #1a1728; }
+html[data-theme="dark"] .sis-moduletile__badge { background: rgba(255,255,255,.08); color: var(--blackAltText); }
