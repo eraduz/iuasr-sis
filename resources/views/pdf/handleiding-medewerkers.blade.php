@@ -45,6 +45,7 @@
 
   <h2>1. Waarvoor is dit systeem?</h2>
   <p>Het IUASR Management Systeem is de interne administratie van de hogeschool. U beheert er — afhankelijk van uw rol — studenten, inschrijvingen, cijfers, collegegeld, cursussen, relatiebeheer &amp; stage, personeelszaken (HR), documenten en rapporten. Het systeem draait uitsluitend op het interne netwerk en is gescheiden van het publieke aanmeldportaal.</p>
+  <p><b>Weergave.</b> Het systeem opent standaard in <b>donkere modus</b> (energiezuiniger en rustiger voor de ogen). Rechtsboven staat een knop (maan/zon) om te wisselen tussen donker en licht; uw keuze wordt onthouden en geldt ook voor het inlogscherm.</p>
   <div class="let">Alle gegevens in de ontwikkel-/testomgeving zijn <b>synthetisch</b> (verzonnen). Ga zorgvuldig om met echte persoonsgegevens; deze vallen onder de AVG.</div>
 
   <h2>2. Inloggen &amp; een module kiezen</h2>
