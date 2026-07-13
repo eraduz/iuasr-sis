@@ -9,7 +9,7 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
-## [1.0.1] — 2026-07-13 — Webhook werkt
+## [1.0.1] — 2026-07-13
 
 Configuratie per omgeving rechtgezet. Gedeelde instellingen staan nu in Git in
 plaats van in `.env`, zodat een nieuwe omgeving (RDP, Plesk) ze met `git pull`
