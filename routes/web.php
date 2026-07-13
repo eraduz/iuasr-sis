@@ -326,7 +326,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/bestuur', [App\Http\Controllers\BestuurController::class, 'index'])->name('bestuur');
     });
 
-    // PDF-handleidingen: medewerkers (iedereen) en technisch/herstel (Beheerder).
+    // Handleiding: HTML-versie met hoofdstuknavigatie (iedereen), plus de PDF's:
+    // medewerkers (iedereen) en technisch/herstel (Beheerder/Bestuur).
+    Route::get('/help', [App\Http\Controllers\HandleidingController::class, 'web'])->name('handleiding.web');
     Route::get('/handleiding', [App\Http\Controllers\HandleidingController::class, 'medewerkers'])->name('handleiding.medewerkers');
     Route::get('/handleiding/technisch', [App\Http\Controllers\HandleidingController::class, 'technisch'])->name('handleiding.technisch');
 

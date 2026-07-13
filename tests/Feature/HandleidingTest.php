@@ -47,7 +47,19 @@ class HandleidingTest extends TestCase
         $this->actingAs(User::where('rol', Rol::Docent)->first())
             ->get(route('dashboard'))
             ->assertOk()
-            ->assertSee(route('handleiding.medewerkers'))
+            ->assertSee(route('handleiding.web'))
             ->assertSee('Help');
+    }
+
+    public function test_html_handleiding_toont_hoofdstuknavigatie_en_afdelingsmarkering(): void
+    {
+        // De HTML-handleiding heeft een hoofdstuknavigatie (met ankers uit de
+        // gedeelde partial) en markeert de hoofdstukken van de eigen afdeling.
+        $this->actingAs(User::where('rol', Rol::Studentenzaken)->first())
+            ->get(route('handleiding.web'))
+            ->assertOk()
+            ->assertSee('Hoofdstukken')
+            ->assertSee('id="h5"', false)      // hoofdstukanker uit de partial
+            ->assertSee('voor u');             // Studentenzaken-hoofdstukken gemarkeerd
     }
 }
