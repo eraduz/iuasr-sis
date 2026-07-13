@@ -241,6 +241,27 @@
         $balieMenu['Balie / Receptie'][] = ['Nieuwe registratie', 'balie.create', 'plus', 'balie.create'];
     }
 
+    // Module Bibliotheek — catalogus, tijdschriftartikelen, uitlenen en innemen.
+    // De bibliotheekmedewerker beheert; het Schoolbestuur kijkt mee (alleen-lezen)
+    // en ziet daarom de aanmaak- en uitleenknoppen niet.
+    $biebMenu = [
+        'Bibliotheek' => [
+            ['Overzicht', 'bibliotheek.dashboard', 'dash', 'bibliotheek.dashboard'],
+            ['Catalogus', 'bibliotheek.publicaties', 'book', 'bibliotheek.publicaties,bibliotheek.publicaties.show,bibliotheek.publicaties.edit'],
+            ['Boekreeksen', 'bibliotheek.reeksen', 'db', 'bibliotheek.reeksen,bibliotheek.reeksen.show,bibliotheek.reeksen.create'],
+            ['Artikelen zoeken', 'bibliotheek.artikelen', 'search', 'bibliotheek.artikelen,bibliotheek.uitgaven.show'],
+            ['Uitleningen', 'bibliotheek.uitleningen', 'cert', 'bibliotheek.uitleningen,bibliotheek.innemen,bibliotheek.lener'],
+            ['Rapportage', 'bibliotheek.rapport', 'report', 'bibliotheek.rapport'],
+        ],
+    ];
+    if ($gebruiker->magBibliotheekBeheren()) {
+        $biebMenu['Bibliotheek'][] = ['Publicatie toevoegen', 'bibliotheek.publicaties.create', 'plus', 'bibliotheek.publicaties.create'];
+        $biebMenu['Bibliotheek'][] = ['Uitlenen', 'bibliotheek.uitlenen', 'taak', 'bibliotheek.uitlenen'];
+    }
+    if ($gebruiker->magBibliotheekSjablonenBeheren()) {
+        $biebMenu['Bibliotheek'][] = ['E-mailsjablonen', 'bibliotheek.sjablonen', 'log', 'bibliotheek.sjablonen'];
+    }
+
     // Standaardmenu buiten een module. Bij multi-rol worden de menu's van álle
     // rollen samengevoegd, zodat de gebruiker elk scherm bereikt waar hij recht op
     // heeft. Groepen worden op titel gecombineerd; dubbele items (zelfde route +
@@ -276,7 +297,9 @@
             $rolMenu = $menus[$r->value]
                 ?? (in_array($r, [Rol::Relatiebeheerder, Rol::Stagecoordinator], true)
                     ? $relatieMenu
-                    : ($r === Rol::Hrmedewerker ? $hrMenu : ($r === Rol::Balie ? $balieMenu : null)));
+                    : ($r === Rol::Hrmedewerker ? $hrMenu
+                        : ($r === Rol::Balie ? $balieMenu
+                            : ($r === Rol::Bibliotheek ? $biebMenu : null))));
             if ($rolMenu !== null) {
                 $standaardMenu = $mergeMenu($standaardMenu, $rolMenu);
             }
@@ -294,11 +317,15 @@
     // met beheerlinks waarvoor het Bestuur geen rechten heeft (die 403 zouden geven),
     // en blijft de gebruiker in de vertrouwde Bestuur-context.
     $inBaliemodule = request()->routeIs('balie') || request()->routeIs('balie.*');
+    $inBiebmodule = request()->routeIs('bibliotheek.*');
     $menu = ($rol === Rol::Bestuur->value)
         ? $standaardMenu
         : ($inCursusmodule
             ? $cursusMenu
-            : ($inRelatiemodule ? $relatieMenu : ($inHrmodule ? $hrMenu : ($inBaliemodule ? $balieMenu : $standaardMenu))));
+            : ($inRelatiemodule ? $relatieMenu
+                : ($inHrmodule ? $hrMenu
+                    : ($inBaliemodule ? $balieMenu
+                        : ($inBiebmodule ? $biebMenu : $standaardMenu)))));
 
     // Zelfservice "Mijn HR" is er voor iedere gekoppelde medewerker, ook buiten de
     // HR-module (bv. een docent met een personeelsdossier). Voeg de groep toe aan

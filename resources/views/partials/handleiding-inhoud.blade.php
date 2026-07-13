@@ -325,7 +325,43 @@
 
   <div class="tip">Registraties worden <b>nooit verwijderd</b>: het logboek is een chronologisch verantwoordingsdocument. Maakt u een fout, corrigeer die dan met <b>Bewerken</b>. Elke aanmaak, wijziging en export wordt gelogd (wie, wat, wanneer).</div>
 
-  <h2 id="h15">15. Vragen of problemen?</h2>
+  <h2 id="h15">15. Bibliotheek (aparte module)</h2>
+  <p>De module <b>Bibliotheek</b> beheert de collectie en de uitleen. De rol <b>Bibliotheekmedewerker</b> werkt hierin; het <b>Schoolbestuur</b> kijkt mee (alleen-lezen). De bibliotheekmedewerker ziet géén cijfers en géén personeelsdossiers — wel de namen en contactgegevens van leners, want zonder die kan niet worden uitgeleend. De collectie is meertalig: <b>Arabisch, Turks, Engels en Nederlands</b> worden correct opgeslagen, doorzocht en getoond.</p>
+
+  <h3>Titel en exemplaar: het verschil</h3>
+  <p>Dit is de kern van de module. Een <b>titel</b> (het boek als werk) staat één keer in de catalogus, met ISBN, auteurs, talen, vakgebied en uitgavejaar. De <b>exemplaren</b> zijn de fysieke boeken die u in de kast hebt staan: elk met een eigen <b>serienummer</b>, een plek in de kast en een eigen <b>status</b>. Heeft u drie exemplaren van hetzelfde boek, dan voert u de titel één keer in en voegt u drie serienummers toe — u kunt ze dan los uitlenen. Zo werken professionele bibliotheeksystemen, en zo blijft de teller "beschikbaar / totaal" kloppen.</p>
+
+  <h3>Een publicatie registreren</h3>
+  <p>Kies bij <b>Publicatie toevoegen</b> eerst het type: <b>Boek</b>, <b>Tijdschrift</b> of <b>Digitaal document</b>. Vul daarna de titel, het ISBN, de auteur(s), de taal of talen (meerdere mogen), het uitgavejaar, het druknummer en het vakgebied in. Een auteur die nog niet bestaat, wordt automatisch aangemaakt. Onderaan geeft u de serienummers van de exemplaren op en kiest u de boekenkast. Een <b>digitaal document</b> heeft geen fysieke exemplaren en wordt niet uitgeleend.</p>
+
+  <h3>Boekreeksen (meerdelige werken)</h3>
+  <p>Bestaat een werk uit meerdere delen — bijvoorbeeld <b>Tafsir Ibn Kathir</b> deel 1 tot en met 4 — gebruik dan <b>Boekreeks aanmaken</b>. U voert de gedeelde gegevens (auteurs, talen, vakgebied, jaar, kast) <b>één keer</b> in en zet daaronder in één scherm alle delen neer, elk met een deelnummer en een serienummer. Elk deel wordt een apart, los uitleenbaar boek, maar ze blijven zichtbaar bij elkaar horen. Later een deel bijvoegen kan op de reekspagina; de gedeelde gegevens worden dan overgenomen.</p>
+
+  <h3>Tijdschriften en artikelen</h3>
+  <p>Een tijdschrift registreert u als publicatie van het type <b>Tijdschrift</b>. Daaronder voegt u de <b>uitgaven</b> toe (uitgavenummer, publicatiedatum, jaar, locatie), en per uitgave de <b>artikelen</b> met artikeltitel, auteur(s), pagina's, trefwoorden en een korte beschrijving. Onder <b>Artikelen zoeken</b> vindt u een artikel terug op <b>artikeltitel</b>, <b>auteur</b>, <b>trefwoord</b> of <b>tijdschriftnaam</b> — en ziet u meteen in welk tijdschrift en welke uitgave het staat.</p>
+
+  <h3>Uitlenen</h3>
+  <p>Bij <b>Uitlenen</b> kiest u een beschikbaar exemplaar en daarna de lener: een <b>student</b> of een <b>docent/medewerker</b>. De lener is altijd iemand die al in het systeem staat, zodat naam, telefoonnummer en e-mailadres uit het dossier komen en er geen tikfouten insluipen. De verwachte retourdatum wordt automatisch berekend uit de standaardtermijn (voor studenten korter dan voor docenten), maar u mag hem aanpassen. Na het uitlenen gaat er automatisch een <b>bevestigingsmail</b> naar de lener, met een kopie naar de bibliotheekpostbus.</p>
+
+  <div class="let">Een exemplaar dat al is uitgeleend, verloren of beschadigd staat niet in de keuzelijst. Wilt u het toch uitlenen, neem het dan eerst in of zet de status terug op Beschikbaar.</div>
+
+  <h3>Innemen</h3>
+  <p>Bij de inname legt u de <b>retourdatum</b> vast en de <b>staat van het materiaal</b>: Uitstekend, Goed, Licht beschadigd, Beschadigd of Ernstig beschadigd, met eventueel een opmerking. Kiest u <b>Beschadigd</b> of <b>Ernstig beschadigd</b>, dan volgt er automatisch een schademelding en gaat het exemplaar uit de uitleen (status Beschadigd) tot u het weer vrijgeeft. Of iets te laat was, rekent het systeem zelf uit; u hoeft dat niet aan te vinken.</p>
+
+  <h3>Automatische e-mails</h3>
+  <p>De bibliotheek verstuurt vijf soorten berichten, allemaal met een kopie naar de bibliotheekpostbus: de <b>uitleenbevestiging</b>, een <b>herinnering drie dagen vóór de vervaldatum</b>, een <b>waarschuwing als een student te laat is</b>, een <b>herinnering voor docenten</b> die elke drie dagen wordt herhaald (zonder boete), en de <b>retourbevestiging</b>. Op de pagina van de lener ziet u precies welke e-mails zijn verstuurd, wanneer, aan wie, en of het gelukt is. De <b>Beheerder</b> past de teksten aan onder <b>E-mailsjablonen</b>.</p>
+
+  <div class="tip">Mislukt een e-mail (bijvoorbeeld omdat de lener geen e-mailadres in het dossier heeft), dan gaat de uitlening gewoon door en staat de mislukte poging in het e-maillogboek. Een boek moet uitgeleend kunnen worden, ook als de mailserver hapert.</div>
+
+  <h3>Overzicht en rapportage</h3>
+  <p>Het <b>Overzicht</b> toont de kerncijfers (boeken, tijdschriften, digitale documenten, nu uitgeleend, te laat, vandaag uitgeleend en geretourneerd), de <b>waarschuwingen</b> (wat te laat is en wat binnen drie dagen terug moet) en grafieken van de uitleningen per maand, per vakgebied en per taal. Onder <b>Rapportage</b> staan de overzichten per vakgebied, per auteur en per uitgavejaar, plus de <b>meest uitgeleende publicaties</b> met het aantal uitleningen en de laatste uitleendatum. De algemene bibliotheeklijst exporteert u naar <b>CSV</b>.</p>
+
+  <h3>Te late studenten bij Studentenzaken</h3>
+  <p>Levert een student materiaal niet op tijd in, dan verschijnt dat automatisch op het <b>dashboard van Studentenzaken</b>: studentnummer, naam, geleend materiaal, aantal dagen te laat en het aantal verstuurde waarschuwingen. Zo kan Studentenzaken de student erop aanspreken zonder in de bibliotheekmodule te hoeven kijken.</p>
+
+  <div class="let">Boetes zijn nog <b>niet</b> ingebouwd: de regels (bedrag per dag, maximum, wie int) zijn nog niet vastgesteld. Te laat leidt nu tot een waarschuwing per e-mail en het signaal op het dashboard.</div>
+
+  <h2 id="h16">16. Vragen of problemen?</h2>
   <p>Neem bij vragen contact op met de systeembeheerder of Studentenzaken (szaken@iuasr.nl). Werkt iets niet zoals verwacht, meld dan wat u deed en wat u zag.</p>
 
   <div class="tip">Deze handleiding wordt bijgewerkt zodra er nieuwe functies bij komen. Kijk bij twijfel of u de meest recente versie hebt (zie de datum onderaan).</div>

@@ -27,9 +27,9 @@ class ModulekeuzeTest extends TestCase
     public function test_de_modules_zijn_aanwezig(): void
     {
         // De placeholder 'stage' is uitgegroeid tot de module Relatiebeheer & Stage.
-        // Balie/Receptie is als zesde module toegevoegd (volgorde 6).
+        // Balie/Receptie (6) en Bibliotheek (7) zijn later toegevoegd.
         $this->assertSame(
-            ['studentenzaken', 'cursussen', 'relatiebeheer', 'scriptie', 'hr', 'balie'],
+            ['studentenzaken', 'cursussen', 'relatiebeheer', 'scriptie', 'hr', 'balie', 'bibliotheek'],
             Module::geordend()->pluck('sleutel')->all(),
         );
         // Alles is gebouwd behalve Scriptie.
@@ -37,6 +37,7 @@ class ModulekeuzeTest extends TestCase
         $this->assertTrue(Module::where('sleutel', 'cursussen')->value('actief'));
         $this->assertTrue(Module::where('sleutel', 'relatiebeheer')->value('actief'));
         $this->assertTrue(Module::where('sleutel', 'balie')->value('actief'));
+        $this->assertTrue(Module::where('sleutel', 'bibliotheek')->value('actief'));
         $this->assertFalse(Module::where('sleutel', 'scriptie')->value('actief'));
     }
 

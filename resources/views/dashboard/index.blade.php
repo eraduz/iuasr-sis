@@ -92,6 +92,32 @@
     <span>Als Studentenzaken heeft u <b>geen inzage in cijfers</b>. Dit wordt server-side afgedwongen (rolscheiding), niet alleen in de interface.</span>
   </div>
 
+  @if ($biebTeLaat->isNotEmpty())
+    {{-- Bibliotheek: studenten die materiaal te laat retourneren. Studentenzaken
+         moet dit zien om de student erop aan te kunnen spreken. --}}
+    <div class="sis-card" style="margin-top:16px;border-left:3px solid var(--secColor100);">
+      <div class="sis-card__hd"><h3>Bibliotheek: te laat</h3><span class="hint">{{ $biebTeLaat->count() }} {{ $biebTeLaat->count() === 1 ? 'uitlening' : 'uitleningen' }}</span></div>
+      <p class="sis-muted" style="font-size:12px;margin:0 0 8px;">Studenten die geleend materiaal niet op tijd hebben teruggebracht. De bibliotheek verstuurt de waarschuwingen automatisch; hier ziet u hoeveel er al zijn gestuurd.</p>
+      <div class="iuasr-dash-tbl-card" style="border:0;">
+        <table class="iuasr-dash-tbl">
+          <thead><tr><th>Studentnummer</th><th>Naam</th><th>Geleend materiaal</th><th style="text-align:right;">Dagen te laat</th><th style="text-align:center;">Waarschuwingen</th></tr></thead>
+          <tbody>
+            @foreach ($biebTeLaat->take(10) as $u)
+              <tr>
+                <td class="tnum">{{ $u->student->studentnummer }}</td>
+                <td class="nm"><a href="{{ route('studenten.show', $u->student) }}">{{ $u->student->volledigeNaam() }}</a></td>
+                <td dir="auto">{{ $u->exemplaar->publicatie->volledigeTitel() }}<small>{{ $u->exemplaar->serienummer }}</small></td>
+                <td class="tnum" style="text-align:right;"><span class="iuasr-dash-status s-rejected">{{ $u->dagenTeLaat() }}</span></td>
+                <td style="text-align:center;">{{ $u->emaillogs->count() }}</td>
+              </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+      @if ($biebTeLaat->count() > 10)<p class="sis-muted" style="font-size:12px;margin:8px 2px 0;">+ {{ $biebTeLaat->count() - 10 }} meer…</p>@endif
+    </div>
+  @endif
+
   @if ($afstudeerSignaal->isNotEmpty())
     @php $afstActie = $afstudeerSignaal->where('wachtOpSz', true); @endphp
     <div class="sis-card" style="margin-top:16px;@if($afstActie->isNotEmpty())border-left:3px solid var(--secColor100);@endif">

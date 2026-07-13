@@ -133,6 +133,30 @@ class User extends Authenticatable
         return $this->magVolgensRol(fn (Rol $r) => $r->magHrBeheer());
     }
 
+    /** Module Bibliotheek: catalogus muteren, uitlenen en innemen (Bibliotheek, Beheer). */
+    public function magBibliotheekBeheren(): bool
+    {
+        return $this->magVolgensRol(fn (Rol $r) => $r->magBibliotheekBeheren());
+    }
+
+    /** Module Bibliotheek: catalogus, dashboard en rapportage inzien (+ Schoolbestuur). */
+    public function magBibliotheekInzien(): bool
+    {
+        return $this->magVolgensRol(fn (Rol $r) => $r->magBibliotheekInzien());
+    }
+
+    /** Te-late uitleningen van studenten zien (Studentenzaken-dashboard, opdracht §9). */
+    public function magBibliotheekSignaalZien(): bool
+    {
+        return $this->magVolgensRol(fn (Rol $r) => $r->magBibliotheekSignaalZien());
+    }
+
+    /** E-mailsjablonen van de bibliotheek beheren (Beheerder). */
+    public function magBibliotheekSjablonenBeheren(): bool
+    {
+        return $this->magVolgensRol(fn (Rol $r) => $r->magBibliotheekSjablonenBeheren());
+    }
+
     /** Module Balie/Receptie: registraties aanmaken/wijzigen (Balie, Beheer). */
     public function magBalieBeheren(): bool
     {

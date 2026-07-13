@@ -64,6 +64,13 @@ class AutorisatieServiceProvider extends ServiceProvider
         // Balielogboek MUTEREN — alleen de Balie zelf (en Beheer voor onderhoud).
         Gate::define('balie-beheren', fn (User $user) => $user->magBalieBeheren());
 
+        // Bibliotheek INZIEN (Bibliotheek, Beheer, Schoolbestuur) en MUTEREN.
+        Gate::define('bibliotheek-inzien', fn (User $user) => $user->magBibliotheekInzien());
+        Gate::define('bibliotheek-beheren', fn (User $user) => $user->magBibliotheekBeheren());
+
+        // Te-late uitleningen zien op het Studentenzaken-dashboard (opdracht bibliotheek §9).
+        Gate::define('bibliotheek-signaal', fn (User $user) => $user->magBibliotheekSignaalZien());
+
         // Gebruikers/rollen/referentiedata beheren (Beheerder).
         Gate::define('beheer', fn (User $user) => $user->heeftRol(\App\Enums\Rol::Beheerder));
     }

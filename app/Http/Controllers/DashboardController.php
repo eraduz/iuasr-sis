@@ -44,6 +44,9 @@ class DashboardController extends Controller
             if ($rol->magModule('balie')) {
                 return redirect()->route('balie.dashboard');
             }
+            if ($rol->magModule('bibliotheek')) {
+                return redirect()->route('bibliotheek.dashboard');
+            }
 
             return redirect()->route('modules.kiezen');
         }
@@ -262,9 +265,24 @@ class DashboardController extends Controller
                 ->values();
         }
 
+        // Bibliotheek (opdracht §9): studenten die materiaal te laat retourneren,
+        // zichtbaar op het Studentenzaken-dashboard — studentnummer, naam, geleend
+        // materiaal, aantal dagen te laat en het aantal verstuurde waarschuwingen.
+        $biebTeLaat = collect();
+        if (auth()->user()->magBibliotheekSignaalZien()) {
+            $biebTeLaat = \App\Models\Bibliotheek\Uitlening::teLaat()
+                ->whereNotNull('student_id')
+                ->with(['student', 'exemplaar.publicatie', 'emaillogs'])
+                ->get()
+                ->filter(fn ($u) => $u->student !== null)
+                ->sortByDesc(fn ($u) => $u->dagenTeLaat())
+                ->values();
+        }
+
         return view('dashboard.index', compact('kpi', 'nt2', 'docLater', 'stat', 'openBesluiten',
             'vrijstellingLijst', 'kennistoetsBewaking', 'dubbeleInschrijving',
-            'regelingLijst', 'presentieAchterstand', 'mijnTaken', 'afspraken', 'afstudeerSignaal'));
+            'regelingLijst', 'presentieAchterstand', 'mijnTaken', 'afspraken', 'afstudeerSignaal',
+            'biebTeLaat'));
     }
 
     /**

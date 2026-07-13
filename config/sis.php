@@ -24,7 +24,7 @@ return [
     | onderaan elke pagina getoond zodat testers en beheer weten welke versie
     | draait. Bijwerken bij elke release; houd de wijzigingen bij in CHANGELOG.md.
     */
-    'versie' => '1.1.0',
+    'versie' => '1.2.0',
 
     /*
     |----------------------------------------------------------------------
@@ -82,7 +82,35 @@ return [
             'hr' => env('SIS_MAIL_CC_HR', 'personeelszaken@iuasr.nl'),
             'studentenzaken' => env('SIS_MAIL_CC_STUDENTENZAKEN', 'szaken@iuasr.nl'),
             'examencommissie' => env('SIS_MAIL_CC_EXAMENCOMMISSIE', 'examencommissie@iuasr.nl'),
+            'bibliotheek' => env('SIS_MAIL_CC_BIBLIOTHEEK', 'bibliotheek@iuasr.nl'),
         ],
+    ],
+
+    /*
+    |----------------------------------------------------------------------
+    | Bibliotheek
+    |----------------------------------------------------------------------
+    | Uitleentermijn per lenerstype, in dagen. De baliemedewerker mag de
+    | retourdatum per uitlening aanpassen; dit is alleen de standaardwaarde.
+    |
+    | TE BEVESTIGEN door de opdrachtgever: de termijnen hieronder zijn een
+    | werkbare terugval (student korter dan docent), GEEN vastgestelde norm.
+    |
+    | Herinnering: het aantal dagen vóór de vervaldatum waarop de automatische
+    | herinnering uitgaat (opdracht: 3). Te late docenten krijgen elke
+    | `docent_herinnering_interval` dagen een herhaling (opdracht: 3).
+    |
+    | BOETE: bewust NIET ingebouwd. De boeteregels (bedrag per dag, maximum,
+    | wie int) zijn nog niet vastgesteld; er worden geen bedragen verzonnen.
+    | Te laat leidt nu tot een waarschuwingsmail en een signaal op het
+    | Studentenzaken-dashboard. Zie PROGRESS.md, openstaande parameters.
+    */
+    'bibliotheek' => [
+        'uitleentermijn_student_dagen' => (int) env('SIS_BIEB_TERMIJN_STUDENT', 21),
+        'uitleentermijn_docent_dagen' => (int) env('SIS_BIEB_TERMIJN_DOCENT', 60),
+        'herinnering_dagen_vooraf' => (int) env('SIS_BIEB_HERINNERING_DAGEN', 3),
+        'docent_herinnering_interval_dagen' => (int) env('SIS_BIEB_DOCENT_INTERVAL', 3),
+        'boete_ingeschakeld' => (bool) env('SIS_BIEB_BOETE_INGESCHAKELD', false), // TE BEVESTIGEN
     ],
 
     'hr' => [

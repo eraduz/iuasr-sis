@@ -630,4 +630,62 @@ Route::middleware('auth')->group(function () {
         Route::get('/logboek', [App\Http\Controllers\Balie\BalieRegistratieController::class, 'index'])->name('balie');
         Route::get('/logboek/export.csv', [App\Http\Controllers\Balie\BalieDashboardController::class, 'export'])->name('balie.export');
     });
+
+    /*
+    |----------------------------------------------------------------------
+    | Module Bibliotheek
+    |----------------------------------------------------------------------
+    | Catalogus (titels + fysieke exemplaren), boekreeksen, tijdschriften met
+    | artikelen, uitlenen en innemen. De Bibliotheekmedewerker en de Beheerder
+    | muteren; het Schoolbestuur kijkt mee (alleen-lezen). De e-mailsjablonen
+    | beheert uitsluitend de Beheerder.
+    |
+    | Beheerroutes staan vóór de inzageroutes, zodat /publicaties/nieuw niet als
+    | een {publicatie}-parameter wordt gelezen.
+    */
+    Route::middleware('rol:bibliotheek,beheerder')->prefix('bibliotheek')->group(function () {
+        // Catalogus
+        Route::get('/publicaties/nieuw', [App\Http\Controllers\Bibliotheek\PublicatieController::class, 'create'])->name('bibliotheek.publicaties.create');
+        Route::post('/publicaties', [App\Http\Controllers\Bibliotheek\PublicatieController::class, 'store'])->name('bibliotheek.publicaties.store');
+        Route::get('/publicaties/{publicatie}/bewerken', [App\Http\Controllers\Bibliotheek\PublicatieController::class, 'edit'])->name('bibliotheek.publicaties.edit');
+        Route::put('/publicaties/{publicatie}', [App\Http\Controllers\Bibliotheek\PublicatieController::class, 'update'])->name('bibliotheek.publicaties.update');
+        Route::post('/publicaties/{publicatie}/exemplaren', [App\Http\Controllers\Bibliotheek\PublicatieController::class, 'exemplaarToevoegen'])->name('bibliotheek.exemplaren.store');
+        Route::put('/exemplaren/{exemplaar}/status', [App\Http\Controllers\Bibliotheek\PublicatieController::class, 'exemplaarStatus'])->name('bibliotheek.exemplaren.status');
+
+        // Boekreeksen
+        Route::get('/reeksen/nieuw', [App\Http\Controllers\Bibliotheek\ReeksController::class, 'create'])->name('bibliotheek.reeksen.create');
+        Route::post('/reeksen', [App\Http\Controllers\Bibliotheek\ReeksController::class, 'store'])->name('bibliotheek.reeksen.store');
+        Route::post('/reeksen/{reeks}/delen', [App\Http\Controllers\Bibliotheek\ReeksController::class, 'deelToevoegen'])->name('bibliotheek.reeksen.deel');
+
+        // Tijdschriften: uitgaven en artikelen
+        Route::post('/tijdschriften/{publicatie}/uitgaven', [App\Http\Controllers\Bibliotheek\TijdschriftController::class, 'uitgaveStore'])->name('bibliotheek.uitgaven.store');
+        Route::post('/uitgaven/{uitgave}/artikelen', [App\Http\Controllers\Bibliotheek\TijdschriftController::class, 'artikelStore'])->name('bibliotheek.artikelen.store');
+        Route::put('/artikelen/{artikel}', [App\Http\Controllers\Bibliotheek\TijdschriftController::class, 'artikelUpdate'])->name('bibliotheek.artikelen.update');
+
+        // Uitlenen en innemen
+        Route::get('/uitlenen', [App\Http\Controllers\Bibliotheek\UitleningController::class, 'create'])->name('bibliotheek.uitlenen');
+        Route::post('/uitlenen', [App\Http\Controllers\Bibliotheek\UitleningController::class, 'store'])->name('bibliotheek.uitlenen.store');
+        Route::get('/uitleningen/{uitlening}/innemen', [App\Http\Controllers\Bibliotheek\UitleningController::class, 'innameForm'])->name('bibliotheek.innemen');
+        Route::put('/uitleningen/{uitlening}/innemen', [App\Http\Controllers\Bibliotheek\UitleningController::class, 'innemen'])->name('bibliotheek.innemen.store');
+    });
+
+    // E-mailsjablonen: uitsluitend de Beheerder (opdracht: "de Administrator").
+    Route::middleware('rol:beheerder')->prefix('bibliotheek')->group(function () {
+        Route::get('/sjablonen', [App\Http\Controllers\Bibliotheek\EmailsjabloonController::class, 'index'])->name('bibliotheek.sjablonen');
+        Route::put('/sjablonen/{sjabloon}', [App\Http\Controllers\Bibliotheek\EmailsjabloonController::class, 'update'])->name('bibliotheek.sjablonen.update');
+    });
+
+    Route::middleware('rol:bibliotheek,beheerder,bestuur')->prefix('bibliotheek')->group(function () {
+        Route::get('/', [App\Http\Controllers\Bibliotheek\BibliotheekDashboardController::class, 'dashboard'])->name('bibliotheek.dashboard');
+        Route::get('/publicaties', [App\Http\Controllers\Bibliotheek\PublicatieController::class, 'index'])->name('bibliotheek.publicaties');
+        Route::get('/publicaties/{publicatie}', [App\Http\Controllers\Bibliotheek\PublicatieController::class, 'show'])->name('bibliotheek.publicaties.show');
+        Route::get('/reeksen', [App\Http\Controllers\Bibliotheek\ReeksController::class, 'index'])->name('bibliotheek.reeksen');
+        Route::get('/reeksen/{reeks}', [App\Http\Controllers\Bibliotheek\ReeksController::class, 'show'])->name('bibliotheek.reeksen.show');
+        Route::get('/artikelen', [App\Http\Controllers\Bibliotheek\TijdschriftController::class, 'artikelen'])->name('bibliotheek.artikelen');
+        Route::get('/uitgaven/{uitgave}', [App\Http\Controllers\Bibliotheek\TijdschriftController::class, 'uitgaveShow'])->name('bibliotheek.uitgaven.show');
+        Route::get('/uitleningen', [App\Http\Controllers\Bibliotheek\UitleningController::class, 'index'])->name('bibliotheek.uitleningen');
+        Route::get('/leners/{type}/{id}', [App\Http\Controllers\Bibliotheek\UitleningController::class, 'lener'])->name('bibliotheek.lener');
+        Route::get('/rapport', [App\Http\Controllers\Bibliotheek\BibliotheekDashboardController::class, 'rapport'])->name('bibliotheek.rapport');
+        Route::get('/rapport/export.csv', [App\Http\Controllers\Bibliotheek\BibliotheekDashboardController::class, 'export'])->name('bibliotheek.export');
+    });
 });

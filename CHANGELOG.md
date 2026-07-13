@@ -9,6 +9,40 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.2.0] — 2026-07-13
+
+Nieuwe module **Bibliotheek** (op verzoek van de opdrachtgever), met een nieuwe
+rol `bibliotheek`.
+
+- **Titel en exemplaar gescheiden** (model van Koha e.a.): de titel staat één keer
+  in de catalogus, de fysieke boeken hangen eronder als exemplaren met een eigen
+  serienummer, kastplek en status. Drie exemplaren van hetzelfde boek zijn dus los
+  uitleenbaar zonder de titel te dupliceren.
+- **Meertalig**: Arabisch, Turks, Engels en Nederlands. Een publicatie kan meerdere
+  talen hebben; opslaan, zoeken en sorteren werkt met Arabisch schrift.
+- **Boekreeksen**: de gedeelde gegevens één keer invoeren en alle delen in één
+  scherm toevoegen (Tafsir Ibn Kathir deel 1–4). Elk deel blijft los uitleenbaar.
+- **Tijdschriften met artikelen**: uitgaven met artikelen, auteurs, pagina's en
+  trefwoorden. Zoeken op artikeltitel, auteur, trefwoord of tijdschriftnaam laat
+  meteen zien in welk tijdschrift een artikel staat.
+- **Uitlenen en innemen**: de lener is een bestaande student of medewerker (echte
+  foreign key). Inname legt de staat van het materiaal vast; bij schade gaat het
+  exemplaar automatisch uit de uitleen. 'Te laat' en 'op tijd' zijn afleidingen,
+  geen kolommen.
+- **E-mail**: vijf sjablonen (door de Beheerder aanpasbaar) met variabelen, altijd
+  met CC naar de bibliotheekpostbus. Elke verzending wordt gelogd, ook een mislukte;
+  een mislukte mail blokkeert de uitlening nooit. Automatische herinneringen via de
+  scheduler (`bibliotheek:herinneringen`, idempotent).
+- **Dashboard en rapportage**: KPI's, waarschuwingen (te laat, binnen 3 dagen terug),
+  grafieken per maand/vakgebied/taal, overzichten per vakgebied, auteur en jaar, de
+  meest uitgeleende titels, en een CSV-export.
+- **Integratie met Studentenzaken**: te late studenten verschijnen op het
+  Studentenzaken-dashboard met studentnummer, naam, materiaal, dagen te laat en het
+  aantal verstuurde waarschuwingen.
+- **Boete nog niet gebouwd**: de boeteregels zijn niet vastgesteld; er worden geen
+  bedragen verzonnen. De uitleentermijnen (21 dagen student, 60 docent) staan in
+  `config/sis.php` en zijn TE BEVESTIGEN.
+
 ## [1.1.0] — 2026-07-13
 
 Nieuwe module **Balie / Receptie** (op verzoek van de opdrachtgever), met een

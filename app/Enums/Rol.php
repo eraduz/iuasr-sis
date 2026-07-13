@@ -41,6 +41,11 @@ enum Rol: string
     // de ingang: telefoon (in/uit), bezoekers, en post (in/uit). Bewust een smalle
     // rol: de baliemedewerker ziet geen studentdossiers, cijfers of personeelsdata.
     case Balie = 'balie';
+    // Module Bibliotheek. De bibliotheekmedewerker beheert de catalogus
+    // (publicaties, boekreeksen, tijdschriftartikelen) en leent uit aan studenten
+    // en docenten. Ziet geen cijfers en geen personeelsdossiers; wel de namen en
+    // contactgegevens van leners, want zonder die kan niet worden uitgeleend.
+    case Bibliotheek = 'bibliotheek';
 
     /** Leesbare naam voor UI en documenten (Nederlands, U-vorm). */
     public function label(): string
@@ -58,6 +63,7 @@ enum Rol: string
             self::Stagecoordinator => 'Stagecoördinator',
             self::Hrmedewerker => 'HR-medewerker',
             self::Balie => 'Balie / Receptie',
+            self::Bibliotheek => 'Bibliotheekmedewerker',
         };
     }
 
@@ -109,7 +115,7 @@ enum Rol: string
             self::Studentenzaken, self::Bestuur, self::Beheerder,
             self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
-            self::Hrmedewerker, self::Balie => false,
+            self::Hrmedewerker, self::Balie, self::Bibliotheek => false,
         };
     }
 
@@ -131,7 +137,7 @@ enum Rol: string
             self::Docent, self::Examencommissie, self::Directie, self::Bestuur,
             self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
-            self::Hrmedewerker, self::Balie => false,
+            self::Hrmedewerker, self::Balie, self::Bibliotheek => false,
         };
     }
 
@@ -179,7 +185,7 @@ enum Rol: string
             self::Studentenzaken, self::Financien, self::Beheerder,
             self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
-            self::Hrmedewerker, self::Balie => false,
+            self::Hrmedewerker, self::Balie, self::Bibliotheek => false,
         };
     }
 
@@ -195,7 +201,7 @@ enum Rol: string
             self::Directie, self::Bestuur, self::Beheerder => true,
             self::Financien, self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
-            self::Hrmedewerker, self::Balie => false,
+            self::Hrmedewerker, self::Balie, self::Bibliotheek => false,
         };
     }
 
@@ -258,9 +264,12 @@ enum Rol: string
             self::Hrmedewerker => ['hr'],
             // Module Balie/Receptie: de baliemedewerker werkt uitsluitend daarbinnen.
             self::Balie => ['balie'],
+            // Module Bibliotheek: de bibliotheekmedewerker werkt uitsluitend daarbinnen.
+            self::Bibliotheek => ['bibliotheek'],
             // Het Schoolbestuur heeft brede inzage en ziet naast Studentenzaken ook
-            // de Cursussen-, Relatiebeheer-, HR- en Balie-module (alleen-lezen).
-            self::Bestuur => ['studentenzaken', 'cursussen', 'relatiebeheer', 'hr', 'balie'],
+            // de Cursussen-, Relatiebeheer-, HR-, Balie- en Bibliotheekmodule
+            // (alleen-lezen).
+            self::Bestuur => ['studentenzaken', 'cursussen', 'relatiebeheer', 'hr', 'balie', 'bibliotheek'],
             // De Directie (opleidingsmanager) beheert haar opleiding, inclusief de
             // relaties/stages van die opleiding (opleidinggebonden gescoped). Géén
             // Balie: dat is een werkregister van de ontvangstbalie, geen
@@ -296,6 +305,48 @@ enum Rol: string
             self::Balie, self::Beheerder, self::Bestuur => true,
             default => false,
         };
+    }
+
+    /**
+     * Mag deze rol de bibliotheek beheren: catalogus muteren, uitlenen, innemen?
+     * De Bibliotheekmedewerker; Beheer voor onderhoud. Het Schoolbestuur niet:
+     * dat kijkt uitsluitend mee.
+     */
+    public function magBibliotheekBeheren(): bool
+    {
+        return match ($this) {
+            self::Bibliotheek, self::Beheerder => true,
+            default => false,
+        };
+    }
+
+    /** Mag deze rol de bibliotheek inzien (catalogus, dashboard, rapportage)? */
+    public function magBibliotheekInzien(): bool
+    {
+        return match ($this) {
+            self::Bibliotheek, self::Beheerder, self::Bestuur => true,
+            default => false,
+        };
+    }
+
+    /**
+     * Mag deze rol het bibliotheeksignaal op het STUDENTENZAKEN-dashboard en het
+     * studentdossier zien: welke studenten hebben materiaal te laat retour? Dat is
+     * geen bibliotheekscherm maar studentinformatie, en hoort dus bij Studentenzaken
+     * (opdracht §9). De bibliotheekmedewerker ziet het uiteraard ook, in de eigen module.
+     */
+    public function magBibliotheekSignaalZien(): bool
+    {
+        return match ($this) {
+            self::Studentenzaken, self::Bibliotheek, self::Beheerder => true,
+            default => false,
+        };
+    }
+
+    /** Mag deze rol de e-mailsjablonen van de bibliotheek beheren? (Beheerder.) */
+    public function magBibliotheekSjablonenBeheren(): bool
+    {
+        return $this === self::Beheerder;
     }
 
     /** Mag deze rol de personeelsadministratie beheren (module HR)? */
