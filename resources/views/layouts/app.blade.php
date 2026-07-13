@@ -43,6 +43,11 @@
     @endif
 
     @yield('inhoud')
+
+    <footer class="sis-appfoot" style="margin-top:28px; padding:14px 2px; border-top:1px solid var(--borderColor); color:var(--blackAltText); font-size:12px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+      <span>IUASR Management Systeem</span>
+      <span>versie {{ config('sis.versie') }}</span>
+    </footer>
   </main>
 </div>
 

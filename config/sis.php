@@ -18,6 +18,16 @@ return [
 
     /*
     |----------------------------------------------------------------------
+    | Versie
+    |----------------------------------------------------------------------
+    | Softwareversie van het systeem (semantisch: MAJOR.MINOR.PATCH). Wordt
+    | onderaan elke pagina getoond zodat testers en beheer weten welke versie
+    | draait. Bijwerken bij elke release; houd de wijzigingen bij in CHANGELOG.md.
+    */
+    'versie' => '1.0.0',
+
+    /*
+    |----------------------------------------------------------------------
     | Studentnummer
     |----------------------------------------------------------------------
     | Formaat: jaarprefix (2 cijfers, bv. "26") + een vast aantal cijfers.

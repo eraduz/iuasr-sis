@@ -152,6 +152,7 @@
       </div>
     @endif
   </main>
+  <footer style="text-align:center; padding:14px; color:var(--blackAltText); font-size:12px;">IUASR Management Systeem · versie {{ config('sis.versie') }}</footer>
 </div>
 </body>
 </html>
