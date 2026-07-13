@@ -25,7 +25,7 @@
 </div>
 
 <form method="GET" action="{{ route('bibliotheek.publicaties') }}" class="sis-toolbar" style="margin-bottom:12px; gap:8px; flex-wrap:wrap;" data-autofilter>
-  <input type="search" name="q" value="{{ $zoek }}" placeholder="Zoek op titel, ISBN, auteur of reeks">
+  <input type="search" name="q" value="{{ $zoek }}" placeholder="Zoek op titel, auteur, ISBN of rek (F. 1070)">
   <select name="soort">
     <option value="">Alle soorten</option>
     @foreach ($soorten as $waarde => $label)
@@ -70,11 +70,12 @@
 
 <div class="iuasr-dash-tbl-card">
   <table class="iuasr-dash-tbl">
-    <thead><tr><th>Titel</th><th>ISBN</th><th>Soort</th><th>Auteur(s)</th><th>Talen</th><th>Jaar</th><th>Vakgebied</th><th style="text-align:center;">Exemplaren</th><th class="row-act"></th></tr></thead>
+    <thead><tr><th>Titel</th><th>Rek</th><th>ISBN</th><th>Soort</th><th>Auteur(s)</th><th>Talen</th><th>Jaar</th><th>Vakgebied</th><th style="text-align:center;">Exemplaren</th><th class="row-act"></th></tr></thead>
     <tbody>
       @forelse ($publicaties as $p)
         <tr>
           <td class="nm" dir="auto"><a href="{{ route('bibliotheek.publicaties.show', $p) }}">{{ $p->volledigeTitel() }}</a></td>
+          <td class="tnum"><b>{{ $p->rekplaats() ?? '—' }}</b></td>
           <td class="tnum">{{ $p->isbn ?? '—' }}</td>
           <td>{{ $p->soort->label() }}</td>
           <td>{{ $p->auteursTekst() }}</td>
@@ -96,7 +97,7 @@
           </td>
         </tr>
       @empty
-        <tr><td colspan="9"><div class="iuasr-dash-empty" style="border:0;"><h3>Geen publicaties</h3><p class="sis-muted">Er zijn geen titels die aan deze filters voldoen.</p></div></td></tr>
+        <tr><td colspan="10"><div class="iuasr-dash-empty" style="border:0;"><h3>Geen publicaties</h3><p class="sis-muted">Er zijn geen titels die aan deze filters voldoen.</p></div></td></tr>
       @endforelse
     </tbody>
   </table>

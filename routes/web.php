@@ -633,6 +633,22 @@ Route::middleware('auth')->group(function () {
 
     /*
     |----------------------------------------------------------------------
+    | Bibliotheek IUASR — de catalogus als ALLEEN-LEZEN raadpleegscherm
+    |----------------------------------------------------------------------
+    | Voor IEDERE ingelogde medewerker (docent, HR, Studentenzaken, ...), uit
+    | welke module hij ook komt: een boek opzoeken, zien in welke kast het staat
+    | en of er een exemplaar vrij is. Bewust geen enkele mutatieroute: uitlenen,
+    | innemen en het beheer van de catalogus blijven in de bibliotheekmodule,
+    | voorbehouden aan de rol Bibliotheek.
+    |
+    | Geen rol-middleware: de auth-groep volstaat. Een boekentitel is geen
+    | gevoelig gegeven, en er staan hier geen leners- of uitleengegevens.
+    */
+    Route::get('/catalogus', [App\Http\Controllers\Bibliotheek\CatalogusController::class, 'index'])->name('catalogus');
+    Route::get('/catalogus/{publicatie}', [App\Http\Controllers\Bibliotheek\CatalogusController::class, 'show'])->name('catalogus.show');
+
+    /*
+    |----------------------------------------------------------------------
     | Module Bibliotheek
     |----------------------------------------------------------------------
     | Catalogus (titels + fysieke exemplaren), boekreeksen, tijdschriften met

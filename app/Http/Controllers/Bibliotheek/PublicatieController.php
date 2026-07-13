@@ -224,6 +224,8 @@ class PublicatieController extends Controller
             'soort' => ['required', Rule::in(PublicatieSoort::waarden())],
             'titel' => ['required', 'string', 'max:255'],
             'isbn' => ['nullable', 'string', 'max:20'],
+            // De rekplaats ("F. 1070"): waar het boek fysiek ligt.
+            'bron_rekcode' => ['nullable', 'string', 'max:40'],
             'uitgavejaar' => ['nullable', 'integer', 'min:1000', 'max:'.(date('Y') + 1)],
             'druknummer' => ['nullable', 'string', 'max:30'],
             'vakgebied_id' => ['nullable', 'integer', 'exists:bibliotheek_vakgebieden,id'],
@@ -243,6 +245,7 @@ class PublicatieController extends Controller
             'vakgebied_id' => 'vakgebied',
             'reeks_id' => 'boekreeks',
             'kast_id' => 'kast',
+            'bron_rekcode' => 'rek / plaats',
         ]);
 
         // Alleen een boek kan deel zijn van een boekreeks.
@@ -254,7 +257,7 @@ class PublicatieController extends Controller
         return [
             'publicatie' => collect($data)->only([
                 'soort', 'titel', 'isbn', 'uitgavejaar', 'druknummer',
-                'vakgebied_id', 'reeks_id', 'deelnummer', 'opmerking',
+                'vakgebied_id', 'reeks_id', 'deelnummer', 'opmerking', 'bron_rekcode',
             ])->all(),
             'auteurs' => array_filter($data['auteurs'] ?? []),
             'talen' => array_map('intval', $data['talen'] ?? []),

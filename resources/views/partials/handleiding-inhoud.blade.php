@@ -375,6 +375,10 @@
 
   <div class="let">Boetes zijn nog <b>niet</b> ingebouwd: de regels (bedrag per dag, maximum, wie int) zijn nog niet vastgesteld. Te laat leidt nu tot een waarschuwing per e-mail en het signaal op het dashboard.</div>
 
+  <h3>Bibliotheek IUASR — een boek zoeken (voor iedereen)</h3>
+  <p>Elke medewerker ziet in het menu de ingang <b>Bibliotheek IUASR</b>, in welke module u ook werkt. Daar zoekt u een boek op titel, auteur, ISBN of <b>rekcode</b>. U ziet meteen de <b>rek / plaats</b> (bijvoorbeeld <b>F. 1070</b>: de letter is de kast, het nummer de plaats in het rek), de taal, het vakgebied en of er een exemplaar <b>beschikbaar</b> is. Met het vinkje <b>Alleen beschikbaar</b> verbergt u wat is uitgeleend.</p>
+  <p>Dit scherm is <b>alleen-lezen</b>: u kunt er niets wijzigen en er staan geen gegevens van leners. Wilt u een boek lenen, meld u dan bij de bibliotheek met het serienummer; zij leggen de uitlening vast.</p>
+
   <h2 id="h16">16. Vragen of problemen?</h2>
   <p>Neem bij vragen contact op met de systeembeheerder of Studentenzaken (szaken@iuasr.nl). Werkt iets niet zoals verwacht, meld dan wat u deed en wat u zag.</p>
 

@@ -115,6 +115,9 @@ class Publicatie extends Model
         return $query->where(function (Builder $sub) use ($zoek) {
             $sub->where('titel', 'like', "%{$zoek}%")
                 ->orWhere('isbn', 'like', "%{$zoek}%")
+                // Ook op de rekplaats ("F. 1070"): zo vindt de bibliotheek terug
+                // welk boek op een bepaalde plek in de kast hoort te liggen.
+                ->orWhere('bron_rekcode', 'like', "%{$zoek}%")
                 ->orWhereHas('auteurs', fn (Builder $a) => $a->where('naam', 'like', "%{$zoek}%"))
                 ->orWhereHas('reeks', fn (Builder $r) => $r->where('titel', 'like', "%{$zoek}%"));
         });
@@ -123,6 +126,16 @@ class Publicatie extends Model
     /* --------------------------------------------------------------------
      | Afleidingen
      |------------------------------------------------------------------- */
+
+    /**
+     * De REKPLAATS: waar het boek fysiek ligt, zoals de bibliotheek het altijd al
+     * noteerde ("F. 1070"). Komt uit de oude Excel-bibliotheek (`bron_rekcode`) en
+     * wordt bij nieuwe titels met de hand ingevuld. De letter is tevens de kast.
+     */
+    public function rekplaats(): ?string
+    {
+        return $this->bron_rekcode;
+    }
 
     /** Titel inclusief deelaanduiding: "Tafsir Ibn Kathir — Deel 2". */
     public function volledigeTitel(): string

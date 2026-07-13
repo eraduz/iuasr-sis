@@ -76,7 +76,7 @@ class BibliotheekDashboardController extends Controller
 
         AuditLogger::log(AuditLogger::INZAGE, 'Bibliotheeklijst', veld: 'bibliotheek_export', context: ['aantal' => $rijen->count()]);
 
-        $kolommen = ['Soort', 'ISBN', 'Titel', 'Auteur(s)', 'Talen', 'Uitgavejaar', 'Druk', 'Vakgebied', 'Exemplaren', 'Beschikbaar'];
+        $kolommen = ['Rek', 'Soort', 'ISBN', 'Titel', 'Auteur(s)', 'Talen', 'Uitgavejaar', 'Druk', 'Vakgebied', 'Exemplaren', 'Beschikbaar'];
 
         return response()->streamDownload(function () use ($rijen, $kolommen) {
             $out = fopen('php://output', 'w');
@@ -85,6 +85,7 @@ class BibliotheekDashboardController extends Controller
 
             foreach ($rijen as $p) {
                 fputcsv($out, [
+                    $p->rekplaats() ?? '',
                     $p->soort->label(),
                     $p->isbn ?? '',
                     $p->volledigeTitel(),

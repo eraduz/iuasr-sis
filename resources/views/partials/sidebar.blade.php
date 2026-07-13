@@ -329,6 +329,15 @@
                     : ($inBaliemodule ? $balieMenu
                         : ($inBiebmodule ? $biebMenu : $standaardMenu)))));
 
+    // "Bibliotheek IUASR" — de catalogus als alleen-lezen raadpleegscherm, voor
+    // IEDERE medewerker en in ELKE module. Binnen de bibliotheekmodule zelf staat
+    // de catalogus al in het menu; daar wordt de link niet herhaald.
+    if (! $inBiebmodule) {
+        $menu['Bibliotheek IUASR'] = [
+            ['Boek zoeken', 'catalogus', 'book', 'catalogus,catalogus.show'],
+        ];
+    }
+
     // Zelfservice "Mijn HR" is er voor iedere gekoppelde medewerker, ook buiten de
     // HR-module (bv. een docent met een personeelsdossier). Voeg de groep toe aan
     // het actieve menu wanneer die er nog niet in staat.

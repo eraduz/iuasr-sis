@@ -40,6 +40,12 @@
   <div class="sis-fld"><label>Titel <span class="req">*</span></label><input type="text" name="titel" value="{{ old('titel', $publicatie->titel) }}" maxlength="255" required dir="auto"></div>
 
   <div class="sis-fld">
+    <label>Rek / plaats</label>
+    <input type="text" name="bron_rekcode" value="{{ old('bron_rekcode', $publicatie->bron_rekcode) }}" maxlength="40" placeholder="bijv. F. 1070">
+    <small class="sis-muted">Waar het boek in de bibliotheek ligt: de letter is de kast, het nummer de plaats in het rek. Dit is het nummer waarmee de collectie altijd al is bijgehouden.</small>
+  </div>
+
+  <div class="sis-fld">
     <label>Auteur(s)</label>
     <div id="auteur-lijst">
       @foreach ($auteurRegels as $auteur)

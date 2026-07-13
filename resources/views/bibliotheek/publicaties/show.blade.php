@@ -22,7 +22,8 @@
 <div class="sis-card" style="margin-bottom:16px;">
   <table class="iuasr-dash-tbl">
     <tbody>
-      <tr><td class="sis-muted" style="width:200px;">ISBN</td><td>{{ $publicatie->isbn ?? '—' }}</td></tr>
+      <tr><td class="sis-muted" style="width:200px;">Rek / plaats</td><td class="tnum"><b>{{ $publicatie->rekplaats() ?? '—' }}</b></td></tr>
+      <tr><td class="sis-muted">ISBN</td><td>{{ $publicatie->isbn ?? '—' }}</td></tr>
       <tr><td class="sis-muted">Talen</td><td>{{ $publicatie->talenTekst() }}</td></tr>
       <tr><td class="sis-muted">Uitgavejaar</td><td>{{ $publicatie->uitgavejaar ?? '—' }}</td></tr>
       <tr><td class="sis-muted">Druknummer</td><td>{{ $publicatie->druknummer ?? '—' }}</td></tr>

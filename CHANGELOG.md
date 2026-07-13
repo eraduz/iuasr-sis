@@ -9,6 +9,19 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.5.0] — 2026-07-13
+
+- **Bibliotheek IUASR**: de catalogus als **alleen-lezen** raadpleegscherm voor
+  iedere ingelogde medewerker, zichtbaar in elke module. Docenten en collega's
+  zoeken een boek op titel, auteur, ISBN of rekcode, zien in welke kast het ligt en
+  of er een exemplaar beschikbaar is. Geen enkele mutatieroute: uitlenen, innemen en
+  het beheer van de catalogus blijven achter de rol Bibliotheek.
+- **Rek / plaats zichtbaar gemaakt.** De rekcode uit de oude Excel-bibliotheek
+  ("F. 1070") stond al als apart veld in de database maar werd nergens getoond. Nu
+  een eigen kolom in beide catalogusschermen, bovenaan op de boekenkaart, in de
+  CSV-export, doorzoekbaar, en invulbaar bij een nieuwe titel.
+- ISBN als eigen kolom in de catalogus.
+
 ## [1.4.0] — 2026-07-13
 
 Verrijking van de bibliotheekcatalogus met ISBN, uitgavejaar en de juiste
