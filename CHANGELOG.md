@@ -9,6 +9,19 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.6.0] — 2026-07-13
+
+- **Publieke zoekpagina voor de bibliotheek-PC** (`/bibliotheek-zoeken`): zonder
+  login kan een student opzoeken of een boek er is, in welke taal, op welk rek het
+  ligt en of het beschikbaar is. Alleen GET, alleen bibliografische gegevens — geen
+  leners, geen uitleenhistorie, geen interne opmerkingen. Met een verzoeklimiet.
+- **Netwerkbeperking nu daadwerkelijk afgedwongen.** `SIS_TOEGESTANE_IPS` stond al
+  in de configuratie, maar er was geen middleware die er iets mee deed: het systeem
+  was in de praktijk vanaf elk netwerk bereikbaar. De nieuwe middleware
+  `IpBeperking` controleert elk verzoek — ook het inlogscherm en de publieke
+  bibliotheekpagina. Leeg gelaten = geen filter (lokale ontwikkeling); op de RDP en
+  Plesk hoort het intranetbereik ingevuld te zijn.
+
 ## [1.5.0] — 2026-07-13
 
 - **Bibliotheek IUASR**: de catalogus als **alleen-lezen** raadpleegscherm voor

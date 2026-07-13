@@ -49,6 +49,25 @@ Route::post('/logout', [DevLoginController::class, 'destroy'])->name('logout');
 // Publieke echtheidscontrole van ondertekende documenten (geen login vereist).
 Route::match(['get', 'post'], '/verificatie', [OndertekeningController::class, 'verificatie'])->name('verificatie');
 
+/*
+|--------------------------------------------------------------------------
+| Publieke bibliotheekcatalogus — de PC in de bibliotheek
+|--------------------------------------------------------------------------
+| Zonder login: een student zoekt zelf op of een boek er is en waar het ligt.
+| Uitsluitend bibliografische gegevens (titel, auteur, taal, jaar, ISBN, rek,
+| beschikbaarheid) — geen persoonsgegevens, geen leners, geen uitleenhistorie,
+| geen interne opmerkingen, en alleen GET.
+|
+| Beveiliging: de netwerkbeperking (SIS_TOEGESTANE_IPS) geldt ook hier, plus een
+| verzoeklimiet tegen het leegtrekken van de catalogus.
+|
+| LET OP: de URI /bibliotheek is al in gebruik door het moduledashboard (binnen
+| de auth-groep) en zou deze route overschrijven. Vandaar /bibliotheek-zoeken.
+*/
+Route::get('/bibliotheek-zoeken', [App\Http\Controllers\Bibliotheek\PubliekeCatalogusController::class, 'index'])
+    ->middleware('throttle:60,1')
+    ->name('catalogus.publiek');
+
 Route::middleware('auth')->group(function () {
 
     // Keuzescherm na de login: welke module wil de gebruiker gebruiken?

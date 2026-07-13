@@ -22,6 +22,14 @@ return Application::configure(basePath: dirname(__DIR__))
             Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO
         );
 
+        // Netwerkbeperking: het systeem draait intern en is IP-beperkt (PvA).
+        // Leeg gelaten lijst = geen filter (lokale ontwikkeling); op test en
+        // productie hoort SIS_TOEGESTANE_IPS gevuld te zijn. Staat vóór de
+        // authenticatie: wie niet op het netwerk hoort, ziet niet eens een login.
+        $middleware->web(prepend: [
+            \App\Http\Middleware\IpBeperking::class,
+        ]);
+
         // Rolscheiding wordt server-side afgedwongen. Registreer de alias
         // zodat routes kunnen worden vergrendeld met ->middleware('rol:docent').
         $middleware->alias([
