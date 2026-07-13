@@ -1,5 +1,5 @@
 # ==========================================================================
-# IUASR SIS — .gitignore
+# IUASR Management Systeem — .gitignore
 # HARDE REGEL: er komt NOOIT een productiedatabase of echte persoonsgegevens
 # in deze repo, in geen enkele fase. Zie PROGRESS.md (AVG-grenzen).
 # ==========================================================================

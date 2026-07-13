@@ -1,6 +1,6 @@
 # /docs — Ontwerp- en projectdocumentatie
 
-Deze map bevat de ontwerpdocumentatie van het SIS: functioneel ontwerp (FO),
+Deze map bevat de ontwerpdocumentatie van het managementsysteem: functioneel ontwerp (FO),
 technisch ontwerp (TO), datamodel, rolmodel, autorisatiematrix en AVG-stukken
 (o.a. DPIA-opzet).
 

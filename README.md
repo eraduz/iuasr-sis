@@ -1,8 +1,10 @@
-# IUASR — Intern Studentbeheersysteem (SIS)
+# IUASR Management Systeem
 
-Intern studentbeheersysteem voor Studentenzaken van IUASR. Vervangt een
-verouderd Access/VBA-systeem. Draait op het interne netwerk (intranet),
-strikt gescheiden van het publieke aanmeldportaal.
+Intern managementsysteem van IUASR. Begonnen als studentbeheersysteem voor
+Studentenzaken (ter vervanging van een verouderd Access/VBA-systeem) en
+uitgegroeid tot een platform met meerdere modules: Studentenzaken, Cursussen
+Administratie, Relatiebeheer & Stage en HR / Personeelszaken. Draait op het
+interne netwerk (intranet), strikt gescheiden van het publieke aanmeldportaal.
 
 ## Stack
 

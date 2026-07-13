@@ -1,6 +1,6 @@
 # Module HR / Personeelszaken — Functioneel & Technisch Ontwerp
 
-Interne SIS-module van IUASR voor personeelsadministratie: medewerkersregistratie,
+Interne module van het IUASR Management Systeem voor personeelsadministratie: medewerkersregistratie,
 dienstverband en FTE, verlof & verzuim (met self-service), gespreks- en
 performancecyclus, organisatiestructuur, onboarding/offboarding en HR-rapportages.
 
@@ -25,7 +25,7 @@ zodra Fase A is opgeleverd.
 
 ### 0.2 Meertaligheid (NL/EN)
 
-De prompt vraagt NL/EN. Het hele SIS is **Nederlandstalig** (CLAUDE.md: UI en
+De prompt vraagt NL/EN. Het hele systeem is **Nederlandstalig** (CLAUDE.md: UI en
 documentatie in het Nederlands, U-vorm). We bouwen daarom **NL** en houden Engels
 als latere uitbreiding (i18n) buiten de MVP. Dit is een bewuste afwijking van de
 prompt, om consistent te blijven met het platform.

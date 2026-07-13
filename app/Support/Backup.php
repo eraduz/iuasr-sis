@@ -110,8 +110,8 @@ class Backup
         $door = auth()->user()?->naam ?? 'onbekend';
 
         return <<<TXT
-        IUASR SIS — Recovery-backup
-        ============================
+        IUASR Management Systeem — Recovery-backup
+        ==========================================
         Gegenereerd : {$datum}
         Door        : {$door}
 

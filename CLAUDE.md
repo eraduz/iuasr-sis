@@ -1,10 +1,15 @@
-# CLAUDE.md — IUASR Intern Studentbeheersysteem (SIS)
+# CLAUDE.md — IUASR Management Systeem
 
 ## Wat dit is
-Intern studentbeheersysteem voor Studentenzaken van IUASR. Vervangt een
-verouderd Access/VBA-systeem. Draait op het interne netwerk (intranet),
-strikt gescheiden van het publieke aanmeldportaal. Zie
-`IUASR-Plan-van-Aanpak.docx` voor het volledige ontwerp.
+Intern managementsysteem van IUASR. Begonnen als studentbeheersysteem voor
+Studentenzaken (ter vervanging van een verouderd Access/VBA-systeem) en
+uitgegroeid tot een platform met meerdere modules (Studentenzaken, Cursussen
+Administratie, Relatiebeheer & Stage, HR / Personeelszaken). Draait op het
+interne netwerk (intranet), strikt gescheiden van het publieke aanmeldportaal.
+Zie `IUASR-Plan-van-Aanpak.docx` voor het oorspronkelijke ontwerp. De naam SIS
+(Studentbeheersysteem) is verlaten omdat het systeem inmiddels meer dan
+studentbeheer omvat; technische tokens (`config/sis.php`, `sis.css`,
+CSS-klassen `sis-*`, env-keys `SIS_*`) blijven ongewijzigd.
 
 ## Stack (vastgelegd)
 - PHP + **Laravel** (geen kale PHP, geen WordPress)

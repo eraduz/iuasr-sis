@@ -16,7 +16,7 @@ class DatabaseDump
     {
         $pdo = DB::getPdo();
 
-        fwrite($handle, "-- IUASR SIS databasedump\n");
+        fwrite($handle, "-- IUASR Management Systeem databasedump\n");
         fwrite($handle, '-- Gegenereerd: '.now()->toDateTimeString()."\n");
         fwrite($handle, "SET NAMES utf8mb4;\nSET FOREIGN_KEY_CHECKS=0;\n\n");
 

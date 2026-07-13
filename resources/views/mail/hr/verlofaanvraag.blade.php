@@ -14,7 +14,7 @@
     @if ($reden)<tr><td style="padding:2px 12px 2px 0; color:#666;">Toelichting</td><td>{{ $reden }}</td></tr>@endif
   </table>
 
-  <p>Log in op het SIS om de aanvraag te beoordelen (Personeelszaken &rarr; Verlof).</p>
+  <p>Log in op het systeem om de aanvraag te beoordelen (Personeelszaken &rarr; Verlof).</p>
 
   <p>Met vriendelijke groet,<br>
     IUASR — HR / Personeelszaken (automatisch bericht)</p>

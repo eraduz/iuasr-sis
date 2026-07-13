@@ -234,6 +234,16 @@ class User extends Authenticatable
         return $this->magVolgensRol(fn (Rol $r) => $r->magInschrijvingBeheren());
     }
 
+    public function magVervroegdAfstuderenVrijgeven(): bool
+    {
+        return $this->magVolgensRol(fn (Rol $r) => $r->magVervroegdAfstuderenVrijgeven());
+    }
+
+    public function magExamencommissieNotities(): bool
+    {
+        return $this->magVolgensRol(fn (Rol $r) => $r->magExamencommissieNotities());
+    }
+
     public function magBsnInzien(): bool
     {
         return $this->magVolgensRol(fn (Rol $r) => $r->magBsnInzien());

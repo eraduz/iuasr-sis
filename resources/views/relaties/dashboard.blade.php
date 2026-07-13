@@ -4,7 +4,16 @@
 
 @section('inhoud')
 <div class="iuasr-dash-vhead">
-  <div><h1>Relatiebeheer &amp; Stage</h1><div class="summary">Overzicht van uw relaties, stages en signaleringen</div></div>
+  <div>
+    <h1>Relatiebeheer &amp; Stage</h1>
+    <div class="summary">Overzicht van uw relaties, stages en signaleringen</div>
+    @php $mijnOpleidingen = auth()->user()->opleidingen->sortBy('code'); @endphp
+    @if ($mijnOpleidingen->isNotEmpty())
+      <div style="margin-top:6px;">
+        <span class="sis-pill-soft" title="Uw opleiding(en) binnen relatiebeheer &amp; stage">Opleiding: <b>{{ $mijnOpleidingen->pluck('naam')->implode(' · ') }}</b></span>
+      </div>
+    @endif
+  </div>
   <div class="iuasr-dash-vhead__actions" style="display:flex; gap:8px;">
     <a class="iuasr-dash-btn" href="{{ route('relaties') }}">Organisaties</a>
     <a class="iuasr-dash-btn" href="{{ route('stages') }}">Stages</a>

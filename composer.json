@@ -2,7 +2,7 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "iuasr/sis",
     "type": "project",
-    "description": "IUASR Intern Studentbeheersysteem (SIS) — Studentenzaken. Intern, AVG-conform, rolgescheiden.",
+    "description": "IUASR Management Systeem — intern platform van IUASR (studentbeheer, cursussen, relatiebeheer & stage, HR). Intern, AVG-conform, rolgescheiden.",
     "keywords": ["iuasr", "sis", "studentbeheer", "laravel"],
     "license": "proprietary",
     "require": {

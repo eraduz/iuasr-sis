@@ -1,6 +1,6 @@
 # Module Relatiebeheer & Stagebeheer — Functioneel & Technisch Ontwerp
 
-Interne SIS-module van IUASR voor het beheren van externe relaties (stagescholen,
+Interne module van het IUASR Management Systeem voor het beheren van externe relaties (stagescholen,
 werkveldorganisaties, samenwerkingspartners), hun contactpersonen, de contactmomenten,
 de stage-/werkveldplaatsen en de plaatsing van studenten daarop, inclusief documenten,
 overeenkomsten, taken, agenda, historie en rapportages.
@@ -87,7 +87,7 @@ Backoffice. Conform de projectlijn (zoals bij de module Cursussen) breiden we de
 `Rol`-enum uit in plaats van RBAC te herbouwen, en hergebruiken we bestaande rollen waar
 mogelijk.
 
-| Voorgestelde rol in SIS | Herkomst | Rechten in deze module |
+| Voorgestelde rol in het systeem | Herkomst | Rechten in deze module |
 |---|---|---|
 | **Relatiebeheerder** (nieuw) | — | Organisaties, contactpersonen, contactmomenten, documenten, notities beheren binnen eigen opleiding(en). |
 | **Stagecoördinator** (nieuw) | — | Alles van Relatiebeheerder + stageplaatsen en plaatsingen beheren, matching, stagestatus, agenda stagebezoeken. |

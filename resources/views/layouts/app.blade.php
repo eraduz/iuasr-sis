@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>@yield('titel', 'IUASR SIS') — IUASR SIS</title>
+<title>@yield('titel', 'IUASR Management Systeem') — IUASR Management Systeem</title>
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,8 +12,9 @@
 <link rel="stylesheet" href="{{ asset('assets/css/sis.css') }}?v={{ filemtime(public_path('assets/css/sis.css')) }}">
 <link rel="stylesheet" href="{{ asset('assets/css/iuasr-plugin-dash.css') }}?v={{ filemtime(public_path('assets/css/iuasr-plugin-dash.css')) }}">
 <link rel="stylesheet" href="{{ asset('assets/css/sis-theme.css') }}?v={{ filemtime(public_path('assets/css/sis-theme.css')) }}">
-{{-- Thema (licht/donker) direct toepassen om een 'flash' te voorkomen. --}}
-<script>try{var t=localStorage.getItem('sis-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+{{-- Thema direct toepassen om een 'flash' te voorkomen. Donker is de STANDAARD
+     (energiezuiniger); alleen wie bewust 'licht' koos, krijgt licht. --}}
+<script>try{var t=localStorage.getItem('sis-theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}</script>
 @stack('head')
 </head>
 <body data-role="{{ auth()->user()?->rol?->value }}">
@@ -42,6 +43,11 @@
     @endif
 
     @yield('inhoud')
+
+    <footer class="sis-appfoot" style="margin-top:28px; padding:14px 2px; border-top:1px solid var(--borderColor); color:var(--blackAltText); font-size:12px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+      <span>IUASR Management Systeem</span>
+      <span>versie {{ config('sis.versie') }}</span>
+    </footer>
   </main>
 </div>
 

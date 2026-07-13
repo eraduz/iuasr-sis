@@ -21,6 +21,11 @@ class KortingController extends Controller
     {
         abort_unless($request->user()->magCollegegeldBeheren(), 403);
 
+        // Een afgestudeerde inschrijving is afgerond en bevroren: geen korting meer.
+        if ($inschrijving->isAfgestudeerd()) {
+            return back()->with('status', 'De opleiding is afgerond (afgestudeerd); de korting kan niet meer worden gewijzigd.');
+        }
+
         $data = $request->validate([
             'korting_percentage' => ['required', 'numeric', 'min:0', 'max:100'],
             'korting_reden' => ['nullable', 'string', 'max:120', 'required_unless:korting_percentage,0'],

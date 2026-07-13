@@ -7,6 +7,7 @@ use App\Enums\InschrijvingStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Inschrijving — de lifecycle per periode/leerjaar. Eén student kan meerdere
@@ -31,6 +32,7 @@ class Inschrijving extends Model
         'invoerdatum',
         'uitschrijfdatum',
         'afstudeerdatum',
+        'vervroegd_afstuderen', // examencommissie: afstuderen vrijgegeven buiten laatste leerjaar
         'betaalwijze',         // VERVALLEN: mengde regeling en betaalwijze; zie betaalregeling
         'betaalregeling',      // termijnen (5 facturen) | volledig (1 factuur)
         'korting_percentage',  // korting op het jaartarief van DEZE opleiding
@@ -46,12 +48,55 @@ class Inschrijving extends Model
             'betaalregeling' => Betaalregeling::class,
             'korting_percentage' => 'float',
             'aanwezigheidsregeling_50' => 'boolean',
+            'vervroegd_afstuderen' => 'boolean',
             'leerjaar' => 'integer',
             'inschrijfdatum' => 'date',
             'invoerdatum' => 'date',
             'uitschrijfdatum' => 'date',
             'afstudeerdatum' => 'date',
         ];
+    }
+
+    /**
+     * Afgestudeerd = terminale eindstatus: de opleiding is afgerond. De
+     * inschrijving wordt daarmee bevroren (alleen-lezen historie) — geen korting,
+     * betaalregeling, aanwezigheidsregeling, vaktoewijziging, schorsen of
+     * uitschrijven meer. Zie de guards in de betreffende controllers.
+     */
+    public function isAfgestudeerd(): bool
+    {
+        return $this->status === InschrijvingStatus::Afgestudeerd;
+    }
+
+    /**
+     * Lopend = de student volgt de opleiding nú (actief of geschorst). Alleen dan
+     * zijn lifecycle-acties (schorsen, uitschrijven, afstuderen) zinvol.
+     */
+    public function isLopend(): bool
+    {
+        return in_array($this->status, [InschrijvingStatus::Actief, InschrijvingStatus::Geschorst], true);
+    }
+
+    /**
+     * Zit deze inschrijving in het LAATSTE leerjaar van de opleiding? Bepaald uit
+     * `opleidingen.nominale_jaren`. Is dat niet vastgelegd, dan is het laatste jaar
+     * onbekend en telt dit als false (afstuderen dan niet toegestaan).
+     */
+    public function isLaatsteLeerjaar(): bool
+    {
+        $nominaal = $this->opleiding?->nominale_jaren;
+
+        return $nominaal !== null && (int) $this->leerjaar === (int) $nominaal;
+    }
+
+    /**
+     * Afstuderen kan uitsluitend vanuit een lopende inschrijving, in het laatste
+     * leerjaar — OF eerder wanneer de examencommissie vervroegd afstuderen heeft
+     * vrijgegeven (zeldzaam: bij vrijstellingen/eerder behaalde EC).
+     */
+    public function magAfstuderen(): bool
+    {
+        return $this->isLopend() && ($this->isLaatsteLeerjaar() || (bool) $this->vervroegd_afstuderen);
     }
 
     public function student(): BelongsTo
@@ -92,5 +137,10 @@ class Inschrijving extends Model
     public function presenties(): HasMany
     {
         return $this->hasMany(Presentie::class);
+    }
+
+    public function afstudeerproces(): HasOne
+    {
+        return $this->hasOne(Afstudeerproces::class);
     }
 }

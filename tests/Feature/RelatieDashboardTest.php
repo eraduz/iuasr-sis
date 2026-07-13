@@ -48,6 +48,22 @@ class RelatieDashboardTest extends TestCase
             ->assertSee('Lopende stages');
     }
 
+    public function test_dashboard_toont_de_gekoppelde_opleiding(): void
+    {
+        // De relatiebeheerder (PABO) ziet zijn opleiding in de kop.
+        $paboNaam = $this->relatiebeheerder->opleidingen->first()->naam;
+        $this->actingAs($this->relatiebeheerder)->get(route('relatiebeheer.dashboard'))
+            ->assertOk()
+            ->assertSee('Opleiding:')
+            ->assertSee($paboNaam);
+
+        // De stagecoördinator (MGV) ziet de MGV-opleiding.
+        $mgvNaam = $this->stagecoordinator->opleidingen->first()->naam;
+        $this->actingAs($this->stagecoordinator)->get(route('relatiebeheer.dashboard'))
+            ->assertOk()
+            ->assertSee($mgvNaam);
+    }
+
     public function test_rapport_is_opleidinggebonden_gescoped(): void
     {
         // Relatiebeheerder is PABO: ziet de PABO-organisatie, niet de MGV-organisatie.

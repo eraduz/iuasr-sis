@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Webroutes — IUASR SIS
+| Webroutes — IUASR Management Systeem
 |--------------------------------------------------------------------------
 | Authenticatie: tijdelijk via dev-login (alleen lokaal), later Entra ID SSO.
 | Rolscheiding wordt server-side afgedwongen via de 'rol'-middleware en Gates.
@@ -326,7 +326,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/bestuur', [App\Http\Controllers\BestuurController::class, 'index'])->name('bestuur');
     });
 
-    // PDF-handleidingen: medewerkers (iedereen) en technisch/herstel (Beheerder).
+    // Handleiding: HTML-versie met hoofdstuknavigatie (iedereen), plus de PDF's:
+    // medewerkers (iedereen) en technisch/herstel (Beheerder/Bestuur).
+    Route::get('/help', [App\Http\Controllers\HandleidingController::class, 'web'])->name('handleiding.web');
     Route::get('/handleiding', [App\Http\Controllers\HandleidingController::class, 'medewerkers'])->name('handleiding.medewerkers');
     Route::get('/handleiding/technisch', [App\Http\Controllers\HandleidingController::class, 'technisch'])->name('handleiding.technisch');
 
@@ -354,6 +356,31 @@ Route::middleware('auth')->group(function () {
     // BSN-inzage NIET voor Schoolbestuur (extra gevoelig).
     Route::middleware('rol:studentenzaken,beheerder,examencommissie,directie')->group(function () {
         Route::get('/studenten/{student}/bsn', [StudentController::class, 'bsn'])->name('studenten.bsn');
+    });
+
+    // --- Vervroegd afstuderen VRIJGEVEN: uitsluitend de Examencommissie (+ Beheerder).
+    // Een academisch besluit bij vrijstellingen/eerder behaalde EC; Studentenzaken
+    // voert het afstuderen daarna administratief uit.
+    Route::middleware('rol:examencommissie,beheerder')->group(function () {
+        Route::post('/inschrijvingen/{inschrijving}/vervroegd-afstuderen', [App\Http\Controllers\VervroegdAfstuderenController::class, 'bijwerken'])->name('inschrijving.vervroegd-afstuderen');
+    });
+
+    // --- Afstudeerproces (examencommissie-gedreven, 5 stappen). Kandidatenlijst is
+    // inzage voor EC/SZ/Directie/Beheer; starten/afbreken doet de examencommissie;
+    // elke stap wordt STRIKT door de verantwoordelijke rol afgevinkt (controller).
+    Route::middleware('rol:examencommissie,studentenzaken,directie,beheerder')->group(function () {
+        Route::get('/afstuderen/kandidaten', [App\Http\Controllers\AfstudeerprocesController::class, 'kandidaten'])->name('afstuderen.kandidaten');
+    });
+    Route::middleware('rol:examencommissie,studentenzaken,beheerder')->group(function () {
+        Route::post('/afstudeerstappen/{stap}/afvinken', [App\Http\Controllers\AfstudeerprocesController::class, 'stapAfvinken'])->name('afstuderen.stap.afvinken');
+    });
+    Route::middleware('rol:examencommissie,beheerder')->group(function () {
+        Route::post('/inschrijvingen/{inschrijving}/afstudeerproces', [App\Http\Controllers\AfstudeerprocesController::class, 'start'])->name('afstuderen.proces.start');
+        Route::post('/afstudeerprocessen/{proces}/afbreken', [App\Http\Controllers\AfstudeerprocesController::class, 'afbreken'])->name('afstuderen.proces.afbreken');
+
+        // Eigen notities van de examencommissie per student (niet gedeeld met SZ/Directie/Bestuur).
+        Route::post('/studenten/{student}/ec-notities', [App\Http\Controllers\ExamencommissieNotitieController::class, 'store'])->name('studenten.ec-notities.store');
+        Route::delete('/studenten/{student}/ec-notities/{notitie}', [App\Http\Controllers\ExamencommissieNotitieController::class, 'destroy'])->name('studenten.ec-notities.destroy');
     });
 
     // --- Historisch studentdossier (gemigreerde cijfers): cijfer-bevoegde rollen
@@ -417,6 +444,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/uitschrijven', [InschrijvingActiesController::class, 'kiesUitschrijven'])->name('uitschrijven');
         Route::get('/studenten/{student}/uitschrijven', [InschrijvingActiesController::class, 'uitschrijvenForm'])->name('uitschrijven.form');
         Route::post('/studenten/{student}/uitschrijven', [InschrijvingActiesController::class, 'uitschrijven'])->name('uitschrijven.store');
+
+        // Afstuderen (terminale eindstatus → alumnus; alleen vanuit het laatste leerjaar)
+        Route::get('/studenten/{student}/afstuderen', [InschrijvingActiesController::class, 'afstuderenForm'])->name('afstuderen.form');
+        Route::post('/studenten/{student}/afstuderen', [InschrijvingActiesController::class, 'afstuderen'])->name('afstuderen.store');
 
         // Verklaringen (A4) — preview + ondertekende PDF genereren
         Route::get('/verklaringen', [VerklaringController::class, 'index'])->name('verklaringen');

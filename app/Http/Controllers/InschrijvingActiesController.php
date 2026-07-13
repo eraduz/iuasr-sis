@@ -34,16 +34,27 @@ class InschrijvingActiesController extends Controller
 
     public function kiesUitschrijven(Request $request): View
     {
-        return $this->kies($request, 'uitschrijven', 'Uitschrijven', 'uitschrijven.form');
+        // Alleen een student met een LOPENDE inschrijving (actief of geschorst) is
+        // uitschrijfbaar; zonder zo'n inschrijving geeft het formulier terecht een
+        // 404 ("Geen inschrijving om uit te schrijven"). Filter die studenten dus
+        // al uit de keuzelijst, zodat de knop nooit naar een 404 wijst.
+        return $this->kies($request, 'uitschrijven', 'Uitschrijven', 'uitschrijven.form',
+            fn ($q) => $q->whereHas('inschrijvingen', fn ($i) => $i->whereIn('status', [
+                InschrijvingStatus::Actief->value, InschrijvingStatus::Geschorst->value,
+            ])));
     }
 
-    private function kies(Request $request, string $sleutel, string $titel, string $doelRoute): View
+    private function kies(Request $request, string $sleutel, string $titel, string $doelRoute, ?\Closure $filter = null): View
     {
         $zoek = trim((string) $request->query('q', ''));
         $studenten = Student::query()
             ->with(['inschrijvingen' => fn ($q) => $q->latest('inschrijfdatum')->with('opleiding')])
-            ->when($zoek !== '', fn ($q) => $q->where('studentnummer', 'like', $zoek.'%')
-                ->orWhere('achternaam', 'like', '%'.$zoek.'%'))
+            ->when($filter !== null, $filter)
+            // De zoekvoorwaarden worden gegroepeerd, zodat het OR nooit buiten een
+            // eventueel statusfilter lekt (anders zou het filter worden omzeild).
+            ->when($zoek !== '', fn ($q) => $q->where(fn ($w) => $w
+                ->where('studentnummer', 'like', $zoek.'%')
+                ->orWhere('achternaam', 'like', '%'.$zoek.'%')))
             ->orderBy('studentnummer')
             ->paginate(15)
             ->withQueryString();
@@ -56,7 +67,9 @@ class InschrijvingActiesController extends Controller
     public function uitschrijvenForm(Student $student): View
     {
         $huidige = $this->huidige($student);
-        abort_if($huidige === null, 404, 'Geen inschrijving om uit te schrijven.');
+        // Alleen een lopende inschrijving (actief/geschorst) kan worden uitgeschreven;
+        // een afgestudeerde of al uitgeschreven inschrijving is een eindstatus.
+        abort_unless($huidige !== null && $huidige->isLopend(), 404, 'Geen lopende inschrijving om uit te schrijven.');
 
         // Financieel gevolg (pro rata) — voor live-berekening op het formulier.
         $jaarbedrag = \App\Support\Collegegeldstatus::tarief($huidige);
@@ -74,7 +87,7 @@ class InschrijvingActiesController extends Controller
     public function uitschrijven(Request $request, Student $student): RedirectResponse
     {
         $huidige = $this->huidige($student);
-        abort_if($huidige === null, 404);
+        abort_unless($huidige !== null && $huidige->isLopend(), 404);
 
         $data = $request->validate([
             'reden' => ['required', 'string', 'max:255'],
@@ -100,6 +113,63 @@ class InschrijvingActiesController extends Controller
 
         return redirect()->route('studenten.show', $student)
             ->with('status', 'Student uitgeschreven per '.\Illuminate\Support\Carbon::parse($uitschrijfdatum)->format('d-m-Y').'.');
+    }
+
+    // ---------------- Afstuderen (terminale eindstatus → alumnus) ----------------
+
+    public function afstuderenForm(Student $student): View
+    {
+        $kandidaten = $this->afstudeerbareInschrijvingen($student);
+        // Afstuderen kan alleen in het laatste leerjaar; is er geen kandidaat, dan
+        // hoort de knop hier niet en geven we 404.
+        abort_if($kandidaten->isEmpty(), 404, 'Geen inschrijving in het laatste leerjaar om af te studeren.');
+
+        return view('inschrijven.afstuderen', compact('student', 'kandidaten'));
+    }
+
+    public function afstuderen(Request $request, Student $student): RedirectResponse
+    {
+        $kandidaten = $this->afstudeerbareInschrijvingen($student);
+        abort_if($kandidaten->isEmpty(), 404);
+
+        $data = $request->validate([
+            'inschrijving_id' => ['required', Rule::in($kandidaten->pluck('id')->all())],
+            'afstudeerdatum' => ['required', 'date'],
+        ]);
+
+        $inschrijving = $kandidaten->firstWhere('id', (int) $data['inschrijving_id']);
+        // Dubbele server-side controle: uitsluitend een lopende inschrijving in het
+        // laatste leerjaar mag afstuderen (UI kan omzeild worden).
+        abort_unless($inschrijving && $inschrijving->magAfstuderen(), 422);
+
+        $inschrijving->update([
+            'status' => InschrijvingStatus::Afgestudeerd,
+            'afstudeerdatum' => $data['afstudeerdatum'],
+        ]);
+
+        AuditLogger::log(AuditLogger::WIJZIGING, $student, veld: 'afstuderen', context: [
+            'inschrijving_id' => $inschrijving->id,
+            'opleiding' => $inschrijving->opleiding?->code,
+            'leerjaar' => $inschrijving->leerjaar,
+            'afstudeerdatum' => $data['afstudeerdatum'],
+        ]);
+
+        return redirect()->route('studenten.show', $student)->with('status',
+            'Student afgestudeerd voor '.($inschrijving->opleiding?->naam ?? 'de opleiding')
+            .'. De student is nu alumnus; deze inschrijving is afgerond. Het studentnummer blijft behouden voor een eventuele nieuwe opleiding.');
+    }
+
+    /**
+     * Inschrijvingen waarvoor afstuderen mogelijk is: lopend (actief/geschorst) én
+     * in het laatste leerjaar van de opleiding (`opleidingen.nominale_jaren`).
+     *
+     * @return \Illuminate\Support\Collection<int, Inschrijving>
+     */
+    private function afstudeerbareInschrijvingen(Student $student): \Illuminate\Support\Collection
+    {
+        return $student->inschrijvingen()->with('opleiding', 'periode')->get()
+            ->filter(fn (Inschrijving $i) => $i->magAfstuderen())
+            ->values();
     }
 
     // ---------------- Schorsen (één klik, omkeerbaar) ----------------
@@ -182,6 +252,17 @@ class InschrijvingActiesController extends Controller
             ->where('opleiding_id', $data['opleiding_id'])->exists();
         if ($bestaatAl) {
             return back()->withInput()->with('fout', 'De student is voor dit studiejaar al ingeschreven voor deze opleiding.');
+        }
+
+        // Dezelfde studie niet opnieuw: is de student al AFGESTUDEERD voor deze
+        // opleiding, dan is die afgerond. Een ANDERE opleiding mag wel — een nieuwe
+        // registratie met hetzelfde studentnummer.
+        $alAfgestudeerd = Inschrijving::where('student_id', $student->id)
+            ->where('opleiding_id', $data['opleiding_id'])
+            ->where('status', InschrijvingStatus::Afgestudeerd->value)
+            ->exists();
+        if ($alAfgestudeerd) {
+            return back()->withInput()->with('fout', 'De student is al afgestudeerd voor deze opleiding en kan zich er niet opnieuw voor inschrijven. Kies een andere opleiding.');
         }
 
         // Nieuwe inschrijving; studentnummer en persoonsgegevens blijven gelijk.

@@ -4,7 +4,7 @@ use App\Enums\Rol;
 
 /*
 |--------------------------------------------------------------------------
-| IUASR SIS — instellingsspecifieke configuratie
+| IUASR Management Systeem — instellingsspecifieke configuratie
 |--------------------------------------------------------------------------
 |
 | Dit bestand bundelt de niet-onderhandelbare principes en de nog vast te
@@ -15,6 +15,16 @@ use App\Enums\Rol;
 */
 
 return [
+
+    /*
+    |----------------------------------------------------------------------
+    | Versie
+    |----------------------------------------------------------------------
+    | Softwareversie van het systeem (semantisch: MAJOR.MINOR.PATCH). Wordt
+    | onderaan elke pagina getoond zodat testers en beheer weten welke versie
+    | draait. Bijwerken bij elke release; houd de wijzigingen bij in CHANGELOG.md.
+    */
+    'versie' => '1.0.0',
 
     /*
     |----------------------------------------------------------------------
@@ -63,7 +73,7 @@ return [
     |--------------------------------------------------------------------------
     | E-mail — afdelings-CC
     |--------------------------------------------------------------------------
-    | Elke automatische SIS-e-mail krijgt een CC naar de postbus van de
+    | Elke automatische systeem-e-mail krijgt een CC naar de postbus van de
     | verantwoordelijke afdeling, zodat medewerkers zien welke berichten zijn
     | verstuurd. Per module: HR, Studentenzaken, Examencommissie.
     */
@@ -152,6 +162,22 @@ return [
         'overgang_drempel_terugval' => null,
         // Herbeoordelingsmomenten leerjaar (semesterstart): eind juli / midden januari.
         'herbeoordeling' => ['juli', 'januari'],
+    ],
+
+    /*
+    |----------------------------------------------------------------------
+    | Collegegeld — facturering & vervaldatum
+    |----------------------------------------------------------------------
+    | Het collegegeld wordt in termijnen gefactureerd (sep/nov/jan/mrt/mei).
+    | IUASR verstuurt de factuur op de FACTUURDAG van de vervalmaand en geeft de
+    | student daarna BETAALTERMIJN_DAGEN de tijd om te betalen. De vervaldatum van
+    | een termijn is dus factuurdag + betaaltermijn (BEVESTIGD 2026-07-12: 14 + 10
+    | = de 24e van de maand). Bepaalt wanneer een onbetaalde termijn 'achterstallig'
+    | wordt en dus de blokkades op herinschrijven/verklaringen aanstuurt.
+    */
+    'collegegeld' => [
+        'factuurdag' => (int) env('SIS_COLLEGEGELD_FACTUURDAG', 14),
+        'betaaltermijn_dagen' => (int) env('SIS_COLLEGEGELD_BETAALTERMIJN_DAGEN', 10),
     ],
 
     /*

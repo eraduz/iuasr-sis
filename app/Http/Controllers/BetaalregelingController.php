@@ -23,6 +23,11 @@ class BetaalregelingController extends Controller
     {
         abort_unless($request->user()->magCollegegeldBeheren(), 403);
 
+        // Een afgestudeerde inschrijving is afgerond en bevroren: geen betaalregeling meer.
+        if ($inschrijving->isAfgestudeerd()) {
+            return back()->with('status', 'De opleiding is afgerond (afgestudeerd); de betaalregeling kan niet meer worden gewijzigd.');
+        }
+
         $data = $request->validate([
             'betaalregeling' => ['required', new Enum(Betaalregeling::class)],
         ]);

@@ -77,6 +77,17 @@ class Student extends Model
         'rekeningnummer',
     ];
 
+    public function afstudeerprocessen(): HasMany
+    {
+        return $this->hasMany(Afstudeerproces::class);
+    }
+
+    /** Notities van de examencommissie (hun eigen werkaantekeningen); nieuwste eerst. */
+    public function examencommissieNotities(): HasMany
+    {
+        return $this->hasMany(ExamencommissieNotitie::class)->latest();
+    }
+
     public function inschrijvingen(): HasMany
     {
         return $this->hasMany(Inschrijving::class);
@@ -230,6 +241,34 @@ class Student extends Model
         return $this->actieveInschrijvingen()
             ->map(fn ($i) => $i->opleiding)
             ->filter()
+            ->values();
+    }
+
+    /**
+     * Alumnus: de student is van minstens één opleiding afgestudeerd. Afgeleid
+     * (geen kolom): blijft kloppen ook wanneer de student later een andere
+     * opleiding volgt met hetzelfde studentnummer.
+     */
+    public function isAlumnus(): bool
+    {
+        return $this->inschrijvingen
+            ->contains(fn ($i) => $i->status === \App\Enums\InschrijvingStatus::Afgestudeerd);
+    }
+
+    /**
+     * De opleidingen waarvan de student is afgestudeerd (voor informatie op het
+     * dossier; de inschrijvingen zelf blijven bewaard).
+     *
+     * @return \Illuminate\Support\Collection<int,\App\Models\Opleiding>
+     */
+    public function afgerondeOpleidingen(): \Illuminate\Support\Collection
+    {
+        return $this->inschrijvingen
+            ->where('status', \App\Enums\InschrijvingStatus::Afgestudeerd)
+            ->map(fn ($i) => $i->opleiding)
+            ->filter()
+            ->unique('id')
+            ->sortBy('naam')
             ->values();
     }
 
