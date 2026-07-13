@@ -9,6 +9,26 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.8.0] — 2026-07-13
+
+- **Tijdschriftinhoud geïmporteerd**: 9.397 artikelen in 571 uitgaven, uit twee
+  bronnen — het Engelse Excel-bestand (15.994 regels) en het Arabische
+  Word-bestand (4.926 alinea's). Per artikel: titel, auteur, pagina's en de
+  Arabische vertaling van de titel. Onder **Artikelen zoeken** vindt u een artikel
+  terug op titel, auteur, trefwoord of tijdschriftnaam.
+- Nieuw commando `bibliotheek:tijdschriften {bestand} [--proef] [--forceren]
+  [--overgeslagen=rapport.csv]`, dat zowel .xlsx als .docx leest en herhaalbaar is.
+- **Bij twijfel wordt er niets geraden.** Een artikel wordt alleen vastgelegd als
+  het tijdschrift én de uitgave bekend zijn; een auteur alleen als de naam
+  overtuigend een naam is. Regels die niet in de structuur passen worden
+  overgeslagen en gerapporteerd met regelnummer en reden.
+- **Niets gaat verloren**: de volledige oorspronkelijke bronregel blijft bij elk
+  artikel bewaard en is doorzoekbaar.
+- **ISBN-verrijking afgerond**: alle 4.393 Nederlandse, Engelse en Turkse titels
+  zijn bevraagd. 837 zekere correcties toegepast; **613 titels hebben nu een ISBN**
+  en 823 een uitgavejaar. 1.404 twijfelgevallen staan klaar onder Verrijking om met
+  de hand te beoordelen.
+
 ## [1.7.0] — 2026-07-13
 
 - **Publicatiesoort is nu een opzoektabel die u zelf beheert.** Boek, tijdschrift en
