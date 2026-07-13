@@ -5,10 +5,8 @@
 
     RewriteEngine On
 
-    # ── Toegang beperken tot toegestane IP's ──────────────────────────────────
-    # Apache ziet het echte bezoekers-IP in REMOTE_ADDR (mod_remoteip). Staat het
-    # er niet tussen -> 403. IP toevoegen? Regel aanvullen met |<ip> en push.
-    RewriteCond %{REMOTE_ADDR} !^(37\.251\.61\.41|24\.132\.214\.178|109\.36\.146\.250|178\.226\.112\.182|178\.230\.61\.75|62\.45\.104\.234|178\.230\.61\.122|178\.230\.1\.68)$
+    # ── TIJDELIJKE BLOKKEERTEST: alleen 1.1.1.1 toegestaan (verifieert 403) ─────
+    RewriteCond %{REMOTE_ADDR} !^(1\.1\.1\.1)$
     RewriteRule ^ - [F]
 
     # Behandel Authorization Header
