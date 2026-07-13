@@ -244,24 +244,41 @@
     // Module Bibliotheek — catalogus, tijdschriftartikelen, uitlenen en innemen.
     // De bibliotheekmedewerker beheert; het Schoolbestuur kijkt mee (alleen-lezen)
     // en ziet daarom de aanmaak- en uitleenknoppen niet.
+    // Vier onderwerpen in plaats van één lange lijst: waar je kijkt (Overzicht),
+    // waar de boeken staan (Collectie), wat er in en uit gaat (Uitlenen), wat je
+    // erover wilt weten (Rapportage), en het onderhoud (Beheer). Het Schoolbestuur
+    // kijkt alleen mee en ziet daarom geen aanmaak-, uitleen- of beheeritems.
     $biebMenu = [
-        'Bibliotheek' => [
+        'Overzicht' => [
             ['Overzicht', 'bibliotheek.dashboard', 'dash', 'bibliotheek.dashboard'],
+        ],
+        'Collectie' => [
             ['Catalogus', 'bibliotheek.publicaties', 'book', 'bibliotheek.publicaties,bibliotheek.publicaties.show,bibliotheek.publicaties.edit'],
             ['Boekreeksen', 'bibliotheek.reeksen', 'db', 'bibliotheek.reeksen,bibliotheek.reeksen.show,bibliotheek.reeksen.create'],
             ['Artikelen zoeken', 'bibliotheek.artikelen', 'search', 'bibliotheek.artikelen,bibliotheek.uitgaven.show'],
+        ],
+        'Uitlenen' => [
             ['Uitleningen', 'bibliotheek.uitleningen', 'cert', 'bibliotheek.uitleningen,bibliotheek.innemen,bibliotheek.lener'],
+        ],
+        'Rapportage' => [
             ['Rapportage', 'bibliotheek.rapport', 'report', 'bibliotheek.rapport'],
         ],
     ];
+
     if ($gebruiker->magBibliotheekBeheren()) {
-        $biebMenu['Bibliotheek'][] = ['Publicatie toevoegen', 'bibliotheek.publicaties.create', 'plus', 'bibliotheek.publicaties.create'];
-        $biebMenu['Bibliotheek'][] = ['Uitlenen', 'bibliotheek.uitlenen', 'taak', 'bibliotheek.uitlenen'];
-        $biebMenu['Bibliotheek'][] = ['Importeren', 'bibliotheek.import', 'db', 'bibliotheek.import'];
-        $biebMenu['Bibliotheek'][] = ['Verrijking (ISBN)', 'bibliotheek.verrijking', 'search', 'bibliotheek.verrijking'];
+        // De aanmaakknop hoort bij de collectie, de uitleenknop bij het uitlenen.
+        $biebMenu['Collectie'][] = ['Publicatie toevoegen', 'bibliotheek.publicaties.create', 'plus', 'bibliotheek.publicaties.create'];
+        $biebMenu['Uitlenen'][] = ['Boek uitlenen', 'bibliotheek.uitlenen', 'taak', 'bibliotheek.uitlenen'];
+
+        // Onderhoud: dit doe je zelden, dus onderaan en apart.
+        $biebMenu['Beheer'] = [
+            ['Importeren', 'bibliotheek.import', 'db', 'bibliotheek.import'],
+            ['Verrijking (ISBN)', 'bibliotheek.verrijking', 'search', 'bibliotheek.verrijking'],
+        ];
     }
+
     if ($gebruiker->magBibliotheekSjablonenBeheren()) {
-        $biebMenu['Bibliotheek'][] = ['E-mailsjablonen', 'bibliotheek.sjablonen', 'log', 'bibliotheek.sjablonen'];
+        $biebMenu['Beheer'][] = ['E-mailsjablonen', 'bibliotheek.sjablonen', 'log', 'bibliotheek.sjablonen'];
     }
 
     // Standaardmenu buiten een module. Bij multi-rol worden de menu's van álle
@@ -363,9 +380,11 @@
         'Relatiebeheer',
         'HR / Personeelszaken',
         'Balie / Receptie',
-        'Bibliotheek',
+        // Binnen de bibliotheekmodule: eerst waar de boeken staan, dan wat er
+        // in en uit gaat.
+        'Collectie', 'Uitlenen',
         'Financieel', 'Financiën', 'Boekhouding',
-        'Documenten', 'Rapporten', 'Rapportages',
+        'Documenten', 'Rapporten', 'Rapportage', 'Rapportages',
         'Bibliotheek IUASR',
         'Zelfservice',
         'Handleidingen',

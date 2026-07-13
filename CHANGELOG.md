@@ -9,6 +9,15 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.6.2] — 2026-07-13
+
+- **Zijbalk van de bibliotheekmodule opgesplitst per onderwerp.** Stond als één
+  lijst van negen items onder het kopje "Bibliotheek". Nu: **Overzicht**,
+  **Collectie** (catalogus, boekreeksen, artikelen zoeken, publicatie toevoegen),
+  **Uitlenen** (uitleningen, boek uitlenen), **Rapportage**, en **Beheer**
+  (importeren, verrijking, e-mailsjablonen) — het onderhoud onderaan, niet tussen
+  het dagelijks werk.
+
 ## [1.6.1] — 2026-07-13
 
 - **Zijbalk geordend op onderwerp.** De menugroepen stonden in de volgorde waarin

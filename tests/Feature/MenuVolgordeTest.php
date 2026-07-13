@@ -36,6 +36,29 @@ class MenuVolgordeTest extends TestCase
             ]);
     }
 
+    public function test_de_bibliotheekmodule_heeft_een_menu_per_onderwerp(): void
+    {
+        $bieb = User::create([
+            'naam' => 'Test bibliotheek',
+            'email' => 'bieb@iuasr.test',
+            'rol' => Rol::Bibliotheek,
+        ]);
+
+        // Niet één lange lijst, maar groepen op onderwerp — en het onderhoud
+        // (Beheer: importeren, verrijking) staat onderaan, niet tussen het werk.
+        $this->actingAs($bieb)->get(route('bibliotheek.dashboard'))
+            ->assertOk()
+            ->assertSeeInOrder([
+                'Overzicht',
+                'Collectie',
+                'Catalogus',
+                'Uitlenen',
+                'Rapportage',
+                'Beheer',
+                'Importeren',
+            ]);
+    }
+
     public function test_bij_multi_rol_worden_de_groepen_ook_geordend(): void
     {
         $gebruiker = User::create([
