@@ -75,6 +75,12 @@ class Publicatie extends Model
             ->orderByDesc('jaar')->orderByDesc('publicatiedatum')->orderByDesc('id');
     }
 
+    /** Wat een externe bibliografische bron over deze titel zei (ISBN, jaar, schrijfwijze). */
+    public function verrijkingen(): HasMany
+    {
+        return $this->hasMany(Verrijking::class, 'publicatie_id');
+    }
+
     /* --------------------------------------------------------------------
      | Autorisatie
      |------------------------------------------------------------------- */

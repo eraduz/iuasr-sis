@@ -24,7 +24,7 @@ return [
     | onderaan elke pagina getoond zodat testers en beheer weten welke versie
     | draait. Bijwerken bij elke release; houd de wijzigingen bij in CHANGELOG.md.
     */
-    'versie' => '1.3.0',
+    'versie' => '1.4.0',
 
     /*
     |----------------------------------------------------------------------
@@ -106,6 +106,33 @@ return [
     | Studentenzaken-dashboard. Zie PROGRESS.md, openstaande parameters.
     */
     'bibliotheek' => [
+        /*
+        | Verrijking van de catalogus met een externe bibliografische bron:
+        | ISBN, uitgavejaar en de juiste schrijfwijze van de titel.
+        |
+        | Uitgaand verkeer gaat UITSLUITEND naar de host hieronder (whitelist,
+        | net als bij het onderwijsnieuws); SSL-verificatie blijft altijd aan.
+        | Open Library vereist geen sleutel. Google Books geeft zonder API-sleutel
+        | meteen HTTP 429 (getest) en is daarom niet de standaard.
+        |
+        | Alleen voor Nederlandse, Engelse en Turkse titels (keuze opdrachtgever):
+        | Arabische titels staan in de bron door elkaar in transliteratie en in
+        | Arabisch schrift, en worden door deze bronnen slecht gedekt.
+        |
+        | ZEKERHEID BOVEN VOLLEDIGHEID: er wordt alleen iets gewijzigd bij een
+        | zekere match (titelgelijkenis >= 92% én overeenkomende auteur).
+        */
+        'verrijking' => [
+            'bron' => env('SIS_BIEB_VERRIJKING_BRON', 'openlibrary'),
+            'host' => env('SIS_BIEB_VERRIJKING_HOST', 'openlibrary.org'),
+            'timeout' => (int) env('SIS_BIEB_VERRIJKING_TIMEOUT', 20),
+            // Pauze tussen twee verzoeken (milliseconden) — beleefd tegen de bron.
+            'pauze_ms' => (int) env('SIS_BIEB_VERRIJKING_PAUZE_MS', 400),
+            // Eigen CA-bundel als de server er geen in php.ini heeft; valt terug op
+            // die van het nieuws. SSL-verificatie blijft altijd AAN.
+            'cacert' => env('SIS_BIEB_VERRIJKING_CACERT'),
+        ],
+
         'uitleentermijn_student_dagen' => (int) env('SIS_BIEB_TERMIJN_STUDENT', 21),
         'uitleentermijn_docent_dagen' => (int) env('SIS_BIEB_TERMIJN_DOCENT', 60),
         'herinnering_dagen_vooraf' => (int) env('SIS_BIEB_HERINNERING_DAGEN', 3),

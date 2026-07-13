@@ -9,6 +9,25 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.4.0] — 2026-07-13
+
+Verrijking van de bibliotheekcatalogus met ISBN, uitgavejaar en de juiste
+schrijfwijze van de titel, via Open Library.
+
+- **Alleen Nederlands, Engels en Turks** (keuze opdrachtgever). Arabische titels
+  staan in de bron door elkaar in Arabisch schrift en transliteratie en worden door
+  deze bronnen slecht gedekt; daar zou corrigeren neerkomen op gokken.
+- **Zekerheid boven volledigheid** ("skip als je onzeker bent"): er wordt alleen
+  iets gewijzigd bij een titelgelijkenis van minstens 92% én een overeenkomende
+  auteur. Twijfelgevallen worden vastgelegd als *onzeker* en NIET toegepast; die
+  lijst loopt een mens na via het scherm **Verrijking**, met Overnemen of Afwijzen.
+- Een bestaand ISBN wordt nooit overschreven; de oude titel blijft bewaard en elke
+  wijziging wordt gelogd (oud → nieuw), dus alles is terug te draaien.
+- Commando `bibliotheek:verrijken --limiet=N [--proef]`, herhaalbaar: een al
+  bevraagde titel wordt niet opnieuw bevraagd.
+- Uitgaand verkeer alleen naar de whitelist-host; SSL-verificatie blijft aan.
+- Gemeten opbrengst op deze collectie: ongeveer 15% zekere treffers.
+
 ## [1.3.0] — 2026-07-13
 
 Import van de bestaande Excel-bibliotheek, en zelf-filterende filterbalken.

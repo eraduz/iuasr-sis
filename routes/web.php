@@ -667,6 +667,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/import/proef', [App\Http\Controllers\Bibliotheek\ImportController::class, 'proef'])->name('bibliotheek.import.proef');
         Route::post('/import/uitvoeren', [App\Http\Controllers\Bibliotheek\ImportController::class, 'importeer'])->name('bibliotheek.import.uitvoeren');
 
+        // Verrijking met een externe bibliografische bron (ISBN, jaar, schrijfwijze)
+        Route::get('/verrijking', [App\Http\Controllers\Bibliotheek\VerrijkingController::class, 'index'])->name('bibliotheek.verrijking');
+        Route::put('/verrijking/{verrijking}/overnemen', [App\Http\Controllers\Bibliotheek\VerrijkingController::class, 'overnemen'])->name('bibliotheek.verrijking.overnemen');
+        Route::put('/verrijking/{verrijking}/afwijzen', [App\Http\Controllers\Bibliotheek\VerrijkingController::class, 'afwijzen'])->name('bibliotheek.verrijking.afwijzen');
+
         // Uitlenen en innemen
         Route::get('/uitlenen', [App\Http\Controllers\Bibliotheek\UitleningController::class, 'create'])->name('bibliotheek.uitlenen');
         Route::post('/uitlenen', [App\Http\Controllers\Bibliotheek\UitleningController::class, 'store'])->name('bibliotheek.uitlenen.store');
