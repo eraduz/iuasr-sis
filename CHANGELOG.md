@@ -9,6 +9,24 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.0.1] — 2026-07-13
+
+Configuratie per omgeving rechtgezet. Gedeelde instellingen staan nu in Git in
+plaats van in `.env`, zodat een nieuwe omgeving (RDP, Plesk) ze met `git pull`
+krijgt en niet meer per machine kan afwijken.
+
+- **Tijdzone hersteld naar Europe/Amsterdam.** Laravel 12 legt `timezone` hard op
+  `UTC` vast zolang er geen eigen `config/app.php` is; `APP_TIMEZONE` in `.env`
+  werd daardoor genegeerd en de hele applicatie rekende in UTC. `config/app.php`
+  is toegevoegd (tijdzone, taal `nl`, faker `nl_NL`).
+- **Sessies worden nu versleuteld.** De framework-standaard `SESSION_ENCRYPT=false`
+  won van de bedoelde instelling. `config/session.php` legt `encrypt` op `true`
+  vast; `secure` blijft per omgeving instelbaar (https → `true`).
+- **`.env.example` teruggebracht** tot uitsluitend machine-specifieke sleutels
+  (URL, database, debug, cookie, IP-bereik, e-mail) plus de gedeelde `APP_KEY`.
+  De dode sleutel `SIS_STUDENTNUMMER_CIJFERS` is vervangen door
+  `SIS_STUDENTNUMMER_VOLGNUMMER_LENGTE`, die de code daadwerkelijk leest.
+
 ## [1.0.0] — 2026-07-13
 
 Eerste vastgelegde versie. Het systeem is uitgegroeid van een studentbeheersysteem

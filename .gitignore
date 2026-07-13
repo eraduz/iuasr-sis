@@ -30,6 +30,9 @@ IUTSTD-*.mdb
 .netrc
 auth.json
 secrets.*
+# Uitgeschreven .env-inhoud per omgeving (bevat de APP_KEY)
+rdp_env.md
+plesk_env.md
 
 # --- Mappen met echte of gevoelige data -----------------------------------
 /data-echt/
