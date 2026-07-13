@@ -347,6 +347,39 @@
             ['Mijn verlof', 'verlof.mijn', 'taak', 'verlof.mijn,verlof.create'],
         ];
     }
+
+    // VASTE VOLGORDE VAN DE GROEPEN, op onderwerp. Zonder deze sortering hangt de
+    // volgorde af van de toevalligheid waarmee de menu's zijn samengevoegd (bij
+    // multi-rol) en van de plek waar een groep later is bijgeplakt — dat leest
+    // rommelig. De volgorde loopt van het dagelijks werk naar het bijwerk:
+    // overzicht → de eigen administratie → geld → documenten & rapportage →
+    // gedeelde voorzieningen (bibliotheek, zelfservice) → hulp en beheer.
+    // Een groep die hier niet in staat, komt achteraan op alfabet — nooit
+    // verstopt, wel zichtbaar dat hij nog geen plek heeft gekregen.
+    $groepsvolgorde = [
+        'Overzicht',
+        'Studenten', 'Onderwijs', 'Cijfers', 'Afstuderen',
+        'Cursussen', 'Cursisten',
+        'Relatiebeheer',
+        'HR / Personeelszaken',
+        'Balie / Receptie',
+        'Bibliotheek',
+        'Financieel', 'Financiën', 'Boekhouding',
+        'Documenten', 'Rapporten', 'Rapportages',
+        'Bibliotheek IUASR',
+        'Zelfservice',
+        'Handleidingen',
+        'Beheer',
+    ];
+
+    $menu = collect($menu)
+        ->sortBy(function ($items, $groep) use ($groepsvolgorde) {
+            $plek = array_search($groep, $groepsvolgorde, true);
+
+            // Onbekende groep: achteraan, alfabetisch onder elkaar.
+            return $plek === false ? [count($groepsvolgorde), $groep] : [$plek, ''];
+        })
+        ->all();
 @endphp
 
 @foreach ($menu as $titel => $items)

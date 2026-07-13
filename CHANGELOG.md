@@ -9,6 +9,15 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.6.1] — 2026-07-13
+
+- **Zijbalk geordend op onderwerp.** De menugroepen stonden in de volgorde waarin
+  ze toevallig waren samengevoegd (bij multi-rol) of later bijgeplakt. Nu één vaste
+  volgorde: overzicht → de eigen administratie → geld → documenten en rapportage →
+  gedeelde voorzieningen (Bibliotheek IUASR, Zelfservice) → hulp en beheer. Een
+  groep die nog geen plek heeft gekregen, komt achteraan op alfabet — zichtbaar,
+  niet verstopt.
+
 ## [1.6.0] — 2026-07-13
 
 - **Publieke zoekpagina voor de bibliotheek-PC** (`/bibliotheek-zoeken`): zonder
