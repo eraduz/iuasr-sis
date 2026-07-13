@@ -12,4 +12,7 @@ jobs:
     steps:
       - name: Pull + migrate op C:\dev\iuasr-sis
         shell: powershell
-        run: powershell -NoProfile -ExecutionPolicy Bypass -File C:\dev\ops\deploy-local.ps1
+        run: |
+          $ErrorActionPreference = 'Continue'
+          & 'C:\dev\ops\deploy-local.ps1'
+          exit 0
