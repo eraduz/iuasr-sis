@@ -1,0 +1,15 @@
+name: Deploy naar lokale server
+
+# Draait bij elke push naar main, op de self-hosted runner (deze machine).
+# GitHub stuurt de job binnen seconden naar de runner -> instant deploy.
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Pull + migrate op C:\dev\iuasr-sis
+        shell: powershell
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File C:\dev\ops\deploy-local.ps1
