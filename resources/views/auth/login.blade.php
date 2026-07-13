@@ -49,7 +49,7 @@
       <span>Dit systeem draait intern en is IP-beperkt. Uw rol volgt uit uw Entra-groep en bepaalt wat u mag zien en doen.</span>
     </div>
 
-    <div class="sis-login__foot">Islamic University of Applied Sciences Rotterdam</div>
+    <div class="sis-login__foot">Islamic University of Applied Sciences Rotterdam · test webhook</div>
   </div>
 </div>
 
