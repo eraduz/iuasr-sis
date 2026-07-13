@@ -228,6 +228,19 @@
         $hrMenu['HR / Personeelszaken'][] = ['Medewerker toevoegen', 'medewerkers.create', 'plus', 'medewerkers.create'];
     }
 
+    // Module Balie/Receptie — één logboek voor telefoon, bezoek en post. De Balie
+    // registreert; Directie en Bestuur kijken mee (alleen-lezen), en zien daarom
+    // de aanmaakknop niet.
+    $balieMenu = [
+        'Balie / Receptie' => [
+            ['Overzicht', 'balie.dashboard', 'dash', 'balie.dashboard'],
+            ['Logboek', 'balie', 'report', 'balie,balie.edit'],
+        ],
+    ];
+    if ($gebruiker->magBalieBeheren()) {
+        $balieMenu['Balie / Receptie'][] = ['Nieuwe registratie', 'balie.create', 'plus', 'balie.create'];
+    }
+
     // Standaardmenu buiten een module. Bij multi-rol worden de menu's van álle
     // rollen samengevoegd, zodat de gebruiker elk scherm bereikt waar hij recht op
     // heeft. Groepen worden op titel gecombineerd; dubbele items (zelfde route +
@@ -263,7 +276,7 @@
             $rolMenu = $menus[$r->value]
                 ?? (in_array($r, [Rol::Relatiebeheerder, Rol::Stagecoordinator], true)
                     ? $relatieMenu
-                    : ($r === Rol::Hrmedewerker ? $hrMenu : null));
+                    : ($r === Rol::Hrmedewerker ? $hrMenu : ($r === Rol::Balie ? $balieMenu : null)));
             if ($rolMenu !== null) {
                 $standaardMenu = $mergeMenu($standaardMenu, $rolMenu);
             }
@@ -280,11 +293,12 @@
     // rapportage van een andere module opent. Zo verschijnt er nooit een module-menu
     // met beheerlinks waarvoor het Bestuur geen rechten heeft (die 403 zouden geven),
     // en blijft de gebruiker in de vertrouwde Bestuur-context.
+    $inBaliemodule = request()->routeIs('balie') || request()->routeIs('balie.*');
     $menu = ($rol === Rol::Bestuur->value)
         ? $standaardMenu
         : ($inCursusmodule
             ? $cursusMenu
-            : ($inRelatiemodule ? $relatieMenu : ($inHrmodule ? $hrMenu : $standaardMenu)));
+            : ($inRelatiemodule ? $relatieMenu : ($inHrmodule ? $hrMenu : ($inBaliemodule ? $balieMenu : $standaardMenu))));
 
     // Zelfservice "Mijn HR" is er voor iedere gekoppelde medewerker, ook buiten de
     // HR-module (bv. een docent met een personeelsdossier). Voeg de groep toe aan

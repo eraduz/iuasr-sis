@@ -31,6 +31,9 @@ class DatabaseSeeder extends Seeder
             NieuwsbronSeeder::class,
             HrSeeder::class,
             HrDocentenSeeder::class,
+            // Module Balie/Receptie — draait ná de HR-seeders, want de registraties
+            // verwijzen naar medewerkers.
+            BalieSeeder::class,
             // Echte personeelslijst (lokaal, gitignored; no-op als het bestand ontbreekt).
             PersoneelSeeder::class,
         ]);

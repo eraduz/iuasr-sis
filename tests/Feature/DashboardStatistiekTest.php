@@ -65,9 +65,14 @@ class DashboardStatistiekTest extends TestCase
             } elseif ($rol->magModule('cursussen')) {
                 // Cursusadministratie wordt naar de Cursussen-module gestuurd.
                 $antwoord->assertRedirect(route('cursussen.dashboard'));
-            } else {
+            } elseif ($rol->magModule('relatiebeheer')) {
                 // Relatiebeheerder/Stagecoördinator naar het Relatiebeheer-dashboard.
                 $antwoord->assertRedirect(route('relatiebeheer.dashboard'));
+            } elseif ($rol->magModule('hr')) {
+                $antwoord->assertRedirect(route('hr.dashboard'));
+            } else {
+                // Balie/Receptie naar het balie-overzicht.
+                $antwoord->assertRedirect(route('balie.dashboard'));
             }
         }
     }

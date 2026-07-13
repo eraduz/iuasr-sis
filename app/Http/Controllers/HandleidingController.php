@@ -71,7 +71,8 @@ class HandleidingController extends Controller
             ['nr' => 11, 'titel' => 'Cursussen Administratie', 'rollen' => ['cursusadministratie']],
             ['nr' => 12, 'titel' => 'Relatiebeheer & Stage', 'rollen' => ['relatiebeheerder', 'stagecoordinator']],
             ['nr' => 13, 'titel' => 'HR / Personeelszaken', 'rollen' => ['hrmedewerker']],
-            ['nr' => 14, 'titel' => 'Vragen of problemen?', 'rollen' => []],
+            ['nr' => 14, 'titel' => 'Balie / Receptie', 'rollen' => ['balie']],
+            ['nr' => 15, 'titel' => 'Vragen of problemen?', 'rollen' => []],
         ];
     }
 }

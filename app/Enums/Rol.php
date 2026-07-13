@@ -37,6 +37,10 @@ enum Rol: string
     // personeelsadministratie én is tevens leidinggevende (manager). Bij IUASR zijn
     // dit dezelfde persoon; de rol ziet daarom alle medewerkers en keurt verlof goed.
     case Hrmedewerker = 'hrmedewerker';
+    // Module Balie/Receptie. Registreert de communicatie- en bezoekersstromen aan
+    // de ingang: telefoon (in/uit), bezoekers, en post (in/uit). Bewust een smalle
+    // rol: de baliemedewerker ziet geen studentdossiers, cijfers of personeelsdata.
+    case Balie = 'balie';
 
     /** Leesbare naam voor UI en documenten (Nederlands, U-vorm). */
     public function label(): string
@@ -53,6 +57,7 @@ enum Rol: string
             self::Relatiebeheerder => 'Relatiebeheerder',
             self::Stagecoordinator => 'Stagecoördinator',
             self::Hrmedewerker => 'HR-medewerker',
+            self::Balie => 'Balie / Receptie',
         };
     }
 
@@ -104,7 +109,7 @@ enum Rol: string
             self::Studentenzaken, self::Bestuur, self::Beheerder,
             self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
-            self::Hrmedewerker => false,
+            self::Hrmedewerker, self::Balie => false,
         };
     }
 
@@ -126,7 +131,7 @@ enum Rol: string
             self::Docent, self::Examencommissie, self::Directie, self::Bestuur,
             self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
-            self::Hrmedewerker => false,
+            self::Hrmedewerker, self::Balie => false,
         };
     }
 
@@ -174,7 +179,7 @@ enum Rol: string
             self::Studentenzaken, self::Financien, self::Beheerder,
             self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
-            self::Hrmedewerker => false,
+            self::Hrmedewerker, self::Balie => false,
         };
     }
 
@@ -190,7 +195,7 @@ enum Rol: string
             self::Directie, self::Bestuur, self::Beheerder => true,
             self::Financien, self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
-            self::Hrmedewerker => false,
+            self::Hrmedewerker, self::Balie => false,
         };
     }
 
@@ -251,14 +256,43 @@ enum Rol: string
             self::Relatiebeheerder, self::Stagecoordinator => ['relatiebeheer'],
             // Module HR / Personeelszaken: de HR-medewerker werkt uitsluitend daarbinnen.
             self::Hrmedewerker => ['hr'],
+            // Module Balie/Receptie: de baliemedewerker werkt uitsluitend daarbinnen.
+            self::Balie => ['balie'],
             // Het Schoolbestuur heeft brede inzage en ziet naast Studentenzaken ook
-            // de Cursussen-, Relatiebeheer- en HR-module (alleen-lezen).
-            self::Bestuur => ['studentenzaken', 'cursussen', 'relatiebeheer', 'hr'],
+            // de Cursussen-, Relatiebeheer-, HR- en Balie-module (alleen-lezen).
+            self::Bestuur => ['studentenzaken', 'cursussen', 'relatiebeheer', 'hr', 'balie'],
             // De Directie (opleidingsmanager) beheert haar opleiding, inclusief de
-            // relaties/stages van die opleiding (opleidinggebonden gescoped).
-            self::Directie => ['studentenzaken', 'relatiebeheer'],
+            // relaties/stages van die opleiding (opleidinggebonden gescoped), en
+            // kijkt mee in het balielogboek (alleen-lezen, voor de bezoekersstromen).
+            self::Directie => ['studentenzaken', 'relatiebeheer', 'balie'],
             self::Studentenzaken, self::Docent,
             self::Examencommissie => ['studentenzaken'],
+        };
+    }
+
+    /**
+     * Mag deze rol het balielogboek beheren (registraties aanmaken en wijzigen)?
+     * Uitsluitend de Balie zelf; Beheer voor onderhoud. Directie en Bestuur niet:
+     * zij kijken mee, maar muteren niet in het werkregister van de balie.
+     */
+    public function magBalieBeheren(): bool
+    {
+        return match ($this) {
+            self::Balie, self::Beheerder => true,
+            default => false,
+        };
+    }
+
+    /**
+     * Mag deze rol het balielogboek inzien (lijst, dashboard, export)? Naast de
+     * Balie en Beheer ook Directie en Bestuur, voor de rapportage over de
+     * bezoekers- en poststromen (alleen-lezen).
+     */
+    public function magBalieInzien(): bool
+    {
+        return match ($this) {
+            self::Balie, self::Beheerder, self::Directie, self::Bestuur => true,
+            default => false,
         };
     }
 

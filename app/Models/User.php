@@ -133,6 +133,18 @@ class User extends Authenticatable
         return $this->magVolgensRol(fn (Rol $r) => $r->magHrBeheer());
     }
 
+    /** Module Balie/Receptie: registraties aanmaken/wijzigen (Balie, Beheer). */
+    public function magBalieBeheren(): bool
+    {
+        return $this->magVolgensRol(fn (Rol $r) => $r->magBalieBeheren());
+    }
+
+    /** Module Balie/Receptie: logboek inzien (Balie, Beheer, Directie, Bestuur). */
+    public function magBalieInzien(): bool
+    {
+        return $this->magVolgensRol(fn (Rol $r) => $r->magBalieInzien());
+    }
+
     public function magHrInzien(): bool
     {
         return $this->magVolgensRol(fn (Rol $r) => $r->magHrInzien());

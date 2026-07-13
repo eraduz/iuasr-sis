@@ -41,6 +41,9 @@ class DashboardController extends Controller
             if ($rol->magModule('hr')) {
                 return redirect()->route('hr.dashboard');
             }
+            if ($rol->magModule('balie')) {
+                return redirect()->route('balie.dashboard');
+            }
 
             return redirect()->route('modules.kiezen');
         }

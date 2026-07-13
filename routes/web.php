@@ -604,4 +604,29 @@ Route::middleware('auth')->group(function () {
         Route::delete('/opzoektabellen/{tabel}/{id}', [ReferentieController::class, 'destroy'])->name('opzoektabellen.destroy');
         Route::get('/opzoektabellen/{tabel}', [ReferentieController::class, 'index'])->name('opzoektabellen.tabel');
     });
+
+    /*
+    |----------------------------------------------------------------------
+    | Module Balie / Receptie
+    |----------------------------------------------------------------------
+    | Eén chronologisch logboek voor telefoon (in/uit), bezoekers en post
+    | (in/uit). De Balie en de Beheerder registreren en wijzigen; Directie en
+    | Bestuur kijken uitsluitend mee (alleen-lezen, ook de export).
+    |
+    | De beheerroutes staan bewust vóór de inzageroutes, zodat /balie/nieuw
+    | niet als een {registratie}-parameter wordt gelezen.
+    */
+    Route::middleware('rol:balie,beheerder')->prefix('balie')->group(function () {
+        Route::get('/nieuw', [App\Http\Controllers\Balie\BalieRegistratieController::class, 'create'])->name('balie.create');
+        Route::post('/', [App\Http\Controllers\Balie\BalieRegistratieController::class, 'store'])->name('balie.store');
+        Route::get('/{registratie}/bewerken', [App\Http\Controllers\Balie\BalieRegistratieController::class, 'edit'])->name('balie.edit');
+        Route::put('/{registratie}', [App\Http\Controllers\Balie\BalieRegistratieController::class, 'update'])->name('balie.update');
+        Route::post('/{registratie}/vertrek', [App\Http\Controllers\Balie\BalieRegistratieController::class, 'vertrek'])->name('balie.vertrek');
+    });
+
+    Route::middleware('rol:balie,beheerder,directie,bestuur')->prefix('balie')->group(function () {
+        Route::get('/', [App\Http\Controllers\Balie\BalieDashboardController::class, 'dashboard'])->name('balie.dashboard');
+        Route::get('/logboek', [App\Http\Controllers\Balie\BalieRegistratieController::class, 'index'])->name('balie');
+        Route::get('/logboek/export.csv', [App\Http\Controllers\Balie\BalieDashboardController::class, 'export'])->name('balie.export');
+    });
 });

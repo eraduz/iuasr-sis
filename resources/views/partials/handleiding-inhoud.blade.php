@@ -308,7 +308,24 @@
   <h3>Mijn HR (self-service)</h3>
   <p>Elke medewerker met een gekoppeld account heeft een eigen, <b>alleen-lezen</b> dossier onder <b>Zelfservice → Mijn HR</b>. U ziet er uw <b>gegevens</b> (functie, afdeling, leidinggevende, huidig dienstverband met FTE), uw <b>verlofsaldo</b> per type, uw <b>verlofaanvragen</b>, uw <b>gesprekken</b> (aankomend en historie), uw <b>documenten</b> (met downloadknop — u kunt uitsluitend uw eigen documenten ophalen, inzage wordt gelogd) en uw <b>onboarding/offboarding-checklists</b> met voortgang. Met de knop <b>Agenda (iCal)</b> downloadt u een <code>.ics</code>-bestand met uw geplande gesprekken en uw goedgekeurde verlof; dat importeert of abonneert u in uw eigen agenda. Het is bewust een <b>los bestand</b> — er is geen live koppeling met Outlook of Teams, zodat de gegevens het intranet niet verlaten.</p>
 
-  <h2 id="h14">14. Vragen of problemen?</h2>
+  <h2 id="h14">14. Balie / Receptie (aparte module)</h2>
+  <p>De module <b>Balie / Receptie</b> is het werkregister van de ontvangstbalie. U legt er alles vast wat aan de ingang binnenkomt of naar buiten gaat: <b>telefoongesprekken</b> (inkomend en uitgaand), <b>bezoekers</b>, en <b>post</b> (ontvangen en verzonden). Alles komt in één doorlopend <b>logboek</b> te staan, met de nieuwste registratie bovenaan. De rol <b>Balie / Receptie</b> registreert en wijzigt; <b>Directie</b> en <b>Schoolbestuur</b> kijken alleen mee. De baliemedewerker ziet bewust géén studentdossiers, cijfers of personeelsdossiers — alleen de namenlijst van medewerkers, om een gesprek of bezoek aan de juiste persoon te koppelen.</p>
+
+  <h3>Iets registreren</h3>
+  <p>Op het <b>Overzicht</b> staan drie knoppen: <b>Telefoongesprek</b>, <b>Bezoeker</b> en <b>Poststuk</b>. Het formulier toont daarna alleen de velden die bij dat soort horen. U kiest de <b>richting</b> (inkomend of uitgaand), de <b>datum en tijd</b> (die staat standaard al op nu), het <b>onderwerp</b>, de <b>naam</b> van degene die belde, op bezoek kwam of de post stuurde, en een <b>korte toelichting</b>. Bij <b>Bestemd voor</b> kiest u de medewerker voor wie het bestemd is; is het niet voor één persoon maar voor een afdeling, vul dan het veld <b>Of afdeling</b> in (bijvoorbeeld "Studentenzaken").</p>
+  <p>Twee dingen gaan automatisch, zodat het logboek klopt: een <b>bezoek</b> is altijd inkomend (een uitgaand bezoek bestaat niet), en bij <b>post</b> wordt geen onderwerp vastgelegd — daar gaat het om afzender, datum en toelichting.</p>
+
+  <h3>Wie is er nu in het pand?</h3>
+  <p>Op het Overzicht staat de lijst <b>Nu in het pand</b>: iedere bezoeker die is aangemeld maar nog niet is afgemeld. Vertrekt een bezoeker, klik dan op <b>Afmelden</b>; het vertrekmoment wordt dan vastgelegd. Deze lijst is bedoeld als bezoekersoverzicht <b>bij een ontruiming</b> — meld bezoekers daarom consequent af.</p>
+
+  <div class="let">Vergeet u af te melden, dan blijft de bezoeker in de lijst staan en klopt het ontruimingsoverzicht niet. Loop de lijst aan het eind van de dag na.</div>
+
+  <h3>Terugzoeken, filteren en exporteren</h3>
+  <p>Onder <b>Logboek</b> staat alles bij elkaar. Het zoekveld doorzoekt het <b>onderwerp</b>, de <b>naam</b>, de <b>organisatie</b>, de <b>afdeling</b> én de <b>toelichting</b> tegelijk — u hoeft dus niet te weten in welk veld iets genoteerd is. Daarnaast filtert u op <b>soort</b>, op <b>richting</b>, op de <b>medewerker</b> voor wie het bestemd was, op een <b>periode</b> (van/tot), of op <b>alleen nog aanwezig</b>. Met <b>Exporteren (CSV)</b> haalt u op wat u op dat moment ziet — de filters gelden dus ook voor de export. Het bestand opent in Excel en is bedoeld voor rapportage en archivering.</p>
+
+  <div class="tip">Registraties worden <b>nooit verwijderd</b>: het logboek is een chronologisch verantwoordingsdocument. Maakt u een fout, corrigeer die dan met <b>Bewerken</b>. Elke aanmaak, wijziging en export wordt gelogd (wie, wat, wanneer).</div>
+
+  <h2 id="h15">15. Vragen of problemen?</h2>
   <p>Neem bij vragen contact op met de systeembeheerder of Studentenzaken (szaken@iuasr.nl). Werkt iets niet zoals verwacht, meld dan wat u deed en wat u zag.</p>
 
   <div class="tip">Deze handleiding wordt bijgewerkt zodra er nieuwe functies bij komen. Kijk bij twijfel of u de meest recente versie hebt (zie de datum onderaan).</div>
