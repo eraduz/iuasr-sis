@@ -262,9 +262,10 @@ enum Rol: string
             // de Cursussen-, Relatiebeheer-, HR- en Balie-module (alleen-lezen).
             self::Bestuur => ['studentenzaken', 'cursussen', 'relatiebeheer', 'hr', 'balie'],
             // De Directie (opleidingsmanager) beheert haar opleiding, inclusief de
-            // relaties/stages van die opleiding (opleidinggebonden gescoped), en
-            // kijkt mee in het balielogboek (alleen-lezen, voor de bezoekersstromen).
-            self::Directie => ['studentenzaken', 'relatiebeheer', 'balie'],
+            // relaties/stages van die opleiding (opleidinggebonden gescoped). Géén
+            // Balie: dat is een werkregister van de ontvangstbalie, geen
+            // opleidingsinformatie (keuze opdrachtgever 2026-07-13).
+            self::Directie => ['studentenzaken', 'relatiebeheer'],
             self::Studentenzaken, self::Docent,
             self::Examencommissie => ['studentenzaken'],
         };
@@ -285,13 +286,14 @@ enum Rol: string
 
     /**
      * Mag deze rol het balielogboek inzien (lijst, dashboard, export)? Naast de
-     * Balie en Beheer ook Directie en Bestuur, voor de rapportage over de
-     * bezoekers- en poststromen (alleen-lezen).
+     * Balie en Beheer uitsluitend het Schoolbestuur (alleen-lezen, brede inzage).
+     * De Directie NIET (keuze opdrachtgever 2026-07-13): het balielogboek is een
+     * werkregister van de ontvangstbalie, geen opleidingsinformatie.
      */
     public function magBalieInzien(): bool
     {
         return match ($this) {
-            self::Balie, self::Beheerder, self::Directie, self::Bestuur => true,
+            self::Balie, self::Beheerder, self::Bestuur => true,
             default => false,
         };
     }

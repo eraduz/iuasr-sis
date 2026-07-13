@@ -25,8 +25,9 @@ nieuwe rol `balie`.
 - **Zoeken en filteren** over onderwerp, naam, organisatie, afdeling en toelichting;
   filters op soort, richting, medewerker, periode en "alleen nog aanwezig".
   **CSV-export** die dezelfde filters respecteert.
-- **Rolscheiding**: de Balie registreert en wijzigt; Directie en Bestuur lezen mee
-  (alleen-lezen). De rol is bewust smal — geen studentdossiers, cijfers of
+- **Rolscheiding**: de Balie registreert en wijzigt; alleen het Schoolbestuur leest
+  mee (alleen-lezen). De Directie heeft geen toegang: het logboek is een
+  werkregister van de balie, geen opleidingsinformatie. De rol is bewust smal — geen studentdossiers, cijfers of
   personeelsdossiers. Registraties worden nooit verwijderd; aanmaak, wijziging,
   afmelden en export worden gelogd.
 - Migratie breidt de enum `users.rol` uit en maakt de modulerij plus het

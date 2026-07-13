@@ -58,7 +58,7 @@ class AutorisatieServiceProvider extends ServiceProvider
         // BSN inzien — gelogd (Studentenzaken, Beheerder).
         Gate::define('bsn-inzien', fn (User $user) => $user->magBsnInzien());
 
-        // Balielogboek INZIEN (Balie, Beheer, Directie, Bestuur — de laatste twee lezen mee).
+        // Balielogboek INZIEN (Balie, Beheer, Schoolbestuur — die laatste leest mee).
         Gate::define('balie-inzien', fn (User $user) => $user->magBalieInzien());
 
         // Balielogboek MUTEREN — alleen de Balie zelf (en Beheer voor onderhoud).

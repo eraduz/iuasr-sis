@@ -14,7 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * Autorisatie (server-side, nooit alleen in de UI):
  *   - beheren (aanmaken/wijzigen): rol Balie en Beheerder;
- *   - inzien: daarnaast Directie en Bestuur (alleen-lezen, voor rapportage).
+ *   - inzien: daarnaast uitsluitend het Schoolbestuur (alleen-lezen). De Directie
+ *     niet: dit is een werkregister van de balie, geen opleidingsinformatie.
  * Registraties worden nooit verwijderd — het logboek is een chronologisch
  * verantwoordingsdocument.
  */
@@ -63,7 +64,7 @@ class BalieRegistratie extends Model
      | Autorisatie
      |------------------------------------------------------------------- */
 
-    /** Mag deze gebruiker de registratie inzien? (Balie, Beheer, Directie, Bestuur.) */
+    /** Mag deze gebruiker de registratie inzien? (Balie, Beheer, Schoolbestuur.) */
     public function zichtbaarVoor(User $gebruiker): bool
     {
         return $gebruiker->magBalieInzien();

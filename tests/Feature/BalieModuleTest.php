@@ -89,31 +89,32 @@ class BalieModuleTest extends TestCase
         ]);
     }
 
-    public function test_directie_en_bestuur_lezen_mee_maar_muteren_niet(): void
+    public function test_schoolbestuur_leest_mee_maar_muteert_niet(): void
     {
         $registratie = $this->registratie();
+        $bestuur = $this->gebruiker(Rol::Bestuur);
 
-        foreach ([Rol::Directie, Rol::Bestuur] as $rol) {
-            $gebruiker = $this->gebruiker($rol);
+        $this->actingAs($bestuur)->get(route('balie'))->assertOk();
+        $this->actingAs($bestuur)->get(route('balie.export'))->assertOk();
 
-            $this->actingAs($gebruiker)->get(route('balie'))->assertOk();
-            $this->actingAs($gebruiker)->get(route('balie.export'))->assertOk();
-
-            $this->actingAs($gebruiker)->get(route('balie.create'))->assertForbidden();
-            $this->actingAs($gebruiker)->get(route('balie.edit', $registratie))->assertForbidden();
-            $this->actingAs($gebruiker)->post(route('balie.store'), $this->formulier())->assertForbidden();
-        }
+        $this->actingAs($bestuur)->get(route('balie.create'))->assertForbidden();
+        $this->actingAs($bestuur)->get(route('balie.edit', $registratie))->assertForbidden();
+        $this->actingAs($bestuur)->post(route('balie.store'), $this->formulier())->assertForbidden();
 
         $this->assertSame(1, BalieRegistratie::count());
     }
 
     public function test_andere_rollen_hebben_geen_toegang_tot_de_balie(): void
     {
-        foreach ([Rol::Studentenzaken, Rol::Docent, Rol::Hrmedewerker, Rol::Financien] as $rol) {
+        // Directie hoort hier uitdrukkelijk bij (keuze opdrachtgever 2026-07-13):
+        // het balielogboek is een werkregister van de balie, geen opleidingsinformatie.
+        foreach ([Rol::Directie, Rol::Studentenzaken, Rol::Docent, Rol::Hrmedewerker, Rol::Financien] as $rol) {
             $gebruiker = $this->gebruiker($rol);
 
             $this->actingAs($gebruiker)->get(route('balie.dashboard'))->assertForbidden();
             $this->actingAs($gebruiker)->get(route('balie'))->assertForbidden();
+            $this->actingAs($gebruiker)->get(route('balie.export'))->assertForbidden();
+            $this->assertFalse($gebruiker->magBalieInzien());
         }
     }
 

@@ -139,7 +139,7 @@ class User extends Authenticatable
         return $this->magVolgensRol(fn (Rol $r) => $r->magBalieBeheren());
     }
 
-    /** Module Balie/Receptie: logboek inzien (Balie, Beheer, Directie, Bestuur). */
+    /** Module Balie/Receptie: logboek inzien (Balie, Beheer, Schoolbestuur). */
     public function magBalieInzien(): bool
     {
         return $this->magVolgensRol(fn (Rol $r) => $r->magBalieInzien());

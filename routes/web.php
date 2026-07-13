@@ -610,8 +610,9 @@ Route::middleware('auth')->group(function () {
     | Module Balie / Receptie
     |----------------------------------------------------------------------
     | Eén chronologisch logboek voor telefoon (in/uit), bezoekers en post
-    | (in/uit). De Balie en de Beheerder registreren en wijzigen; Directie en
-    | Bestuur kijken uitsluitend mee (alleen-lezen, ook de export).
+    | (in/uit). De Balie en de Beheerder registreren en wijzigen; het
+    | Schoolbestuur kijkt uitsluitend mee (alleen-lezen, ook de export). De
+    | Directie heeft géén toegang: dit is een werkregister van de balie.
     |
     | De beheerroutes staan bewust vóór de inzageroutes, zodat /balie/nieuw
     | niet als een {registratie}-parameter wordt gelezen.
@@ -624,7 +625,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/{registratie}/vertrek', [App\Http\Controllers\Balie\BalieRegistratieController::class, 'vertrek'])->name('balie.vertrek');
     });
 
-    Route::middleware('rol:balie,beheerder,directie,bestuur')->prefix('balie')->group(function () {
+    Route::middleware('rol:balie,beheerder,bestuur')->prefix('balie')->group(function () {
         Route::get('/', [App\Http\Controllers\Balie\BalieDashboardController::class, 'dashboard'])->name('balie.dashboard');
         Route::get('/logboek', [App\Http\Controllers\Balie\BalieRegistratieController::class, 'index'])->name('balie');
         Route::get('/logboek/export.csv', [App\Http\Controllers\Balie\BalieDashboardController::class, 'export'])->name('balie.export');
