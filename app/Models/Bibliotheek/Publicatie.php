@@ -26,6 +26,8 @@ class Publicatie extends Model
     protected $fillable = [
         'soort', 'isbn', 'titel', 'uitgavejaar', 'druknummer',
         'vakgebied_id', 'reeks_id', 'deelnummer', 'opmerking',
+        // Herkomst uit het Excel-bestand (rekcode). Maakt de import idempotent.
+        'bron_rekcode',
     ];
 
     protected function casts(): array

@@ -10,7 +10,9 @@ class Vakgebied extends Model
 {
     protected $table = 'bibliotheek_vakgebieden';
 
-    protected $fillable = ['naam', 'omschrijving', 'actief', 'volgorde'];
+    // `rekletter` koppelt het vakgebied aan de rekcode uit de oude Excel-bibliotheek
+    // (A = Tafsir, F = Fiqh, ...); dat is de betrouwbare bron voor het vakgebied.
+    protected $fillable = ['naam', 'rekletter', 'omschrijving', 'actief', 'volgorde'];
 
     protected function casts(): array
     {

@@ -19,7 +19,7 @@
   @endif
 </div>
 
-<form method="GET" action="{{ route('bibliotheek.uitleningen') }}" class="sis-toolbar" style="margin-bottom:12px; gap:8px;">
+<form method="GET" action="{{ route('bibliotheek.uitleningen') }}" class="sis-toolbar" style="margin-bottom:12px; gap:8px;" data-autofilter>
   <input type="search" name="q" value="{{ $zoek }}" placeholder="Zoek op titel, serienummer, lener of studentnummer" dir="auto">
   <select name="status">
     <option value="lopend" @selected($statusFilter === 'lopend')>Lopend</option>
@@ -70,3 +70,5 @@
 
 <div style="margin-top:12px;">{{ $uitleningen->links() }}</div>
 @endsection
+
+@include('partials.autofilter')

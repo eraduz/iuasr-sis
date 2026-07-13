@@ -662,6 +662,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/uitgaven/{uitgave}/artikelen', [App\Http\Controllers\Bibliotheek\TijdschriftController::class, 'artikelStore'])->name('bibliotheek.artikelen.store');
         Route::put('/artikelen/{artikel}', [App\Http\Controllers\Bibliotheek\TijdschriftController::class, 'artikelUpdate'])->name('bibliotheek.artikelen.update');
 
+        // Import van de bestaande Excel-bibliotheek (proefdraaien, dan importeren)
+        Route::get('/import', [App\Http\Controllers\Bibliotheek\ImportController::class, 'index'])->name('bibliotheek.import');
+        Route::post('/import/proef', [App\Http\Controllers\Bibliotheek\ImportController::class, 'proef'])->name('bibliotheek.import.proef');
+        Route::post('/import/uitvoeren', [App\Http\Controllers\Bibliotheek\ImportController::class, 'importeer'])->name('bibliotheek.import.uitvoeren');
+
         // Uitlenen en innemen
         Route::get('/uitlenen', [App\Http\Controllers\Bibliotheek\UitleningController::class, 'create'])->name('bibliotheek.uitlenen');
         Route::post('/uitlenen', [App\Http\Controllers\Bibliotheek\UitleningController::class, 'store'])->name('bibliotheek.uitlenen.store');

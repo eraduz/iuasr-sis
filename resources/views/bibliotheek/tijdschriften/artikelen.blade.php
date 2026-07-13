@@ -12,7 +12,7 @@
   </div>
 </div>
 
-<form method="GET" action="{{ route('bibliotheek.artikelen') }}" class="sis-toolbar" style="margin-bottom:12px; gap:8px; flex-wrap:wrap;">
+<form method="GET" action="{{ route('bibliotheek.artikelen') }}" class="sis-toolbar" style="margin-bottom:12px; gap:8px; flex-wrap:wrap;" data-autofilter>
   <input type="search" name="q" value="{{ $zoek }}" placeholder="Zoek op titel, auteur of trefwoord" dir="auto">
   <select name="tijdschrift">
     <option value="">Alle tijdschriften</option>
@@ -48,3 +48,5 @@
 
 <div style="margin-top:12px;">{{ $artikelen->links() }}</div>
 @endsection
+
+@include('partials.autofilter')

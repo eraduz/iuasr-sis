@@ -9,6 +9,30 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.3.0] — 2026-07-13
+
+Import van de bestaande Excel-bibliotheek, en zelf-filterende filterbalken.
+
+- **Importwizard** (`bibliotheek:importeren` + scherm onder Bibliotheek → Importeren).
+  Eerst proefdraaien (inlezen, rapporteren, niets opslaan), dan pas importeren.
+  Idempotent: een tweede import maakt niets dubbel.
+- **Normalisatie van de bron**, die met de hand is gegroeid: het vakgebied komt uit
+  de **rekletter** (A = Tafsir, F = Fiqh, …) in plaats van uit de vakgebiedkolom met
+  144 spellingvarianten; taalfouten worden gecorrigeerd (Arabish → Arabisch,
+  Nederlans → Nederlands); waarden die geen taal zijn (woordenboeken, Grammatica)
+  verhuizen naar de opmerking. Frans, Duits, Spaans en Albanees toegevoegd als taal.
+  De oorspronkelijke bronwaarden blijven bewaard in het opmerkingveld.
+- **Aantal = exemplaren**: "F. 143" met aantal 3 wordt één titel met F.143-1, F.143-2
+  en F.143-3, in kast F. Een onwaarschijnlijk aantal (de bron bevat één keer 41306)
+  wordt teruggebracht tot 1 exemplaar en gemeld.
+- **Streaming XLSX-lezer** in plaats van het hele bestand in het geheugen laden;
+  12.470 regels paste niet in 128 MB.
+- Resultaat op de dev-database: **10.969 titels, 15.928 exemplaren, 7.795 auteurs**,
+  geen enkele titel zonder vakgebied. 188 bronregels overgeslagen (geen titel).
+- **Filterbalken filteren nu vanzelf**: een keuzelijst of datum aanpassen verzendt
+  het formulier direct; het zoekveld blijft op Enter werken. Met een regel die de
+  actieve filters toont.
+
 ## [1.2.0] — 2026-07-13
 
 Nieuwe module **Bibliotheek** (op verzoek van de opdrachtgever), met een nieuwe

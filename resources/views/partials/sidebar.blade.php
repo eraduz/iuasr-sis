@@ -257,6 +257,7 @@
     if ($gebruiker->magBibliotheekBeheren()) {
         $biebMenu['Bibliotheek'][] = ['Publicatie toevoegen', 'bibliotheek.publicaties.create', 'plus', 'bibliotheek.publicaties.create'];
         $biebMenu['Bibliotheek'][] = ['Uitlenen', 'bibliotheek.uitlenen', 'taak', 'bibliotheek.uitlenen'];
+        $biebMenu['Bibliotheek'][] = ['Importeren', 'bibliotheek.import', 'db', 'bibliotheek.import'];
     }
     if ($gebruiker->magBibliotheekSjablonenBeheren()) {
         $biebMenu['Bibliotheek'][] = ['E-mailsjablonen', 'bibliotheek.sjablonen', 'log', 'bibliotheek.sjablonen'];

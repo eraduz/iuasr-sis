@@ -24,7 +24,7 @@
   </div>
 </div>
 
-<form method="GET" action="{{ route('bibliotheek.publicaties') }}" class="sis-toolbar" style="margin-bottom:12px; gap:8px; flex-wrap:wrap;">
+<form method="GET" action="{{ route('bibliotheek.publicaties') }}" class="sis-toolbar" style="margin-bottom:12px; gap:8px; flex-wrap:wrap;" data-autofilter>
   <input type="search" name="q" value="{{ $zoek }}" placeholder="Zoek op titel, ISBN, auteur of reeks">
   <select name="soort">
     <option value="">Alle soorten</option>
@@ -54,6 +54,19 @@
   <button class="iuasr-dash-btn iuasr-dash-btn--sm" type="submit">Filteren</button>
   <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('bibliotheek.publicaties') }}">Wissen</a>
 </form>
+
+@if ($soortFilter || $vakgebiedFilter || $taalFilter || $statusFilter || $jaarFilter || $zoek !== '')
+  <p class="sis-muted" style="margin:-6px 2px 12px; font-size:12px;">
+    Actieve filters:
+    @if ($zoek !== '')<b>zoekterm "{{ $zoek }}"</b>@endif
+    @if ($soortFilter)<b>{{ $soorten[$soortFilter] ?? $soortFilter }}</b>@endif
+    @if ($vakgebiedFilter)<b>{{ $vakgebieden->firstWhere('id', $vakgebiedFilter)?->naam }}</b>@endif
+    @if ($taalFilter)<b>{{ $talen->firstWhere('id', $taalFilter)?->naam }}</b>@endif
+    @if ($statusFilter)<b>{{ $statussen[$statusFilter] ?? $statusFilter }}</b>@endif
+    @if ($jaarFilter)<b>jaar {{ $jaarFilter }}</b>@endif
+    — <a href="{{ route('bibliotheek.publicaties') }}">alles tonen</a>
+  </p>
+@endif
 
 <div class="iuasr-dash-tbl-card">
   <table class="iuasr-dash-tbl">
@@ -93,3 +106,5 @@
 <div style="margin-top:12px;">{{ $publicaties->links() }}</div>
 <p class="sis-tblnote">De teller bij Exemplaren toont beschikbaar / totaal. Een titel staat één keer in de catalogus; de fysieke boeken hangen eronder als exemplaren.</p>
 @endsection
+
+@include('partials.autofilter')
