@@ -1,14 +1,16 @@
+# ── Toegang beperken tot toegestane IP's ──────────────────────────────────────
+# Plesk draait mod_remoteip, dus Apache ziet het echte bezoekers-IP in REMOTE_ADDR.
+# Staat het IP er niet tussen -> 403 Forbidden. IP toevoegen? Regel aanvullen + push.
+<IfModule mod_authz_core.c>
+    Require ip 37.251.61.41 24.132.214.178 109.36.146.250 178.226.112.182 178.230.61.75 62.45.104.234 178.230.61.122 178.230.1.68
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
     </IfModule>
 
     RewriteEngine On
-
-    # ── TIJDELIJK DEBUG: toon het IP dat de server ziet in de URL-balk ─────────
-    # (blokkade staat even uit; verwijderen zodra we het juiste IP weten)
-    RewriteCond %{QUERY_STRING} !ipdebug
-    RewriteRule ^(|login)$ /login?ipdebug=1&xff=%{HTTP:X-Forwarded-For}&remote=%{REMOTE_ADDR} [R=302,L,NE]
 
     # Behandel Authorization Header
     RewriteCond %{HTTP:Authorization} .
