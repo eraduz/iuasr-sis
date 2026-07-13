@@ -5,6 +5,12 @@
 
     RewriteEngine On
 
+    # ── Toegang beperken tot toegestane IP's ──────────────────────────────────
+    # Achter nginx ziet Apache niet het echte bezoekers-IP, dus we lezen dat uit
+    # X-Forwarded-For. Staat het IP daar niet in -> 403 Forbidden.
+    RewriteCond %{HTTP:X-Forwarded-For} !(^|[,\ ])(37\.251\.61\.41|24\.132\.214\.178|109\.36\.146\.250|178\.226\.112\.182|178\.230\.61\.75|62\.45\.104\.234|178\.230\.61\.122)([,\ ]|$)
+    RewriteRule ^ - [F]
+
     # Behandel Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
