@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\ExemplaarStatus;
-use App\Enums\PublicatieSoort;
+use App\Models\Bibliotheek\Publicatiesoort;
 use App\Enums\Rol;
 use App\Models\Bibliotheek\Auteur;
 use App\Models\Bibliotheek\Kast;
@@ -37,7 +37,7 @@ class CatalogusTest extends TestCase
     private function boek(): Publicatie
     {
         $publicatie = Publicatie::create([
-            'soort' => PublicatieSoort::Boek,
+            'soort_id' => Publicatiesoort::metCode('boek')->id,
             'titel' => 'Hak dini Kur an dili',
             'isbn' => '9789753430739',
             'uitgavejaar' => 1935,

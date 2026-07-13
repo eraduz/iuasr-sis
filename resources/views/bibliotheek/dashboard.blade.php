@@ -21,9 +21,11 @@
 </div>
 
 <div class="iuasr-dash-stats">
-  <div class="iuasr-dash-stat"><span class="lbl">Boeken</span><span class="val">{{ $kpi['boeken'] }}</span><span class="delta">titels</span></div>
-  <div class="iuasr-dash-stat"><span class="lbl">Tijdschriften</span><span class="val">{{ $kpi['tijdschriften'] }}</span><span class="delta">titels</span></div>
-  <div class="iuasr-dash-stat"><span class="lbl">Digitale documenten</span><span class="val">{{ $kpi['digitaal'] }}</span><span class="delta">titels</span></div>
+  {{-- Eén tegel per soort uit de opzoektabel: voegt de bibliotheek een soort toe
+       (cd, dvd, ...), dan verschijnt die hier vanzelf. --}}
+  @foreach ($perSoort as $s)
+    <div class="iuasr-dash-stat"><span class="lbl">{{ $s->naam }}</span><span class="val">{{ number_format($s->publicaties_count, 0, ',', '.') }}</span><span class="delta">titels</span></div>
+  @endforeach
   <div class="iuasr-dash-stat"><span class="lbl">Nu uitgeleend</span><span class="val">{{ $kpi['uitgeleend'] }}</span><span class="delta">exemplaren</span></div>
   <div class="iuasr-dash-stat {{ $kpi['telaat'] > 0 ? 'iuasr-dash-stat--alert' : '' }}"><span class="lbl">Te laat</span><span class="val">{{ $kpi['telaat'] }}</span><span class="delta">niet retour</span></div>
   <div class="iuasr-dash-stat"><span class="lbl">Vandaag uitgeleend</span><span class="val">{{ $kpi['vandaag_uit'] }}</span><span class="delta">vandaag</span></div>

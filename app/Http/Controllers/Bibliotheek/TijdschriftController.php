@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Bibliotheek;
 
-use App\Enums\PublicatieSoort;
 use App\Http\Controllers\Controller;
 use App\Models\Bibliotheek\Artikel;
 use App\Models\Bibliotheek\Auteur;
@@ -46,7 +45,7 @@ class TijdschriftController extends Controller
     public function uitgaveStore(Request $request, Publicatie $publicatie): RedirectResponse
     {
         abort_unless($publicatie->beheerbaarVoor($request->user()), 403, 'U mag de bibliotheek niet beheren.');
-        abort_unless($publicatie->soort === PublicatieSoort::Tijdschrift, 422, 'Alleen een tijdschrift kent uitgaven.');
+        abort_unless($publicatie->heeftUitgaven(), 422, 'Alleen een soort met uitgaven (zoals een tijdschrift) kent afleveringen.');
 
         $data = $request->validate([
             'uitgavenummer' => ['required', 'string', 'max:40'],
@@ -134,6 +133,8 @@ class TijdschriftController extends Controller
 
     private function tijdschriften()
     {
-        return Publicatie::where('soort', PublicatieSoort::Tijdschrift)->orderBy('titel')->get();
+        // Alle titels van een soort dat uitgaven kent (nu: tijdschrift).
+        return Publicatie::whereHas('soort', fn ($s) => $s->where('heeft_uitgaven', true))
+            ->orderBy('titel')->get();
     }
 }

@@ -5,7 +5,6 @@
 @section('inhoud')
 @php
   $magBeheer = auth()->user()->magBibliotheekBeheren();
-  $soorten = \App\Enums\PublicatieSoort::opties();
   $statussen = \App\Enums\ExemplaarStatus::opties();
 @endphp
 
@@ -28,8 +27,8 @@
   <input type="search" name="q" value="{{ $zoek }}" placeholder="Zoek op titel, auteur, ISBN of rek (F. 1070)">
   <select name="soort">
     <option value="">Alle soorten</option>
-    @foreach ($soorten as $waarde => $label)
-      <option value="{{ $waarde }}" @selected($soortFilter === $waarde)>{{ $label }}</option>
+    @foreach ($soorten as $s)
+      <option value="{{ $s->id }}" @selected($soortFilter === $s->id)>{{ $s->naam }}</option>
     @endforeach
   </select>
   <select name="vakgebied">
@@ -59,7 +58,7 @@
   <p class="sis-muted" style="margin:-6px 2px 12px; font-size:12px;">
     Actieve filters:
     @if ($zoek !== '')<b>zoekterm "{{ $zoek }}"</b>@endif
-    @if ($soortFilter)<b>{{ $soorten[$soortFilter] ?? $soortFilter }}</b>@endif
+    @if ($soortFilter)<b>{{ $soorten->firstWhere('id', $soortFilter)?->naam }}</b>@endif
     @if ($vakgebiedFilter)<b>{{ $vakgebieden->firstWhere('id', $vakgebiedFilter)?->naam }}</b>@endif
     @if ($taalFilter)<b>{{ $talen->firstWhere('id', $taalFilter)?->naam }}</b>@endif
     @if ($statusFilter)<b>{{ $statussen[$statusFilter] ?? $statusFilter }}</b>@endif
@@ -83,7 +82,7 @@
           <td class="tnum">{{ $p->uitgavejaar ?? '—' }}</td>
           <td>{{ $p->vakgebied?->naam ?? '—' }}</td>
           <td style="text-align:center;">
-            @if ($p->soort->heeftExemplaren())
+            @if ($p->heeftExemplaren())
               <span class="iuasr-dash-status {{ $p->aantalBeschikbaar() > 0 ? 's-approved' : 's-submitted' }}">{{ $p->aantalBeschikbaar() }} / {{ $p->exemplaren->count() }}</span>
             @else
               <span class="sis-muted">digitaal</span>

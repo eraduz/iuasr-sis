@@ -55,7 +55,7 @@
           <td>{{ $p->vakgebied?->naam ?? '—' }}</td>
           <td class="tnum"><b>{{ $p->rekplaats() ?? '—' }}</b></td>
           <td style="text-align:center;">
-            @if (! $p->soort->heeftExemplaren())
+            @if (! $p->heeftExemplaren())
               <span class="sis-muted">digitaal</span>
             @elseif ($p->aantalBeschikbaar() > 0)
               <span class="iuasr-dash-status s-approved">{{ $p->aantalBeschikbaar() }} van {{ $p->exemplaren->count() }}</span>

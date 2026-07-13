@@ -3,7 +3,7 @@
 namespace App\Support;
 
 use App\Enums\ExemplaarStatus;
-use App\Enums\PublicatieSoort;
+use App\Models\Bibliotheek\Publicatiesoort;
 use App\Models\Bibliotheek\Auteur;
 use App\Models\Bibliotheek\Exemplaar;
 use App\Models\Bibliotheek\Kast;
@@ -88,7 +88,7 @@ class BibliotheekImport
 
             $statistiek['titels']++;
             $statistiek['exemplaren'] += $rij['aantal'];
-            $statistiek['tijdschriften'] += $rij['soort'] === PublicatieSoort::Tijdschrift ? 1 : 0;
+            $statistiek['tijdschriften'] += $rij['soortcode'] === 'tijdschrift' ? 1 : 0;
             $statistiek['zonder_taal'] += $rij['taalcode'] === null ? 1 : 0;
             $statistiek['aantal_gecorrigeerd'] += $rij['aantal_gecorrigeerd'] ? 1 : 0;
 
@@ -109,6 +109,7 @@ class BibliotheekImport
     {
         $resultaat = ['titels' => 0, 'exemplaren' => 0, 'overgeslagen_bestond_al' => 0];
 
+        $soorten = Publicatiesoort::all()->keyBy('code');
         $vakgebieden = Vakgebied::whereNotNull('rekletter')->get()->keyBy('rekletter');
         $kasten = Kast::all()->keyBy('code');
         $talen = Taal::all()->keyBy('code');
@@ -139,7 +140,7 @@ class BibliotheekImport
             }
 
             $publicatie = Publicatie::create([
-                'soort' => $rij['soort'],
+                'soort_id' => $soorten[$rij['soortcode']]->id ?? null,
                 'titel' => $rij['titel'],
                 'vakgebied_id' => $vakgebieden[$rij['rekletter']]->id ?? null,
                 'opmerking' => $rij['opmerking'],
@@ -378,7 +379,8 @@ class BibliotheekImport
 
         return $basis + [
             'fout' => null,
-            'soort' => $isTijdschrift ? PublicatieSoort::Tijdschrift : PublicatieSoort::Boek,
+            // De soort als CODE; de import kent de opzoektabel niet uit zijn hoofd.
+            'soortcode' => $isTijdschrift ? 'tijdschrift' : 'boek',
             'titel' => mb_substr($titel, 0, 255),
             'auteur' => $auteur !== '' ? mb_substr($auteur, 0, 255) : null,
             'taalcode' => $taalcode,

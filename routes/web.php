@@ -702,6 +702,20 @@ Route::middleware('auth')->group(function () {
         Route::post('/import/proef', [App\Http\Controllers\Bibliotheek\ImportController::class, 'proef'])->name('bibliotheek.import.proef');
         Route::post('/import/uitvoeren', [App\Http\Controllers\Bibliotheek\ImportController::class, 'importeer'])->name('bibliotheek.import.uitvoeren');
 
+        // Opzoektabellen: soorten (boek, cd, dvd, ...), talen, vakgebieden, kasten.
+        // De bibliotheek beheert deze keuzelijsten zelf; een soort draagt de vlaggen
+        // die het gedrag bepalen (fysieke exemplaren / uitgaven met artikelen).
+        Route::get('/soorten', [App\Http\Controllers\Bibliotheek\OpzoektabelController::class, 'index'])->name('bibliotheek.opzoektabellen');
+        Route::post('/soorten', [App\Http\Controllers\Bibliotheek\OpzoektabelController::class, 'soortStore'])->name('bibliotheek.opzoektabellen.soort.store');
+        Route::put('/soorten/{soort}', [App\Http\Controllers\Bibliotheek\OpzoektabelController::class, 'soortUpdate'])->name('bibliotheek.opzoektabellen.soort.update');
+        Route::delete('/soorten/{soort}', [App\Http\Controllers\Bibliotheek\OpzoektabelController::class, 'soortDestroy'])->name('bibliotheek.opzoektabellen.soort.destroy');
+        Route::post('/talen', [App\Http\Controllers\Bibliotheek\OpzoektabelController::class, 'taalStore'])->name('bibliotheek.opzoektabellen.taal.store');
+        Route::delete('/talen/{taal}', [App\Http\Controllers\Bibliotheek\OpzoektabelController::class, 'taalDestroy'])->name('bibliotheek.opzoektabellen.taal.destroy');
+        Route::post('/vakgebieden', [App\Http\Controllers\Bibliotheek\OpzoektabelController::class, 'vakgebiedStore'])->name('bibliotheek.opzoektabellen.vakgebied.store');
+        Route::delete('/vakgebieden/{vakgebied}', [App\Http\Controllers\Bibliotheek\OpzoektabelController::class, 'vakgebiedDestroy'])->name('bibliotheek.opzoektabellen.vakgebied.destroy');
+        Route::post('/kasten', [App\Http\Controllers\Bibliotheek\OpzoektabelController::class, 'kastStore'])->name('bibliotheek.opzoektabellen.kast.store');
+        Route::delete('/kasten/{kast}', [App\Http\Controllers\Bibliotheek\OpzoektabelController::class, 'kastDestroy'])->name('bibliotheek.opzoektabellen.kast.destroy');
+
         // Verrijking met een externe bibliografische bron (ISBN, jaar, schrijfwijze)
         Route::get('/verrijking', [App\Http\Controllers\Bibliotheek\VerrijkingController::class, 'index'])->name('bibliotheek.verrijking');
         Route::put('/verrijking/{verrijking}/overnemen', [App\Http\Controllers\Bibliotheek\VerrijkingController::class, 'overnemen'])->name('bibliotheek.verrijking.overnemen');

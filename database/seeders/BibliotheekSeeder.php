@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Enums\BibliotheekMailsoort;
 use App\Enums\ExemplaarStatus;
-use App\Enums\PublicatieSoort;
+use App\Models\Bibliotheek\Publicatiesoort;
 use App\Models\Bibliotheek\Auteur;
 use App\Models\Bibliotheek\Kast;
 use App\Models\Bibliotheek\Publicatie;
@@ -36,6 +36,7 @@ class BibliotheekSeeder extends Seeder
         }
 
         $taal = fn (string $code) => Taal::where('code', $code)->value('id');
+        $soort = fn (string $code) => Publicatiesoort::where('code', $code)->value('id');
         $vak = fn (string $naam) => Vakgebied::where('naam', $naam)->value('id');
 
         // Boekenkasten.
@@ -51,7 +52,7 @@ class BibliotheekSeeder extends Seeder
 
         foreach ([1, 2, 3, 4] as $deel) {
             $publicatie = Publicatie::create([
-                'soort' => PublicatieSoort::Boek,
+                'soort_id' => $soort('boek'),
                 'titel' => 'Tafsir Ibn Kathir',
                 'uitgavejaar' => 2018,
                 'druknummer' => '2e druk',
@@ -83,7 +84,7 @@ class BibliotheekSeeder extends Seeder
 
         foreach ($titels as [$titel, $auteurNaam, $vakgebied, $talen, $jaar, $kast, $serie, $aantalExemplaren]) {
             $publicatie = Publicatie::create([
-                'soort' => PublicatieSoort::Boek,
+                'soort_id' => $soort('boek'),
                 'titel' => $titel,
                 'uitgavejaar' => $jaar,
                 'vakgebied_id' => $vak($vakgebied),
@@ -102,7 +103,7 @@ class BibliotheekSeeder extends Seeder
 
         // Digitaal document (geen fysieke exemplaren).
         $digitaal = Publicatie::create([
-            'soort' => PublicatieSoort::Digitaal,
+            'soort_id' => $soort('digitaal'),
             'titel' => 'Onderwijsvisie IUASR (PDF)',
             'uitgavejaar' => 2025,
             'vakgebied_id' => $vak('Overige'),
@@ -112,7 +113,7 @@ class BibliotheekSeeder extends Seeder
         // Tijdschrift met twee uitgaven en artikelen — de zoekvraag uit de opdracht:
         // "in welk tijdschrift staat dit artikel?"
         $tijdschrift = Publicatie::create([
-            'soort' => PublicatieSoort::Tijdschrift,
+            'soort_id' => $soort('tijdschrift'),
             'titel' => 'Studia Islamica Rotterdam',
             'vakgebied_id' => $vak('Overige'),
         ]);

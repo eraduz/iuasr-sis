@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Enums\PublicatieSoort;
+use App\Models\Bibliotheek\Publicatiesoort;
 use App\Models\Bibliotheek\Auteur;
 use App\Models\Bibliotheek\Publicatie;
 use App\Models\Bibliotheek\Taal;
@@ -26,7 +26,7 @@ class BibliotheekVerrijkingTest extends TestCase
     private function publicatie(string $titel, ?string $auteur = null, string $taal = 'tr'): Publicatie
     {
         $publicatie = Publicatie::create([
-            'soort' => PublicatieSoort::Boek,
+            'soort_id' => Publicatiesoort::metCode('boek')->id,
             'titel' => $titel,
             'bron_rekcode' => 'B - '.random_int(1, 9999),
         ]);

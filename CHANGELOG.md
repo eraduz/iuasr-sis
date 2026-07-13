@@ -9,6 +9,22 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.7.0] — 2026-07-13
+
+- **Publicatiesoort is nu een opzoektabel die u zelf beheert.** Boek, tijdschrift en
+  digitaal document stonden vast in de code; **cd** en **dvd** zijn toegevoegd en
+  nieuwe soorten voegt de bibliotheek voortaan zelf toe onder **Beheer → Soorten &
+  tabellen**, samen met talen, vakgebieden en kasten.
+- Een soort draagt twee vlaggen die het **gedrag** bepalen, geen etiket:
+  *fysieke exemplaren* (boek, cd, dvd — een digitaal document niet) en
+  *uitgaven met artikelen* (tijdschrift). Een nieuwe soort werkt daardoor meteen
+  correct: geen exemplaren waar ze niet horen, geen uitleenknop bij iets digitaals.
+- Het dashboard telt per soort uit de tabel, dus een nieuwe soort verschijnt vanzelf
+  als tegel.
+- **Verwijderen kan alleen als er niets aan hangt** (een soort met titels, een taal
+  aan een boek, een kast met exemplaren blijft staan) — anders een nette melding en
+  de suggestie om de waarde op inactief te zetten.
+
 ## [1.6.2] — 2026-07-13
 
 - **Zijbalk van de bibliotheekmodule opgesplitst per onderwerp.** Stond als één

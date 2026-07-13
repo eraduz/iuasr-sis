@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Enums\BibliotheekMailsoort;
 use App\Enums\ExemplaarStatus;
 use App\Enums\Materiaalstaat;
-use App\Enums\PublicatieSoort;
+use App\Models\Bibliotheek\Publicatiesoort;
 use App\Enums\Rol;
 use App\Models\Bibliotheek\Auteur;
 use App\Models\Bibliotheek\Emaillog;
@@ -44,7 +44,7 @@ class BibliotheekModuleTest extends TestCase
     private function publicatie(array $overschrijf = []): Publicatie
     {
         return Publicatie::create(array_merge([
-            'soort' => PublicatieSoort::Boek,
+            'soort_id' => Publicatiesoort::metCode('boek')->id,
             'titel' => 'Tafsir Ibn Kathir',
             'uitgavejaar' => 2018,
         ], $overschrijf));
@@ -91,7 +91,7 @@ class BibliotheekModuleTest extends TestCase
         $this->actingAs($bieb)->get(route('bibliotheek.publicaties.create'))->assertOk();
 
         $this->actingAs($bieb)->post(route('bibliotheek.publicaties.store'), [
-            'soort' => 'boek',
+            'soort_id' => Publicatiesoort::metCode('boek')->id,
             'titel' => 'صحيح البخاري',
             'auteurs' => ['Sahih al-Bukhari'],
             'exemplaren' => ['IUASR-HAD-001'],
@@ -202,7 +202,7 @@ class BibliotheekModuleTest extends TestCase
         $reeks = \App\Models\Bibliotheek\Reeks::create(['titel' => 'Een reeks']);
 
         $this->actingAs($bieb)->post(route('bibliotheek.publicaties.store'), [
-            'soort' => 'tijdschrift',
+            'soort_id' => Publicatiesoort::metCode('tijdschrift')->id,
             'titel' => 'Studia Islamica',
             'reeks_id' => $reeks->id,
             'deelnummer' => 3,
@@ -217,7 +217,7 @@ class BibliotheekModuleTest extends TestCase
     public function test_artikelen_zijn_te_vinden_op_titel_auteur_trefwoord_en_tijdschrift(): void
     {
         $bieb = $this->gebruiker(Rol::Bibliotheek);
-        $tijdschrift = $this->publicatie(['soort' => PublicatieSoort::Tijdschrift, 'titel' => 'Studia Islamica']);
+        $tijdschrift = $this->publicatie(['soort_id' => Publicatiesoort::metCode('tijdschrift')->id, 'titel' => 'Studia Islamica']);
         $uitgave = $tijdschrift->uitgaven()->create(['uitgavenummer' => '2025/1', 'jaar' => 2025]);
 
         $artikel = $uitgave->artikelen()->create([

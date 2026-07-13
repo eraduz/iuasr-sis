@@ -73,7 +73,7 @@
             <td class="tnum">{{ $p->uitgavejaar ?? '—' }}</td>
             <td class="tnum bieb-rek">{{ $p->rekplaats() ?? '—' }}</td>
             <td style="text-align:center;">
-              @if (! $p->soort->heeftExemplaren())
+              @if (! $p->heeftExemplaren())
                 <span class="sis-muted">digitaal</span>
               @elseif ($p->aantalBeschikbaar() > 0)
                 <span class="iuasr-dash-status s-approved">ja</span>

@@ -3,7 +3,6 @@
 namespace App\Models\Bibliotheek;
 
 use App\Enums\ExemplaarStatus;
-use App\Enums\PublicatieSoort;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -24,7 +23,7 @@ class Publicatie extends Model
     protected $table = 'bibliotheek_publicaties';
 
     protected $fillable = [
-        'soort', 'isbn', 'titel', 'uitgavejaar', 'druknummer',
+        'soort_id', 'isbn', 'titel', 'uitgavejaar', 'druknummer',
         'vakgebied_id', 'reeks_id', 'deelnummer', 'opmerking',
         // Herkomst uit het Excel-bestand (rekcode). Maakt de import idempotent.
         'bron_rekcode',
@@ -33,7 +32,6 @@ class Publicatie extends Model
     protected function casts(): array
     {
         return [
-            'soort' => PublicatieSoort::class,
             'uitgavejaar' => 'integer',
             'deelnummer' => 'integer',
         ];
@@ -42,6 +40,17 @@ class Publicatie extends Model
     /* --------------------------------------------------------------------
      | Relaties
      |------------------------------------------------------------------- */
+
+    /**
+     * Het soort: boek, tijdschrift, digitaal document, cd, dvd — en wat de
+     * bibliotheek er zelf aan toevoegt. Een OPZOEKTABEL, geen vaste lijst in de
+     * code. De soort draagt de twee vlaggen die het gedrag bepalen:
+     * heeftExemplaren() en heeftUitgaven().
+     */
+    public function soort(): BelongsTo
+    {
+        return $this->belongsTo(Publicatiesoort::class, 'soort_id');
+    }
 
     public function vakgebied(): BelongsTo
     {
@@ -126,6 +135,30 @@ class Publicatie extends Model
     /* --------------------------------------------------------------------
      | Afleidingen
      |------------------------------------------------------------------- */
+
+    /** Is dit een publicatie van de opgegeven soort (op code, bijv. 'boek')? */
+    public function isSoort(string $code): bool
+    {
+        return $this->soort?->code === $code;
+    }
+
+    /** Kent deze titel fysieke exemplaren? Leest de vlag van de soort. */
+    public function heeftExemplaren(): bool
+    {
+        return (bool) $this->soort?->heeftExemplaren();
+    }
+
+    /** Kent deze titel uitgaven met artikelen? Leest de vlag van de soort. */
+    public function heeftUitgaven(): bool
+    {
+        return (bool) $this->soort?->heeftUitgaven();
+    }
+
+    /** Filteren op soortcode: ->vanSoort('tijdschrift'). */
+    public function scopeVanSoort(Builder $query, string $code): Builder
+    {
+        return $query->whereHas('soort', fn (Builder $s) => $s->where('code', $code));
+    }
 
     /**
      * De REKPLAATS: waar het boek fysiek ligt, zoals de bibliotheek het altijd al

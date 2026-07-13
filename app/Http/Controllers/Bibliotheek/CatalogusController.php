@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Bibliotheek;
 
 use App\Enums\ExemplaarStatus;
-use App\Enums\PublicatieSoort;
+use App\Models\Bibliotheek\Publicatiesoort;
 use App\Http\Controllers\Controller;
 use App\Models\Bibliotheek\Publicatie;
 use App\Models\Bibliotheek\Taal;
@@ -32,7 +32,7 @@ class CatalogusController extends Controller
         $publicaties = Publicatie::query()
             ->with(['auteurs', 'talen', 'vakgebied', 'reeks', 'exemplaren.kast'])
             ->when($request->filled('q'), fn ($q) => $q->zoek((string) $request->query('q')))
-            ->when($request->filled('soort'), fn ($q) => $q->where('soort', (string) $request->query('soort')))
+            ->when($request->filled('soort'), fn ($q) => $q->where('soort_id', (int) $request->query('soort')))
             ->when($request->filled('vakgebied'), fn ($q) => $q->where('vakgebied_id', (int) $request->query('vakgebied')))
             ->when($request->filled('taal'), fn ($q) => $q->whereHas('talen', fn ($t) => $t->where('bibliotheek_talen.id', (int) $request->query('taal'))))
             ->when($request->query('beschikbaar') === '1',
@@ -45,9 +45,9 @@ class CatalogusController extends Controller
             'publicaties' => $publicaties,
             'vakgebieden' => Vakgebied::where('actief', true)->orderBy('volgorde')->get(),
             'talen' => Taal::where('actief', true)->orderBy('naam')->get(),
-            'soorten' => PublicatieSoort::opties(),
+            'soorten' => Publicatiesoort::actief()->geordend()->get(),
             'zoek' => (string) $request->query('q', ''),
-            'soortFilter' => (string) $request->query('soort', ''),
+            'soortFilter' => (int) $request->query('soort', 0),
             'vakgebiedFilter' => (int) $request->query('vakgebied', 0),
             'taalFilter' => (int) $request->query('taal', 0),
             'alleenBeschikbaar' => $request->query('beschikbaar') === '1',

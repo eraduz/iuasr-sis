@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Enums\PublicatieSoort;
+use App\Models\Bibliotheek\Publicatiesoort;
 use App\Enums\Rol;
 use App\Models\Bibliotheek\Exemplaar;
 use App\Models\Bibliotheek\Publicatie;
@@ -62,7 +62,7 @@ class BibliotheekImportTest extends TestCase
 
         $publicatie = Publicatie::where('bron_rekcode', 'F. 143')->firstOrFail();
         $this->assertSame('Al-mawsou3a al-fiqhiya', $publicatie->titel);
-        $this->assertSame(PublicatieSoort::Boek, $publicatie->soort);
+        $this->assertSame('boek', $publicatie->soort->code);
         $this->assertSame('As-sarkhassi', $publicatie->auteurs->first()->naam);
         $this->assertSame('Arabisch', $publicatie->talen->first()->naam);
 
@@ -192,7 +192,7 @@ class BibliotheekImportTest extends TestCase
         $import->importeer($gelezen['rijen']);
 
         $this->assertSame(1, $gelezen['statistiek']['tijdschriften']);
-        $this->assertSame(PublicatieSoort::Tijdschrift, Publicatie::where('bron_rekcode', 'C . 1')->firstOrFail()->soort);
+        $this->assertSame('tijdschrift', Publicatie::where('bron_rekcode', 'C . 1')->firstOrFail()->soort->code);
 
         unlink($pad);
     }

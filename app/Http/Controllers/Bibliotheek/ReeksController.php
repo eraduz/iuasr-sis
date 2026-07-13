@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Bibliotheek;
 
 use App\Enums\ExemplaarStatus;
-use App\Enums\PublicatieSoort;
+use App\Models\Bibliotheek\Publicatiesoort;
 use App\Http\Controllers\Controller;
 use App\Models\Bibliotheek\Auteur;
 use App\Models\Bibliotheek\Exemplaar;
@@ -83,11 +83,13 @@ class ReeksController extends Controller
 
         $auteurIds = Auteur::idsVoorNamen(array_filter($data['auteurs'] ?? []));
         $taalIds = array_map('intval', $data['talen'] ?? []);
+        // Een reeksdeel is altijd een boek; de soort komt uit de opzoektabel.
+        $boekSoortId = Publicatiesoort::metCode('boek')?->id;
         $aantal = 0;
 
         foreach ($data['delen'] as $deel) {
             $publicatie = Publicatie::create([
-                'soort' => PublicatieSoort::Boek,
+                'soort_id' => $boekSoortId,
                 // Zonder eigen ondertitel krijgt het deel de reekstitel; de
                 // deelaanduiding komt uit volledigeTitel().
                 'titel' => ($deel['titel'] ?? '') ?: $data['titel'],
@@ -146,7 +148,7 @@ class ReeksController extends Controller
         $voorbeeld = $reeks->delen()->with(['auteurs', 'talen'])->first();
 
         $publicatie = Publicatie::create([
-            'soort' => PublicatieSoort::Boek,
+            'soort_id' => Publicatiesoort::metCode('boek')?->id,
             'titel' => ($data['titel'] ?? '') ?: $reeks->titel,
             'uitgavejaar' => $voorbeeld?->uitgavejaar,
             'vakgebied_id' => $voorbeeld?->vakgebied_id,

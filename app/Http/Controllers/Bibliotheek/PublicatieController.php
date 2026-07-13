@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Bibliotheek;
 
 use App\Enums\ExemplaarStatus;
-use App\Enums\PublicatieSoort;
+use App\Models\Bibliotheek\Publicatiesoort;
 use App\Http\Controllers\Controller;
 use App\Models\Bibliotheek\Auteur;
 use App\Models\Bibliotheek\Exemplaar;
@@ -36,7 +36,7 @@ class PublicatieController extends Controller
         $publicaties = Publicatie::query()
             ->with(['auteurs', 'talen', 'vakgebied', 'reeks', 'exemplaren'])
             ->when($request->filled('q'), fn ($q) => $q->zoek((string) $request->query('q')))
-            ->when($request->filled('soort'), fn ($q) => $q->where('soort', (string) $request->query('soort')))
+            ->when($request->filled('soort'), fn ($q) => $q->where('soort_id', (int) $request->query('soort')))
             ->when($request->filled('vakgebied'), fn ($q) => $q->where('vakgebied_id', (int) $request->query('vakgebied')))
             ->when($request->filled('jaar'), fn ($q) => $q->where('uitgavejaar', (int) $request->query('jaar')))
             ->when($request->filled('taal'), fn ($q) => $q->whereHas('talen', fn ($t) => $t->where('bibliotheek_talen.id', (int) $request->query('taal'))))
@@ -47,10 +47,11 @@ class PublicatieController extends Controller
 
         return view('bibliotheek.publicaties.index', [
             'publicaties' => $publicaties,
+            'soorten' => Publicatiesoort::actief()->geordend()->get(),
             'vakgebieden' => Vakgebied::where('actief', true)->orderBy('volgorde')->get(),
             'talen' => Taal::where('actief', true)->orderBy('naam')->get(),
             'zoek' => (string) $request->query('q', ''),
-            'soortFilter' => (string) $request->query('soort', ''),
+            'soortFilter' => (int) $request->query('soort', 0),
             'vakgebiedFilter' => (int) $request->query('vakgebied', 0),
             'taalFilter' => (int) $request->query('taal', 0),
             'statusFilter' => (string) $request->query('status', ''),
@@ -60,10 +61,11 @@ class PublicatieController extends Controller
 
     public function create(Request $request): View
     {
-        $soort = PublicatieSoort::tryFrom((string) $request->query('soort', '')) ?? PublicatieSoort::Boek;
+        // Vooraf gekozen soort (via de knoppen op het dashboard); anders 'boek'.
+        $soort = Publicatiesoort::metCode((string) $request->query('soort', '')) ?? Publicatiesoort::metCode('boek');
 
         return view('bibliotheek.publicaties.form', $this->formulierData(new Publicatie([
-            'soort' => $soort,
+            'soort_id' => $soort?->id,
         ])));
     }
 
@@ -80,7 +82,7 @@ class PublicatieController extends Controller
 
         AuditLogger::log(AuditLogger::AANMAAK, $publicatie, veld: 'publicatie', context: [
             'titel' => $publicatie->titel,
-            'soort' => $publicatie->soort->value,
+            'soort' => $publicatie->soort?->code,
         ]);
 
         return redirect()->route('bibliotheek.publicaties.show', $publicatie)
@@ -160,7 +162,7 @@ class PublicatieController extends Controller
     public function exemplaarToevoegen(Request $request, Publicatie $publicatie): RedirectResponse
     {
         abort_unless($publicatie->beheerbaarVoor($request->user()), 403, 'U mag deze publicatie niet wijzigen.');
-        abort_unless($publicatie->soort->heeftExemplaren(), 422, 'Een digitaal document kent geen fysieke exemplaren.');
+        abort_unless($publicatie->heeftExemplaren(), 422, 'Dit soort kent geen fysieke exemplaren (bijvoorbeeld een digitaal document).');
 
         $data = $request->validate([
             'serienummer' => ['required', 'string', 'max:40', 'unique:bibliotheek_exemplaren,serienummer'],
@@ -218,10 +220,10 @@ class PublicatieController extends Controller
      */
     private function valideer(Request $request, ?Publicatie $bestaand = null): array
     {
-        $soort = PublicatieSoort::tryFrom((string) $request->input('soort'));
+        $soort = Publicatiesoort::find((int) $request->input('soort_id'));
 
         $data = $request->validate([
-            'soort' => ['required', Rule::in(PublicatieSoort::waarden())],
+            'soort_id' => ['required', 'integer', 'exists:bibliotheek_soorten,id'],
             'titel' => ['required', 'string', 'max:255'],
             'isbn' => ['nullable', 'string', 'max:20'],
             // De rekplaats ("F. 1070"): waar het boek fysiek ligt.
@@ -246,17 +248,18 @@ class PublicatieController extends Controller
             'reeks_id' => 'boekreeks',
             'kast_id' => 'kast',
             'bron_rekcode' => 'rek / plaats',
+            'soort_id' => 'soort',
         ]);
 
         // Alleen een boek kan deel zijn van een boekreeks.
-        if ($soort !== PublicatieSoort::Boek) {
+        if ($soort?->code !== 'boek') {
             $data['reeks_id'] = null;
             $data['deelnummer'] = null;
         }
 
         return [
             'publicatie' => collect($data)->only([
-                'soort', 'titel', 'isbn', 'uitgavejaar', 'druknummer',
+                'soort_id', 'titel', 'isbn', 'uitgavejaar', 'druknummer',
                 'vakgebied_id', 'reeks_id', 'deelnummer', 'opmerking', 'bron_rekcode',
             ])->all(),
             'auteurs' => array_filter($data['auteurs'] ?? []),
@@ -275,8 +278,8 @@ class PublicatieController extends Controller
      */
     private function exemplarenBijwerken(Publicatie $publicatie, array $serienummers, ?int $kastId): void
     {
-        if (! $publicatie->soort->heeftExemplaren()) {
-            return; // Een digitaal document heeft geen fysieke exemplaren.
+        if (! $publicatie->heeftExemplaren()) {
+            return; // Bijv. een digitaal document: geen fysieke exemplaren.
         }
 
         foreach ($serienummers as $serienummer) {
@@ -299,6 +302,7 @@ class PublicatieController extends Controller
     {
         return [
             'publicatie' => $publicatie,
+            'soorten' => Publicatiesoort::actief()->geordend()->get(),
             'vakgebieden' => Vakgebied::where('actief', true)->orderBy('volgorde')->get(),
             'talen' => Taal::where('actief', true)->orderBy('naam')->get(),
             'kasten' => Kast::where('actief', true)->orderBy('code')->get(),

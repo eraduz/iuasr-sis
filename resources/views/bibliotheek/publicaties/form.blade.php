@@ -3,7 +3,9 @@
 @php
   $nieuw = ! $publicatie->exists;
   $titel = $nieuw ? 'Nieuwe publicatie' : 'Publicatie bewerken';
-  $soortWaarde = old('soort', $publicatie->soort?->value ?? 'boek');
+  $soortWaarde = (int) old('soort_id', $publicatie->soort_id);
+  $boekSoortId = $soorten->firstWhere('code', 'boek')?->id;
+  $digitaalSoortIds = $soorten->where('heeft_exemplaren', false)->pluck('id')->all();
   $auteurRegels = old('auteurs', $gekozenAuteurs ?: ['']);
 @endphp
 
@@ -25,11 +27,13 @@
   <div class="sis-fld-row sis-fld-row--2">
     <div class="sis-fld">
       <label>Publicatietype <span class="req">*</span></label>
-      <select name="soort" id="pub-soort" required>
-        @foreach (\App\Enums\PublicatieSoort::opties() as $waarde => $label)
-          <option value="{{ $waarde }}" @selected($soortWaarde === $waarde)>{{ $label }}</option>
+      <select name="soort_id" id="pub-soort" required
+              data-boek="{{ $boekSoortId }}" data-zonder-exemplaren="{{ implode(',', $digitaalSoortIds) }}">
+        @foreach ($soorten as $s)
+          <option value="{{ $s->id }}" @selected($soortWaarde === $s->id)>{{ $s->naam }}</option>
         @endforeach
       </select>
+      <small class="sis-muted">Staat het soort er niet bij (bijv. cd of dvd)? Voeg het toe onder Beheer &rarr; Soorten.</small>
     </div>
     <div class="sis-fld">
       <label>ISBN</label>
@@ -140,9 +144,15 @@
     if (veld) veld.style.display = zichtbaar ? '' : 'none';
   };
 
+  // Welke soort een boekreeks kan hebben en welke geen exemplaren heeft, staat in
+  // de opzoektabel — de vlaggen komen mee als data-attributen. De server dwingt
+  // dit opnieuw af.
+  var boekId = soort.getAttribute('data-boek');
+  var zonderExemplaren = (soort.getAttribute('data-zonder-exemplaren') || '').split(',').filter(Boolean);
+
   var bijwerken = function () {
-    toon('reeks', soort.value === 'boek');
-    toon('exemplaren', soort.value !== 'digitaal');
+    toon('reeks', soort.value === boekId);
+    toon('exemplaren', zonderExemplaren.indexOf(soort.value) === -1);
   };
 
   soort.addEventListener('change', bijwerken);

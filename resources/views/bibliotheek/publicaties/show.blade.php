@@ -36,7 +36,7 @@
   </table>
 </div>
 
-@if ($publicatie->soort->heeftExemplaren())
+@if ($publicatie->heeftExemplaren())
   <h2 style="margin:22px 0 10px;">Exemplaren</h2>
   <div class="iuasr-dash-tbl-card">
     <table class="iuasr-dash-tbl">
@@ -94,7 +94,7 @@
   @endif
 @endif
 
-@if ($publicatie->soort->heeftUitgaven())
+@if ($publicatie->heeftUitgaven())
   <h2 style="margin:22px 0 10px;">Uitgaven</h2>
   <div class="iuasr-dash-tbl-card">
     <table class="iuasr-dash-tbl">

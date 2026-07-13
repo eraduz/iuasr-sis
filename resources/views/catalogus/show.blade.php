@@ -28,7 +28,7 @@
   </table>
 </div>
 
-@if ($publicatie->soort->heeftExemplaren())
+@if ($publicatie->heeftExemplaren())
   <h2 style="margin:22px 0 10px;">Waar staat het?</h2>
   <div class="iuasr-dash-tbl-card">
     <table class="iuasr-dash-tbl">
@@ -67,7 +67,7 @@
   </div>
 @endif
 
-@if ($publicatie->soort->heeftUitgaven() && $publicatie->uitgaven->isNotEmpty())
+@if ($publicatie->heeftUitgaven() && $publicatie->uitgaven->isNotEmpty())
   <h2 style="margin:22px 0 10px;">Uitgaven en artikelen</h2>
   @foreach ($publicatie->uitgaven as $uitgave)
     <div class="sis-card" style="margin-bottom:10px;">

@@ -272,6 +272,7 @@
 
         // Onderhoud: dit doe je zelden, dus onderaan en apart.
         $biebMenu['Beheer'] = [
+            ['Soorten & tabellen', 'bibliotheek.opzoektabellen', 'db', 'bibliotheek.opzoektabellen'],
             ['Importeren', 'bibliotheek.import', 'db', 'bibliotheek.import'],
             ['Verrijking (ISBN)', 'bibliotheek.verrijking', 'search', 'bibliotheek.verrijking'],
         ];

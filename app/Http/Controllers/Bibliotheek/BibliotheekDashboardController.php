@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Bibliotheek;
 
-use App\Enums\PublicatieSoort;
 use App\Http\Controllers\Controller;
 use App\Models\Bibliotheek\Publicatie;
+use App\Models\Bibliotheek\Publicatiesoort;
 use App\Models\Bibliotheek\Uitlening;
 use App\Support\AuditLogger;
 use Illuminate\Contracts\View\View;
@@ -28,10 +28,10 @@ class BibliotheekDashboardController extends Controller
         $venster = (int) config('sis.bibliotheek.herinnering_dagen_vooraf', 3);
 
         return view('bibliotheek.dashboard', [
+            // Per SOORT geteld, uit de opzoektabel — zo verschijnt een nieuwe soort
+            // (cd, dvd, ...) vanzelf op het dashboard, zonder codewijziging.
+            'perSoort' => Publicatiesoort::actief()->geordend()->withCount('publicaties')->get(),
             'kpi' => [
-                'boeken' => Publicatie::where('soort', PublicatieSoort::Boek)->count(),
-                'tijdschriften' => Publicatie::where('soort', PublicatieSoort::Tijdschrift)->count(),
-                'digitaal' => Publicatie::where('soort', PublicatieSoort::Digitaal)->count(),
                 'uitgeleend' => Uitlening::lopend()->count(),
                 'telaat' => Uitlening::teLaat()->count(),
                 'vandaag_uit' => Uitlening::whereDate('uitgeleend_op', Carbon::today())->count(),
@@ -67,7 +67,7 @@ class BibliotheekDashboardController extends Controller
         $rijen = Publicatie::query()
             ->with(['auteurs', 'talen', 'vakgebied', 'exemplaren'])
             ->when($request->filled('q'), fn ($q) => $q->zoek((string) $request->query('q')))
-            ->when($request->filled('soort'), fn ($q) => $q->where('soort', (string) $request->query('soort')))
+            ->when($request->filled('soort'), fn ($q) => $q->where('soort_id', (int) $request->query('soort')))
             ->when($request->filled('vakgebied'), fn ($q) => $q->where('vakgebied_id', (int) $request->query('vakgebied')))
             ->when($request->filled('jaar'), fn ($q) => $q->where('uitgavejaar', (int) $request->query('jaar')))
             ->when($request->filled('taal'), fn ($q) => $q->whereHas('talen', fn ($t) => $t->where('bibliotheek_talen.id', (int) $request->query('taal'))))
