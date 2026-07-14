@@ -131,6 +131,29 @@ class TijdschriftController extends Controller
         return back()->with('status', 'Artikel bijgewerkt.');
     }
 
+    /**
+     * Artikel verwijderen. Anders dan bij een publicatie mág dit hier wél: een
+     * artikel is een inhoudsopgave-regel, geen bezit — een tikfout of een dubbel
+     * ingelezen regel moet je gewoon kunnen weghalen. De verwijdering wordt
+     * gelogd, mét de titel, zodat naspeurbaar blijft wat er weg is.
+     */
+    public function artikelDestroy(Request $request, Artikel $artikel): RedirectResponse
+    {
+        abort_unless($request->user()->magBibliotheekBeheren(), 403, 'U mag de bibliotheek niet beheren.');
+
+        $uitgave = $artikel->uitgave;
+
+        AuditLogger::log(AuditLogger::VERWIJDERING, $artikel, veld: 'tijdschriftartikel', context: [
+            'titel' => $artikel->titel,
+            'uitgave' => $uitgave?->omschrijving(),
+        ]);
+
+        $artikel->auteurs()->detach();
+        $artikel->delete();
+
+        return back()->with('status', 'Artikel verwijderd.');
+    }
+
     private function tijdschriften()
     {
         // Alle titels van een soort dat uitgaven kent (nu: tijdschrift).

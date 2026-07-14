@@ -9,6 +9,18 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.9.0] — 2026-07-14
+
+- **Artikelen zijn nu volledig te beheren.** Toevoegen kon al; **wijzigen en
+  verwijderen** ontbraken. Op de uitgavepagina klapt u bij elk artikel een
+  formulier open (titel, auteurs, pagina's, trefwoorden, beschrijving) en kunt u het
+  ook verwijderen. Elke mutatie wordt gelogd, ook wát er is verwijderd.
+- Vanaf de tijdschriftpagina gaat u met **Artikelen beheren** direct naar de juiste
+  uitgave.
+- **Module hernoemd**: "Scriptie Administratie" heet voortaan **Scriptie
+  Coördinatie**. Alleen de zichtbare naam; de sleutel `scriptie` blijft ongewijzigd,
+  dus routes en rechten blijven intact.
+
 ## [1.8.1] — 2026-07-14
 
 - **De artikelen staan nu op de tijdschriftpagina zelf.** U hoefde niet langer per

@@ -696,6 +696,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/tijdschriften/{publicatie}/uitgaven', [App\Http\Controllers\Bibliotheek\TijdschriftController::class, 'uitgaveStore'])->name('bibliotheek.uitgaven.store');
         Route::post('/uitgaven/{uitgave}/artikelen', [App\Http\Controllers\Bibliotheek\TijdschriftController::class, 'artikelStore'])->name('bibliotheek.artikelen.store');
         Route::put('/artikelen/{artikel}', [App\Http\Controllers\Bibliotheek\TijdschriftController::class, 'artikelUpdate'])->name('bibliotheek.artikelen.update');
+        Route::delete('/artikelen/{artikel}', [App\Http\Controllers\Bibliotheek\TijdschriftController::class, 'artikelDestroy'])->name('bibliotheek.artikelen.destroy');
 
         // Import van de bestaande Excel-bibliotheek (proefdraaien, dan importeren)
         Route::get('/import', [App\Http\Controllers\Bibliotheek\ImportController::class, 'index'])->name('bibliotheek.import');

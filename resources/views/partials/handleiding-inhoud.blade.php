@@ -354,6 +354,11 @@
   <h3>Zoeken en filteren in de catalogus</h3>
   <p>In de <b>Catalogus</b> filtert u op soort (boek, tijdschrift, digitaal document), vakgebied, taal, status en jaar. <b>Zodra u een keuze maakt, wordt de lijst meteen bijgewerkt</b> — u hoeft niet op Filteren te klikken. Wilt u bijvoorbeeld alleen tijdschriften zien, kies dan bij "Alle soorten" de optie <b>Tijdschrift</b>. In het zoekveld typt u een titel, ISBN, auteur of reeks en drukt u op <b>Enter</b>. Boven de lijst ziet u welke filters actief zijn, met een link om weer alles te tonen.</p>
 
+  <h3>Artikelen toevoegen, wijzigen en verwijderen</h3>
+  <p>Open een tijdschrift in de catalogus en klap een uitgave open; met <b>Artikelen beheren</b> komt u op de uitgavepagina. Onderaan staat het formulier <b>Artikel toevoegen</b> (titel, auteur(s), pagina's, trefwoorden, korte beschrijving; meerdere auteurs kunnen met de knop <i>Auteur toevoegen</i>). Bij elk bestaand artikel klapt u <b>Artikel bewerken of verwijderen</b> open om het aan te passen of weg te halen. Elke wijziging wordt gelogd.</p>
+  <p>Is er nog geen uitgave? Voeg die dan eerst toe op de pagina van het tijdschrift (uitgavenummer, publicatiedatum, jaar, locatie). Een artikel hoort altijd bij een uitgave — zo blijft vindbaar in welk nummer het stond.</p>
+  <div class="let">Bij <b>geïmporteerde</b> artikelen staat in het veld Beschrijving de oorspronkelijke regel uit het bronbestand. Laat die staan: daardoor blijft het artikel vindbaar op elk woord dat in de bron stond, ook op wat het systeem niet als titel of auteur herkende.</div>
+
   <h3>De tijdschriftinhoud importeren (artikelen)</h3>
   <p>De inhoud van de tijdschriften — welke artikelen in welke uitgave staan — komt uit twee aparte bestanden: een Excel-bestand met de Engelse tijdschriften en een Word-bestand met de Arabische. De beheerder leest die in met een commando op de server; het systeem herkent daarin de opbouw <b>rek &rarr; tijdschrift &rarr; uitgave &rarr; artikel</b> en legt per artikel de <b>titel</b>, de <b>auteur</b>, de <b>pagina's</b> en (bij het Engelse bestand) de <b>Arabische vertaling van de titel</b> vast.</p>
   <p>Daarna vindt u onder <b>Artikelen zoeken</b> een artikel terug op titel, auteur, trefwoord of tijdschriftnaam — en ziet u meteen in welk tijdschrift en welke uitgave het staat.</p>

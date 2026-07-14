@@ -118,7 +118,9 @@
         @if ($uitgave->jaar) <span class="sis-muted" style="font-weight:400;">({{ $uitgave->jaar }})</span>@endif
         <span class="iuasr-dash-status s-approved" style="margin-left:8px;">{{ $uitgave->artikelen->count() }} {{ $uitgave->artikelen->count() === 1 ? 'artikel' : 'artikelen' }}</span>
         @if ($uitgave->locatie) <small class="sis-muted">· {{ $uitgave->locatie }}</small>@endif
-        <a class="iuasr-dash-btn iuasr-dash-btn--sm" style="float:right;" href="{{ route('bibliotheek.uitgaven.show', $uitgave) }}">Openen</a>
+        <a class="iuasr-dash-btn iuasr-dash-btn--sm" style="float:right;" href="{{ route('bibliotheek.uitgaven.show', $uitgave) }}">
+          {{ $magBeheer ? 'Artikelen beheren' : 'Openen' }}
+        </a>
       </summary>
 
       <table class="iuasr-dash-tbl" style="margin-top:10px;">
