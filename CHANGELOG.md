@@ -9,6 +9,21 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.8.1] — 2026-07-14
+
+- **De artikelen staan nu op de tijdschriftpagina zelf.** U hoefde niet langer per
+  uitgave door te klikken: elke uitgave is een uitklapbaar blok met de artikelen
+  erin (titel, auteur, pagina's, Arabische titel), met bovenaan het totaal aantal
+  uitgaven en artikelen en een link naar Artikelen zoeken voor dit tijdschrift.
+  Zowel in de bibliotheekmodule als op de alleen-lezen kaart voor collega's.
+- **Scherm "Dubbele tijdschriften"** (Beheer): zoekt plankregels uit de boekenlijst
+  die bij een tijdschrift met uitgaven horen, en stelt voor ze samen te voegen —
+  met behoud van exemplaren, rekcode, auteurs, talen en opmerkingen. Samenvoegen
+  gebeurt alleen na aanvinken; een tijdschrift dat zelf uitgaven heeft, wordt nooit
+  opgeslokt. Op de huidige gegevens levert dit **geen** voorstellen op: de 566
+  plankregels uit de boekenlijst blijken losse stukken (met een artikeltitel als
+  naam), geen dubbele tijdschriften.
+
 ## [1.8.0] — 2026-07-13
 
 - **Tijdschriftinhoud geïmporteerd**: 9.397 artikelen in 571 uitgaven, uit twee

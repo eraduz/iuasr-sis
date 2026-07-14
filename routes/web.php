@@ -716,6 +716,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/kasten', [App\Http\Controllers\Bibliotheek\OpzoektabelController::class, 'kastStore'])->name('bibliotheek.opzoektabellen.kast.store');
         Route::delete('/kasten/{kast}', [App\Http\Controllers\Bibliotheek\OpzoektabelController::class, 'kastDestroy'])->name('bibliotheek.opzoektabellen.kast.destroy');
 
+        // Dubbele tijdschriften: plankregels uit de boekenlijst samenvoegen met de
+        // tijdschriften die uitgaven en artikelen hebben. Voorstel, geen automatisme.
+        Route::get('/samenvoegen', [App\Http\Controllers\Bibliotheek\TijdschriftSamenvoegController::class, 'index'])->name('bibliotheek.samenvoegen');
+        Route::post('/samenvoegen', [App\Http\Controllers\Bibliotheek\TijdschriftSamenvoegController::class, 'samenvoegen'])->name('bibliotheek.samenvoegen.uitvoeren');
+
         // Verrijking met een externe bibliografische bron (ISBN, jaar, schrijfwijze)
         Route::get('/verrijking', [App\Http\Controllers\Bibliotheek\VerrijkingController::class, 'index'])->name('bibliotheek.verrijking');
         Route::put('/verrijking/{verrijking}/overnemen', [App\Http\Controllers\Bibliotheek\VerrijkingController::class, 'overnemen'])->name('bibliotheek.verrijking.overnemen');

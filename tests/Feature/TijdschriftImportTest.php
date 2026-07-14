@@ -188,6 +188,47 @@ class TijdschriftImportTest extends TestCase
         unlink($pad);
     }
 
+    public function test_de_artikelen_staan_op_de_pagina_van_het_tijdschrift(): void
+    {
+        $pad = $this->bestand([
+            'ISLAMIC STUDIES   REK N: 3',
+            'Vol. 1, June 1962, N: 2',
+            'CONTENTS',
+            '· Sunnah and Hadith - Fazlur Rahman ... 1 – 36',
+            '· Pluralism in the Islamic World - G. E. von Grunebaum ... 37 - 59',
+        ]);
+
+        $import = new TijdschriftImport();
+        $import->importeer($import->lees($pad)['rijen']);
+
+        $tijdschrift = Publicatie::where('titel', 'ISLAMIC STUDIES')->firstOrFail();
+
+        $bieb = \App\Models\User::create([
+            'naam' => 'Bieb', 'email' => 'bieb@iuasr.test', 'rol' => \App\Enums\Rol::Bibliotheek,
+        ]);
+
+        // Op de beheerpagina van het tijdschrift staan de artikelen zélf, niet
+        // alleen een teller — dat scheelt doorklikken per uitgave.
+        $this->actingAs($bieb)->get(route('bibliotheek.publicaties.show', $tijdschrift))
+            ->assertOk()
+            ->assertSee('2 artikelen')
+            ->assertSee('Sunnah and Hadith')
+            ->assertSee('Fazlur Rahman')
+            ->assertSee('1-36');
+
+        // En op de alleen-lezen kaart die elke medewerker ziet, ook.
+        $docent = \App\Models\User::create([
+            'naam' => 'Docent', 'email' => 'docent@iuasr.test', 'rol' => \App\Enums\Rol::Docent,
+        ]);
+
+        $this->actingAs($docent)->get(route('catalogus.show', $tijdschrift))
+            ->assertOk()
+            ->assertSee('Sunnah and Hadith')
+            ->assertSee('Pluralism in the Islamic World');
+
+        unlink($pad);
+    }
+
     public function test_de_artikelen_zijn_terug_te_vinden_via_de_zoekfunctie(): void
     {
         $pad = $this->bestand([

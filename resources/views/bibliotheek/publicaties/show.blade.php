@@ -95,26 +95,52 @@
 @endif
 
 @if ($publicatie->heeftUitgaven())
-  <h2 style="margin:22px 0 10px;">Uitgaven</h2>
-  <div class="iuasr-dash-tbl-card">
-    <table class="iuasr-dash-tbl">
-      <thead><tr><th>Uitgavenummer</th><th>Datum</th><th>Jaar</th><th>Locatie</th><th style="text-align:right;">Artikelen</th><th class="row-act"></th></tr></thead>
-      <tbody>
-        @forelse ($publicatie->uitgaven as $uitgave)
-          <tr>
-            <td class="nm"><a href="{{ route('bibliotheek.uitgaven.show', $uitgave) }}">{{ $uitgave->uitgavenummer }}</a></td>
-            <td class="tnum">{{ $uitgave->publicatiedatum?->format('d-m-Y') ?? '—' }}</td>
-            <td class="tnum">{{ $uitgave->jaar ?? '—' }}</td>
-            <td>{{ $uitgave->locatie ?? '—' }}</td>
-            <td class="tnum" style="text-align:right;">{{ $uitgave->artikelen->count() }}</td>
-            <td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('bibliotheek.uitgaven.show', $uitgave) }}">Artikelen</a></td>
-          </tr>
-        @empty
-          <tr><td colspan="6"><div class="iuasr-dash-empty" style="border:0;"><h3>Nog geen uitgaven</h3><p class="sis-muted">Voeg de eerste aflevering toe.</p></div></td></tr>
-        @endforelse
-      </tbody>
-    </table>
-  </div>
+  @php $totaalArtikelen = $publicatie->uitgaven->sum(fn ($u) => $u->artikelen->count()); @endphp
+
+  <h2 style="margin:22px 0 10px;">
+    Uitgaven en artikelen
+    <span class="sis-muted" style="font-size:14px; font-weight:400;">
+      — {{ $publicatie->uitgaven->count() }} {{ $publicatie->uitgaven->count() === 1 ? 'uitgave' : 'uitgaven' }},
+      {{ number_format($totaalArtikelen, 0, ',', '.') }} {{ $totaalArtikelen === 1 ? 'artikel' : 'artikelen' }}
+    </span>
+  </h2>
+
+  <p class="sis-muted" style="margin:0 0 10px;">
+    Klap een uitgave open om de artikelen te zien. Zoekt u één bepaald artikel, gebruik dan
+    <a href="{{ route('bibliotheek.artikelen', ['tijdschrift' => $publicatie->id]) }}">Artikelen zoeken</a> —
+    daar doorzoekt u alle artikelen van dit tijdschrift in één keer.
+  </p>
+
+  @forelse ($publicatie->uitgaven as $uitgave)
+    <details class="sis-card" style="margin-bottom:8px;" @if ($loop->first) open @endif>
+      <summary style="cursor:pointer; font-weight:600;">
+        {{ $uitgave->uitgavenummer }}
+        @if ($uitgave->jaar) <span class="sis-muted" style="font-weight:400;">({{ $uitgave->jaar }})</span>@endif
+        <span class="iuasr-dash-status s-approved" style="margin-left:8px;">{{ $uitgave->artikelen->count() }} {{ $uitgave->artikelen->count() === 1 ? 'artikel' : 'artikelen' }}</span>
+        @if ($uitgave->locatie) <small class="sis-muted">· {{ $uitgave->locatie }}</small>@endif
+        <a class="iuasr-dash-btn iuasr-dash-btn--sm" style="float:right;" href="{{ route('bibliotheek.uitgaven.show', $uitgave) }}">Openen</a>
+      </summary>
+
+      <table class="iuasr-dash-tbl" style="margin-top:10px;">
+        <thead><tr><th>Artikel</th><th>Auteur(s)</th><th style="width:110px;">Pagina's</th></tr></thead>
+        <tbody>
+          @forelse ($uitgave->artikelen as $artikel)
+            <tr>
+              <td class="nm" dir="auto">{{ $artikel->titel }}
+                @if ($artikel->trefwoorden)<br><small class="sis-muted" dir="auto">{{ $artikel->trefwoorden }}</small>@endif
+              </td>
+              <td dir="auto">{{ $artikel->auteurs->pluck('naam')->implode(', ') ?: '—' }}</td>
+              <td class="tnum">{{ $artikel->paginas ?? '—' }}</td>
+            </tr>
+          @empty
+            <tr><td colspan="3"><p class="sis-muted">Nog geen artikelen bij deze uitgave.</p></td></tr>
+          @endforelse
+        </tbody>
+      </table>
+    </details>
+  @empty
+    <div class="iuasr-dash-empty"><h3>Nog geen uitgaven</h3><p class="sis-muted">Voeg hieronder de eerste aflevering toe.</p></div>
+  @endforelse
 
   @if ($magBeheer)
     <form method="POST" action="{{ route('bibliotheek.uitgaven.store', $publicatie) }}" class="sis-card sis-form" style="margin-top:12px; max-width:760px;">

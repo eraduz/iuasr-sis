@@ -68,16 +68,33 @@
 @endif
 
 @if ($publicatie->heeftUitgaven() && $publicatie->uitgaven->isNotEmpty())
-  <h2 style="margin:22px 0 10px;">Uitgaven en artikelen</h2>
+  @php $totaalArtikelen = $publicatie->uitgaven->sum(fn ($u) => $u->artikelen->count()); @endphp
+
+  <h2 style="margin:22px 0 10px;">
+    Uitgaven en artikelen
+    <span class="sis-muted" style="font-size:14px; font-weight:400;">
+      — {{ $publicatie->uitgaven->count() }} {{ $publicatie->uitgaven->count() === 1 ? 'uitgave' : 'uitgaven' }},
+      {{ number_format($totaalArtikelen, 0, ',', '.') }} {{ $totaalArtikelen === 1 ? 'artikel' : 'artikelen' }}
+    </span>
+  </h2>
+  <p class="sis-muted" style="margin:0 0 10px;">Klap een uitgave open om de artikelen te zien.</p>
+
   @foreach ($publicatie->uitgaven as $uitgave)
-    <div class="sis-card" style="margin-bottom:10px;">
-      <h3>{{ $uitgave->uitgavenummer }}@if ($uitgave->jaar) ({{ $uitgave->jaar }})@endif</h3>
-      <table class="iuasr-dash-tbl">
-        <thead><tr><th>Artikel</th><th>Auteur(s)</th><th>Pagina's</th></tr></thead>
+    <details class="sis-card" style="margin-bottom:8px;" @if ($loop->first) open @endif>
+      <summary style="cursor:pointer; font-weight:600;">
+        {{ $uitgave->uitgavenummer }}
+        @if ($uitgave->jaar) <span class="sis-muted" style="font-weight:400;">({{ $uitgave->jaar }})</span>@endif
+        <span class="iuasr-dash-status s-approved" style="margin-left:8px;">{{ $uitgave->artikelen->count() }} {{ $uitgave->artikelen->count() === 1 ? 'artikel' : 'artikelen' }}</span>
+      </summary>
+
+      <table class="iuasr-dash-tbl" style="margin-top:10px;">
+        <thead><tr><th>Artikel</th><th>Auteur(s)</th><th style="width:110px;">Pagina's</th></tr></thead>
         <tbody>
           @forelse ($uitgave->artikelen as $artikel)
             <tr>
-              <td class="nm" dir="auto">{{ $artikel->titel }}</td>
+              <td class="nm" dir="auto">{{ $artikel->titel }}
+                @if ($artikel->trefwoorden)<br><small class="sis-muted" dir="auto">{{ $artikel->trefwoorden }}</small>@endif
+              </td>
               <td dir="auto">{{ $artikel->auteurs->pluck('naam')->implode(', ') ?: '—' }}</td>
               <td class="tnum">{{ $artikel->paginas ?? '—' }}</td>
             </tr>
@@ -86,7 +103,7 @@
           @endforelse
         </tbody>
       </table>
-    </div>
+    </details>
   @endforeach
 @endif
 
