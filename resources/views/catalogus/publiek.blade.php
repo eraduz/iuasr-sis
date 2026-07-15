@@ -58,6 +58,8 @@
     @if ($zoek !== '') voor <b>"{{ $zoek }}"</b>@endif
   </p>
 
+  @include('partials.az-index', ['route' => 'catalogus.publiek', 'letterFilter' => $letterFilter, 'perPagina' => $perPagina])
+
   <div class="iuasr-dash-tbl-card">
     <table class="iuasr-dash-tbl">
       <thead><tr><th>Titel</th><th>Auteur(s)</th><th>Taal</th><th>Jaar</th><th>Rek</th><th style="text-align:center;">Beschikbaar</th></tr></thead>

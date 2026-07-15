@@ -161,6 +161,24 @@ class Publicatie extends Model
     }
 
     /**
+     * Titels die met een bepaalde letter beginnen (A–Z). '#' vangt alles wat niet
+     * met een letter begint (cijfers, Arabisch schrift, leestekens) — zo blijft
+     * elke titel via het alfabet bereikbaar. Maakt een lijst van duizenden titels
+     * per letter behapbaar.
+     */
+    public function scopeBeginletter(Builder $query, string $letter): Builder
+    {
+        $letter = mb_strtoupper(trim($letter));
+
+        if ($letter === '#') {
+            // Niet-Latijnse of niet-letterbegin: alles buiten A–Z.
+            return $query->whereRaw('UPPER(LEFT(titel, 1)) NOT BETWEEN ? AND ?', ['A', 'Z']);
+        }
+
+        return $query->where('titel', 'like', $letter.'%');
+    }
+
+    /**
      * De REKPLAATS: waar het boek fysiek ligt, zoals de bibliotheek het altijd al
      * noteerde ("F. 1070"). Komt uit de oude Excel-bibliotheek (`bron_rekcode`) en
      * wordt bij nieuwe titels met de hand ingevuld. De letter is tevens de kast.

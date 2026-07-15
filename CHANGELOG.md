@@ -9,6 +9,19 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.10.0] — 2026-07-15
+
+- **De catalogus is nu te navigeren.** Met 11.000 titels waren het 441 pagina's met
+  alleen vorige/volgende. Nu:
+  - een **A–Z-balk** boven de lijst — klik een letter en u ziet alleen die titels
+    (de knop **#** vangt titels die met een cijfer of Arabisch schrift beginnen);
+  - een keuze voor het **aantal per pagina** (25, 50, 100 of 200);
+  - een **verbeterde paginabalk** met paginanummers, eerste/laatste en een
+    sprongveld ("naar pagina …"), in plaats van alleen ‹ ›.
+  Op alle drie de catalogusschermen: het beheerscherm, de alleen-lezen kaart voor
+  collega's en de publieke zoekpagina. De verbeterde paginabalk geldt voor het hele
+  systeem.
+
 ## [1.9.1] — 2026-07-15
 
 - **Artikel toevoegen is eenvoudiger.** Het kon alleen op de uitgavepagina, drie

@@ -40,6 +40,8 @@
   <a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('catalogus') }}">Wissen</a>
 </form>
 
+@include('partials.az-index', ['route' => 'catalogus', 'letterFilter' => $letterFilter, 'perPagina' => $perPagina])
+
 <div class="iuasr-dash-tbl-card">
   <table class="iuasr-dash-tbl">
     <thead><tr><th>Titel</th><th>ISBN</th><th>Auteur(s)</th><th>Talen</th><th>Jaar</th><th>Vakgebied</th><th>Rek</th><th style="text-align:center;">Beschikbaar</th></tr></thead>

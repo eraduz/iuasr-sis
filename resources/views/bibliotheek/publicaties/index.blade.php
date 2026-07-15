@@ -67,6 +67,8 @@
   </p>
 @endif
 
+@include('partials.az-index', ['route' => 'bibliotheek.publicaties', 'letterFilter' => $letterFilter, 'perPagina' => $perPagina])
+
 <div class="iuasr-dash-tbl-card">
   <table class="iuasr-dash-tbl">
     <thead><tr><th>Titel</th><th>Rek</th><th>ISBN</th><th>Soort</th><th>Auteur(s)</th><th>Talen</th><th>Jaar</th><th>Vakgebied</th><th style="text-align:center;">Exemplaren</th><th class="row-act"></th></tr></thead>

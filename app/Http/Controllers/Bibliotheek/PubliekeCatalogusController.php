@@ -39,8 +39,9 @@ class PubliekeCatalogusController extends Controller
             ->when($request->filled('vakgebied'), fn ($q) => $q->where('vakgebied_id', (int) $request->query('vakgebied')))
             ->when($request->query('beschikbaar') === '1',
                 fn ($q) => $q->whereHas('exemplaren', fn ($e) => $e->where('status', ExemplaarStatus::Beschikbaar)))
+            ->when($request->filled('letter'), fn ($q) => $q->beginletter((string) $request->query('letter')))
             ->orderBy('titel')
-            ->paginate(20)
+            ->paginate(\App\Support\Paginakeuze::aantal($request))
             ->withQueryString();
 
         return view('catalogus.publiek', [
@@ -51,6 +52,8 @@ class PubliekeCatalogusController extends Controller
             'taalFilter' => (int) $request->query('taal', 0),
             'vakgebiedFilter' => (int) $request->query('vakgebied', 0),
             'alleenBeschikbaar' => $request->query('beschikbaar') === '1',
+            'letterFilter' => mb_strtoupper((string) $request->query('letter', '')),
+            'perPagina' => \App\Support\Paginakeuze::aantal($request),
         ]);
     }
 }

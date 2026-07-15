@@ -37,8 +37,9 @@ class CatalogusController extends Controller
             ->when($request->filled('taal'), fn ($q) => $q->whereHas('talen', fn ($t) => $t->where('bibliotheek_talen.id', (int) $request->query('taal'))))
             ->when($request->query('beschikbaar') === '1',
                 fn ($q) => $q->whereHas('exemplaren', fn ($e) => $e->where('status', ExemplaarStatus::Beschikbaar)))
+            ->when($request->filled('letter'), fn ($q) => $q->beginletter((string) $request->query('letter')))
             ->orderBy('titel')
-            ->paginate(25)
+            ->paginate(\App\Support\Paginakeuze::aantal($request))
             ->withQueryString();
 
         return view('catalogus.index', [
@@ -51,6 +52,8 @@ class CatalogusController extends Controller
             'vakgebiedFilter' => (int) $request->query('vakgebied', 0),
             'taalFilter' => (int) $request->query('taal', 0),
             'alleenBeschikbaar' => $request->query('beschikbaar') === '1',
+            'letterFilter' => mb_strtoupper((string) $request->query('letter', '')),
+            'perPagina' => \App\Support\Paginakeuze::aantal($request),
         ]);
     }
 

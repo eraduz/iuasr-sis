@@ -41,8 +41,9 @@ class PublicatieController extends Controller
             ->when($request->filled('jaar'), fn ($q) => $q->where('uitgavejaar', (int) $request->query('jaar')))
             ->when($request->filled('taal'), fn ($q) => $q->whereHas('talen', fn ($t) => $t->where('bibliotheek_talen.id', (int) $request->query('taal'))))
             ->when($request->filled('status'), fn ($q) => $q->whereHas('exemplaren', fn ($e) => $e->where('status', (string) $request->query('status'))))
+            ->when($request->filled('letter'), fn ($q) => $q->beginletter((string) $request->query('letter')))
             ->orderBy('titel')
-            ->paginate(25)
+            ->paginate(\App\Support\Paginakeuze::aantal($request))
             ->withQueryString();
 
         return view('bibliotheek.publicaties.index', [
@@ -56,6 +57,8 @@ class PublicatieController extends Controller
             'taalFilter' => (int) $request->query('taal', 0),
             'statusFilter' => (string) $request->query('status', ''),
             'jaarFilter' => (string) $request->query('jaar', ''),
+            'letterFilter' => mb_strtoupper((string) $request->query('letter', '')),
+            'perPagina' => \App\Support\Paginakeuze::aantal($request),
         ]);
     }
 
