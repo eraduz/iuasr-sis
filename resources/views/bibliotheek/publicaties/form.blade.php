@@ -6,6 +6,7 @@
   $soortWaarde = (int) old('soort_id', $publicatie->soort_id);
   $boekSoortId = $soorten->firstWhere('code', 'boek')?->id;
   $digitaalSoortIds = $soorten->where('heeft_exemplaren', false)->pluck('id')->all();
+  $metUitgavenSoortIds = $soorten->where('heeft_uitgaven', true)->pluck('id')->all();
   $auteurRegels = old('auteurs', $gekozenAuteurs ?: ['']);
 @endphp
 
@@ -28,7 +29,7 @@
     <div class="sis-fld">
       <label>Publicatietype <span class="req">*</span></label>
       <select name="soort_id" id="pub-soort" required
-              data-boek="{{ $boekSoortId }}" data-zonder-exemplaren="{{ implode(',', $digitaalSoortIds) }}">
+              data-boek="{{ $boekSoortId }}" data-zonder-exemplaren="{{ implode(',', $digitaalSoortIds) }}" data-met-uitgaven="{{ implode(',', $metUitgavenSoortIds) }}">
         @foreach ($soorten as $s)
           <option value="{{ $s->id }}" @selected($soortWaarde === $s->id)>{{ $s->naam }}</option>
         @endforeach
@@ -120,6 +121,33 @@
         </select>
       </div>
     </div>
+
+    {{-- Bij een tijdschrift: meteen een eerste uitgave met haar artikelen. Alles
+         optioneel — laat u het leeg, dan maakt u het tijdschrift zonder inhoud aan
+         en voegt u die later toe. --}}
+    <div data-veld="tijdschrift-inhoud" style="display:none;">
+      <h3 style="margin-top:18px;">Eerste uitgave (optioneel)</h3>
+      <div class="sis-fld-row sis-fld-row--2">
+        <div class="sis-fld"><label>Uitgavenummer</label><input type="text" name="eerste_uitgavenummer" value="{{ old('eerste_uitgavenummer') }}" maxlength="40" placeholder="bijv. 2026/1"></div>
+        <div class="sis-fld"><label>Jaar</label><input type="number" name="eerste_jaar" value="{{ old('eerste_jaar') }}" min="1000" max="{{ date('Y') + 1 }}"></div>
+      </div>
+
+      <label>Artikelen in deze uitgave</label>
+      <table class="iuasr-dash-tbl" style="margin-top:4px;">
+        <thead><tr><th>Artikeltitel</th><th style="width:220px;">Auteur</th><th style="width:120px;">Pagina's</th></tr></thead>
+        <tbody id="artikel-lijst">
+          @for ($i = 0; $i < 3; $i++)
+            <tr>
+              <td><input type="text" name="artikelen[{{ $i }}][titel]" maxlength="255" dir="auto"></td>
+              <td><input type="text" name="artikelen[{{ $i }}][auteur]" maxlength="255" dir="auto"></td>
+              <td><input type="text" name="artikelen[{{ $i }}][paginas]" maxlength="30"></td>
+            </tr>
+          @endfor
+        </tbody>
+      </table>
+      <button type="button" class="iuasr-dash-btn iuasr-dash-btn--sm" id="artikel-erbij" style="margin-top:6px;">Nog een artikel</button>
+      <small class="sis-muted" style="display:block; margin-top:4px;">Lege regels worden overgeslagen. Meer artikelen of extra auteurs per artikel voegt u na het opslaan toe op de tijdschriftpagina.</small>
+    </div>
   @endif
 
   <div class="sis-fld"><label>Korte opmerking</label><textarea name="opmerking" maxlength="2000" dir="auto">{{ old('opmerking', $publicatie->opmerking) }}</textarea></div>
@@ -149,10 +177,14 @@
   // dit opnieuw af.
   var boekId = soort.getAttribute('data-boek');
   var zonderExemplaren = (soort.getAttribute('data-zonder-exemplaren') || '').split(',').filter(Boolean);
+  var metUitgaven = (soort.getAttribute('data-met-uitgaven') || '').split(',').filter(Boolean);
 
   var bijwerken = function () {
     toon('reeks', soort.value === boekId);
     toon('exemplaren', zonderExemplaren.indexOf(soort.value) === -1);
+    // Alleen een soort met uitgaven (tijdschrift) krijgt de sectie voor een eerste
+    // uitgave met artikelen te zien.
+    toon('tijdschrift-inhoud', metUitgaven.indexOf(soort.value) !== -1);
   };
 
   soort.addEventListener('change', bijwerken);
@@ -175,6 +207,21 @@
 
   erbij('auteur-erbij', 'auteur-lijst', 'auteurs[]', 'Naam van de auteur');
   erbij('exemplaar-erbij', 'exemplaar-lijst', 'exemplaren[]', 'Intern serienummer');
+
+  // Een extra artikelregel bij het aanmaken van een tijdschrift.
+  var artikelKnop = document.getElementById('artikel-erbij');
+  if (artikelKnop) {
+    artikelKnop.addEventListener('click', function () {
+      var lijst = document.getElementById('artikel-lijst');
+      var i = lijst.rows.length;
+      var rij = lijst.insertRow();
+      rij.innerHTML =
+        '<td><input type="text" name="artikelen[' + i + '][titel]" maxlength="255" dir="auto"></td>' +
+        '<td><input type="text" name="artikelen[' + i + '][auteur]" maxlength="255" dir="auto"></td>' +
+        '<td><input type="text" name="artikelen[' + i + '][paginas]" maxlength="30"></td>';
+      rij.querySelector('input').focus();
+    });
+  }
 })();
 </script>
 @endpush

@@ -80,6 +80,92 @@ class TijdschriftController extends Controller
         return view('bibliotheek.tijdschriften.uitgave', ['uitgave' => $uitgave]);
     }
 
+    /**
+     * Artikel toevoegen vanaf de TIJDSCHRIFTPAGINA. Een artikel hoort bij een
+     * uitgave; hier kiest de medewerker een bestaande uitgave óf voert een nieuw
+     * uitgavenummer in — dan wordt de uitgave meteen aangemaakt. Zo hoeft hij niet
+     * eerst naar de uitgavepagina door te klikken.
+     */
+    public function artikelSnelStore(Request $request, Publicatie $publicatie): RedirectResponse
+    {
+        abort_unless($publicatie->beheerbaarVoor($request->user()), 403, 'U mag de bibliotheek niet beheren.');
+        abort_unless($publicatie->heeftUitgaven(), 422, 'Dit soort kent geen uitgaven met artikelen.');
+
+        $data = $request->validate([
+            'uitgave_id' => ['nullable', 'integer', 'exists:bibliotheek_uitgaven,id'],
+            'nieuw_uitgavenummer' => ['nullable', 'string', 'max:40'],
+            'nieuw_jaar' => ['nullable', 'integer', 'min:1000', 'max:'.(date('Y') + 1)],
+            'titel' => ['required', 'string', 'max:255'],
+            'paginas' => ['nullable', 'string', 'max:30'],
+            'trefwoorden' => ['nullable', 'string', 'max:255'],
+            'beschrijving' => ['nullable', 'string', 'max:2000'],
+            'auteurs' => ['nullable', 'array'],
+            'auteurs.*' => ['nullable', 'string', 'max:255'],
+        ], [], ['titel' => 'artikeltitel', 'paginas' => "pagina's", 'uitgave_id' => 'uitgave']);
+
+        // Welke uitgave? Een gekozen bestaande, of een nieuw ingevoerd nummer.
+        $uitgave = $this->kiesOfMaakUitgave($publicatie, $data);
+
+        if ($uitgave === null) {
+            return back()->withInput()->with('fout', 'Kies een bestaande uitgave of vul een nieuw uitgavenummer in.');
+        }
+
+        $this->maakArtikel($uitgave, $data);
+
+        return redirect()->route('bibliotheek.publicaties.show', $publicatie)
+            ->with('status', 'Artikel toegevoegd aan uitgave '.$uitgave->uitgavenummer.'.');
+    }
+
+    /**
+     * Kiest de opgegeven bestaande uitgave, of maakt er een aan op basis van het
+     * nieuwe uitgavenummer. Geeft null als er niets bruikbaars is opgegeven.
+     *
+     * @param  array<string,mixed>  $data
+     */
+    private function kiesOfMaakUitgave(Publicatie $publicatie, array $data): ?Uitgave
+    {
+        if (! empty($data['uitgave_id'])) {
+            // Alleen een uitgave van DIT tijdschrift; nooit die van een ander.
+            return $publicatie->uitgaven()->find($data['uitgave_id']);
+        }
+
+        $nummer = trim((string) ($data['nieuw_uitgavenummer'] ?? ''));
+
+        if ($nummer === '') {
+            return null;
+        }
+
+        // Bestaat het nummer al bij dit tijdschrift, gebruik dan die uitgave.
+        return $publicatie->uitgaven()->firstOrCreate(
+            ['uitgavenummer' => mb_substr($nummer, 0, 40)],
+            ['jaar' => $data['nieuw_jaar'] ?? null],
+        );
+    }
+
+    /**
+     * Maakt één artikel aan bij een uitgave en logt dat.
+     *
+     * @param  array<string,mixed>  $data
+     */
+    private function maakArtikel(Uitgave $uitgave, array $data): Artikel
+    {
+        $artikel = $uitgave->artikelen()->create([
+            'titel' => $data['titel'],
+            'paginas' => $data['paginas'] ?? null,
+            'trefwoorden' => $data['trefwoorden'] ?? null,
+            'beschrijving' => $data['beschrijving'] ?? null,
+        ]);
+
+        $artikel->auteurs()->sync(Auteur::idsVoorNamen(array_filter($data['auteurs'] ?? [])));
+
+        AuditLogger::log(AuditLogger::AANMAAK, $artikel, veld: 'tijdschriftartikel', context: [
+            'uitgave' => $uitgave->omschrijving(),
+            'titel' => $artikel->titel,
+        ]);
+
+        return $artikel;
+    }
+
     /** Artikel toevoegen aan een uitgave. */
     public function artikelStore(Request $request, Uitgave $uitgave): RedirectResponse
     {
@@ -94,13 +180,7 @@ class TijdschriftController extends Controller
             'auteurs.*' => ['nullable', 'string', 'max:255'],
         ], [], ['titel' => 'artikeltitel', 'paginas' => "pagina's"]);
 
-        $artikel = $uitgave->artikelen()->create(collect($data)->except('auteurs')->all());
-        $artikel->auteurs()->sync(Auteur::idsVoorNamen(array_filter($data['auteurs'] ?? [])));
-
-        AuditLogger::log(AuditLogger::AANMAAK, $artikel, veld: 'tijdschriftartikel', context: [
-            'uitgave' => $uitgave->omschrijving(),
-            'titel' => $artikel->titel,
-        ]);
+        $this->maakArtikel($uitgave, $data);
 
         return back()->with('status', 'Artikel toegevoegd.');
     }

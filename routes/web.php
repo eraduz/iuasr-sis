@@ -694,6 +694,7 @@ Route::middleware('auth')->group(function () {
 
         // Tijdschriften: uitgaven en artikelen
         Route::post('/tijdschriften/{publicatie}/uitgaven', [App\Http\Controllers\Bibliotheek\TijdschriftController::class, 'uitgaveStore'])->name('bibliotheek.uitgaven.store');
+        Route::post('/tijdschriften/{publicatie}/artikel', [App\Http\Controllers\Bibliotheek\TijdschriftController::class, 'artikelSnelStore'])->name('bibliotheek.tijdschrift.artikel');
         Route::post('/uitgaven/{uitgave}/artikelen', [App\Http\Controllers\Bibliotheek\TijdschriftController::class, 'artikelStore'])->name('bibliotheek.artikelen.store');
         Route::put('/artikelen/{artikel}', [App\Http\Controllers\Bibliotheek\TijdschriftController::class, 'artikelUpdate'])->name('bibliotheek.artikelen.update');
         Route::delete('/artikelen/{artikel}', [App\Http\Controllers\Bibliotheek\TijdschriftController::class, 'artikelDestroy'])->name('bibliotheek.artikelen.destroy');

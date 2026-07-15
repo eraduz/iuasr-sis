@@ -113,6 +113,88 @@ class TijdschriftArtikelBeheerTest extends TestCase
             ->assertSee('Artikel bewerken of verwijderen');
     }
 
+    public function test_artikel_toevoegen_vanaf_de_tijdschriftpagina_aan_een_bestaande_uitgave(): void
+    {
+        $uitgave = $this->uitgave();
+        $tijdschrift = $uitgave->tijdschrift;
+
+        $this->actingAs($this->bibliothecaris())
+            ->post(route('bibliotheek.tijdschrift.artikel', $tijdschrift), [
+                'uitgave_id' => $uitgave->id,
+                'titel' => 'Een nieuw artikel',
+                'auteurs' => ['Yusuf Demir'],
+                'paginas' => '3-19',
+            ])->assertRedirect(route('bibliotheek.publicaties.show', $tijdschrift));
+
+        $artikel = Artikel::where('titel', 'Een nieuw artikel')->firstOrFail();
+        $this->assertSame($uitgave->id, $artikel->uitgave_id);
+        $this->assertSame('Yusuf Demir', $artikel->auteurs->first()->naam);
+    }
+
+    public function test_artikel_toevoegen_vanaf_de_tijdschriftpagina_maakt_de_uitgave_meteen_aan(): void
+    {
+        // Nog geen uitgaven: de medewerker voert een nieuw uitgavenummer in.
+        $tijdschrift = Publicatie::create([
+            'soort_id' => Publicatiesoort::metCode('tijdschrift')->id,
+            'titel' => 'Nieuw Tijdschrift',
+        ]);
+
+        $this->actingAs($this->bibliothecaris())
+            ->post(route('bibliotheek.tijdschrift.artikel', $tijdschrift), [
+                'uitgave_id' => null,
+                'nieuw_uitgavenummer' => '2026/1',
+                'nieuw_jaar' => 2026,
+                'titel' => 'Eerste artikel ooit',
+                'paginas' => '1-10',
+            ])->assertRedirect();
+
+        $uitgave = Uitgave::where('publicatie_id', $tijdschrift->id)->firstOrFail();
+        $this->assertSame('2026/1', $uitgave->uitgavenummer);
+        $this->assertSame(2026, $uitgave->jaar);
+        $this->assertSame(1, $uitgave->artikelen()->count());
+    }
+
+    public function test_zonder_uitgavekeuze_gebeurt_er_niets(): void
+    {
+        $tijdschrift = Publicatie::create([
+            'soort_id' => Publicatiesoort::metCode('tijdschrift')->id,
+            'titel' => 'Nieuw Tijdschrift',
+        ]);
+
+        $this->actingAs($this->bibliothecaris())
+            ->post(route('bibliotheek.tijdschrift.artikel', $tijdschrift), [
+                'uitgave_id' => null,
+                'nieuw_uitgavenummer' => '',
+                'titel' => 'Een artikel zonder uitgave',
+            ])->assertRedirect();
+
+        // Geen uitgave gekozen én geen nieuw nummer: melding, geen artikel.
+        $this->assertSame(0, Artikel::count());
+    }
+
+    public function test_bij_het_aanmaken_van_een_tijdschrift_meteen_artikelen_toevoegen(): void
+    {
+        $this->actingAs($this->bibliothecaris())
+            ->post(route('bibliotheek.publicaties.store'), [
+                'soort_id' => Publicatiesoort::metCode('tijdschrift')->id,
+                'titel' => 'Studia Nova',
+                'eerste_uitgavenummer' => '2026/1',
+                'eerste_jaar' => 2026,
+                'artikelen' => [
+                    ['titel' => 'Openingsartikel', 'auteur' => 'A. Auteur', 'paginas' => '1-12'],
+                    ['titel' => 'Tweede artikel', 'auteur' => '', 'paginas' => '13-20'],
+                    ['titel' => '', 'auteur' => '', 'paginas' => ''],   // lege regel: overslaan
+                ],
+            ])->assertRedirect();
+
+        $tijdschrift = Publicatie::where('titel', 'Studia Nova')->firstOrFail();
+        $uitgave = $tijdschrift->uitgaven()->firstOrFail();
+
+        $this->assertSame('2026/1', $uitgave->uitgavenummer);
+        $this->assertSame(2, $uitgave->artikelen()->count(), 'De lege regel is overgeslagen.');
+        $this->assertSame('A. Auteur', Artikel::where('titel', 'Openingsartikel')->firstOrFail()->auteurs->first()->naam);
+    }
+
     public function test_wie_de_bibliotheek_niet_beheert_kan_geen_artikelen_muteren(): void
     {
         $uitgave = $this->uitgave();

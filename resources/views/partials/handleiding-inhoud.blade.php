@@ -356,7 +356,8 @@
 
   <h3>Artikelen toevoegen, wijzigen en verwijderen</h3>
   <p>Open een tijdschrift in de catalogus en klap een uitgave open; met <b>Artikelen beheren</b> komt u op de uitgavepagina. Onderaan staat het formulier <b>Artikel toevoegen</b> (titel, auteur(s), pagina's, trefwoorden, korte beschrijving; meerdere auteurs kunnen met de knop <i>Auteur toevoegen</i>). Bij elk bestaand artikel klapt u <b>Artikel bewerken of verwijderen</b> open om het aan te passen of weg te halen. Elke wijziging wordt gelogd.</p>
-  <p>Is er nog geen uitgave? Voeg die dan eerst toe op de pagina van het tijdschrift (uitgavenummer, publicatiedatum, jaar, locatie). Een artikel hoort altijd bij een uitgave — zo blijft vindbaar in welk nummer het stond.</p>
+  <p><b>Een artikel toevoegen kan nu ook rechtstreeks op de tijdschriftpagina.</b> Onderaan staat het formulier <b>Artikel toevoegen</b>: kies bij "In welke uitgave?" een bestaande uitgave, of kies "— nieuwe uitgave —" en vul een uitgavenummer in; die uitgave wordt dan meteen aangemaakt. Zo hoeft u niet eerst de uitgave op te zoeken. Een artikel hoort altijd bij een uitgave, zodat vindbaar blijft in welk nummer het stond.</p>
+  <p><b>En bij het aanmaken van een nieuw tijdschrift</b> kunt u meteen een eerste uitgave met een paar artikelen invoeren (titel, auteur, pagina's). Dat is optioneel — laat u het leeg, dan maakt u alleen het tijdschrift aan en voegt u de inhoud later toe.</p>
   <div class="let">Bij <b>geïmporteerde</b> artikelen staat in het veld Beschrijving de oorspronkelijke regel uit het bronbestand. Laat die staan: daardoor blijft het artikel vindbaar op elk woord dat in de bron stond, ook op wat het systeem niet als titel of auteur herkende.</div>
 
   <h3>De tijdschriftinhoud importeren (artikelen)</h3>

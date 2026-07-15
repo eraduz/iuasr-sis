@@ -85,8 +85,19 @@ class PublicatieController extends Controller
             'soort' => $publicatie->soort?->code,
         ]);
 
-        return redirect()->route('bibliotheek.publicaties.show', $publicatie)
-            ->with('status', 'Publicatie toegevoegd.');
+        // Bij een tijdschrift mogen bij het aanmaken meteen een eerste uitgave en
+        // haar artikelen worden opgegeven — dan hoeft de medewerker niet eerst op
+        // te slaan en terug te komen.
+        $aantalArtikelen = $publicatie->heeftUitgaven()
+            ? $this->eersteUitgaveMetArtikelen($request, $publicatie)
+            : 0;
+
+        $melding = 'Publicatie toegevoegd.';
+        if ($aantalArtikelen > 0) {
+            $melding .= ' '.$aantalArtikelen.' '.($aantalArtikelen === 1 ? 'artikel' : 'artikelen').' toegevoegd.';
+        }
+
+        return redirect()->route('bibliotheek.publicaties.show', $publicatie)->with('status', $melding);
     }
 
     public function show(Request $request, Publicatie $publicatie): View
@@ -156,6 +167,64 @@ class PublicatieController extends Controller
 
         return redirect()->route('bibliotheek.publicaties.show', $publicatie)
             ->with('status', 'Publicatie bijgewerkt.');
+    }
+
+    /**
+     * Bij het aanmaken van een tijdschrift: een eerste uitgave met haar artikelen,
+     * als die zijn ingevoerd. Geeft het aantal aangemaakte artikelen terug.
+     * Zonder uitgavenummer gebeurt er niets — de uitgave is optioneel.
+     */
+    private function eersteUitgaveMetArtikelen(Request $request, Publicatie $publicatie): int
+    {
+        $data = $request->validate([
+            'eerste_uitgavenummer' => ['nullable', 'string', 'max:40'],
+            'eerste_jaar' => ['nullable', 'integer', 'min:1000', 'max:'.(date('Y') + 1)],
+            'artikelen' => ['nullable', 'array'],
+            'artikelen.*.titel' => ['nullable', 'string', 'max:255'],
+            'artikelen.*.auteur' => ['nullable', 'string', 'max:255'],
+            'artikelen.*.paginas' => ['nullable', 'string', 'max:30'],
+        ]);
+
+        $nummer = trim((string) ($data['eerste_uitgavenummer'] ?? ''));
+
+        if ($nummer === '') {
+            return 0;
+        }
+
+        $uitgave = $publicatie->uitgaven()->create([
+            'uitgavenummer' => $nummer,
+            'jaar' => $data['eerste_jaar'] ?? null,
+        ]);
+
+        $aantal = 0;
+
+        foreach ($data['artikelen'] ?? [] as $rij) {
+            $titel = trim((string) ($rij['titel'] ?? ''));
+
+            if ($titel === '') {
+                continue; // lege regel: overslaan
+            }
+
+            $artikel = $uitgave->artikelen()->create([
+                'titel' => mb_substr($titel, 0, 255),
+                'paginas' => $rij['paginas'] ?? null,
+            ]);
+
+            $auteur = trim((string) ($rij['auteur'] ?? ''));
+            if ($auteur !== '') {
+                $artikel->auteurs()->sync(Auteur::idsVoorNamen([$auteur]));
+            }
+
+            $aantal++;
+        }
+
+        AuditLogger::log(AuditLogger::AANMAAK, $uitgave, veld: 'tijdschriftuitgave', context: [
+            'tijdschrift' => $publicatie->titel,
+            'uitgavenummer' => $uitgave->uitgavenummer,
+            'artikelen' => $aantal,
+        ]);
+
+        return $aantal;
     }
 
     /** Voeg één exemplaar toe aan een bestaande titel. */

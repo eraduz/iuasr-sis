@@ -9,6 +9,17 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.9.1] — 2026-07-15
+
+- **Artikel toevoegen is eenvoudiger.** Het kon alleen op de uitgavepagina, drie
+  niveaus diep. Nu staat er een formulier **Artikel toevoegen** op de
+  tijdschriftpagina zelf: u kiest een bestaande uitgave of vult een nieuw
+  uitgavenummer in (die uitgave wordt dan meteen aangemaakt) en voegt het artikel
+  in één keer toe.
+- **Bij het aanmaken van een tijdschrift** kunt u nu meteen een eerste uitgave met
+  een paar artikelen invoeren. Optioneel; laat u het leeg, dan maakt u alleen het
+  tijdschrift aan.
+
 ## [1.9.0] — 2026-07-14
 
 - **Artikelen zijn nu volledig te beheren.** Toevoegen kon al; **wijzigen en

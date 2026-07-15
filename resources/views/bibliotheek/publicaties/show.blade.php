@@ -145,16 +145,86 @@
   @endforelse
 
   @if ($magBeheer)
-    <form method="POST" action="{{ route('bibliotheek.uitgaven.store', $publicatie) }}" class="sis-card sis-form" style="margin-top:12px; max-width:760px;">
+    {{-- Artikel toevoegen, direct vanaf de tijdschriftpagina. U kiest een
+         bestaande uitgave of vult een nieuw uitgavenummer in — dan wordt die
+         uitgave meteen aangemaakt. Zo hoeft u niet eerst door te klikken. --}}
+    <form method="POST" action="{{ route('bibliotheek.tijdschrift.artikel', $publicatie) }}" class="sis-card sis-form" style="margin-top:16px; max-width:820px;">
       @csrf
-      <div class="sis-fld-row sis-fld-row--3">
-        <div class="sis-fld"><label>Uitgavenummer <span class="req">*</span></label><input type="text" name="uitgavenummer" maxlength="40" placeholder="bijv. 2026/1" required></div>
-        <div class="sis-fld"><label>Publicatiedatum</label><input type="date" name="publicatiedatum"></div>
-        <div class="sis-fld"><label>Jaar</label><input type="number" name="jaar" min="1000" max="{{ date('Y') + 1 }}"></div>
+      <h3>Artikel toevoegen</h3>
+
+      <div class="sis-fld">
+        <label>In welke uitgave? <span class="req">*</span></label>
+        <select name="uitgave_id" id="artikel-uitgave">
+          @foreach ($publicatie->uitgaven as $uitgave)
+            <option value="{{ $uitgave->id }}">{{ $uitgave->uitgavenummer }}@if ($uitgave->jaar) ({{ $uitgave->jaar }})@endif</option>
+          @endforeach
+          <option value="">— nieuwe uitgave —</option>
+        </select>
       </div>
-      <div class="sis-fld"><label>Locatie</label><input type="text" name="locatie" maxlength="255" placeholder="Waar staat deze uitgave?"></div>
-      <div class="sis-form__actions"><div class="right"><button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit">Uitgave toevoegen</button></div></div>
+
+      <div class="sis-fld-row sis-fld-row--2" data-veld="nieuwe-uitgave" style="{{ $publicatie->uitgaven->isEmpty() ? '' : 'display:none;' }}">
+        <div class="sis-fld"><label>Nieuw uitgavenummer</label><input type="text" name="nieuw_uitgavenummer" maxlength="40" placeholder="bijv. 2026/1"></div>
+        <div class="sis-fld"><label>Jaar</label><input type="number" name="nieuw_jaar" min="1000" max="{{ date('Y') + 1 }}"></div>
+      </div>
+
+      <div class="sis-fld"><label>Artikeltitel <span class="req">*</span></label><input type="text" name="titel" value="{{ old('titel') }}" maxlength="255" required dir="auto"></div>
+
+      <div class="sis-fld">
+        <label>Auteur(s)</label>
+        <div id="snel-auteurs">
+          <input type="text" name="auteurs[]" maxlength="255" dir="auto" placeholder="Naam van de auteur" style="margin-bottom:6px;">
+        </div>
+        <button type="button" class="iuasr-dash-btn iuasr-dash-btn--sm" id="snel-auteur-erbij">Auteur toevoegen</button>
+      </div>
+
+      <div class="sis-fld-row sis-fld-row--2">
+        <div class="sis-fld"><label>Pagina's</label><input type="text" name="paginas" maxlength="30" placeholder="bijv. 12-27"></div>
+        <div class="sis-fld"><label>Trefwoorden</label><input type="text" name="trefwoorden" maxlength="255" dir="auto"></div>
+      </div>
+
+      <div class="sis-form__actions"><div class="right"><button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit">Artikel toevoegen</button></div></div>
     </form>
+
+    <details class="sis-card" style="margin-top:12px; max-width:760px;">
+      <summary style="cursor:pointer;" class="sis-muted">Alleen een lege uitgave toevoegen (zonder artikel)</summary>
+      <form method="POST" action="{{ route('bibliotheek.uitgaven.store', $publicatie) }}" class="sis-form" style="margin-top:10px;">
+        @csrf
+        <div class="sis-fld-row sis-fld-row--3">
+          <div class="sis-fld"><label>Uitgavenummer <span class="req">*</span></label><input type="text" name="uitgavenummer" maxlength="40" placeholder="bijv. 2026/1" required></div>
+          <div class="sis-fld"><label>Publicatiedatum</label><input type="date" name="publicatiedatum"></div>
+          <div class="sis-fld"><label>Jaar</label><input type="number" name="jaar" min="1000" max="{{ date('Y') + 1 }}"></div>
+        </div>
+        <div class="sis-fld"><label>Locatie</label><input type="text" name="locatie" maxlength="255" placeholder="Waar staat deze uitgave?"></div>
+        <div class="sis-form__actions"><div class="right"><button class="iuasr-dash-btn" type="submit">Uitgave toevoegen</button></div></div>
+      </form>
+    </details>
   @endif
 @endif
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+  // Kiest de medewerker "nieuwe uitgave", toon dan de velden voor het nummer.
+  var keuze = document.getElementById('artikel-uitgave');
+  if (keuze) {
+    var velden = document.querySelector('[data-veld="nieuwe-uitgave"]');
+    var toon = function () { if (velden) velden.style.display = keuze.value === '' ? '' : 'none'; };
+    keuze.addEventListener('change', toon);
+    toon();
+  }
+
+  var knop = document.getElementById('snel-auteur-erbij');
+  if (knop) {
+    knop.addEventListener('click', function () {
+      var invoer = document.createElement('input');
+      invoer.type = 'text'; invoer.name = 'auteurs[]';
+      invoer.placeholder = 'Naam van de auteur';
+      invoer.setAttribute('dir', 'auto'); invoer.style.marginBottom = '6px';
+      document.getElementById('snel-auteurs').appendChild(invoer);
+      invoer.focus();
+    });
+  }
+})();
+</script>
+@endpush
