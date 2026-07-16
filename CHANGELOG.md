@@ -9,6 +9,25 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.14.0] — 2026-07-16
+
+- **Bibliotheek: taalcontrole op titels (spel-/typefouten).** Nieuw commando
+  `bibliotheek:taalcontrole` dat boektitels in het **Turks, Engels en Nederlands**
+  controleert op waarschijnlijke typefouten. Het gebruikt geen extern woordenboek,
+  maar de **titels zelf**: een woord dat bijna nooit voorkomt en één letter afwijkt
+  van een woord dat juist heel vaak voorkomt, is vermoedelijk een typefout — met dat
+  vaker voorkomende woord als **suggestie**. De uitkomst is een reviewlijst (op het
+  scherm en als CSV).
+- **Zekerste correcties automatisch toegepast (Nederlands & Engels).** De veiligste
+  correcties — de fout zit binnen in het woord (begin én einde kloppen), het juiste
+  woord komt veel vaker voor — zijn **automatisch doorgevoerd**: 14 titels, elk
+  **gelogd** (oude → nieuwe titel) en in een controle-CSV. Voorbeelden:
+  *gellof → geloof*, *pcychologie → psychologie*, *geschidenis → geschiedenis*,
+  *philisophy → philosophy*, *internatinal → international*. **Turks wordt bewust NIET
+  automatisch gecorrigeerd** (te veel geldige woorden liggen daar één letter uiteen,
+  bv. *kurban*/*kuran*, *hakkari*/*haklari*); die staan in de reviewlijst voor een
+  handmatige beslissing.
+
 ## [1.13.0] — 2026-07-16
 
 - **Nieuwe module: Stichtingsbestuur.** Voor het bijhouden van het bestuur en het
