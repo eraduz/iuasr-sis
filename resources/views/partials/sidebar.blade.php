@@ -283,6 +283,20 @@
         $biebMenu['Beheer'][] = ['E-mailsjablonen', 'bibliotheek.sjablonen', 'log', 'bibliotheek.sjablonen'];
     }
 
+    // Module Scriptie Coördinatie — het scriptietraject in elf stappen (tabbladen).
+    // De coördinator regisseert en start trajecten; docent, directie en
+    // examencommissie werken per stap mee; het Schoolbestuur kijkt mee (alleen-lezen)
+    // en ziet daarom de Kandidaten-knop niet.
+    $scriptieMenu = [
+        'Scriptie Coördinatie' => [
+            ['Overzicht', 'scriptie.dashboard', 'dash', 'scriptie.dashboard'],
+            ['Trajecten', 'scriptie.trajecten', 'report', 'scriptie.trajecten,scriptie.show'],
+        ],
+    ];
+    if ($gebruiker->magScriptieBeheren()) {
+        $scriptieMenu['Scriptie Coördinatie'][] = ['Scriptie Kandidaten', 'scriptie.kandidaten', 'cert', 'scriptie.kandidaten'];
+    }
+
     // Standaardmenu buiten een module. Bij multi-rol worden de menu's van álle
     // rollen samengevoegd, zodat de gebruiker elk scherm bereikt waar hij recht op
     // heeft. Groepen worden op titel gecombineerd; dubbele items (zelfde route +
@@ -320,7 +334,8 @@
                     ? $relatieMenu
                     : ($r === Rol::Hrmedewerker ? $hrMenu
                         : ($r === Rol::Balie ? $balieMenu
-                            : ($r === Rol::Bibliotheek ? $biebMenu : null))));
+                            : ($r === Rol::Bibliotheek ? $biebMenu
+                                : ($r === Rol::Scriptiecoordinator ? $scriptieMenu : null)))));
             if ($rolMenu !== null) {
                 $standaardMenu = $mergeMenu($standaardMenu, $rolMenu);
             }
@@ -339,6 +354,7 @@
     // en blijft de gebruiker in de vertrouwde Bestuur-context.
     $inBaliemodule = request()->routeIs('balie') || request()->routeIs('balie.*');
     $inBiebmodule = request()->routeIs('bibliotheek.*');
+    $inScriptiemodule = request()->routeIs('scriptie.*');
     $menu = ($rol === Rol::Bestuur->value)
         ? $standaardMenu
         : ($inCursusmodule
@@ -346,7 +362,8 @@
             : ($inRelatiemodule ? $relatieMenu
                 : ($inHrmodule ? $hrMenu
                     : ($inBaliemodule ? $balieMenu
-                        : ($inBiebmodule ? $biebMenu : $standaardMenu)))));
+                        : ($inBiebmodule ? $biebMenu
+                            : ($inScriptiemodule ? $scriptieMenu : $standaardMenu))))));
 
     // "Bibliotheek IUASR" — de catalogus als alleen-lezen raadpleegscherm, voor
     // IEDERE medewerker en in ELKE module. Binnen de bibliotheekmodule zelf staat
@@ -382,6 +399,7 @@
         'Relatiebeheer',
         'HR / Personeelszaken',
         'Balie / Receptie',
+        'Scriptie Coördinatie',
         // Binnen de bibliotheekmodule: eerst waar de boeken staan, dan wat er
         // in en uit gaat.
         'Collectie', 'Uitlenen',

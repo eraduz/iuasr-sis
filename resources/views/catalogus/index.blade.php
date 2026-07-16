@@ -19,8 +19,8 @@
   <input type="search" name="q" value="{{ $zoek }}" placeholder="Zoek op titel, auteur, ISBN of rek (F. 1070)" dir="auto" style="min-width:280px;">
   <select name="soort">
     <option value="">Alle soorten</option>
-    @foreach ($soorten as $waarde => $label)
-      <option value="{{ $waarde }}" @selected($soortFilter === $waarde)>{{ $label }}</option>
+    @foreach ($soorten as $s)
+      <option value="{{ $s->id }}" @selected($soortFilter === $s->id)>{{ $s->naam }}</option>
     @endforeach
   </select>
   <select name="vakgebied">

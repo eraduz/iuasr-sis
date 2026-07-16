@@ -381,7 +381,7 @@
   <p>Bij de inname legt u de <b>retourdatum</b> vast en de <b>staat van het materiaal</b>: Uitstekend, Goed, Licht beschadigd, Beschadigd of Ernstig beschadigd, met eventueel een opmerking. Kiest u <b>Beschadigd</b> of <b>Ernstig beschadigd</b>, dan volgt er automatisch een schademelding en gaat het exemplaar uit de uitleen (status Beschadigd) tot u het weer vrijgeeft. Of iets te laat was, rekent het systeem zelf uit; u hoeft dat niet aan te vinken.</p>
 
   <h3>Automatische e-mails</h3>
-  <p>De bibliotheek verstuurt vijf soorten berichten, allemaal met een kopie naar de bibliotheekpostbus: de <b>uitleenbevestiging</b>, een <b>herinnering drie dagen vóór de vervaldatum</b>, een <b>waarschuwing als een student te laat is</b>, een <b>herinnering voor docenten</b> die elke drie dagen wordt herhaald (zonder boete), en de <b>retourbevestiging</b>. Op de pagina van de lener ziet u precies welke e-mails zijn verstuurd, wanneer, aan wie, en of het gelukt is. De <b>Beheerder</b> past de teksten aan onder <b>E-mailsjablonen</b>.</p>
+  <p>De bibliotheek verstuurt vijf soorten berichten, allemaal met een kopie naar de bibliotheekpostbus: de <b>uitleenbevestiging</b>, een <b>herinnering drie dagen vóór de vervaldatum</b>, een <b>waarschuwing als een student te laat is</b> (waarin de <b>boete van € 10,00 per boek</b> wordt genoemd), een <b>herinnering voor docenten</b> die elke drie dagen wordt herhaald (zonder boete), en de <b>retourbevestiging</b>. Op de pagina van de lener ziet u precies welke e-mails zijn verstuurd, wanneer, aan wie, en of het gelukt is. De <b>Beheerder</b> past de teksten aan onder <b>E-mailsjablonen</b>; het boetebedrag komt automatisch in de plaats van de variabele <b>&#123;&#123;Boete&#125;&#125;</b>.</p>
 
   <div class="tip">Mislukt een e-mail (bijvoorbeeld omdat de lener geen e-mailadres in het dossier heeft), dan gaat de uitlening gewoon door en staat de mislukte poging in het e-maillogboek. Een boek moet uitgeleend kunnen worden, ook als de mailserver hapert.</div>
 
@@ -391,13 +391,24 @@
   <h3>Te late studenten bij Studentenzaken</h3>
   <p>Levert een student materiaal niet op tijd in, dan verschijnt dat automatisch op het <b>dashboard van Studentenzaken</b>: studentnummer, naam, geleend materiaal, aantal dagen te laat en het aantal verstuurde waarschuwingen. Zo kan Studentenzaken de student erop aanspreken zonder in de bibliotheekmodule te hoeven kijken.</p>
 
-  <div class="let">Boetes zijn nog <b>niet</b> ingebouwd: de regels (bedrag per dag, maximum, wie int) zijn nog niet vastgesteld. Te laat leidt nu tot een waarschuwing per e-mail en het signaal op het dashboard.</div>
+  <div class="let">De <b>boete</b> is vastgesteld op <b>€ 10,00 per boek</b> en wordt in de te-laat-mail aan studenten genoemd. Het systeem <b>int of administreert de boete zelf niet</b> — dat regelt de bibliotheek buiten het systeem. Docenten krijgen geen boete. Te laat leidt daarnaast tot het signaal op het dashboard van Studentenzaken.</div>
 
   <h3>Bibliotheek IUASR — een boek zoeken (voor iedereen)</h3>
   <p>Elke medewerker ziet in het menu de ingang <b>Bibliotheek IUASR</b>, in welke module u ook werkt. Daar zoekt u een boek op titel, auteur, ISBN of <b>rekcode</b>. U ziet meteen de <b>rek / plaats</b> (bijvoorbeeld <b>F. 1070</b>: de letter is de kast, het nummer de plaats in het rek), de taal, het vakgebied en of er een exemplaar <b>beschikbaar</b> is. Met het vinkje <b>Alleen beschikbaar</b> verbergt u wat is uitgeleend.</p>
   <p>Dit scherm is <b>alleen-lezen</b>: u kunt er niets wijzigen en er staan geen gegevens van leners. Wilt u een boek lenen, meld u dan bij de bibliotheek met het serienummer; zij leggen de uitlening vast.</p>
 
-  <h2 id="h16">16. Vragen of problemen?</h2>
+  <h2 id="h16">16. Scriptie Coördinatie (aparte module)</h2>
+  <p>De module <b>Scriptie Coördinatie</b> begeleidt het volledige scriptietraject van een student, van de toelating tot de afronding. De rol <b>Scriptiecoördinator</b> regisseert het traject; de <b>docent</b> (scriptiebegeleider), de <b>Directie</b> (opleidingsdirecteur) en de <b>Examencommissie</b> (scriptiecommissie/examinator) werken per stap mee; het <b>Schoolbestuur</b> kijkt mee (alleen-lezen). U opent de module via het <b>modulekeuzescherm</b> (rechtsboven <b>Modules</b>).</p>
+  <h3>Scriptie Kandidaten</h3>
+  <p>Onder <b>Scriptie Kandidaten</b> ziet de coördinator de studenten die aan de <b>toelatingseisen</b> voldoen: minimaal <b>180 EC</b> behaald én <b>Methoden en Technieken I en II</b> afgerond. Per student staat de behaalde EC en of de twee vakken zijn behaald. Voldoet een student, dan start u met één klik het scriptietraject. (Met het vinkje <b>Ook wie nog niet voldoet</b> toont u alle actieve studenten.)</p>
+  <h3>Het traject in elf stappen</h3>
+  <p>Een traject is een pagina met <b>elf tabbladen</b>, één per stap. U doorloopt ze op volgorde; elke stap heeft een eigen formulier en/of checklist en een eigen <b>status</b>. De stappen zijn: 1. Toelatingseisen · 2. Scriptievoorstel · 3. Onderwerpbeoordeling · 4. Begeleider · 5. Scriptieovereenkomst · 6. Plan van Aanpak · 7. Definitieve inlevering · 8. Plagiaatcontrole · 9. Beoordeling · 10. Verdediging · 11. Afronding.</p>
+  <p>Boven aan elk tabblad zet u de <b>status</b> van de stap en vinkt u de stap <b>af</b> als hij klaar is. Een stap kan pas worden afgevinkt als de vorige stap gereed is. Elke stap wordt afgevinkt door de <b>verantwoordelijke rol</b>: de coördinator voor de organiserende stappen (toelating, voorstel, begeleider, overeenkomst, plagiaat, afronding), de <b>examencommissie</b> voor de beoordelende stappen (onderwerp, beoordeling, verdediging) en de <b>begeleider</b> voor het plan van aanpak en de inlevering. Vinkt u de laatste stap <b>Afronding</b> af, dan is het traject afgerond.</p>
+  <h3>Overeenkomst, gesprekken en documenten</h3>
+  <p>Bij stap 5 legt u de <b>digitale goedkeuring</b> vast (student, begeleider, coördinator, opleidingsdirecteur) en genereert u de <b>scriptieovereenkomst</b> als ondertekende PDF met verificatiecode. Bij het Plan van Aanpak legt de begeleider <b>begeleidingsgesprekken</b> vast (datum, besproken punten, feedback, actiepunten). Bij verschillende stappen uploadt u <b>documenten</b> (plan van aanpak, eindversie, plagiaatrapport, presentatie); die worden veilig en met versiebeheer bewaard.</p>
+  <div class="let">Cijfers en een academisch besluit (onderwerp, beoordeling, verdediging) horen bij de examencommissie: de coördinator kan die stappen niet zelf afvinken. Zo blijft de rolscheiding gewaarborgd.</div>
+
+  <h2 id="h17">17. Vragen of problemen?</h2>
   <p>Neem bij vragen contact op met de systeembeheerder of Studentenzaken (szaken@iuasr.nl). Werkt iets niet zoals verwacht, meld dan wat u deed en wat u zag.</p>
 
   <div class="tip">Deze handleiding wordt bijgewerkt zodra er nieuwe functies bij komen. Kijk bij twijfel of u de meest recente versie hebt (zie de datum onderaan).</div>

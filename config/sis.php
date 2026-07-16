@@ -24,7 +24,7 @@ return [
     | onderaan elke pagina getoond zodat testers en beheer weten welke versie
     | draait. Bijwerken bij elke release; houd de wijzigingen bij in CHANGELOG.md.
     */
-    'versie' => '1.10.0',
+    'versie' => '1.12.0',
 
     /*
     |----------------------------------------------------------------------
@@ -93,17 +93,16 @@ return [
     | Uitleentermijn per lenerstype, in dagen. De baliemedewerker mag de
     | retourdatum per uitlening aanpassen; dit is alleen de standaardwaarde.
     |
-    | TE BEVESTIGEN door de opdrachtgever: de termijnen hieronder zijn een
-    | werkbare terugval (student korter dan docent), GEEN vastgestelde norm.
+    | BEVESTIGD (opdrachtgever, 2026-07-15): student 21 dagen, docent 60 dagen.
     |
     | Herinnering: het aantal dagen vóór de vervaldatum waarop de automatische
     | herinnering uitgaat (opdracht: 3). Te late docenten krijgen elke
     | `docent_herinnering_interval` dagen een herhaling (opdracht: 3).
     |
-    | BOETE: bewust NIET ingebouwd. De boeteregels (bedrag per dag, maximum,
-    | wie int) zijn nog niet vastgesteld; er worden geen bedragen verzonnen.
-    | Te laat leidt nu tot een waarschuwingsmail en een signaal op het
-    | Studentenzaken-dashboard. Zie PROGRESS.md, openstaande parameters.
+    | BOETE: bevestigd 2026-07-15 op EUR 10,00 per boek. Dit bedrag wordt UITSLUITEND
+    | GENOEMD in de te-laat-mail voor studenten (variabele {{Boete}}); het systeem
+    | int, boekt of administreert de boete NIET — dat loopt (voorlopig) buiten het
+    | systeem om. Docenten krijgen geen boete. `boete_per_boek` is env-overschrijfbaar.
     */
     'bibliotheek' => [
         /*
@@ -137,7 +136,9 @@ return [
         'uitleentermijn_docent_dagen' => (int) env('SIS_BIEB_TERMIJN_DOCENT', 60),
         'herinnering_dagen_vooraf' => (int) env('SIS_BIEB_HERINNERING_DAGEN', 3),
         'docent_herinnering_interval_dagen' => (int) env('SIS_BIEB_DOCENT_INTERVAL', 3),
-        'boete_ingeschakeld' => (bool) env('SIS_BIEB_BOETE_INGESCHAKELD', false), // TE BEVESTIGEN
+        // Boete per te laat ingeleverd boek (studenten). Alleen GENOEMD in de mail;
+        // niet geadministreerd of geïnd door het systeem. BEVESTIGD 2026-07-15: EUR 10.
+        'boete_per_boek' => (float) env('SIS_BIEB_BOETE_PER_BOEK', 10),
     ],
 
     'hr' => [
@@ -286,6 +287,30 @@ return [
         'weken_per_blok' => (int) env('SIS_PRESENTIE_WEKEN_PER_BLOK', 8),
         'norm' => (float) env('SIS_PRESENTIE_NORM', 0.75),
         'norm_regeling' => (float) env('SIS_PRESENTIE_NORM_REGELING', 0.50),
+    ],
+
+    /*
+    |----------------------------------------------------------------------
+    | Scriptie Coördinatie
+    |----------------------------------------------------------------------
+    | Toelatingseis EC voor de scriptie (stap 1 van het traject). Instelbaar
+    | zoals de overige OER-normen; standaard 180 EC. De toelatingsvakken
+    | (Methoden/Methodes en Technieken I en II) en het scriptievak worden per
+    | opleiding op VAKCODE herkend — de naam wijkt in de bron af ("Methodes"
+    | i.p.v. "Methoden") en dezelfde code kan in meerdere opleidingen bestaan.
+    | Alleen de opleidingen met een scriptie staan hier (PABO volgt later).
+    | Het leesbare scriptienummer: prefix + 2-cijferige jaarprefix + volgnummer.
+    */
+    'scriptie' => [
+        'toelating_ec' => (float) env('SIS_SCRIPTIE_TOELATING_EC', 180),
+        'scriptienummer' => [
+            'prefix' => 'S',
+            'volgnummer_lengte' => (int) env('SIS_SCRIPTIE_VOLGNUMMER_LENGTE', 4),
+        ],
+        'toelating_vakken' => [
+            'ISLTH' => ['mt1' => 'B-MT04-A', 'mt2' => 'B-MT04-B', 'scriptie' => 'B-BR01'],
+            'MGV' => ['mt1' => 'M-GV16a', 'mt2' => 'M-GV16b', 'scriptie' => 'M-GV17'],
+        ],
     ],
 
     /*

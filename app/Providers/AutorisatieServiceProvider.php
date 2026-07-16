@@ -71,6 +71,11 @@ class AutorisatieServiceProvider extends ServiceProvider
         // Te-late uitleningen zien op het Studentenzaken-dashboard (opdracht bibliotheek §9).
         Gate::define('bibliotheek-signaal', fn (User $user) => $user->magBibliotheekSignaalZien());
 
+        // Module Scriptie Coördinatie INZIEN (coördinator, docent-begeleider,
+        // directie, examencommissie, bestuur, beheer) en BEHEREN (coördinator, beheer).
+        Gate::define('scriptie-inzien', fn (User $user) => $user->magScriptieInzien());
+        Gate::define('scriptie-beheren', fn (User $user) => $user->magScriptieBeheren());
+
         // Gebruikers/rollen/referentiedata beheren (Beheerder).
         Gate::define('beheer', fn (User $user) => $user->heeftRol(\App\Enums\Rol::Beheerder));
     }

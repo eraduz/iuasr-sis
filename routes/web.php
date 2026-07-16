@@ -652,6 +652,46 @@ Route::middleware('auth')->group(function () {
 
     /*
     |----------------------------------------------------------------------
+    | Module Scriptie Coördinatie
+    |----------------------------------------------------------------------
+    | Het volledige scriptietraject in elf stappen (tabbladen). De coördinator
+    | regisseert; de docent-begeleider, de Directie (opleidingsdirecteur) en de
+    | Examencommissie (scriptiecommissie/examinator) werken per stap mee; het
+    | Schoolbestuur kijkt uitsluitend mee (alleen-lezen). De rolscheiding per stap
+    | wordt server-side afgedwongen (Scriptie::magStapBewerken / Scriptiestap::magAfvinkenDoor).
+    |
+    | Mutatieroutes staan vóór de inzageroutes; de statische paden (/kandidaten,
+    | /trajecten) staan vóór /trajecten/{scriptie}.
+    */
+    Route::middleware('rol:scriptiecoordinator,docent,directie,examencommissie,beheerder')->prefix('scriptie')->group(function () {
+        Route::post('/kandidaten/{inschrijving}/start', [App\Http\Controllers\Scriptie\ScriptieKandidaatController::class, 'start'])->name('scriptie.start');
+        Route::put('/trajecten/{scriptie}/kern', [App\Http\Controllers\Scriptie\ScriptietrajectController::class, 'updateKern'])->name('scriptie.kern.update');
+        Route::post('/trajecten/{scriptie}/afbreken', [App\Http\Controllers\Scriptie\ScriptietrajectController::class, 'afbreken'])->name('scriptie.afbreken');
+        Route::put('/trajecten/{scriptie}/stap/{stap}/status', [App\Http\Controllers\Scriptie\ScriptieStapController::class, 'status'])->name('scriptie.stap.status');
+        Route::post('/trajecten/{scriptie}/stap/{stap}/afvinken', [App\Http\Controllers\Scriptie\ScriptieStapController::class, 'afvinken'])->name('scriptie.stap.afvinken');
+        Route::put('/trajecten/{scriptie}/stap/{stap}/checklist', [App\Http\Controllers\Scriptie\ScriptieStapController::class, 'checklist'])->name('scriptie.stap.checklist');
+        Route::put('/trajecten/{scriptie}/stap/{stap}', [App\Http\Controllers\Scriptie\ScriptieStapController::class, 'update'])->name('scriptie.stap.update');
+        Route::put('/trajecten/{scriptie}/goedkeuring', [App\Http\Controllers\Scriptie\ScriptieStapController::class, 'goedkeuring'])->name('scriptie.goedkeuring');
+        Route::post('/trajecten/{scriptie}/overeenkomst', [App\Http\Controllers\Scriptie\ScriptieStapController::class, 'overeenkomstGenereren'])->name('scriptie.overeenkomst');
+        Route::post('/trajecten/{scriptie}/gesprekken', [App\Http\Controllers\Scriptie\ScriptieGesprekController::class, 'store'])->name('scriptie.gesprek.store');
+        Route::put('/trajecten/{scriptie}/gesprekken/{gesprek}', [App\Http\Controllers\Scriptie\ScriptieGesprekController::class, 'update'])->name('scriptie.gesprek.update');
+        Route::delete('/trajecten/{scriptie}/gesprekken/{gesprek}', [App\Http\Controllers\Scriptie\ScriptieGesprekController::class, 'destroy'])->name('scriptie.gesprek.destroy');
+        Route::post('/trajecten/{scriptie}/documenten', [App\Http\Controllers\Scriptie\ScriptieDocumentController::class, 'store'])->name('scriptie.document.store');
+        Route::post('/trajecten/{scriptie}/documenten/{document}/versie', [App\Http\Controllers\Scriptie\ScriptieDocumentController::class, 'versie'])->name('scriptie.document.versie');
+        Route::delete('/trajecten/{scriptie}/documenten/{document}', [App\Http\Controllers\Scriptie\ScriptieDocumentController::class, 'destroy'])->name('scriptie.document.destroy');
+    });
+
+    Route::middleware('rol:scriptiecoordinator,docent,directie,examencommissie,beheerder,bestuur')->prefix('scriptie')->group(function () {
+        Route::get('/', [App\Http\Controllers\Scriptie\ScriptieDashboardController::class, 'dashboard'])->name('scriptie.dashboard');
+        Route::get('/kandidaten', [App\Http\Controllers\Scriptie\ScriptieKandidaatController::class, 'index'])->name('scriptie.kandidaten');
+        Route::get('/trajecten', [App\Http\Controllers\Scriptie\ScriptietrajectController::class, 'index'])->name('scriptie.trajecten');
+        Route::get('/trajecten/{scriptie}', [App\Http\Controllers\Scriptie\ScriptietrajectController::class, 'show'])->name('scriptie.show');
+        Route::get('/trajecten/{scriptie}/overeenkomst/download', [App\Http\Controllers\Scriptie\ScriptieStapController::class, 'overeenkomstDownload'])->name('scriptie.overeenkomst.download');
+        Route::get('/trajecten/{scriptie}/documenten/{document}/download', [App\Http\Controllers\Scriptie\ScriptieDocumentController::class, 'download'])->name('scriptie.document.download');
+    });
+
+    /*
+    |----------------------------------------------------------------------
     | Bibliotheek IUASR — de catalogus als ALLEEN-LEZEN raadpleegscherm
     |----------------------------------------------------------------------
     | Voor IEDERE ingelogde medewerker (docent, HR, Studentenzaken, ...), uit

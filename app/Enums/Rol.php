@@ -46,6 +46,12 @@ enum Rol: string
     // en docenten. Ziet geen cijfers en geen personeelsdossiers; wel de namen en
     // contactgegevens van leners, want zonder die kan niet worden uitgeleend.
     case Bibliotheek = 'bibliotheek';
+    // Module Scriptie Coördinatie. De scriptiecoördinator regisseert het volledige
+    // scriptietraject (toelating, voorstel, begeleiding, overeenkomst, plan van
+    // aanpak, inlevering, plagiaatcontrole, beoordeling, verdediging en afronding).
+    // Opleidinggebonden, net als de Directie. De begeleiding (docent), goedkeuring
+    // (opleidingsdirecteur) en beoordeling (examencommissie) werken erin mee.
+    case Scriptiecoordinator = 'scriptiecoordinator';
 
     /** Leesbare naam voor UI en documenten (Nederlands, U-vorm). */
     public function label(): string
@@ -64,6 +70,7 @@ enum Rol: string
             self::Hrmedewerker => 'HR-medewerker',
             self::Balie => 'Balie / Receptie',
             self::Bibliotheek => 'Bibliotheekmedewerker',
+            self::Scriptiecoordinator => 'Scriptiecoördinator',
         };
     }
 
@@ -115,7 +122,8 @@ enum Rol: string
             self::Studentenzaken, self::Bestuur, self::Beheerder,
             self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
-            self::Hrmedewerker, self::Balie, self::Bibliotheek => false,
+            self::Hrmedewerker, self::Balie, self::Bibliotheek,
+            self::Scriptiecoordinator => false,
         };
     }
 
@@ -137,7 +145,8 @@ enum Rol: string
             self::Docent, self::Examencommissie, self::Directie, self::Bestuur,
             self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
-            self::Hrmedewerker, self::Balie, self::Bibliotheek => false,
+            self::Hrmedewerker, self::Balie, self::Bibliotheek,
+            self::Scriptiecoordinator => false,
         };
     }
 
@@ -185,7 +194,8 @@ enum Rol: string
             self::Studentenzaken, self::Financien, self::Beheerder,
             self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
-            self::Hrmedewerker, self::Balie, self::Bibliotheek => false,
+            self::Hrmedewerker, self::Balie, self::Bibliotheek,
+            self::Scriptiecoordinator => false,
         };
     }
 
@@ -201,7 +211,8 @@ enum Rol: string
             self::Directie, self::Bestuur, self::Beheerder => true,
             self::Financien, self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
-            self::Hrmedewerker, self::Balie, self::Bibliotheek => false,
+            self::Hrmedewerker, self::Balie, self::Bibliotheek,
+            self::Scriptiecoordinator => false,
         };
     }
 
@@ -266,17 +277,22 @@ enum Rol: string
             self::Balie => ['balie'],
             // Module Bibliotheek: de bibliotheekmedewerker werkt uitsluitend daarbinnen.
             self::Bibliotheek => ['bibliotheek'],
+            // Module Scriptie Coördinatie: de scriptiecoördinator werkt daarbinnen.
+            self::Scriptiecoordinator => ['scriptie'],
             // Het Schoolbestuur heeft brede inzage en ziet naast Studentenzaken ook
-            // de Cursussen-, Relatiebeheer-, HR-, Balie- en Bibliotheekmodule
-            // (alleen-lezen).
-            self::Bestuur => ['studentenzaken', 'cursussen', 'relatiebeheer', 'hr', 'balie', 'bibliotheek'],
+            // de Cursussen-, Relatiebeheer-, HR-, Balie-, Bibliotheek- en
+            // Scriptiemodule (alleen-lezen).
+            self::Bestuur => ['studentenzaken', 'cursussen', 'relatiebeheer', 'hr', 'balie', 'bibliotheek', 'scriptie'],
             // De Directie (opleidingsmanager) beheert haar opleiding, inclusief de
-            // relaties/stages van die opleiding (opleidinggebonden gescoped). Géén
-            // Balie: dat is een werkregister van de ontvangstbalie, geen
-            // opleidingsinformatie (keuze opdrachtgever 2026-07-13).
-            self::Directie => ['studentenzaken', 'relatiebeheer'],
-            self::Studentenzaken, self::Docent,
-            self::Examencommissie => ['studentenzaken'],
+            // relaties/stages van die opleiding (opleidinggebonden gescoped) en de
+            // scriptietrajecten die zij mede goedkeurt. Géén Balie: dat is een
+            // werkregister van de ontvangstbalie, geen opleidingsinformatie.
+            self::Directie => ['studentenzaken', 'relatiebeheer', 'scriptie'],
+            // De Docent begeleidt scriptietrajecten; de Examencommissie
+            // (scriptiecommissie/examinator) beoordeelt ze. Beiden zien de module
+            // naast Studentenzaken.
+            self::Docent, self::Examencommissie => ['studentenzaken', 'scriptie'],
+            self::Studentenzaken => ['studentenzaken'],
         };
     }
 
@@ -347,6 +363,51 @@ enum Rol: string
     public function magBibliotheekSjablonenBeheren(): bool
     {
         return $this === self::Beheerder;
+    }
+
+    /**
+     * Mag deze rol scriptietrajecten regisseren: een traject starten, de kern
+     * (titel, taal, begeleider) beheren, kandidaten inschrijven en de coördinerende
+     * stappen sturen? De scriptiecoördinator; Beheer voor onderhoud. De begeleiding,
+     * goedkeuring en beoordeling van afzonderlijke stappen loopt via de
+     * verantwoordelijke per stap (Scriptiestap::magAfvinkenDoor).
+     */
+    public function magScriptieBeheren(): bool
+    {
+        return match ($this) {
+            self::Scriptiecoordinator, self::Beheerder => true,
+            default => false,
+        };
+    }
+
+    /**
+     * Mag deze rol de module Scriptie Coördinatie inzien (dashboard, kandidaten,
+     * trajecten)? De coördinator en Beheer beheren; de Docent (begeleider), de
+     * Directie (opleidingsdirecteur), de Examencommissie (scriptiecommissie/
+     * examinator) en het Schoolbestuur kijken mee en werken per stap mee.
+     */
+    public function magScriptieInzien(): bool
+    {
+        return match ($this) {
+            self::Scriptiecoordinator, self::Beheerder, self::Bestuur,
+            self::Directie, self::Examencommissie, self::Docent => true,
+            default => false,
+        };
+    }
+
+    /**
+     * Is de zichtbaarheid binnen Scriptie Coördinatie opleidinggebonden? De
+     * coördinator en de Directie zien uitsluitend de trajecten van hun eigen
+     * opleiding(en); de Docent ziet alleen de trajecten waarvan hij begeleider is
+     * (aparte scoping in Scriptie::scopeZichtbaarVoor). Examencommissie, Bestuur en
+     * Beheer zien alle trajecten.
+     */
+    public function isScriptieBeperkt(): bool
+    {
+        return match ($this) {
+            self::Scriptiecoordinator, self::Directie => true,
+            default => false,
+        };
     }
 
     /** Mag deze rol de personeelsadministratie beheren (module HR)? */

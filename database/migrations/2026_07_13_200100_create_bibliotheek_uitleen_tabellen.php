@@ -104,7 +104,7 @@ return new class extends Migration
             [
                 'soort' => 'te_laat_student',
                 'onderwerp' => 'Te laat: {{Titel}} ({{AantalDagenTeLaat}} dagen)',
-                'inhoud' => "Geachte {{Naam}},\n\nDe door u geleende publicatie is te laat ingeleverd:\n\n  Titel: {{Titel}}\n  Uiterste retourdatum: {{Retourdatum}}\n  Aantal dagen te laat: {{AantalDagenTeLaat}}\n\nLever de publicatie zo spoedig mogelijk in. Zolang de publicatie niet is ingeleverd, kan de bibliotheek u verdere uitleningen weigeren.\n\nMet vriendelijke groet,\nBibliotheek IUASR",
+                'inhoud' => "Geachte {{Naam}},\n\nDe door u geleende publicatie is te laat ingeleverd:\n\n  Titel: {{Titel}}\n  Uiterste retourdatum: {{Retourdatum}}\n  Aantal dagen te laat: {{AantalDagenTeLaat}}\n\nVoor een te laat ingeleverd boek brengt de bibliotheek een boete van {{Boete}} per boek in rekening. Lever de publicatie zo spoedig mogelijk in. Zolang de publicatie niet is ingeleverd, kan de bibliotheek u verdere uitleningen weigeren.\n\nMet vriendelijke groet,\nBibliotheek IUASR",
                 'actief' => true, 'created_at' => $nu, 'updated_at' => $nu,
             ],
             [

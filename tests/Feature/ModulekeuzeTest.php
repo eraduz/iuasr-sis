@@ -32,13 +32,13 @@ class ModulekeuzeTest extends TestCase
             ['studentenzaken', 'cursussen', 'relatiebeheer', 'scriptie', 'hr', 'balie', 'bibliotheek'],
             Module::geordend()->pluck('sleutel')->all(),
         );
-        // Alles is gebouwd behalve Scriptie.
+        // Sinds de module Scriptie Coördinatie (2026-07-16) zijn alle zeven modules gebouwd.
         $this->assertTrue(Module::where('sleutel', 'studentenzaken')->value('actief'));
         $this->assertTrue(Module::where('sleutel', 'cursussen')->value('actief'));
         $this->assertTrue(Module::where('sleutel', 'relatiebeheer')->value('actief'));
         $this->assertTrue(Module::where('sleutel', 'balie')->value('actief'));
         $this->assertTrue(Module::where('sleutel', 'bibliotheek')->value('actief'));
-        $this->assertFalse(Module::where('sleutel', 'scriptie')->value('actief'));
+        $this->assertTrue(Module::where('sleutel', 'scriptie')->value('actief'));
     }
 
     public function test_dev_login_leidt_naar_het_keuzescherm(): void
@@ -56,8 +56,7 @@ class ModulekeuzeTest extends TestCase
             ->assertOk()
             ->assertSee('Kies een module')
             ->assertSee('Studentenzaken')
-            ->assertSee(route('dashboard'), false)   // Studentenzaken linkt naar het dashboard
-            ->assertSee('Binnenkort');               // de nog niet gebouwde modules
+            ->assertSee(route('dashboard'), false);  // Studentenzaken linkt naar het dashboard
     }
 
     public function test_financien_ziet_zowel_studentenzaken_als_cursussen(): void
@@ -91,8 +90,8 @@ class ModulekeuzeTest extends TestCase
     {
         $this->assertSame('dashboard', Module::where('sleutel', 'studentenzaken')->first()->startRoute());
         $this->assertSame('cursussen.dashboard', Module::where('sleutel', 'cursussen')->first()->startRoute());
-        // De nog niet gebouwde modules hebben geen startroute.
-        $this->assertNull(Module::where('sleutel', 'scriptie')->first()->startRoute());
+        // Sinds 2026-07-16 is ook Scriptie Coördinatie gebouwd en heeft een startroute.
+        $this->assertSame('scriptie.dashboard', Module::where('sleutel', 'scriptie')->first()->startRoute());
     }
 
     public function test_keuzescherm_vereist_login(): void

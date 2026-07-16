@@ -457,6 +457,29 @@ class BibliotheekModuleTest extends TestCase
         $this->assertSame(3, Emaillog::count());
     }
 
+    public function test_de_te_laat_studentmail_noemt_de_boete_van_tien_euro(): void
+    {
+        Mail::fake();
+
+        $student = $this->student();
+        $publicatie = $this->publicatie();
+
+        Uitlening::create([
+            'exemplaar_id' => $this->exemplaar($publicatie, 'B-1')->id,
+            'student_id' => $student->id,
+            'uitgeleend_op' => Carbon::today()->subDays(30),
+            'verwachte_retour_op' => Carbon::today()->subDays(4),
+        ]);
+
+        $this->artisan('bibliotheek:herinneringen')->assertSuccessful();
+
+        // Het boetebedrag (€ 10,00) én het woord 'boete' staan in de mailtekst.
+        Mail::assertSent(\App\Mail\BibliotheekBericht::class, function ($mail) {
+            return str_contains($mail->tekst, '€ 10,00')
+                && stripos($mail->tekst, 'boete') !== false;
+        });
+    }
+
     public function test_een_mislukte_mail_blokkeert_de_uitlening_niet(): void
     {
         Mail::fake();

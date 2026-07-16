@@ -37,6 +37,7 @@ class Module extends Model
         'hr' => 'hr.dashboard',
         'balie' => 'balie.dashboard',
         'bibliotheek' => 'bibliotheek.dashboard',
+        'scriptie' => 'scriptie.dashboard',
     ];
 
     public function startRoute(): ?string

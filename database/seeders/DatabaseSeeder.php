@@ -37,6 +37,9 @@ class DatabaseSeeder extends Seeder
             // Module Bibliotheek — draait ná de studenten- en HR-seeders, want de
             // uitleningen verwijzen naar studenten en medewerkers.
             BibliotheekSeeder::class,
+            // Module Scriptie Coördinatie — draait ná de studenten-/curriculum-/
+            // resultatenseeders, want de toelatingscontrole leest EC en resultaten.
+            ScriptieSeeder::class,
             // Echte personeelslijst (lokaal, gitignored; no-op als het bestand ontbreekt).
             PersoneelSeeder::class,
         ]);

@@ -143,4 +143,10 @@ class Inschrijving extends Model
     {
         return $this->hasOne(Afstudeerproces::class);
     }
+
+    /** Het scriptietraject van deze inschrijving (module Scriptie Coördinatie). */
+    public function scriptie(): HasOne
+    {
+        return $this->hasOne(Scriptie::class);
+    }
 }

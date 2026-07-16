@@ -9,6 +9,40 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.12.0] — 2026-07-16
+
+- **Nieuwe module: Scriptie Coördinatie.** Het volledige scriptietraject in **elf
+  stappen**, elk een eigen tabblad met een formulier en/of checklist:
+  1. Toelatingseisen · 2. Scriptievoorstel · 3. Onderwerpbeoordeling ·
+  4. Begeleider · 5. Scriptieovereenkomst · 6. Plan van Aanpak ·
+  7. Definitieve inlevering · 8. Plagiaatcontrole · 9. Beoordeling ·
+  10. Verdediging · 11. Afronding. De stappen worden op volgorde afgevinkt.
+- **Scriptie Kandidaten.** Een lijst van studenten die aan de toelatingseisen
+  voldoen (minimaal **180 EC** behaald én **Methoden en Technieken I en II**
+  afgerond) en nog geen traject hebben. Vanaf hier start de coördinator een traject.
+- **Nieuwe rol: Scriptiecoördinator.** Regisseert het traject. De **docent**
+  (begeleider), de **Directie** (opleidingsdirecteur) en de **Examencommissie**
+  (scriptiecommissie/examinator) werken per stap mee; het **Schoolbestuur** kijkt
+  mee (alleen-lezen). Elke stap kan alleen worden afgevinkt door de verantwoordelijke
+  rol; academische stappen (onderwerp, beoordeling, verdediging) blijven bij de
+  examencommissie.
+- **Ondertekende scriptieovereenkomst, begeleidingsgesprekken en documenten.** De
+  overeenkomst wordt als **ondertekende PDF** met verificatiecode gegenereerd;
+  begeleidingsgesprekken en documenten (plan van aanpak, eindversie, plagiaatrapport,
+  presentatie) worden per traject vastgelegd, met versiebeheer en op de private schijf.
+
+## [1.11.0] — 2026-07-15
+
+- **Uitleentermijnen bevestigd.** De standaardtermijnen zijn nu definitief: een
+  **student leent 21 dagen**, een **docent 60 dagen**. De baliemedewerker mag de
+  retourdatum per uitlening nog steeds zelf aanpassen.
+- **Boete van € 10,00 per boek in de te-laat-mail.** Levert een student een boek te
+  laat in, dan noemt de waarschuwingsmail voortaan een boete van **€ 10,00 per boek**.
+  Let op: het systeem **int of administreert de boete niet** — dat regelt de
+  bibliotheek buiten het systeem om. Docenten krijgen geen boete. De Beheerder kan
+  de mailtekst aanpassen onder **E-mailsjablonen**; het bedrag komt automatisch in de
+  plaats van de nieuwe variabele **{{Boete}}**.
+
 ## [1.10.0] — 2026-07-15
 
 - **De catalogus is nu te navigeren.** Met 11.000 titels waren het 441 pagina's met

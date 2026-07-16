@@ -155,6 +155,12 @@ class Student extends Model
         return $this->hasMany(Resultaat::class);
     }
 
+    /** Scriptietrajecten van deze student (module Scriptie Coördinatie). */
+    public function scripties(): HasMany
+    {
+        return $this->hasMany(Scriptie::class);
+    }
+
     public function betalingen(): HasMany
     {
         return $this->hasMany(Betaling::class);

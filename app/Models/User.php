@@ -360,6 +360,54 @@ class User extends Authenticatable
         );
     }
 
+    // --- Module Scriptie Coördinatie ---
+
+    /** Scriptietrajecten regisseren: starten, kern beheren, kandidaten inschrijven. */
+    public function magScriptieBeheren(): bool
+    {
+        return $this->magVolgensRol(fn (Rol $r) => $r->magScriptieBeheren());
+    }
+
+    /** De module Scriptie Coördinatie inzien (dashboard, kandidaten, trajecten). */
+    public function magScriptieInzien(): bool
+    {
+        return $this->magVolgensRol(fn (Rol $r) => $r->magScriptieInzien());
+    }
+
+    /**
+     * Is de zichtbaarheid binnen Scriptie Coördinatie opleidinggebonden
+     * (coördinator/Directie)? Bestuur, Examencommissie en Beheer verruimen de scope
+     * naar alle trajecten. De docent-begeleider is niet opleidinggebonden maar
+     * begeleider-gebonden — die scoping zit in Scriptie::scopeZichtbaarVoor.
+     */
+    public function isScriptieBeperkt(): bool
+    {
+        $heeftBeperkteRol = $this->magVolgensRol(fn (Rol $r) => $r->isScriptieBeperkt());
+        if (! $heeftBeperkteRol) {
+            return false;
+        }
+
+        return ! $this->magVolgensRol(
+            fn (Rol $r) => in_array($r, [Rol::Bestuur, Rol::Examencommissie, Rol::Beheerder], true)
+        );
+    }
+
+    /**
+     * Is deze gebruiker uitsluitend scriptiebegeleider (docent zonder bredere
+     * scriptie-inzage)? Dan ziet hij alleen de trajecten waarvan hij begeleider is.
+     */
+    public function isScriptieBegeleider(): bool
+    {
+        if (! $this->heeftRol(Rol::Docent)) {
+            return false;
+        }
+
+        return ! $this->magVolgensRol(fn (Rol $r) => in_array($r, [
+            Rol::Scriptiecoordinator, Rol::Examencommissie, Rol::Directie,
+            Rol::Bestuur, Rol::Beheerder,
+        ], true));
+    }
+
     public function magFinancieelInzien(): bool
     {
         return $this->magVolgensRol(fn (Rol $r) => $r->magFinancieelInzien());

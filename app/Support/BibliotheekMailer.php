@@ -74,12 +74,17 @@ class BibliotheekMailer
      */
     private static function variabelen(Uitlening $uitlening): array
     {
+        $boete = (float) config('sis.bibliotheek.boete_per_boek', 10);
+
         return [
             'Naam' => $uitlening->lenerNaam(),
             'Titel' => $uitlening->exemplaar?->publicatie?->volledigeTitel() ?? '',
             'Uitleendatum' => $uitlening->uitgeleend_op->format('d-m-Y'),
             'Retourdatum' => ($uitlening->retour_op ?? $uitlening->verwachte_retour_op)->format('d-m-Y'),
             'AantalDagenTeLaat' => (string) $uitlening->dagenTeLaat(),
+            // Boete per boek — alleen ter vermelding in de te-laat-mail; het systeem
+            // int of administreert niets (config sis.bibliotheek.boete_per_boek).
+            'Boete' => '€ '.number_format($boete, 2, ',', '.'),
         ];
     }
 

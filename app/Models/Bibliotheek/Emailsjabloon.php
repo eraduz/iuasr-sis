@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * E-mailsjabloon dat de Beheerder kan aanpassen. Ondersteunde variabelen:
- * {{Naam}}, {{Titel}}, {{Uitleendatum}}, {{Retourdatum}}, {{AantalDagenTeLaat}}.
+ * {{Naam}}, {{Titel}}, {{Uitleendatum}}, {{Retourdatum}}, {{AantalDagenTeLaat}},
+ * {{Boete}} (het boetebedrag per te laat ingeleverd boek, bv. "€ 10,00").
  */
 class Emailsjabloon extends Model
 {
@@ -16,7 +17,7 @@ class Emailsjabloon extends Model
     protected $fillable = ['soort', 'onderwerp', 'inhoud', 'actief'];
 
     /** De variabelen die in onderwerp en inhoud mogen voorkomen. */
-    public const VARIABELEN = ['Naam', 'Titel', 'Uitleendatum', 'Retourdatum', 'AantalDagenTeLaat'];
+    public const VARIABELEN = ['Naam', 'Titel', 'Uitleendatum', 'Retourdatum', 'AantalDagenTeLaat', 'Boete'];
 
     protected function casts(): array
     {
