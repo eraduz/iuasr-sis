@@ -9,6 +9,21 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.13.0] — 2026-07-16
+
+- **Nieuwe module: Stichtingsbestuur.** Voor het bijhouden van het bestuur en het
+  toezicht van de stichting, met een **nieuwe rol Stichtingsbestuur**.
+  - **Bestuursleden & Raad van Toezicht.** Twee organen: het **Stichtingsbestuur**
+    (voorzitter, penningmeester, secretaris, lid — met bevoegdheid) en de **Raad van
+    Toezicht** (commissarissen). Per lid: naam, achternaam, geboortedatum, adres,
+    telefoon, e-mail, datum in functie, titel. Afgetreden leden blijven bewaard
+    (historie).
+  - **Vergaderingen.** Per (jaarlijkse) vergadering: datum, soort (Stichtingsbestuur
+    of Raad van Toezicht), besproken onderwerpen, besluiten, en de **aanwezigheid**
+    per lid — **fysiek**, **online** of **niet bijgewoond**.
+  - Bewust een **afgeschermde** module (governance- en persoonsgegevens): alleen de
+    rol Stichtingsbestuur en de Beheerder; alle mutaties worden gelogd.
+
 ## [1.12.0] — 2026-07-16
 
 - **Nieuwe module: Scriptie Coördinatie.** Het volledige scriptietraject in **elf

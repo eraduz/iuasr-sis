@@ -408,7 +408,14 @@
   <p>Bij stap 5 legt u de <b>digitale goedkeuring</b> vast (student, begeleider, coördinator, opleidingsdirecteur) en genereert u de <b>scriptieovereenkomst</b> als ondertekende PDF met verificatiecode. Bij het Plan van Aanpak legt de begeleider <b>begeleidingsgesprekken</b> vast (datum, besproken punten, feedback, actiepunten). Bij verschillende stappen uploadt u <b>documenten</b> (plan van aanpak, eindversie, plagiaatrapport, presentatie); die worden veilig en met versiebeheer bewaard.</p>
   <div class="let">Cijfers en een academisch besluit (onderwerp, beoordeling, verdediging) horen bij de examencommissie: de coördinator kan die stappen niet zelf afvinken. Zo blijft de rolscheiding gewaarborgd.</div>
 
-  <h2 id="h17">17. Vragen of problemen?</h2>
+  <h2 id="h17">17. Stichtingsbestuur (aparte module)</h2>
+  <p>De module <b>Stichtingsbestuur</b> houdt het bestuur en het toezicht van de stichting bij. De rol <b>Stichtingsbestuur</b> beheert de module; de Beheerder voor onderhoud. Deze module is bewust <b>afgeschermd</b>: er kijkt geen andere rol mee, want het gaat om governance- en persoonsgegevens. (Let op: dit is iets anders dan het <b>Schoolbestuur</b>, dat de onderwijsstatistieken overziet.)</p>
+  <h3>Leden &amp; Raad van Toezicht</h3>
+  <p>U legt twee organen vast: het <b>Stichtingsbestuur</b> (met de titels voorzitter, penningmeester, secretaris en lid, plus een omschrijving van de bevoegdheid) en de <b>Raad van Toezicht</b> (de commissarissen). Per persoon houdt u naam, achternaam, geboortedatum, adres, telefoonnummer, e-mail, de datum in functie en de titel bij. Treedt iemand af, zet dan het vinkje <b>Actief</b> uit en vul de datum uit functie in — het lid blijft dan bewaard in de historie.</p>
+  <h3>Vergaderingen</h3>
+  <p>Onder <b>Vergaderingen</b> legt u per (jaarlijkse) vergadering vast: de datum, het soort (Stichtingsbestuur of Raad van Toezicht), de besproken onderwerpen en de besluiten. In het <b>aanwezigheidsraster</b> zet u per lid of hij <b>fysiek</b> of <b>online</b> aanwezig was, of <b>niet bijgewoond</b> heeft. Laat u een lid leeg, dan is er niets voor hem geregistreerd. Op de detailpagina ziet u de onderwerpen, de besluiten en de aanwezigheid in één overzicht.</p>
+
+  <h2 id="h18">18. Vragen of problemen?</h2>
   <p>Neem bij vragen contact op met de systeembeheerder of Studentenzaken (szaken@iuasr.nl). Werkt iets niet zoals verwacht, meld dan wat u deed en wat u zag.</p>
 
   <div class="tip">Deze handleiding wordt bijgewerkt zodra er nieuwe functies bij komen. Kijk bij twijfel of u de meest recente versie hebt (zie de datum onderaan).</div>

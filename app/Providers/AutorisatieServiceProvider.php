@@ -76,6 +76,10 @@ class AutorisatieServiceProvider extends ServiceProvider
         Gate::define('scriptie-inzien', fn (User $user) => $user->magScriptieInzien());
         Gate::define('scriptie-beheren', fn (User $user) => $user->magScriptieBeheren());
 
+        // Module Stichtingsbestuur (Stichtingsbestuur, Beheer) — geen meekijkers.
+        Gate::define('stichtingsbestuur-inzien', fn (User $user) => $user->magStichtingsbestuurInzien());
+        Gate::define('stichtingsbestuur-beheren', fn (User $user) => $user->magStichtingsbestuurBeheren());
+
         // Gebruikers/rollen/referentiedata beheren (Beheerder).
         Gate::define('beheer', fn (User $user) => $user->heeftRol(\App\Enums\Rol::Beheerder));
     }

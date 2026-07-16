@@ -692,6 +692,36 @@ Route::middleware('auth')->group(function () {
 
     /*
     |----------------------------------------------------------------------
+    | Module Stichtingsbestuur
+    |----------------------------------------------------------------------
+    | De bestuursleden (Stichtingsbestuur), de commissarissen (Raad van Toezicht) en
+    | de vergaderingen met onderwerpen, besluiten en aanwezigheid. Alleen het
+    | Stichtingsbestuur en de Beheerder — bewust geen meekijkers (governance- en
+    | persoonsgegevens). De aanmaakroutes staan vóór de {param}-routes.
+    */
+    Route::middleware('rol:stichtingsbestuur,beheerder')->prefix('stichtingsbestuur')->group(function () {
+        Route::get('/', [App\Http\Controllers\Stichtingsbestuur\StichtingsbestuurDashboardController::class, 'dashboard'])->name('stichtingsbestuur.dashboard');
+
+        // Bestuursleden / commissarissen
+        Route::get('/leden', [App\Http\Controllers\Stichtingsbestuur\BestuurslidController::class, 'index'])->name('stichtingsbestuur.leden');
+        Route::get('/leden/nieuw', [App\Http\Controllers\Stichtingsbestuur\BestuurslidController::class, 'create'])->name('stichtingsbestuur.leden.create');
+        Route::post('/leden', [App\Http\Controllers\Stichtingsbestuur\BestuurslidController::class, 'store'])->name('stichtingsbestuur.leden.store');
+        Route::get('/leden/{lid}/bewerken', [App\Http\Controllers\Stichtingsbestuur\BestuurslidController::class, 'edit'])->name('stichtingsbestuur.leden.edit');
+        Route::put('/leden/{lid}', [App\Http\Controllers\Stichtingsbestuur\BestuurslidController::class, 'update'])->name('stichtingsbestuur.leden.update');
+        Route::delete('/leden/{lid}', [App\Http\Controllers\Stichtingsbestuur\BestuurslidController::class, 'destroy'])->name('stichtingsbestuur.leden.destroy');
+
+        // Vergaderingen
+        Route::get('/vergaderingen', [App\Http\Controllers\Stichtingsbestuur\BestuursvergaderingController::class, 'index'])->name('stichtingsbestuur.vergaderingen');
+        Route::get('/vergaderingen/nieuw', [App\Http\Controllers\Stichtingsbestuur\BestuursvergaderingController::class, 'create'])->name('stichtingsbestuur.vergaderingen.create');
+        Route::post('/vergaderingen', [App\Http\Controllers\Stichtingsbestuur\BestuursvergaderingController::class, 'store'])->name('stichtingsbestuur.vergaderingen.store');
+        Route::get('/vergaderingen/{vergadering}', [App\Http\Controllers\Stichtingsbestuur\BestuursvergaderingController::class, 'show'])->name('stichtingsbestuur.vergaderingen.show');
+        Route::get('/vergaderingen/{vergadering}/bewerken', [App\Http\Controllers\Stichtingsbestuur\BestuursvergaderingController::class, 'edit'])->name('stichtingsbestuur.vergaderingen.edit');
+        Route::put('/vergaderingen/{vergadering}', [App\Http\Controllers\Stichtingsbestuur\BestuursvergaderingController::class, 'update'])->name('stichtingsbestuur.vergaderingen.update');
+        Route::delete('/vergaderingen/{vergadering}', [App\Http\Controllers\Stichtingsbestuur\BestuursvergaderingController::class, 'destroy'])->name('stichtingsbestuur.vergaderingen.destroy');
+    });
+
+    /*
+    |----------------------------------------------------------------------
     | Bibliotheek IUASR — de catalogus als ALLEEN-LEZEN raadpleegscherm
     |----------------------------------------------------------------------
     | Voor IEDERE ingelogde medewerker (docent, HR, Studentenzaken, ...), uit

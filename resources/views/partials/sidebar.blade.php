@@ -297,6 +297,16 @@
         $scriptieMenu['Scriptie Coördinatie'][] = ['Scriptie Kandidaten', 'scriptie.kandidaten', 'cert', 'scriptie.kandidaten'];
     }
 
+    // Module Stichtingsbestuur — bestuursleden/commissarissen en de vergaderingen
+    // (onderwerpen, besluiten, aanwezigheid). Bewust een smalle, afgeschermde rol.
+    $stichtingsbestuurMenu = [
+        'Stichtingsbestuur' => [
+            ['Overzicht', 'stichtingsbestuur.dashboard', 'dash', 'stichtingsbestuur.dashboard'],
+            ['Leden & RvT', 'stichtingsbestuur.leden', 'cert', 'stichtingsbestuur.leden,stichtingsbestuur.leden.edit,stichtingsbestuur.leden.create'],
+            ['Vergaderingen', 'stichtingsbestuur.vergaderingen', 'report', 'stichtingsbestuur.vergaderingen,stichtingsbestuur.vergaderingen.show,stichtingsbestuur.vergaderingen.edit,stichtingsbestuur.vergaderingen.create'],
+        ],
+    ];
+
     // Standaardmenu buiten een module. Bij multi-rol worden de menu's van álle
     // rollen samengevoegd, zodat de gebruiker elk scherm bereikt waar hij recht op
     // heeft. Groepen worden op titel gecombineerd; dubbele items (zelfde route +
@@ -335,7 +345,8 @@
                     : ($r === Rol::Hrmedewerker ? $hrMenu
                         : ($r === Rol::Balie ? $balieMenu
                             : ($r === Rol::Bibliotheek ? $biebMenu
-                                : ($r === Rol::Scriptiecoordinator ? $scriptieMenu : null)))));
+                                : ($r === Rol::Scriptiecoordinator ? $scriptieMenu
+                                    : ($r === Rol::Stichtingsbestuur ? $stichtingsbestuurMenu : null))))));
             if ($rolMenu !== null) {
                 $standaardMenu = $mergeMenu($standaardMenu, $rolMenu);
             }
@@ -355,6 +366,7 @@
     $inBaliemodule = request()->routeIs('balie') || request()->routeIs('balie.*');
     $inBiebmodule = request()->routeIs('bibliotheek.*');
     $inScriptiemodule = request()->routeIs('scriptie.*');
+    $inStichtingsbestuurmodule = request()->routeIs('stichtingsbestuur.*');
     $menu = ($rol === Rol::Bestuur->value)
         ? $standaardMenu
         : ($inCursusmodule
@@ -363,7 +375,8 @@
                 : ($inHrmodule ? $hrMenu
                     : ($inBaliemodule ? $balieMenu
                         : ($inBiebmodule ? $biebMenu
-                            : ($inScriptiemodule ? $scriptieMenu : $standaardMenu))))));
+                            : ($inScriptiemodule ? $scriptieMenu
+                                : ($inStichtingsbestuurmodule ? $stichtingsbestuurMenu : $standaardMenu)))))));
 
     // "Bibliotheek IUASR" — de catalogus als alleen-lezen raadpleegscherm, voor
     // IEDERE medewerker en in ELKE module. Binnen de bibliotheekmodule zelf staat
@@ -400,6 +413,7 @@
         'HR / Personeelszaken',
         'Balie / Receptie',
         'Scriptie Coördinatie',
+        'Stichtingsbestuur',
         // Binnen de bibliotheekmodule: eerst waar de boeken staan, dan wat er
         // in en uit gaat.
         'Collectie', 'Uitlenen',

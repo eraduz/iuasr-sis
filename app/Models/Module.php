@@ -38,6 +38,7 @@ class Module extends Model
         'balie' => 'balie.dashboard',
         'bibliotheek' => 'bibliotheek.dashboard',
         'scriptie' => 'scriptie.dashboard',
+        'stichtingsbestuur' => 'stichtingsbestuur.dashboard',
     ];
 
     public function startRoute(): ?string

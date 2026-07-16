@@ -40,6 +40,8 @@ class DatabaseSeeder extends Seeder
             // Module Scriptie Coördinatie — draait ná de studenten-/curriculum-/
             // resultatenseeders, want de toelatingscontrole leest EC en resultaten.
             ScriptieSeeder::class,
+            // Module Stichtingsbestuur — onafhankelijk; synthetische bestuursleden.
+            StichtingsbestuurSeeder::class,
             // Echte personeelslijst (lokaal, gitignored; no-op als het bestand ontbreekt).
             PersoneelSeeder::class,
         ]);

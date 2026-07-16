@@ -29,7 +29,7 @@ class ModulekeuzeTest extends TestCase
         // De placeholder 'stage' is uitgegroeid tot de module Relatiebeheer & Stage.
         // Balie/Receptie (6) en Bibliotheek (7) zijn later toegevoegd.
         $this->assertSame(
-            ['studentenzaken', 'cursussen', 'relatiebeheer', 'scriptie', 'hr', 'balie', 'bibliotheek'],
+            ['studentenzaken', 'cursussen', 'relatiebeheer', 'scriptie', 'hr', 'balie', 'bibliotheek', 'stichtingsbestuur'],
             Module::geordend()->pluck('sleutel')->all(),
         );
         // Sinds de module Scriptie Coördinatie (2026-07-16) zijn alle zeven modules gebouwd.

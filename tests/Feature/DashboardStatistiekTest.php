@@ -74,9 +74,11 @@ class DashboardStatistiekTest extends TestCase
                 $antwoord->assertRedirect(route('balie.dashboard'));
             } elseif ($rol->magModule('bibliotheek')) {
                 $antwoord->assertRedirect(route('bibliotheek.dashboard'));
-            } else {
-                // Scriptiecoördinator naar het scriptieoverzicht.
+            } elseif ($rol->magModule('scriptie')) {
                 $antwoord->assertRedirect(route('scriptie.dashboard'));
+            } else {
+                // Stichtingsbestuur naar het stichtingsbestuuroverzicht.
+                $antwoord->assertRedirect(route('stichtingsbestuur.dashboard'));
             }
         }
     }

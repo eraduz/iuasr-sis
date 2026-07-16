@@ -52,6 +52,11 @@ enum Rol: string
     // Opleidinggebonden, net als de Directie. De begeleiding (docent), goedkeuring
     // (opleidingsdirecteur) en beoordeling (examencommissie) werken erin mee.
     case Scriptiecoordinator = 'scriptiecoordinator';
+    // Module Stichtingsbestuur. Het stichtingsbestuur en de Raad van Toezicht van de
+    // stichting: de bestuursleden/commissarissen en de (jaarlijkse) vergaderingen met
+    // onderwerpen, besluiten en aanwezigheid. Governance-data — bewust een smalle,
+    // afgeschermde rol.
+    case Stichtingsbestuur = 'stichtingsbestuur';
 
     /** Leesbare naam voor UI en documenten (Nederlands, U-vorm). */
     public function label(): string
@@ -71,6 +76,7 @@ enum Rol: string
             self::Balie => 'Balie / Receptie',
             self::Bibliotheek => 'Bibliotheekmedewerker',
             self::Scriptiecoordinator => 'Scriptiecoördinator',
+            self::Stichtingsbestuur => 'Stichtingsbestuur',
         };
     }
 
@@ -123,7 +129,7 @@ enum Rol: string
             self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
             self::Hrmedewerker, self::Balie, self::Bibliotheek,
-            self::Scriptiecoordinator => false,
+            self::Scriptiecoordinator, self::Stichtingsbestuur => false,
         };
     }
 
@@ -146,7 +152,7 @@ enum Rol: string
             self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
             self::Hrmedewerker, self::Balie, self::Bibliotheek,
-            self::Scriptiecoordinator => false,
+            self::Scriptiecoordinator, self::Stichtingsbestuur => false,
         };
     }
 
@@ -195,7 +201,7 @@ enum Rol: string
             self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
             self::Hrmedewerker, self::Balie, self::Bibliotheek,
-            self::Scriptiecoordinator => false,
+            self::Scriptiecoordinator, self::Stichtingsbestuur => false,
         };
     }
 
@@ -212,7 +218,7 @@ enum Rol: string
             self::Financien, self::Cursusadministratie,
             self::Relatiebeheerder, self::Stagecoordinator,
             self::Hrmedewerker, self::Balie, self::Bibliotheek,
-            self::Scriptiecoordinator => false,
+            self::Scriptiecoordinator, self::Stichtingsbestuur => false,
         };
     }
 
@@ -279,6 +285,8 @@ enum Rol: string
             self::Bibliotheek => ['bibliotheek'],
             // Module Scriptie Coördinatie: de scriptiecoördinator werkt daarbinnen.
             self::Scriptiecoordinator => ['scriptie'],
+            // Module Stichtingsbestuur: het stichtingsbestuur werkt uitsluitend daarbinnen.
+            self::Stichtingsbestuur => ['stichtingsbestuur'],
             // Het Schoolbestuur heeft brede inzage en ziet naast Studentenzaken ook
             // de Cursussen-, Relatiebeheer-, HR-, Balie-, Bibliotheek- en
             // Scriptiemodule (alleen-lezen).
@@ -408,6 +416,26 @@ enum Rol: string
             self::Scriptiecoordinator, self::Directie => true,
             default => false,
         };
+    }
+
+    /**
+     * Mag deze rol de module Stichtingsbestuur beheren (bestuursleden en
+     * vergaderingen muteren)? Uitsluitend het Stichtingsbestuur zelf; de Beheerder
+     * voor onderhoud. Bewust géén meekijkers: het gaat om governance- en
+     * persoonsgegevens van bestuursleden en vertrouwelijke besluiten.
+     */
+    public function magStichtingsbestuurBeheren(): bool
+    {
+        return match ($this) {
+            self::Stichtingsbestuur, self::Beheerder => true,
+            default => false,
+        };
+    }
+
+    /** Mag deze rol de module Stichtingsbestuur inzien? Dezelfde rollen als het beheer. */
+    public function magStichtingsbestuurInzien(): bool
+    {
+        return $this->magStichtingsbestuurBeheren();
     }
 
     /** Mag deze rol de personeelsadministratie beheren (module HR)? */

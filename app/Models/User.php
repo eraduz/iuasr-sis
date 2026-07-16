@@ -408,6 +408,20 @@ class User extends Authenticatable
         ], true));
     }
 
+    // --- Module Stichtingsbestuur ---
+
+    /** Bestuursleden en vergaderingen muteren (Stichtingsbestuur, Beheer). */
+    public function magStichtingsbestuurBeheren(): bool
+    {
+        return $this->magVolgensRol(fn (Rol $r) => $r->magStichtingsbestuurBeheren());
+    }
+
+    /** De module Stichtingsbestuur inzien. */
+    public function magStichtingsbestuurInzien(): bool
+    {
+        return $this->magVolgensRol(fn (Rol $r) => $r->magStichtingsbestuurInzien());
+    }
+
     public function magFinancieelInzien(): bool
     {
         return $this->magVolgensRol(fn (Rol $r) => $r->magFinancieelInzien());
