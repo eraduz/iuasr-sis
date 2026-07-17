@@ -144,6 +144,7 @@
             'Beheer' => [
                 ['Gebruikers & rollen', 'gebruikers', 'users', 'gebruikers'],
                 ['Noodaccounts', 'noodaccounts', 'alert', 'noodaccounts'],
+                ['Quotes', 'quotes', 'book', 'quotes'],
                 ['Opzoektabellen', 'opzoektabellen', 'db', 'opzoektabellen'],
                 ['Nieuwsbronnen', 'nieuws', 'report', 'nieuws'],
                 ['Audit-log', 'audit-log', 'log', 'audit-log'],
@@ -435,6 +436,10 @@
         })
         ->all();
 @endphp
+
+{{-- Bemoediging bovenaan het menu, vóór de eerste menugroep. Staat los van de
+     rol: iedereen ziet hem. --}}
+@include('partials.quote')
 
 @foreach ($menu as $titel => $items)
   <div class="iuasr-dash-sidebar__group">

@@ -18,6 +18,7 @@ use App\Http\Controllers\KortingController;
 use App\Http\Controllers\NoodaccountController;
 use App\Http\Controllers\OndertekeningController;
 use App\Http\Controllers\PresentieController;
+use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\RapportController;
 use App\Http\Controllers\ReferentieController;
 use App\Http\Controllers\StudentController;
@@ -100,6 +101,15 @@ Route::middleware('auth')->group(function () {
 
     // Keuzescherm na de login: welke module wil de gebruiker gebruiken?
     Route::get('/modules', [App\Http\Controllers\ModuleController::class, 'index'])->name('modules.kiezen');
+
+    /*
+    | Zijbalk-quote (99 Schone Namen + eigen spreuken). Leesbaar voor iedere
+    | ingelogde medewerker — de quote staat immers in ieders zijbalk. `huidig`
+    | wordt door de browser precies op de wisselgrens opgehaald, `afbeelding`
+    | serveert het bestand van de private schijf (geen storage:link nodig).
+    */
+    Route::get('/quote/huidig', [QuoteController::class, 'huidig'])->name('quotes.huidig');
+    Route::get('/quote/{quote}/afbeelding', [QuoteController::class, 'afbeelding'])->name('quotes.afbeelding');
 
     /*
     |--------------------------------------------------------------------------
@@ -633,6 +643,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/beheer/noodaccounts', [NoodaccountController::class, 'store'])->name('noodaccounts.store');
         Route::put('/beheer/noodaccounts/{gebruiker}/wachtwoord', [NoodaccountController::class, 'wachtwoord'])->name('noodaccounts.wachtwoord');
         Route::delete('/beheer/noodaccounts/{gebruiker}', [NoodaccountController::class, 'destroy'])->name('noodaccounts.destroy');
+
+        // Zijbalk-quotes beheren (99 Schone Namen + eigen spreuken).
+        Route::get('/beheer/quotes', [QuoteController::class, 'index'])->name('quotes');
+        Route::post('/beheer/quotes', [QuoteController::class, 'store'])->name('quotes.store');
+        Route::put('/beheer/quotes/{quote}', [QuoteController::class, 'update'])->name('quotes.update');
+        Route::put('/beheer/quotes/{quote}/toggle', [QuoteController::class, 'toggle'])->name('quotes.toggle');
+        Route::delete('/beheer/quotes/{quote}', [QuoteController::class, 'destroy'])->name('quotes.destroy');
 
         Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');
 

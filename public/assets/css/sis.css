@@ -761,3 +761,49 @@ a.sis-moduletile:hover {
   text-transform: uppercase; letter-spacing: .04em; color: var(--blackAltText);
   background: rgba(30,20,70,0.07); padding: 3px 9px; border-radius: 999px;
 }
+
+/* ================================================================
+   ZIJBALK-QUOTE — 99 Schone Namen + eigen spreuken
+   ----------------------------------------------------------------
+   Staat bovenaan het menu en wisselt om de paar minuten (zie
+   partials/quote.blade.php en App\Support\Quoteroulatie).
+
+   De afbeeldingstegel houdt BEWUST in beide thema's dezelfde donkere
+   achtergrond. Zo hoeft de beheerder maar EEN versie van elke
+   afbeelding te maken: goud/wit lijnwerk op transparant leest dan
+   altijd, ook als een collega de lichte modus gebruikt.
+   Weergavemaat 152 px = 4 cm; lever de bron op 456 px (3x).
+   ================================================================ */
+.sis-quote {
+  margin: -8px -4px 16px; padding: 14px 10px 16px;
+  border-bottom: 1px solid var(--borderSubtleColor);
+  text-align: center;
+}
+.sis-quote__inner { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+.sis-quote__inner.is-in { animation: sis-quote-in .5s ease both; }
+@keyframes sis-quote-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.sis-quote__img,
+.sis-quote__ar {
+  width: 152px; height: 152px; max-width: 100%;
+  border-radius: 12px;
+  background: var(--priColor100);
+  border: 1px solid rgba(214,154,45,0.35);
+  object-fit: contain;
+}
+.sis-quote__img { padding: 6px; }
+/* Zonder afbeelding: de Arabische tekst zelf vult de tegel. */
+.sis-quote__ar {
+  display: flex; align-items: center; justify-content: center;
+  padding: 10px; color: var(--goud, #D69A2D);
+  font-size: 30px; line-height: 1.5; font-weight: 500;
+}
+.sis-quote__kop {
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: 15px; color: var(--secColor100); line-height: 1.25;
+}
+.sis-quote__nl { font-size: 12px; line-height: 1.45; color: var(--blackText); }
+.sis-quote__bron { font-size: 10.5px; color: var(--blackAltText); font-style: italic; }
+
+/* De zijbalk is er voor navigatie; op papier heeft de quote geen functie. */
+@media print { .sis-quote { display: none !important; } }

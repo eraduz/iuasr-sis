@@ -24,7 +24,7 @@ return [
     | onderaan elke pagina getoond zodat testers en beheer weten welke versie
     | draait. Bijwerken bij elke release; houd de wijzigingen bij in CHANGELOG.md.
     */
-    'versie' => '1.15.0',
+    'versie' => '1.16.0',
 
     /*
     |----------------------------------------------------------------------
@@ -321,6 +321,28 @@ return [
     | server-side afgedwongen (zie AutorisatieServiceProvider en policies).
     */
     'rollen' => Rol::waarden(),
+
+    /*
+    |----------------------------------------------------------------------
+    | Quotes in de zijbalk (99 Schone Namen + eigen spreuken)
+    |----------------------------------------------------------------------
+    | Bovenaan het menu wisselt om de zoveel minuten een Schone Naam van Allah
+    | of een eigen spreuk — bedoeld als bemoediging, zonder verdere functie.
+    | Welke quote er staat wordt AFGELEID uit de klok (zie Quoteroulatie), dus
+    | iedereen ziet in hetzelfde tijdvak dezelfde tekst en de reeks loopt door
+    | ongeacht hoe vaak iemand navigeert.
+    |
+    | De afbeeldingen staan op de private schijf (map `quotes/`) en worden
+    | uitgeserveerd via een route, zodat er geen storage:link nodig is en er
+    | niets in de webroot belandt.
+    */
+    'quote' => [
+        'interval_minuten' => (int) env('SIS_QUOTE_INTERVAL_MINUTEN', 5),
+        // Weergavemaat in de zijbalk: 4 cm ≈ 152 px. Lever de afbeelding op het
+        // drievoudige (456 px) zodat hij op een scherpe monitor niet vaag wordt.
+        'afbeelding_px' => 152,
+        'max_upload_kb' => (int) env('SIS_QUOTE_MAX_UPLOAD_KB', 1024),
+    ],
 
     /*
     |----------------------------------------------------------------------

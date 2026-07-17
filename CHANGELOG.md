@@ -9,6 +9,28 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.16.0] — 2026-07-17
+
+- **99 Schone Namen in de zijbalk.** Bovenaan het menu staat voortaan een Schone
+  Naam van Allah (Asma ul-Husna) met de Arabische tekst en de Nederlandse
+  betekenis, die **elke vijf minuten** wisselt. Alle 99 Namen zijn ingeladen; u
+  hoeft alleen nog de afbeeldingen toe te voegen. Zonder afbeelding toont de
+  zijbalk de Arabische tekst, dus het werkt meteen.
+- **Iedereen ziet op hetzelfde moment dezelfde Naam.** Welke Naam er staat volgt
+  uit de klok, niet uit uw eigen bezoek. Daardoor loopt de reeks door terwijl u
+  het systeem gebruikt — bij een gewone carrousel zou hij bij elke paginawissel
+  weer bij nummer 1 beginnen.
+- **Eigen spreuken toevoegen** via Beheer → Quotes: kop, Arabische tekst,
+  Nederlandse betekenis, bron en een afbeelding. Per quote aan of uit te zetten
+  met één klik, en de volgorde is instelbaar.
+- **Afbeeldingen:** vierkant, **456 × 456 pixels**, PNG met doorzichtige
+  achtergrond, goud of wit lijnwerk. In de zijbalk staat hij op 152 pixels — dat
+  is 4 cm.
+- **Veiligheidsfix: `.env.testing` toegevoegd.** Zonder dat bestand valt
+  `php artisan <commando> --env=testing` stilzwijgend terug op de gewone `.env`
+  en dus op de ONTWIKKELdatabase. Zo is op 17 juli de complete ontwikkeldatabase
+  gewist door een `migrate:fresh --env=testing`. Die vergissing kan nu niet meer.
+
 ## [1.15.0] — 2026-07-17
 
 - **Noodtoegang (break-glass).** Maximaal **twee** beheerdersaccounts kunnen

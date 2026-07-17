@@ -223,6 +223,26 @@ MAIL_FROM_NAME="IUASR Studentenzaken"</span>
 
   <div class="let"><b>Deployvoorwaarden.</b> Zet <code>SESSION_SECURE_COOKIE=true</code> en dwing HTTPS af in de vhost vóórdat deze functie live gaat — anders gaat het noodwachtwoord bij gebruik leesbaar over de lijn, en juist tijdens een storing is dat niet ondenkbaar. Vul <code>SIS_TOEGESTANE_IPS</code>; de noodtoegang leunt op die beperking. Vervang tot slot <code>trustProxies(at: '*')</code> in <code>bootstrap/app.php</code> door het concrete proxy-IP en firewall de app-server: zolang <code>*</code> blijft staan, is het client-IP met een <code>X-Forwarded-For</code>-header te vervalsen, waarmee zowel de IP-beperking als de per-IP-verzoeklimiet te omzeilen is en de audit-log een vals IP vastlegt.</div>
 
+  <h2>6c. Omgevingen — .env, .env.testing en phpunit.xml</h2>
+  <div class="let"><b>Waarom .env.testing in Git staat en moet blijven.</b> Draait u <code>php artisan &lt;commando&gt; --env=testing</code> zonder dat <code>.env.testing</code> bestaat, dan valt Laravel <b>stilzwijgend terug op de gewone <code>.env</code></b> — en die wijst naar de <b>ontwikkeldatabase</b>. Zo is op 17-07-2026 de complete ontwikkeldatabase gewist met een <code>migrate:fresh --env=testing</code>: alle studenten, cijfers en de hele bibliotheekimport. De <code>&lt;env&gt;</code>-regels in <code>phpunit.xml</code> helpen daar niet tegen: die gelden alleen ónder phpunit, niet bij een los artisan-commando. <code>.env.testing</code> is het vangnet en bevat geen geheimen — dezelfde lokale testgegevens staan al in <code>phpunit.xml</code>. <b>Niet verwijderen, en houd beide bestanden gelijk.</b></div>
+  <table class="kv">
+    <tr><td><code>.env</code></td><td>Per omgeving, <b>nooit in Git</b>. Bevat de <b>APP_KEY</b> waarmee BSN en rekeningnummer zijn versleuteld — zonder die sleutel is die data onherstelbaar (zie de recovery-back-up).</td></tr>
+    <tr><td><code>.env.testing</code></td><td><b>Wel in Git.</b> Wijst naar <code>iuasr_sis_test</code>. Bevat een <b>wegwerp-APP_KEY</b> die alleen de testdatabase versleutelt — <code>php artisan test</code> zet <code>APP_ENV=testing</code> en laadt dit bestand, dus zonder sleutel faalt elke test die een pagina rendert.</td></tr>
+    <tr><td><code>phpunit.xml</code></td><td>Zet dezelfde testdatabase voor de suite zelf.</td></tr>
+  </table>
+  <p>Controleer bij twijfel op welke database u zit: <code>php artisan tinker --env=testing --execute="echo config('database.connections.mysql.database');"</code> hoort <code>iuasr_sis_test</code> te geven, zonder de vlag <code>iuasr_sis</code>.</p>
+
+  <h2>6d. Zijbalk-quotes (99 Schone Namen)</h2>
+  <p>Tabel <code>quotes</code>; beheer via <b>Beheer &rarr; Quotes</b> (<code>rol:beheerder</code>). Welke quote er staat wordt <b>afgeleid uit de klok</b> (<code>App\Support\Quoteroulatie</code>: <code>slot = tijd ÷ interval</code>, dan <code>slot % aantal</code>) en nergens opgeslagen. Dat is bewust: het systeem is server-gerenderd, dus een gewone JavaScript-carrousel zou bij elke paginawissel weer bij nummer 1 beginnen. Nu loopt de reeks door, ziet iedereen in hetzelfde tijdvak dezelfde Naam, en is er geen sessie, teller of achtergrondtaak nodig.</p>
+  <p>De browser haalt <code>/quote/huidig</code> precies op de wisselgrens op (<code>secondenTotVolgende</code>) in plaats van te pollen — één verzoek per tijdvak. De lijst wordt gecachet omdat de zijbalk op élke pagina rendert; <code>Quote::booted</code> leegt die cache bij elke mutatie.</p>
+  <table class="kv">
+    <tr><td><code>SIS_QUOTE_INTERVAL_MINUTEN</code></td><td>Wisselinterval (standaard <b>5</b>; ondergrens 1 minuut).</td></tr>
+    <tr><td><code>SIS_QUOTE_MAX_UPLOAD_KB</code></td><td>Maximale grootte van een afbeelding (standaard 1024 KB).</td></tr>
+    <tr><td>Afbeeldingen</td><td>Op de <b>private schijf</b> (<code>storage/app/quotes/</code>), uitgeserveerd via <code>quotes.afbeelding</code>. Bewust <b>geen</b> <code>storage:link</code>: dan zou user-upload in de webroot staan, en symlinks zijn op Plesk en in OneDrive-mappen een bekende bron van ellende. Validatie op <code>image</code> + <code>mimes:png,jpg,jpeg,webp</code> — <b>geen svg</b>, dat kan script bevatten en wordt inline in ieders zijbalk getoond.</td></tr>
+    <tr><td>Maatvoering</td><td>Weergave 152 px (= 4 cm); aanleveren op <b>456 × 456 px</b> (3&times;). De tegel houdt in beide thema's dezelfde donkere achtergrond, zodat één versie met goud/wit lijnwerk overal leest.</td></tr>
+  </table>
+  <p><code>QuoteSeeder</code> laadt de 99 Namen, <b>idempotent op (soort, titel)</b>: opnieuw draaien overschrijft een aangepaste betekenis of een geüploade afbeelding niet, en is dus veilig op een gevulde database.</p>
+
   <h2>7. Presentie (aanwezigheidsregistratie)</h2>
   <p>De docent registreert per college de aanwezigheid; dit is verplicht. Het model is bewust <b>genormaliseerd</b>: één regel per student &times; vak &times; onderwijsweek — nooit vaste weekkolommen op de inschrijving.</p>
   <table class="kv">

@@ -80,7 +80,8 @@ class HandleidingController extends Controller
             ['nr' => 16, 'titel' => 'Scriptie Coördinatie', 'rollen' => ['scriptiecoordinator']],
             ['nr' => 17, 'titel' => 'Stichtingsbestuur', 'rollen' => ['stichtingsbestuur']],
             ['nr' => 18, 'titel' => 'Noodtoegang', 'rollen' => ['beheerder']],
-            ['nr' => 19, 'titel' => 'Vragen of problemen?', 'rollen' => []],
+            ['nr' => 19, 'titel' => 'Quote in de zijbalk', 'rollen' => []],
+            ['nr' => 20, 'titel' => 'Vragen of problemen?', 'rollen' => []],
         ];
     }
 }

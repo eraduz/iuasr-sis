@@ -422,7 +422,14 @@
   <p>De Beheerder beheert de noodaccounts via <b>Beheer → Noodaccounts</b>: een beheerder aanwijzen, het wachtwoord wijzigen, of de noodtoegang intrekken. Bij het wijzigen typt u ter bevestiging het e-mailadres exact over — dezelfde extra stap als bij het verwijderen van een student. Intrekken wist alleen het wachtwoord; het gebruikersaccount blijft gewoon bestaan.</p>
   <div class="let">Behandel het noodwachtwoord als de sleutel van het gebouw. Deel het nooit per e-mail of chat en zet het niet in een document op een gedeelde schijf. Bewaar het in de digitale kluis of wachtwoordmanager, en geef de twee wachtwoorden aan <b>twee verschillende personen</b> — dan sluit één vergeten wachtwoord u niet buiten. Kies één lange zin van minimaal 16 tekens; lengte beschermt hier beter dan leestekens. Elke inlogpoging wordt vastgelegd in het audit-logboek, geslaagd én mislukt.</div>
 
-  <h2 id="h19">19. Vragen of problemen?</h2>
+  <h2 id="h19">19. Quote in de zijbalk (99 Schone Namen)</h2>
+  <p>Bovenaan het menu staat een <b>Schone Naam van Allah</b> (Asma ul-Husna) met de Arabische tekst en de Nederlandse betekenis, of een eigen spreuk. Hij <b>wisselt elke vijf minuten</b>. Welke er staat volgt uit de klok en niet uit uw eigen bezoek, dus u en uw collega's zien op hetzelfde moment dezelfde Naam — en de reeks loopt door terwijl u werkt. U hoeft niets in te stellen; het is bedoeld als bemoediging, er hangt geen functie aan.</p>
+  <h3>Beheren (Beheerder)</h3>
+  <p>Via <b>Beheer → Quotes</b> voegt de Beheerder eigen spreuken toe (kop, Arabische tekst, Nederlandse betekenis, bron en een afbeelding), zet hij een quote met één klik aan of uit, en past hij de volgorde aan. Alle 99 Namen staan er al in.</p>
+  <h3>Afbeeldingen aanleveren</h3>
+  <p>Vierkant, <b>456 × 456 pixels</b>, <b>PNG met een doorzichtige achtergrond</b>. In de zijbalk wordt de afbeelding op 152 pixels getoond — dat is precies <b>4 cm</b>; drie keer zo groot aanleveren houdt hem scherp op een goed beeldscherm. Maak het lijnwerk <b>goud of wit</b>: de tegel heeft in zowel de lichte als de donkere modus dezelfde donkere achtergrond, dus u hoeft maar één versie te maken. Een quote zonder afbeelding toont gewoon de Arabische tekst, dus u kunt de afbeeldingen rustig later toevoegen.</p>
+
+  <h2 id="h20">20. Vragen of problemen?</h2>
   <p>Neem bij vragen contact op met de systeembeheerder of Studentenzaken (szaken@iuasr.nl). Werkt iets niet zoals verwacht, meld dan wat u deed en wat u zag.</p>
 
   <div class="tip">Deze handleiding wordt bijgewerkt zodra er nieuwe functies bij komen. Kijk bij twijfel of u de meest recente versie hebt (zie de datum onderaan).</div>

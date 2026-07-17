@@ -42,6 +42,10 @@ class DatabaseSeeder extends Seeder
             ScriptieSeeder::class,
             // Module Stichtingsbestuur — onafhankelijk; synthetische bestuursleden.
             StichtingsbestuurSeeder::class,
+            // Zijbalk-quotes: de 99 Schone Namen. Onafhankelijk en idempotent op
+            // (soort, titel), dus veilig om opnieuw te draaien op een gevulde
+            // database — eigen spreuken en geüploade afbeeldingen blijven staan.
+            QuoteSeeder::class,
             // Echte personeelslijst (lokaal, gitignored; no-op als het bestand ontbreekt).
             PersoneelSeeder::class,
         ]);
