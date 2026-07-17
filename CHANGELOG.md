@@ -9,6 +9,27 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.18.0] — 2026-07-17
+
+- **Geanonimiseerde demo-dump voor Plesk.** Twee nieuwe commando's:
+  `sis:demo-anonimiseren` vervangt alle persoonsgegevens door synthetische, en
+  `sis:demo-controleren` toetst het resultaat en slaat alarm zodra er iets
+  doorheen glipt. Zo kunt u een demo op de publieke Plesk-server zetten mét de
+  volledige bibliotheekcatalogus, maar zonder één echt persoonsgegeven.
+- **Wat blijft en wat gaat.** Blijft: curriculum, 11.009 bibliotheektitels, 9.397
+  artikelen, opzoektabellen, de 99 Schone Namen en alle aantallen — de demo blijft
+  realistisch. Gaat: namen, adressen, e-mail, geboortedata, alle vrije tekst, het
+  audit-logboek, de ondertekende documenten en de noodtoegang.
+- **Veiligheidsgrendel.** `sis:demo-anonimiseren` weigert te draaien tenzij de
+  databasenaam op `_demo` eindigt. Het commando overschrijft onomkeerbaar, en kan
+  daarmee onmogelijk uw ontwikkeldatabase raken — ook niet als u het per ongeluk
+  daar aanroept.
+- **Bevinding (belangrijk).** De ontwikkeldatabase blijkt **echte**
+  persoonsgegevens te bevatten: ~3.500 historische studentdossiers (1998–2026) en
+  echte personeelsnamen. BSN en rekeningnummer zijn leeg. Dat wijkt af van de
+  AVG-regel in `CLAUDE.md` (bouwen en testen uitsluitend op synthetische data).
+  Zie `PROGRESS.md` — dit verdient een besluit van de opdrachtgever en de FG.
+
 ## [1.17.0] — 2026-07-17
 
 - **Systeemmeldingen op elke pagina.** De Beheerder kan via **Beheer →

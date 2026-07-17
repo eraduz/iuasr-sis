@@ -135,6 +135,61 @@ SIS_TOEGESTANE_IPS=
 > foutdetails lekken). `SESSION_SECURE_COOKIE=true` omdat het subdomein op HTTPS
 > draait.
 
+## Stap 7a — (Alternatief) een demo-dump importeren i.p.v. seeden
+
+`migrate --seed` (stap 7) geeft u een werkende demo met **synthetische** data,
+maar zónder de echte bibliotheekcatalogus (11.009 titels, 9.397 artikelen) —
+die komt uit een Excel-import en zit niet in de seeders. Wilt u die wél in de
+demo, gebruik dan een **geanonimiseerde dump** van de ontwikkeldatabase.
+
+> **AVG-hard.** De ontwikkeldatabase bevat het echte, historische
+> studentenregister (~3.500 dossiers, 1998–2026) en echte personeelsnamen. Die
+> mogen **nooit** op deze publieke Plesk-server. Upload daarom uitsluitend een
+> dump die door `sis:demo-anonimiseren` is gehaald en door `sis:demo-controleren`
+> is goedgekeurd. Zie de technische handleiding, hoofdstuk 6f, voor de procedure.
+
+**Dump maken (lokaal, op uw eigen machine):**
+
+```bash
+# 1. Kopie van de ontwikkeldatabase naar een *_demo-database
+mariadb -u root -e "DROP DATABASE IF EXISTS iuasr_sis_demo; CREATE DATABASE iuasr_sis_demo CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; GRANT ALL ON iuasr_sis_demo.* TO 'iuasr_sis'@'127.0.0.1';"
+mariadb-dump -u iuasr_sis -p --single-transaction iuasr_sis > kopie.sql
+mariadb -u iuasr_sis -p iuasr_sis_demo < kopie.sql
+
+# 2. Anonimiseren (weigert op elke database die niet op _demo eindigt)
+DB_DATABASE=iuasr_sis_demo php artisan sis:demo-anonimiseren
+
+# 3. Controleren — doe dit ALTIJD, en upload niets bij exitcode 1
+DB_DATABASE=iuasr_sis_demo php artisan sis:demo-controleren
+
+# 4. Dumpen
+mariadb-dump -u iuasr_sis -p --single-transaction --default-character-set=utf8mb4 iuasr_sis_demo > demo.sql
+
+# 5. De MariaDB-sandboxregel eruit halen (phpMyAdmin struikelt erover)
+sed -i '/^\/\*M!999999/d' demo.sql
+
+# 6. kopie.sql VERWIJDEREN — dat bestand bevat de echte gegevens
+rm kopie.sql
+```
+
+**Importeren in Plesk:**
+
+- **Databases → (uw database) → phpMyAdmin → Import**, kies `demo.sql`.
+  Bij >10 MB werkt de gezipte variant (`.sql.gz`) meestal beter dan het
+  onbewerkte bestand; phpMyAdmin pakt hem zelf uit.
+- Of via een **Scheduled Task**, na het bestand met File Manager te hebben
+  geüpload:
+  ```bash
+  mysql -h 127.0.0.1 -u DBGEBRUIKER -pWACHTWOORD DBNAAM < /var/www/vhosts/.../demo.sql
+  ```
+- Daarna **niet** `migrate --seed` draaien — de dump bevat schema én data. Wel
+  `php artisan migrate --force` als er intussen nieuwe migraties bij zijn
+  gekomen, en `php artisan config:cache`.
+
+De dump gebruikt `utf8mb4` / `utf8mb4_unicode_ci`, wat MySQL 8 op Plesk zonder
+meer begrijpt. Dumps liggen lokaal in `storage/app/db-snapshots/` — die map staat
+in `.gitignore` en komt dus nooit in de repo terecht.
+
 ## Stap 7 — Migreren, seeden en storage:link (Scheduled Tasks)
 
 Zonder SSH draai je artisan-commando's via **Tools & Settings → Scheduled Tasks**
