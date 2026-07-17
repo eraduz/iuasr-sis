@@ -44,16 +44,32 @@ foreach ($regel in Get-Content $envPad) {
     }
 }
 
-# APP_ENV=testing in .env is op een ontwikkelmachine bijna altijd fout:
-# `php artisan serve` geeft APP_ENV door aan het webserverproces, waardoor ELK
-# webverzoek .env.testing laadt en dus op de TESTdatabase uitkomt. Symptoom:
-# "Access denied for user ... Database: <naam>_test" of een lege applicatie.
+# APP_ENV=testing in .env is op een ontwikkelmachine fout, en in combinatie met
+# dit bestand ook schadelijk: `php artisan serve` geeft APP_ENV door aan het
+# webserverproces (ServeCommand::$passthroughVariables), waardoor ELK webverzoek
+# .env.testing laadt en dus op de TESTdatabase uitkomt.
+#
+# We genereren dan BEWUST NIETS. Zonder .env.testing valt Laravel terug op .env
+# en werkt de applicatie gewoon; met .env.testing zou hij stilzwijgend op een
+# lege testdatabase draaien, en dat is erger dan een duidelijke waarschuwing.
+# Zodra APP_ENV=local staat, wordt het bestand alsnog aangemaakt.
 if ($waarden['APP_ENV'] -eq 'testing') {
     Write-Host ''
-    Write-Host '  LET OP: in .env staat APP_ENV=testing.' -ForegroundColor Red
-    Write-Host '  Daardoor komen uw WEBVERZOEKEN op de testdatabase uit in plaats' -ForegroundColor Red
-    Write-Host '  van op de ontwikkeldatabase. Zet APP_ENV=local in .env.' -ForegroundColor Red
+    Write-Host '  LET OP: in .env staat APP_ENV=testing (regel met APP_ENV).' -ForegroundColor Red
+    Write-Host '  Daardoor komen uw WEBVERZOEKEN op de TESTdatabase uit in plaats' -ForegroundColor Red
+    Write-Host '  van op de ontwikkeldatabase: u ziet dan een lege applicatie of' -ForegroundColor Red
+    Write-Host '  "Access denied ... Database: <naam>_test".' -ForegroundColor Red
     Write-Host ''
+    Write-Host '  ZET IN .env:  APP_ENV=local' -ForegroundColor Yellow
+    Write-Host '  en draai daarna opnieuw:  .\scripts\dev.ps1' -ForegroundColor Yellow
+    Write-Host ''
+    Write-Host '  .env.testing is NIET aangemaakt zolang dit niet klopt.' -ForegroundColor DarkGray
+    if (Test-Path $doelPad) {
+        Remove-Item $doelPad -Force
+        Write-Host '  (een bestaande .env.testing is verwijderd, zodat de app blijft werken)' -ForegroundColor DarkGray
+    }
+    Write-Host ''
+    return
 }
 
 $db = $waarden['DB_DATABASE']
