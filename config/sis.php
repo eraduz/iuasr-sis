@@ -24,7 +24,7 @@ return [
     | onderaan elke pagina getoond zodat testers en beheer weten welke versie
     | draait. Bijwerken bij elke release; houd de wijzigingen bij in CHANGELOG.md.
     */
-    'versie' => '1.14.0',
+    'versie' => '1.15.0',
 
     /*
     |----------------------------------------------------------------------
@@ -321,6 +321,39 @@ return [
     | server-side afgedwongen (zie AutorisatieServiceProvider en policies).
     */
     'rollen' => Rol::waarden(),
+
+    /*
+    |----------------------------------------------------------------------
+    | Noodtoegang (break-glass)
+    |----------------------------------------------------------------------
+    | Offline noodtoegang voor als Entra ID (SSO) onbereikbaar is. Maximaal
+    | TWEE accounts met de rol Beheerder mogen met gebruikersnaam+wachtwoord
+    | inloggen. Dat maximum wordt op DATABASENIVEAU afgedwongen (unieke
+    | `users.noodaccount_slot` met CHECK 1..2) én in de applicatie; deze
+    | instelling is de derde controle en mag het er nooit mee oneens zijn.
+    | Reguliere accounts hebben en krijgen géén wachtwoord.
+    |
+    | Elke inlogpoging (geslaagd én mislukt) en elke wachtwoordwijziging komt
+    | in het audit-logboek. Het wachtwoord zelf wordt daar NOOIT in vastgelegd.
+    |
+    | De noodtoegang blijft achter de netwerkbeperking (`toegestane_ips`):
+    | een beheerder die van buiten moet werken gaat eerst de VPN op. Er is
+    | bewust GEEN uitzondering op de IP-beperking — die zou de enige
+    | wachtwoorddeur van het systeem aan het internet blootstellen.
+    |
+    | BEVESTIGD (opdrachtgever, 2026-07-17): maximaal 2 noodaccounts, geen
+    | tweede factor, alleen bereikbaar vanaf het interne netwerk.
+    */
+    'noodaccount' => [
+        'maximum' => 2, // NIET instelbaar via env: de database dwingt hetzelfde af.
+        // Lengte boven complexiteit (NCSC): één lange wachtwoordzin.
+        'wachtwoord_min_lengte' => (int) env('SIS_NOODACCOUNT_WACHTWOORD_MIN_LENGTE', 16),
+        // Verzoeklimiet per gebruikersnaam+IP, en ruimer per IP alleen. Bewust
+        // GEEN permanente accountblokkade: dan kan een aanvaller met een handvol
+        // foute pogingen de noodtoegang dichtzetten juist wanneer die nodig is.
+        'max_pogingen' => (int) env('SIS_NOODACCOUNT_MAX_POGINGEN', 5),
+        'max_pogingen_per_ip' => (int) env('SIS_NOODACCOUNT_MAX_POGINGEN_PER_IP', 20),
+    ],
 
     /*
     |----------------------------------------------------------------------

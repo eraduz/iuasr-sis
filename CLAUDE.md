@@ -14,7 +14,12 @@ CSS-klassen `sis-*`, env-keys `SIS_*`) blijven ongewijzigd.
 ## Stack (vastgelegd)
 - PHP + **Laravel** (geen kale PHP, geen WordPress)
 - **MySQL / InnoDB** — échte foreign keys, geen tekstuele koppelsleutels
-- Auth via **Microsoft Entra ID (SSO/OIDC)** — bouw NOOIT een eigen login
+- Auth via **Microsoft Entra ID (SSO/OIDC)** — bouw NOOIT een eigen login.
+  **Eén uitzondering** (opdrachtgever 2026-07-17): maximaal TWEE noodaccounts
+  (break-glass) met de rol Beheerder mogen met wachtwoord inloggen via
+  `/noodtoegang`, voor als Entra ID onbereikbaar is. Dat maximum is
+  database-afgedwongen (`users.noodaccount_slot`, uniek + CHECK 1..2). Reguliere
+  accounts krijgen NOOIT een wachtwoord; bouw geen tweede wachtwoordpad.
 - Draait intern, IP-beperkt
 
 ## Design system (leidend)

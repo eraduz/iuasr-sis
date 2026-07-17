@@ -47,6 +47,15 @@
       </form>
     @endif
 
+    {{-- Noodtoegang (break-glass): buiten de dev-blok-@if, want deze weg moet
+         áltijd zichtbaar zijn — juist in productie. Geen formulier hier: één
+         plek voor de wachtwoordcontrole houdt de verzoeklimiet en de
+         audit-logging op één route. --}}
+    <div class="sis-login__divider">Noodtoegang</div>
+    <div style="text-align:center;">
+      <a href="{{ route('noodlogin') }}" style="font-size:13px;">Inloggen zonder Entra ID (alleen voor beheerders)</a>
+    </div>
+
     <div class="sis-login__note" style="margin-top:18px;">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       <span>Dit systeem draait intern en is IP-beperkt. Uw rol volgt uit uw Entra-groep en bepaalt wat u mag zien en doen.</span>

@@ -22,7 +22,12 @@
 <form method="GET" action="{{ route('audit-log') }}" class="iuasr-dash-filters" style="grid-template-columns:1fr 1fr;">
   <select name="actie" onchange="this.form.submit()">
     <option value="">Alle acties</option>
-    @foreach (['inzage'=>'Inzage','aanmaak'=>'Aanmaak','wijziging'=>'Wijziging','uitgifte'=>'Uitgifte','verwijdering'=>'Verwijdering'] as $k=>$v)
+    {{-- 'noodtoegang' bundelt geslaagde én mislukte noodlogins; 'noodlogin_mislukt'
+         staat er ook los in, want dat is het scherm waarop u aanvallen ziet. --}}
+    @foreach ([
+      'inzage'=>'Inzage','aanmaak'=>'Aanmaak','wijziging'=>'Wijziging','uitgifte'=>'Uitgifte','verwijdering'=>'Verwijdering',
+      'noodtoegang'=>'Noodtoegang (alle pogingen)','noodlogin'=>'Noodtoegang — geslaagd','noodlogin_mislukt'=>'Noodtoegang — mislukt',
+    ] as $k=>$v)
       <option value="{{ $k }}" @selected($actie===$k)>{{ $v }}</option>
     @endforeach
   </select>

@@ -106,6 +106,21 @@ class GebruikerController extends Controller
         $primair = Rol::from($data['rol']);
         $extra = $this->extraRollenUit($data['rollen'] ?? [], $primair);
 
+        // Een noodaccount (break-glass) mag hier niet stilzwijgend onbruikbaar
+        // worden. Zou de rol Beheerder wegvallen of het account inactief worden,
+        // dan blijft `noodaccount_slot` bezet terwijl inloggen niet meer lukt: het
+        // scherm meldt dan '2 van 2 plaatsen in gebruik' terwijl er nog maar één
+        // werkt — en dat merkt u pas als Entra ID daadwerkelijk uitvalt. Trek de
+        // noodtoegang daarom eerst bewust in.
+        if ($gebruiker->isNoodaccount()) {
+            $blijftBeheerder = $primair === Rol::Beheerder || in_array(Rol::Beheerder, $extra, true);
+            $blijftActief = $request->boolean('actief', $gebruiker->actief);
+
+            if (! $blijftBeheerder || ! $blijftActief) {
+                return back()->with('fout', "{$gebruiker->naam} is noodaccount {$gebruiker->noodaccount_slot} en moet daarvoor een actieve Beheerder blijven. Trek eerst de noodtoegang in via Beheer → Noodaccounts.");
+            }
+        }
+
         $oudPrimair = $gebruiker->rol->value;
         $oudExtra = $gebruiker->extraRollen()->map(fn (Rol $r) => $r->value)->all();
 

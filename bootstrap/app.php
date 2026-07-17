@@ -37,5 +37,18 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Bij een validatiefout flasht Laravel de request-input terug naar de
+        // sessie, zodat het formulier ingevuld blijft. Standaard worden alleen
+        // velden overgeslagen die 'password' HETEN — dit project gebruikt
+        // Nederlandse veldnamen, dus 'wachtwoord' moet er expliciet bij. Zonder
+        // deze regel belandt het noodwachtwoord (break-glass) in leesbare vorm in
+        // de sessiestore bij elke mislukte inlogpoging. Zie NoodaccountTest.
+        $exceptions->dontFlash([
+            'wachtwoord',
+            'wachtwoord_confirmation',
+            'huidig_wachtwoord',
+            'current_password',
+            'password',
+            'password_confirmation',
+        ]);
     })->create();

@@ -19,6 +19,15 @@ class AuditLogger
     public const VERWIJDERING = 'verwijdering';
     public const UITGIFTE = 'uitgifte';
 
+    /**
+     * Noodtoegang (break-glass). Bij een MISLUKTE poging is er geen ingelogde
+     * gebruiker: `user_id` en `rol` blijven dan null (beide kolommen zijn
+     * nullable) en de geprobeerde gebruikersnaam gaat mee in de context.
+     */
+    public const NOODLOGIN = 'noodlogin';
+
+    public const NOODLOGIN_MISLUKT = 'noodlogin_mislukt';
+
     public static function log(
         string $actie,
         Model|string $onderwerp,

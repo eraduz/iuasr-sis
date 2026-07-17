@@ -415,7 +415,14 @@
   <h3>Vergaderingen</h3>
   <p>Onder <b>Vergaderingen</b> legt u per (jaarlijkse) vergadering vast: de datum, het soort (Stichtingsbestuur of Raad van Toezicht), de besproken onderwerpen en de besluiten. In het <b>aanwezigheidsraster</b> zet u per lid of hij <b>fysiek</b> of <b>online</b> aanwezig was, of <b>niet bijgewoond</b> heeft. Laat u een lid leeg, dan is er niets voor hem geregistreerd. Op de detailpagina ziet u de onderwerpen, de besluiten en de aanwezigheid in één overzicht.</p>
 
-  <h2 id="h18">18. Vragen of problemen?</h2>
+  <h2 id="h18">18. Noodtoegang (alleen voor beheerders)</h2>
+  <p>Normaal logt u in met uw IUASR-account via Microsoft Entra ID. Valt Entra ID uit, dan kan niemand meer inloggen en ligt het systeem stil. Voor dat geval bestaat de <b>noodtoegang</b>: ten hoogste <b>twee</b> beheerders kunnen dan met een gebruikersnaam en wachtwoord binnen, via de link <b>Noodtoegang</b> onder aan het inlogscherm. Voor alle andere medewerkers verandert er niets — die accounts hebben geen wachtwoord en kunnen deze weg niet gebruiken.</p>
+  <p>De noodtoegang werkt <b>uitsluitend vanaf het interne netwerk</b>. Moet u tijdens een storing van buiten werken, ga dan eerst de VPN op.</p>
+  <h3>Beheer</h3>
+  <p>De Beheerder beheert de noodaccounts via <b>Beheer → Noodaccounts</b>: een beheerder aanwijzen, het wachtwoord wijzigen, of de noodtoegang intrekken. Bij het wijzigen typt u ter bevestiging het e-mailadres exact over — dezelfde extra stap als bij het verwijderen van een student. Intrekken wist alleen het wachtwoord; het gebruikersaccount blijft gewoon bestaan.</p>
+  <div class="let">Behandel het noodwachtwoord als de sleutel van het gebouw. Deel het nooit per e-mail of chat en zet het niet in een document op een gedeelde schijf. Bewaar het in de digitale kluis of wachtwoordmanager, en geef de twee wachtwoorden aan <b>twee verschillende personen</b> — dan sluit één vergeten wachtwoord u niet buiten. Kies één lange zin van minimaal 16 tekens; lengte beschermt hier beter dan leestekens. Elke inlogpoging wordt vastgelegd in het audit-logboek, geslaagd én mislukt.</div>
+
+  <h2 id="h19">19. Vragen of problemen?</h2>
   <p>Neem bij vragen contact op met de systeembeheerder of Studentenzaken (szaken@iuasr.nl). Werkt iets niet zoals verwacht, meld dan wat u deed en wat u zag.</p>
 
   <div class="tip">Deze handleiding wordt bijgewerkt zodra er nieuwe functies bij komen. Kijk bij twijfel of u de meest recente versie hebt (zie de datum onderaan).</div>

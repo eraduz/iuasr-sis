@@ -9,6 +9,33 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.15.0] — 2026-07-17
+
+- **Noodtoegang (break-glass).** Maximaal **twee** beheerdersaccounts kunnen
+  voortaan met gebruikersnaam en wachtwoord inloggen via `/noodtoegang`, voor het
+  geval Microsoft Entra ID onbereikbaar is en niemand meer het systeem in kan. Alle
+  overige medewerkers loggen uitsluitend via Entra ID in; die accounts hebben geen
+  wachtwoord. Het maximum van twee wordt door de database zelf afgedwongen, niet
+  alleen door de applicatie.
+- **Beheerscherm Noodaccounts** (Beheer → Noodaccounts). Een beheerder wijst een
+  noodaccount aan, wijzigt het wachtwoord of trekt de noodtoegang in. Het wachtwoord
+  wijzigen vereist het e-mailadres exact over te typen — dezelfde dubbele beveiliging
+  als bij het verwijderen van een student. Intrekken wist het wachtwoord; het account
+  zelf blijft bestaan.
+- **Bootstrap via de server.** `php artisan sis:noodaccount-instellen <e-mailadres>`
+  zet het eerste wachtwoord. Dat kan niet anders: zolang er geen werkend inlogpad is,
+  is het beheerscherm onbereikbaar. Het commando vraagt het wachtwoord met verborgen
+  invoer, zodat het niet in de shell-historie belandt.
+- **Volledige logging.** Elke inlogpoging staat in het audit-logboek — geslaagd én
+  mislukt, met IP-adres en de geprobeerde gebruikersnaam. Het wachtwoord zelf komt er
+  nooit in, ook de versleutelde vorm niet.
+- **Verzoeklimiet.** Vijf pogingen per minuut per gebruikersnaam, twintig per
+  IP-adres. Bewust géén blokkade van het account zelf: dan zou iemand met een handvol
+  foute pogingen uw noodtoegang kunnen dichtzetten juist wanneer u die nodig heeft.
+- **Alleen vanaf het interne netwerk.** De noodtoegang valt onder dezelfde
+  netwerkbeperking als de rest van het systeem. Moet u van buiten werken, dan gaat u
+  eerst de VPN op (keuze opdrachtgever).
+
 ## [1.14.0] — 2026-07-16
 
 - **Bibliotheek: taalcontrole op titels (spel-/typefouten).** Nieuw commando

@@ -374,6 +374,16 @@ enum Rol: string
     }
 
     /**
+     * Mag deze rol de noodaccounts (break-glass) beheren: aanwijzen, het wachtwoord
+     * zetten en de noodtoegang intrekken? Uitsluitend de Beheerder — dit is de
+     * laatste toegangsweg als Entra ID onbereikbaar is. Elke mutatie wordt gelogd.
+     */
+    public function magNoodaccountsBeheren(): bool
+    {
+        return $this === self::Beheerder;
+    }
+
+    /**
      * Mag deze rol scriptietrajecten regisseren: een traject starten, de kern
      * (titel, taal, begeleider) beheren, kandidaten inschrijven en de coördinerende
      * stappen sturen? De scriptiecoördinator; Beheer voor onderhoud. De begeleiding,

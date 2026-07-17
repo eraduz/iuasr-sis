@@ -82,5 +82,9 @@ class AutorisatieServiceProvider extends ServiceProvider
 
         // Gebruikers/rollen/referentiedata beheren (Beheerder).
         Gate::define('beheer', fn (User $user) => $user->heeftRol(\App\Enums\Rol::Beheerder));
+
+        // Noodaccounts (break-glass) beheren — Beheerder. Dit is de enige plek in
+        // het systeem waar wachtwoorden worden gezet.
+        Gate::define('noodaccounts-beheren', fn (User $user) => $user->magNoodaccountsBeheren());
     }
 }

@@ -193,6 +193,36 @@ MAIL_FROM_NAME="IUASR Studentenzaken"</span>
     <li><b>Presentiegegevens zijn onderwijsinhoudelijk.</b> Studentenzaken, Financiële Administratie en Beheer hebben géén toegang tot presentielijsten of aanwezigheidspercentages (Gate <code>presentie-inzien</code>). Registreren mag alleen de docent van het eigen vak (Gate <code>presentie-registreren</code>). Inzage en mutatie worden gelogd.</li>
   </ul>
 
+  <h2>6b. Noodtoegang (break-glass)</h2>
+  <p>Authenticatie loopt via <b>Microsoft Entra ID</b>. Valt Entra ID (of de koppeling) uit, dan kan niemand meer inloggen. Voor dat geval mogen ten hoogste <b>twee</b> accounts met de rol Beheerder met gebruikersnaam+wachtwoord inloggen op <code>/noodtoegang</code>. Dit is de <b>enige</b> plaats in het systeem waar een wachtwoord toegang geeft; reguliere accounts hebben <code>users.password = NULL</code> en kunnen deze weg niet gebruiken.</p>
+
+  <h3>Datamodel &amp; harde grens</h3>
+  <p>Op <code>users</code>: <code>password</code> (nullable), <code>noodaccount_slot</code> (<b>uniek</b>, met <code>CHECK (noodaccount_slot IS NULL OR noodaccount_slot IN (1,2))</code>) en <code>wachtwoord_gewijzigd_op</code>. Het maximum van twee is dus <b>database-afgedwongen</b>, niet alleen applicatielogica: MySQL staat meerdere <code>NULL</code>-waarden toe in een unieke index, dus reguliere accounts zijn onbeperkt, maar een derde noodaccount is onmogelijk — ook bij een applicatiebug of een handmatige <code>INSERT</code>. <code>password</code> en <code>noodaccount_slot</code> staan bewust <b>niet</b> in <code>$fillable</code>; ze worden alleen via <code>forceFill()</code> gezet.</p>
+
+  <h3>Eerste ingebruikname (bootstrap)</h3>
+  <p>Het eerste wachtwoord kan <b>niet</b> via het beheerscherm: daarvoor moet u ingelogd zijn, en zolang Entra ID nog niet gekoppeld is bestaat er geen werkend inlogpad (de dev-login geeft in productie een 404). Zet het daarom op de server:</p>
+  <span class="cmd">php artisan sis:noodaccount-instellen beheer@iuasr.nl</span>
+  <p>Het commando vraagt het wachtwoord tweemaal met <b>verborgen invoer</b> — nooit als argument, dat zou het in de shell-historie en in <code>ps</code> achterlaten. Het maakt <b>geen accounts aan</b>: het account moet al bestaan (Beheer &rarr; Gebruikers &amp; rollen) en de rol Beheerder plus <code>actief</code> hebben. Intrekken kan met <code>--intrekken</code>; dit commando blijft ook de terugval als u buitengesloten raakt.</p>
+
+  <h3>Instellingen</h3>
+  <table class="kv">
+    <tr><td><code>SIS_NOODACCOUNT_WACHTWOORD_MIN_LENGTE</code></td><td>Minimale lengte (standaard <b>16</b>). Lengte boven complexiteit: één lange zin.</td></tr>
+    <tr><td><code>SIS_NOODACCOUNT_MAX_POGINGEN</code></td><td>Pogingen per minuut per gebruikersnaam+IP (standaard <b>5</b>).</td></tr>
+    <tr><td><code>SIS_NOODACCOUNT_MAX_POGINGEN_PER_IP</code></td><td>Pogingen per minuut per IP (standaard <b>20</b>).</td></tr>
+    <tr><td><code>sis.noodaccount.maximum</code></td><td>Vast op <b>2</b>, bewust <b>niet</b> via env: de database dwingt hetzelfde af en een afwijkende waarde zou alleen een onverklaarbare SQL-fout opleveren.</td></tr>
+  </table>
+  <p>Er is <b>geen</b> permanente accountblokkade na X foute pogingen, alleen een verzoeklimiet. Dat is opzet: een blokkade zou betekenen dat iemand met een handvol foute pogingen de noodtoegang kan dichtzetten juist wanneer die nodig is. De wachtwoordkwaliteit is hier dus de daadwerkelijke verdediging.</p>
+
+  <h3>Netwerk</h3>
+  <p>De noodtoegang valt onder dezelfde netwerkbeperking als de rest (<code>SIS_TOEGESTANE_IPS</code>, middleware <code>IpBeperking</code>): <b>uitsluitend vanaf het interne netwerk</b>. Er is bewust géén uitzondering gebouwd — die zou de enige wachtwoorddeur van het systeem aan het hele internet blootstellen. Moet een beheerder tijdens een storing van buiten werken, dan is de <b>VPN</b> de weg (keuze opdrachtgever, 2026-07-17).</p>
+
+  <h3>Logging</h3>
+  <p>Elke poging komt in <code>audit_logs</code>: <code>actie=noodlogin</code> (geslaagd, mét <code>user_id</code> en rol) of <code>actie=noodlogin_mislukt</code> (dan is er geen actor: <code>user_id</code> en <code>rol</code> zijn <code>NULL</code>, en de geprobeerde gebruikersnaam plus de reden staan in <code>context</code>). Het wachtwoord — ook de versleutelde vorm — wordt <b>nooit</b> gelogd. Naar de gebruiker gaat altijd dezelfde melding, zodat niet te achterhalen is welk e-mailadres een noodaccount is; de echte reden staat alleen in het logboek. Filter op <code>/audit-log?actie=noodlogin</code>.</p>
+
+  <div class="let"><b>Bewaarprocedure — dit is de zwakste schakel.</b> Het reële faalscenario is niet "gekraakt" maar "in een Word-bestand op een gedeelde schijf" of "kwijt op het moment dat het nodig is". Bewaar elk wachtwoord in de <b>kluis/wachtwoordmanager</b>, nooit per e-mail of chat. Geef <b>slot 1 en slot 2 aan twee verschillende personen</b>, zodat één vergeten wachtwoord niemand buitensluit. Roteer periodiek; <code>wachtwoord_gewijzigd_op</code> toont op het beheerscherm wanneer dat voor het laatst gebeurde. Er is bewust <b>geen</b> automatische verlooptermijn: een verlopen noodwachtwoord is een noodtoegang die niet werkt.</div>
+
+  <div class="let"><b>Deployvoorwaarden.</b> Zet <code>SESSION_SECURE_COOKIE=true</code> en dwing HTTPS af in de vhost vóórdat deze functie live gaat — anders gaat het noodwachtwoord bij gebruik leesbaar over de lijn, en juist tijdens een storing is dat niet ondenkbaar. Vul <code>SIS_TOEGESTANE_IPS</code>; de noodtoegang leunt op die beperking. Vervang tot slot <code>trustProxies(at: '*')</code> in <code>bootstrap/app.php</code> door het concrete proxy-IP en firewall de app-server: zolang <code>*</code> blijft staan, is het client-IP met een <code>X-Forwarded-For</code>-header te vervalsen, waarmee zowel de IP-beperking als de per-IP-verzoeklimiet te omzeilen is en de audit-log een vals IP vastlegt.</div>
+
   <h2>7. Presentie (aanwezigheidsregistratie)</h2>
   <p>De docent registreert per college de aanwezigheid; dit is verplicht. Het model is bewust <b>genormaliseerd</b>: één regel per student &times; vak &times; onderwijsweek — nooit vaste weekkolommen op de inschrijving.</p>
   <table class="kv">

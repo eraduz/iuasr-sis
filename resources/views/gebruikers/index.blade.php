@@ -29,7 +29,10 @@
     <h1>Gebruikers &amp; rollen</h1>
     <div class="summary"><b>{{ $gebruikers->count() }}</b> gebruikers · <b>{{ count($rollen) }}</b> rollen · toegang via IUASR SSO</div>
   </div>
-  <div class="iuasr-dash-vhead__actions"><a class="iuasr-dash-btn" href="{{ route('audit-log') }}">Audit-log</a></div>
+  <div class="iuasr-dash-vhead__actions">
+    <a class="iuasr-dash-btn" href="{{ route('noodaccounts') }}">Noodaccounts</a>
+    <a class="iuasr-dash-btn" href="{{ route('audit-log') }}">Audit-log</a>
+  </div>
 </div>
 
 <div class="sis-card" style="margin-bottom:18px;">

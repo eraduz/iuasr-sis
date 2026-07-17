@@ -3,6 +3,7 @@
 use App\Http\Controllers\AanwezigheidsregelingController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\DevLoginController;
+use App\Http\Controllers\Auth\NoodloginController;
 use App\Http\Controllers\BetaalregelingController;
 use App\Http\Controllers\BetalingController;
 use App\Http\Controllers\BetalingsafspraakController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\GebruikerController;
 use App\Http\Controllers\InschrijvingActiesController;
 use App\Http\Controllers\InschrijvingController;
 use App\Http\Controllers\KortingController;
+use App\Http\Controllers\NoodaccountController;
 use App\Http\Controllers\OndertekeningController;
 use App\Http\Controllers\PresentieController;
 use App\Http\Controllers\RapportController;
@@ -45,6 +47,32 @@ Route::get('/login', function () {
 
 Route::post('/dev-login', [DevLoginController::class, 'store'])->name('dev-login');
 Route::post('/logout', [DevLoginController::class, 'destroy'])->name('logout');
+
+/*
+|--------------------------------------------------------------------------
+| Noodtoegang (break-glass) — buiten Entra ID om
+|--------------------------------------------------------------------------
+| Als Microsoft Entra ID onbereikbaar is, kan niemand meer inloggen en ligt het
+| systeem stil. Daarom mogen maximaal TWEE accounts met de rol Beheerder hier
+| met gebruikersnaam+wachtwoord binnen. Dit is met opzet de enige plek in het
+| systeem waar een wachtwoord toegang geeft.
+|
+| Deze route werkt WÉL in productie — anders heeft hij geen zin. Dat is het
+| verschil met de dev-login (DevLoginController::weigerInProductie).
+|
+| De netwerkbeperking (IpBeperking) geldt hier onverkort: uitsluitend vanaf het
+| interne netwerk. Van buiten werken betekent eerst de VPN op (keuze
+| opdrachtgever 2026-07-17) — een uitzondering zou de enige wachtwoorddeur van
+| het systeem aan het internet blootstellen.
+|
+| Beveiliging: verzoeklimiet per gebruikersnaam+IP (throttle:noodlogin), rol- en
+| actief-controle na de wachtwoordcontrole, en volledige audit-logging van élke
+| poging — geslaagd én mislukt.
+*/
+Route::get('/noodtoegang', [NoodloginController::class, 'toon'])->name('noodlogin');
+Route::post('/noodtoegang', [NoodloginController::class, 'store'])
+    ->middleware('throttle:noodlogin')
+    ->name('noodlogin.store');
 
 // Publieke echtheidscontrole van ondertekende documenten (geen login vereist).
 Route::match(['get', 'post'], '/verificatie', [OndertekeningController::class, 'verificatie'])->name('verificatie');
@@ -597,6 +625,14 @@ Route::middleware('auth')->group(function () {
         Route::put('/gebruikers/{gebruiker}/rol', [GebruikerController::class, 'updateRol'])->name('gebruikers.rol');
         // Opleidingtoewijzing voor directieleden (zichtbaarheid per opleiding).
         Route::put('/gebruikers/{gebruiker}/opleidingen', [GebruikerController::class, 'updateOpleidingen'])->name('gebruikers.opleidingen');
+
+        // Noodaccounts (break-glass) — aanwijzen, wachtwoord zetten, intrekken.
+        // Het eerste wachtwoord wordt gezet met `php artisan sis:noodaccount-instellen`;
+        // dit scherm is voor het beheer daarna.
+        Route::get('/beheer/noodaccounts', [NoodaccountController::class, 'index'])->name('noodaccounts');
+        Route::post('/beheer/noodaccounts', [NoodaccountController::class, 'store'])->name('noodaccounts.store');
+        Route::put('/beheer/noodaccounts/{gebruiker}/wachtwoord', [NoodaccountController::class, 'wachtwoord'])->name('noodaccounts.wachtwoord');
+        Route::delete('/beheer/noodaccounts/{gebruiker}', [NoodaccountController::class, 'destroy'])->name('noodaccounts.destroy');
 
         Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');
 

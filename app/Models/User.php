@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Rol;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -10,9 +11,11 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 
 /**
- * Medewerker-account. Authenticatie verloopt via Microsoft Entra ID (SSO/OIDC);
- * het systeem beheert zelf GEEN wachtwoorden. De rol volgt bij voorkeur uit de
- * Entra-groep en wordt bij elke actie server-side gecontroleerd.
+ * Medewerker-account. Authenticatie verloopt via Microsoft Entra ID (SSO/OIDC).
+ * Het systeem beheert zelf GEEN wachtwoorden, met ÉÉN uitzondering: de maximaal
+ * twee noodaccounts (break-glass, `noodaccount_slot` 1 of 2) mogen met
+ * gebruikersnaam+wachtwoord inloggen als Entra ID onbereikbaar is. De rol volgt
+ * bij voorkeur uit de Entra-groep en wordt bij elke actie server-side gecontroleerd.
  *
  * Multi-rol: `rol` is de PRIMAIRE rol (startdashboard, standaard-scoping,
  * weergave). Aanvullende rollen staan in {@see Roltoewijzing}. De rechten worden
@@ -35,9 +38,14 @@ class User extends Authenticatable
         'rol',
         'docent_id',
         'actief',
+        // LET OP: 'password' en 'noodaccount_slot' staan hier BEWUST niet.
+        // Beide worden uitsluitend via forceFill() gezet, zodat een onbedoelde
+        // mass-assignment nooit een noodaccount kan aanmaken of een wachtwoord
+        // kan zetten. Zie NoodaccountController.
     ];
 
     protected $hidden = [
+        'password',
         'remember_token',
     ];
 
@@ -46,8 +54,41 @@ class User extends Authenticatable
         return [
             'rol' => Rol::class,
             'actief' => 'boolean',
+            'password' => 'hashed',
             'laatst_ingelogd_op' => 'datetime',
+            'wachtwoord_gewijzigd_op' => 'datetime',
         ];
+    }
+
+    // --- Toegang ---
+
+    /** Alleen actieve accounts. Een ingetrokken account mag nergens meer in. */
+    public function scopeActief(Builder $query): Builder
+    {
+        return $query->where('actief', true);
+    }
+
+    /** De maximaal twee noodaccounts (break-glass). */
+    public function scopeNoodaccount(Builder $query): Builder
+    {
+        return $query->whereNotNull('noodaccount_slot');
+    }
+
+    /** Is dit een noodaccount (break-glass) met wachtwoordtoegang? */
+    public function isNoodaccount(): bool
+    {
+        return $this->noodaccount_slot !== null;
+    }
+
+    /**
+     * Mag dit account daadwerkelijk met wachtwoord inloggen? Drie eisen tegelijk:
+     * het is een noodaccount, het is actief, en het heeft de rol Beheerder. De
+     * controle staat hier zodat het login-pad, het beheerscherm en het
+     * artisan-commando dezelfde definitie delen.
+     */
+    public function magNoodloginGebruiken(): bool
+    {
+        return $this->isNoodaccount() && $this->actief && $this->heeftRol(Rol::Beheerder);
     }
 
     /** Koppeling naar het docentprofiel (voor de rol Docent — eigen vak). */
@@ -155,6 +196,12 @@ class User extends Authenticatable
     public function magBibliotheekSjablonenBeheren(): bool
     {
         return $this->magVolgensRol(fn (Rol $r) => $r->magBibliotheekSjablonenBeheren());
+    }
+
+    /** Noodaccounts (break-glass) beheren: aanwijzen, wachtwoord zetten, intrekken (Beheerder). */
+    public function magNoodaccountsBeheren(): bool
+    {
+        return $this->magVolgensRol(fn (Rol $r) => $r->magNoodaccountsBeheren());
     }
 
     /** Module Balie/Receptie: registraties aanmaken/wijzigen (Balie, Beheer). */

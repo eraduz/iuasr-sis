@@ -49,9 +49,13 @@ class HandleidingController extends Controller
     }
 
     /**
-     * De hoofdstukken (koppen 1..14) met per hoofdstuk de rol(len) waarvoor het
-     * vooral bedoeld is — dit stuurt de 'voor u'-markering in de navigatie. Een
-     * lege rollenlijst is algemene stof voor iedereen.
+     * De hoofdstukken met per hoofdstuk de rol(len) waarvoor het vooral bedoeld
+     * is — dit stuurt de 'voor u'-markering in de navigatie. Een lege rollenlijst
+     * is algemene stof voor iedereen.
+     *
+     * LET OP: deze lijst moet gelijk lopen met de koppen in
+     * `partials/handleiding-inhoud` (nummer én ankervolgorde). Voegt u daar een
+     * hoofdstuk toe, werk het hier bij — anders wijst de navigatie mis.
      *
      * @return array<int, array{nr:int, titel:string, rollen:array<int,string>}>
      */
@@ -73,7 +77,10 @@ class HandleidingController extends Controller
             ['nr' => 13, 'titel' => 'HR / Personeelszaken', 'rollen' => ['hrmedewerker']],
             ['nr' => 14, 'titel' => 'Balie / Receptie', 'rollen' => ['balie']],
             ['nr' => 15, 'titel' => 'Bibliotheek', 'rollen' => ['bibliotheek']],
-            ['nr' => 16, 'titel' => 'Vragen of problemen?', 'rollen' => []],
+            ['nr' => 16, 'titel' => 'Scriptie Coördinatie', 'rollen' => ['scriptiecoordinator']],
+            ['nr' => 17, 'titel' => 'Stichtingsbestuur', 'rollen' => ['stichtingsbestuur']],
+            ['nr' => 18, 'titel' => 'Noodtoegang', 'rollen' => ['beheerder']],
+            ['nr' => 19, 'titel' => 'Vragen of problemen?', 'rollen' => []],
         ];
     }
 }

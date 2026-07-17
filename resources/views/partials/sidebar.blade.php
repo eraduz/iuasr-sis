@@ -143,6 +143,7 @@
             ],
             'Beheer' => [
                 ['Gebruikers & rollen', 'gebruikers', 'users', 'gebruikers'],
+                ['Noodaccounts', 'noodaccounts', 'alert', 'noodaccounts'],
                 ['Opzoektabellen', 'opzoektabellen', 'db', 'opzoektabellen'],
                 ['Nieuwsbronnen', 'nieuws', 'report', 'nieuws'],
                 ['Audit-log', 'audit-log', 'log', 'audit-log'],
