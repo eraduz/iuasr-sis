@@ -9,6 +9,26 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.17.0] — 2026-07-17
+
+- **Systeemmeldingen op elke pagina.** De Beheerder kan via **Beheer →
+  Systeemmeldingen** een bericht plaatsen dat bovenaan **elke pagina van elke
+  module** verschijnt — bijvoorbeeld: *"Vandaag is het systeem vanaf 18.00 uur
+  niet beschikbaar wegens onderhoud."*
+- **Verschijnt en verdwijnt vanzelf.** U geeft op vanaf wanneer en tot wanneer;
+  standaard **24 uur**. Daarna is de melding weg zonder dat iemand iets hoeft te
+  doen. U kunt een melding ook vooruit klaarzetten door *Vanaf* in de toekomst te
+  leggen, en met **Nu stoppen** direct van alle schermen halen.
+- **Drie soorten:** Mededeling, Let op en Urgent. Een urgente melding kan de
+  medewerker niet wegklikken; bij de andere twee mag dat, en dan onthoudt zijn
+  browser dat. Past u de melding daarna aan, dan verschijnt hij opnieuw — ook bij
+  wie hem al had weggeklikt, zodat een correctie juist die mensen bereikt.
+- **Gericht of voor iedereen.** Standaard ziet iedereen de melding; u kunt hem ook
+  beperken tot bepaalde rollen, bijvoorbeeld alleen de bibliotheek.
+- **Historie blijft.** Verlopen meldingen blijven in het overzicht staan — zo is
+  terug te zien wat er is omgeroepen en door wie. Na 30 dagen worden ze
+  automatisch opgeruimd.
+
 ## [1.16.0] — 2026-07-17
 
 - **99 Schone Namen in de zijbalk.** Bovenaan het menu staat voortaan een Schone

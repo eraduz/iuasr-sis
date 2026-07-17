@@ -143,6 +143,7 @@
             ],
             'Beheer' => [
                 ['Gebruikers & rollen', 'gebruikers', 'users', 'gebruikers'],
+                ['Systeemmeldingen', 'meldingen', 'alert', 'meldingen'],
                 ['Noodaccounts', 'noodaccounts', 'alert', 'noodaccounts'],
                 ['Quotes', 'quotes', 'book', 'quotes'],
                 ['Opzoektabellen', 'opzoektabellen', 'db', 'opzoektabellen'],

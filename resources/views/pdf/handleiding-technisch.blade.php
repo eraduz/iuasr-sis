@@ -232,6 +232,17 @@ MAIL_FROM_NAME="IUASR Studentenzaken"</span>
   </table>
   <p>Controleer bij twijfel op welke database u zit: <code>php artisan tinker --env=testing --execute="echo config('database.connections.mysql.database');"</code> hoort <code>iuasr_sis_test</code> te geven, zonder de vlag <code>iuasr_sis</code>.</p>
 
+  <h2>6e. Systeemmeldingen</h2>
+  <p>Tabel <code>meldingen</code>; beheer via <b>Beheer &rarr; Systeemmeldingen</b> (<code>rol:beheerder</code>). De balk wordt in <code>layouts/app</code> vóór de flash-meldingen gerenderd en staat dus op <b>elke pagina van elke module</b>.</p>
+  <div class="let"><b>Zichtbaarheid is afgeleid, niet opgeslagen — en dat is met opzet.</b> Een melding is zichtbaar zolang <code>now()</code> tussen <code>van</code> en <code>tot</code> valt (<code>Melding::scopeLopend</code>). Er is geen status-kolom en geen geplande taak die de melding weghaalt. Zou dat er wél zijn, dan blijft er bij een uitgevallen scheduler een verouderde mededeling op alle schermen staan — precies het scenario dat je moet vermijden. Nu verdwijnt hij op de seconde, ook als er niets draait. <b>Intrekken</b> is simpelweg <code>tot = now()</code>; <code>after:van</code> op <code>tot</code> voorkomt een melding die nooit verschijnt.</p>
+  <table class="kv">
+    <tr><td><code>SIS_MELDING_DUUR_UREN</code></td><td>Vult het formulier voor (standaard <b>24</b> uur na <i>Vanaf</i>).</td></tr>
+    <tr><td><code>SIS_MELDING_BEWAARTERMIJN_DAGEN</code></td><td>Hoe lang verlopen meldingen als historie blijven staan (standaard 30).</td></tr>
+    <tr><td><code>sis:meldingen-opruimen</code></td><td>Verwijdert alleen <b>historie</b>, wekelijks ma 04:00 (<code>--proef</code>, <code>--dagen=</code>). De zichtbaarheid hangt hier niet van af.</td></tr>
+    <tr><td><code>rollen</code> (json)</td><td><code>NULL</code> = iedereen; anders unie over <code>User::rolSleutels()</code> (<code>scopeVoorRollen</code>), consistent met het multi-rolmodel.</td></tr>
+    <tr><td>Wegklikken</td><td>In de <b>browser</b> (localStorage), niet in de database: een voorkeur van het moment, en zo kost het geen schrijfactie per paginalading. De sleutel bevat <code>updated_at</code> (<code>Melding::sluitSleutel()</code>), zodat een <b>gewijzigde</b> melding opnieuw verschijnt bij wie hem al had weggeklikt — anders mist een correctie juist die mensen. Urgent is standaard niet afsluitbaar.</td></tr>
+  </table>
+
   <h2>6d. Zijbalk-quotes (99 Schone Namen)</h2>
   <p>Tabel <code>quotes</code>; beheer via <b>Beheer &rarr; Quotes</b> (<code>rol:beheerder</code>). Welke quote er staat wordt <b>afgeleid uit de klok</b> (<code>App\Support\Quoteroulatie</code>: <code>slot = tijd ÷ interval</code>, dan <code>slot % aantal</code>) en nergens opgeslagen. Dat is bewust: het systeem is server-gerenderd, dus een gewone JavaScript-carrousel zou bij elke paginawissel weer bij nummer 1 beginnen. Nu loopt de reeks door, ziet iedereen in hetzelfde tijdvak dezelfde Naam, en is er geen sessie, teller of achtergrondtaak nodig.</p>
   <p>De browser haalt <code>/quote/huidig</code> precies op de wisselgrens op (<code>secondenTotVolgende</code>) in plaats van te pollen — één verzoek per tijdvak. De lijst wordt gecachet omdat de zijbalk op élke pagina rendert; <code>Quote::booted</code> leegt die cache bij elke mutatie.</p>

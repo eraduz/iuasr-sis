@@ -24,7 +24,7 @@ return [
     | onderaan elke pagina getoond zodat testers en beheer weten welke versie
     | draait. Bijwerken bij elke release; houd de wijzigingen bij in CHANGELOG.md.
     */
-    'versie' => '1.16.0',
+    'versie' => '1.17.0',
 
     /*
     |----------------------------------------------------------------------
@@ -321,6 +321,26 @@ return [
     | server-side afgedwongen (zie AutorisatieServiceProvider en policies).
     */
     'rollen' => Rol::waarden(),
+
+    /*
+    |----------------------------------------------------------------------
+    | Systeemmeldingen (onderhoud, storing)
+    |----------------------------------------------------------------------
+    | Een balk bovenaan ELKE pagina van elke module, waarmee de Beheerder iets
+    | aan alle medewerkers kwijt kan: "vandaag onderhoud vanaf 18:00".
+    |
+    | De melding verdwijnt VANZELF zodra `tot` voorbij is — dat is afgeleid uit
+    | de klok, dus er is geen achtergrondtaak voor nodig en er kan nooit een
+    | melding blijven hangen doordat de cron niet liep. `standaard_duur_uren`
+    | vult alleen het formulier voor: 24 uur, zoals gevraagd.
+    |
+    | De rij blijft daarna staan als historie (wie riep wat om); pas na
+    | `bewaartermijn_dagen` verwijdert `sis:meldingen-opruimen` hem echt.
+    */
+    'melding' => [
+        'standaard_duur_uren' => (int) env('SIS_MELDING_DUUR_UREN', 24),
+        'bewaartermijn_dagen' => (int) env('SIS_MELDING_BEWAARTERMIJN_DAGEN', 30),
+    ],
 
     /*
     |----------------------------------------------------------------------

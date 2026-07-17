@@ -29,6 +29,11 @@
   </nav>
 
   <main class="iuasr-dash-main">
+    {{-- Systeemmeldingen van de Beheerder (onderhoud, storing). Staan bovenaan
+         ELKE pagina van elke module, dus vóór de flash-melding over de eigen
+         actie: een storing gaat voor "Gelukt". --}}
+    @include('partials.meldingen')
+
     @if (session('status'))
       <div class="iuasr-dash-alert iuasr-dash-alert--ok iuasr-dash-alert--flash" style="margin-bottom:16px;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>

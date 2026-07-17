@@ -15,6 +15,7 @@ use App\Http\Controllers\GebruikerController;
 use App\Http\Controllers\InschrijvingActiesController;
 use App\Http\Controllers\InschrijvingController;
 use App\Http\Controllers\KortingController;
+use App\Http\Controllers\MeldingController;
 use App\Http\Controllers\NoodaccountController;
 use App\Http\Controllers\OndertekeningController;
 use App\Http\Controllers\PresentieController;
@@ -643,6 +644,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/beheer/noodaccounts', [NoodaccountController::class, 'store'])->name('noodaccounts.store');
         Route::put('/beheer/noodaccounts/{gebruiker}/wachtwoord', [NoodaccountController::class, 'wachtwoord'])->name('noodaccounts.wachtwoord');
         Route::delete('/beheer/noodaccounts/{gebruiker}', [NoodaccountController::class, 'destroy'])->name('noodaccounts.destroy');
+
+        // Systeemmeldingen: de balk bovenaan elke pagina van elke module.
+        // Zichtbaarheid volgt uit het venster van/tot; 'intrekken' zet `tot` op nu.
+        Route::get('/beheer/meldingen', [MeldingController::class, 'index'])->name('meldingen');
+        Route::post('/beheer/meldingen', [MeldingController::class, 'store'])->name('meldingen.store');
+        Route::put('/beheer/meldingen/{melding}', [MeldingController::class, 'update'])->name('meldingen.update');
+        Route::put('/beheer/meldingen/{melding}/intrekken', [MeldingController::class, 'intrekken'])->name('meldingen.intrekken');
+        Route::delete('/beheer/meldingen/{melding}', [MeldingController::class, 'destroy'])->name('meldingen.destroy');
 
         // Zijbalk-quotes beheren (99 Schone Namen + eigen spreuken).
         Route::get('/beheer/quotes', [QuoteController::class, 'index'])->name('quotes');

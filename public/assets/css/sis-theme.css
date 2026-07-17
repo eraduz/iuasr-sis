@@ -162,3 +162,6 @@ html[data-theme="dark"] .sis-quote__ar { background: #221a3d; border-color: rgba
 html[data-theme="dark"] .sis-quote__kop { color: #E8A0AE; }
 html[data-theme="dark"] .sis-quote__nl { color: #D8D4E8; }
 html[data-theme="dark"] .sis-quote__bron { color: #9A93B5; }
+
+/* --- Systeemmeldingen in donkere modus --------------------------- */
+html[data-theme="dark"] .sis-melding__sluit:hover { background: rgba(255,255,255,0.12); }

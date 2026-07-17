@@ -429,7 +429,16 @@
   <h3>Afbeeldingen aanleveren</h3>
   <p>Vierkant, <b>456 × 456 pixels</b>, <b>PNG met een doorzichtige achtergrond</b>. In de zijbalk wordt de afbeelding op 152 pixels getoond — dat is precies <b>4 cm</b>; drie keer zo groot aanleveren houdt hem scherp op een goed beeldscherm. Maak het lijnwerk <b>goud of wit</b>: de tegel heeft in zowel de lichte als de donkere modus dezelfde donkere achtergrond, dus u hoeft maar één versie te maken. Een quote zonder afbeelding toont gewoon de Arabische tekst, dus u kunt de afbeeldingen rustig later toevoegen.</p>
 
-  <h2 id="h20">20. Vragen of problemen?</h2>
+  <h2 id="h20">20. Systeemmeldingen (Beheerder)</h2>
+  <p>Soms moet iedereen iets weten: <i>"Vandaag is het systeem vanaf 18.00 uur niet beschikbaar wegens onderhoud."</i> De Beheerder plaatst zo'n bericht via <b>Beheer &rarr; Systeemmeldingen</b>. Het verschijnt als een balk <b>bovenaan elke pagina van elke module</b> — u kunt het dus niet missen, waar u ook aan het werk bent.</p>
+  <h3>Verschijnt en verdwijnt vanzelf</h3>
+  <p>U geeft op <b>vanaf</b> wanneer en <b>tot</b> wanneer de melding zichtbaar is; standaard staat dat op 24 uur. Daarna is hij weg, zonder dat iemand iets hoeft te doen. Wilt u een bericht vooruit klaarzetten — bijvoorbeeld maandagochtend al het onderhoud van vrijdag aankondigen — zet <i>Vanaf</i> dan in de toekomst. Moet de melding er eerder af, gebruik <b>Nu stoppen</b>.</p>
+  <h3>Drie soorten</h3>
+  <p><b>Mededeling</b> voor gewoon nieuws, <b>Let op</b> voor gepland onderhoud, en <b>Urgent</b> voor een storing. Een urgente melding kan niemand wegklikken — die staat er juist omdat iedereen hem moet zien. Bij de andere twee mag de medewerker hem sluiten; zijn browser onthoudt dat. Past u de tekst daarna aan (<i>"het wordt toch 20.00 uur"</i>), dan verschijnt de melding opnieuw, óók bij wie hem al had weggeklikt.</p>
+  <h3>Voor wie</h3>
+  <p>Vinkt u niets aan, dan ziet <b>iedereen</b> de melding. U kunt hem ook beperken tot bepaalde rollen, bijvoorbeeld alleen de bibliotheek. Verlopen meldingen blijven in het overzicht staan, zodat terug te zien is wat er is omgeroepen en door wie.</p>
+
+  <h2 id="h21">21. Vragen of problemen?</h2>
   <p>Neem bij vragen contact op met de systeembeheerder of Studentenzaken (szaken@iuasr.nl). Werkt iets niet zoals verwacht, meld dan wat u deed en wat u zag.</p>
 
   <div class="tip">Deze handleiding wordt bijgewerkt zodra er nieuwe functies bij komen. Kijk bij twijfel of u de meest recente versie hebt (zie de datum onderaan).</div>

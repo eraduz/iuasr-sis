@@ -807,3 +807,27 @@ a.sis-moduletile:hover {
 
 /* De zijbalk is er voor navigatie; op papier heeft de quote geen functie. */
 @media print { .sis-quote { display: none !important; } }
+
+/* ================================================================
+   SYSTEEMMELDINGEN — balk bovenaan elke pagina van elke module
+   ----------------------------------------------------------------
+   Zichtbaarheid volgt uit het venster van/tot (App\Models\Melding);
+   wegklikken onthoudt de browser in localStorage. Hergebruikt de
+   bestaande .iuasr-dash-alert-kleuren, zodat een melding aanvoelt
+   als de rest van het systeem en niet als een reclamebanner.
+   ================================================================ */
+.sis-meldingen { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.sis-melding { position: relative; padding-right: 40px; }
+.sis-melding__tekst { display: block; }
+.sis-melding__tekst b { display: block; margin-bottom: 1px; }
+.sis-melding__sluit {
+  position: absolute; top: 8px; right: 8px;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; padding: 0;
+  background: transparent; border: 0; border-radius: 6px;
+  color: inherit; opacity: .55; cursor: pointer;
+}
+.sis-melding__sluit:hover { opacity: 1; background: rgba(0,0,0,0.06); }
+
+/* Een systeemmelding hoort niet op een uitdraai: die is morgen onjuist. */
+@media print { .sis-meldingen { display: none !important; } }
