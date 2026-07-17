@@ -22,6 +22,12 @@ $env:Path = "$env:USERPROFILE\php\8.3;$env:USERPROFILE\bin;$env:Path"
 # 3) Database starten
 & "$PSScriptRoot\db-start.ps1"
 
+# 3b) .env.testing afleiden van .env. Zonder dat bestand valt `--env=testing`
+#     terug op .env en dus op de ONTWIKKELdatabase; zo is op 17-07-2026 de hele
+#     ontwikkeldatabase gewist. Het staat bewust NIET in Git — het bevat de
+#     inloggegevens van deze machine.
+& "$PSScriptRoot\env-testing.ps1"
+
 # 4) Ontwikkelserver starten (op de voorgrond; Ctrl+C om te stoppen)
 Set-Location $proj
 Write-Host "Start Laravel op http://127.0.0.1:8000  (Ctrl+C om te stoppen)" -ForegroundColor Cyan

@@ -22,11 +22,13 @@ IUTSTD-*.mdb
 .env
 .env.*
 !.env.example
-# .env.testing hoort WEL in Git: zonder dat bestand valt `--env=testing` terug op
-# de gewone .env en dus op de ONTWIKKELdatabase. Een `migrate:fresh --env=testing`
-# wiste zo op 2026-07-17 de hele ontwikkeldatabase. Het bevat geen geheimen —
-# dezelfde lokale testgegevens staan al in phpunit.xml. Niet verwijderen.
-!.env.testing
+# .env.testing hoort NIET in Git, ook al is het een vangnet tegen
+# `--env=testing` op de ontwikkeldatabase: het bevat de inloggegevens van de
+# machine waar het staat. Eén dag met dat bestand in Git kostte de RDP zijn
+# werkende omgeving (ander databasewachtwoord + `artisan serve` geeft APP_ENV
+# door aan de webserver ⇒ elk webverzoek op de testdatabase). Het wordt nu per
+# machine afgeleid uit .env door scripts/env-testing.ps1; zie .env.testing.example.
+!.env.testing.example
 *.pem
 *.key
 *.p12

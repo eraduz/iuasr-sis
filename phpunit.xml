@@ -25,13 +25,19 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
         <!-- Tests draaien op een aparte MariaDB-testdatabase (zelfde InnoDB/FK-gedrag
-             als productie); nooit de ontwikkel- of productiedatabase, nooit echte data. -->
+             als productie); nooit de ontwikkel- of productiedatabase, nooit echte data.
+
+             DB_DATABASE staat hier BEWUST hard: RefreshDatabase draait migrate:fresh
+             en zou de ontwikkeldatabase wissen als deze regel ontbreekt of misgaat.
+             Deze waarde mag dus nooit van een gegenereerd bestand afhangen.
+
+             HOST/POORT/GEBRUIKER/WACHTWOORD staan hier BEWUST NIET: die verschillen
+             per machine (de RDP heeft bijvoorbeeld geen databasewachtwoord). Ze komen
+             uit de .env / .env.testing van de machine zelf. Stonden ze hier vast, dan
+             falen de tests overal waar de inloggegevens anders zijn - met een
+             misleidende 'Access denied' die niets met de tests te maken heeft. -->
         <env name="DB_CONNECTION" value="mysql"/>
-        <env name="DB_HOST" value="127.0.0.1"/>
-        <env name="DB_PORT" value="3307"/>
         <env name="DB_DATABASE" value="iuasr_sis_test"/>
-        <env name="DB_USERNAME" value="iuasr_sis"/>
-        <env name="DB_PASSWORD" value="iuasr_sis_dev"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>

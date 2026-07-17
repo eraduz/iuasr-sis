@@ -168,9 +168,23 @@ mariadb-dump -u iuasr_sis -p --single-transaction --default-character-set=utf8mb
 # 5. De MariaDB-sandboxregel eruit halen (phpMyAdmin struikelt erover)
 sed -i '/^\/\*M!999999/d' demo.sql
 
-# 6. kopie.sql VERWIJDEREN — dat bestand bevat de echte gegevens
+# 6. CONTROLEER HET BESTAND (niet de database — die kan prima zijn terwijl de
+#    dump stuk is). Alle drie moeten kloppen:
+head -c 3 demo.sql | od -c        # GEEN 357 273 277 (dat is een BOM)
+grep -c 'الرحمن' demo.sql          # moet > 0 zijn
+grep -c 'Ø§' demo.sql               # moet 0 zijn (dubbel gecodeerd Arabisch)
+
+# 7. kopie.sql VERWIJDEREN — dat bestand bevat de echte gegevens
 rm kopie.sql
 ```
+
+> **Bewerk de dump nooit met PowerShell 5.1.** `Get-Content` leest een bestand
+> zonder BOM als **Windows-1252**, niet als UTF-8. Alle Arabische tekst raakt
+> daardoor dubbel gecodeerd (`الرحمن` wordt `Ø§Ù„Ø±Ø­Ù…Ù†`) en
+> `Set-Content -Encoding utf8` zet er ook nog een BOM voor. Zo is op 17-07-2026
+> een complete demo-dump onbruikbaar geworden: op Plesk verschenen alleen vreemde
+> tekens, terwijl de database zelf helemaal goed was. Gebruik `sed` in Git Bash,
+> zoals hierboven — dat werkt op bytes en raakt de tekst niet aan.
 
 **Importeren in Plesk:**
 

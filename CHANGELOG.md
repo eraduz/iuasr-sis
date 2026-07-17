@@ -9,6 +9,29 @@ Werkwijze bij een release: verhoog `sis.versie`, voeg hieronder een kort blok to
 (PATCH = bugfixes, MINOR = nieuwe functies, MAJOR = ingrijpende wijzigingen) en
 noem de datum.
 
+## [1.18.1] — 2026-07-17
+
+- **Hersteld: Arabisch in de Plesk-dump.** De demo-dump toonde op Plesk alleen
+  vreemde tekens. Oorzaak: de dump was met PowerShell nabewerkt, en dat leest een
+  bestand zonder BOM als Windows-1252 in plaats van UTF-8 — waardoor alle
+  Arabische tekst dubbel gecodeerd raakte en er een BOM voor kwam te staan. De
+  database zelf was al die tijd in orde. De dump is opnieuw gemaakt en
+  gecontroleerd: het Arabisch overleeft nu de export, de gzip én een testimport.
+- **Hersteld: "Access denied ... Database: iuasr_sis_test" op de RDP.** De
+  `.env.testing` die gisteren aan Git was toegevoegd, bevatte het
+  databasewachtwoord van één machine. Omdat `php artisan serve` `APP_ENV`
+  doorgeeft aan de webserver, laadde elk webverzoek op een machine met
+  `APP_ENV=testing` in `.env` ineens dat bestand — en dus de verkeerde database.
+  `.env.testing` staat nu **niet meer in Git** en wordt per machine afgeleid uit
+  uw eigen `.env` door `scripts/env-testing.ps1` (loopt automatisch mee met
+  `dev.ps1`). **Zet in uw `.env` `APP_ENV=local`**; `dev.ps1` waarschuwt nu als
+  dat niet zo is.
+- **Tests draaien nu op elke machine.** `phpunit.xml` legde ook host, poort,
+  gebruiker en wachtwoord vast — waarden die per machine verschillen. Alleen de
+  testdatabasenaam staat daar nu nog hard (die mag nooit wegvallen, anders wist
+  `RefreshDatabase` de ontwikkeldatabase); de inloggegevens komen uit uw eigen
+  `.env`.
+
 ## [1.18.0] — 2026-07-17
 
 - **Geanonimiseerde demo-dump voor Plesk.** Twee nieuwe commando's:
