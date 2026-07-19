@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="nl">
+{{-- 'geen-js' wordt hieronder meteen weggehaald zodra scripts draaien. Blijft
+     hij staan, dan valt het menu terug op een gewone lijst in de pagina in
+     plaats van een paneel dat zonder JavaScript niet te openen is. --}}
+<html lang="nl" class="geen-js">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,7 +17,7 @@
 <link rel="stylesheet" href="{{ asset('assets/css/sis-theme.css') }}?v={{ filemtime(public_path('assets/css/sis-theme.css')) }}">
 {{-- Thema direct toepassen om een 'flash' te voorkomen. Donker is de STANDAARD
      (energiezuiniger); alleen wie bewust 'licht' koos, krijgt licht. --}}
-<script>try{var t=localStorage.getItem('sis-theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}</script>
+<script>document.documentElement.classList.remove('geen-js');try{var t=localStorage.getItem('sis-theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}</script>
 @stack('head')
 </head>
 <body data-role="{{ auth()->user()?->rol?->value }}">
@@ -24,7 +27,11 @@
 @include('partials.header')
 
 <div class="iuasr-dash-app">
-  <nav class="iuasr-dash-sidebar" aria-label="Hoofdmenu">
+  {{-- Achtergrondlaag bij het uitgeschoven menu op tablet/telefoon. Staat vóór
+       de zijbalk in de DOM zodat de zijbalk er zonder z-index-gedoe boven ligt. --}}
+  <div class="sis-menu-achtergrond" id="sis-menu-achtergrond" hidden></div>
+
+  <nav class="iuasr-dash-sidebar" id="sis-sidebar" aria-label="Hoofdmenu">
     @include('partials.sidebar')
   </nav>
 
@@ -55,6 +62,40 @@
     </footer>
   </main>
 </div>
+
+{{-- Uitschuifbaar menu op tablet en telefoon. --}}
+<script>
+(function () {
+  var knop = document.getElementById('sis-menuknop');
+  var menu = document.getElementById('sis-sidebar');
+  var achtergrond = document.getElementById('sis-menu-achtergrond');
+  if (!knop || !menu || !achtergrond) return;
+
+  function zet(open) {
+    menu.classList.toggle('is-open', open);
+    achtergrond.hidden = !open;
+    knop.setAttribute('aria-expanded', open ? 'true' : 'false');
+    knop.setAttribute('aria-label', open ? 'Menu sluiten' : 'Menu openen');
+    document.body.classList.toggle('sis-menu-open', open);
+    // De focus meenemen: wie met het toetsenbord werkt, moet na het openen
+    // in het menu staan en na het sluiten terug op de knop.
+    if (open) { var eerste = menu.querySelector('a, button'); if (eerste) eerste.focus(); }
+    else { knop.focus(); }
+  }
+
+  knop.addEventListener('click', function () { zet(!menu.classList.contains('is-open')); });
+  achtergrond.addEventListener('click', function () { zet(false); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && menu.classList.contains('is-open')) zet(false);
+  });
+
+  // Wordt het venster breder dan het breekpunt (tablet gedraaid), dan staat de
+  // zijbalk weer vast naast de inhoud; een 'open' stand zou dan blijven hangen.
+  var breed = window.matchMedia('(min-width: 901px)');
+  var opWissel = function (e) { if (e.matches && menu.classList.contains('is-open')) zet(false); };
+  breed.addEventListener ? breed.addEventListener('change', opWissel) : breed.addListener(opWissel);
+})();
+</script>
 
 @stack('scripts')
 </body>

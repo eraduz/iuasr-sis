@@ -6,6 +6,12 @@
 <header class="iuasr-dash-header">
   <div class="iuasr-dash-header__inner">
     <div class="iuasr-dash-header__brand">
+      {{-- Menuknop voor tablet en telefoon. Op een breed scherm staat de zijbalk
+           gewoon naast de inhoud en is deze knop verborgen (CSS). --}}
+      <button type="button" class="sis-menuknop" id="sis-menuknop"
+              aria-label="Menu openen" aria-expanded="false" aria-controls="sis-sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
       <a class="iuasr-dash-header__logo" href="{{ route('dashboard') }}" aria-label="IUASR Management Systeem">
         <img src="{{ asset('assets/img/logo-dark.png') }}" alt="IUASR">
       </a>

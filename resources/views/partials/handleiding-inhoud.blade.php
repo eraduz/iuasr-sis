@@ -434,6 +434,16 @@
   <h3>Achtergrondpatroon</h3>
   <p>Op het <b>inlogscherm</b> en het <b>modulekeuzescherm</b> loopt een fijn islamitisch patroon door de achtergrond: achthoekige sterren (<i>khatam</i>) met ruiten ertussen, in het goud van de huisstijl op een zeer lage dekking. Het staat bewust alleen op die twee schermen — over lijsten en formulieren heen zou zo'n patroon onrustig worden en het lezen bemoeilijken. Het past zich aan de lichte en donkere modus aan en wordt bij afdrukken weggelaten.</p>
 
+  <h2 id="h19b">19b. Werken op tablet en telefoon</h2>
+  <p>Het systeem is gemaakt voor een monitor of laptop, maar werkt ook op een <b>tablet</b> en een <b>telefoon</b>. Op die schermen verandert er een aantal dingen, zodat u niet hoeft te knijpen of zijwaarts te schuiven.</p>
+  <h3>Het menu</h3>
+  <p>Op een smal scherm staat het menu niet meer vast naast de pagina, maar schuift het als paneel over de inhoud. U opent het met de <b>menuknop</b> (de drie streepjes) linksboven. Sluiten kan door naast het menu te tikken, opnieuw op de knop te drukken, of met <b>Esc</b>. De menugroepen en de Schone Naam blijven gewoon zichtbaar. Draait u de tablet naar liggend, dan komt het menu vanzelf weer vast naast de pagina te staan.</p>
+  <h3>Lijsten</h3>
+  <p>Op een telefoon zijn tabellen te breed. Elke rij wordt daarom een <b>kaartje</b> waarin de gegevens onder elkaar staan, met de knop rechts. Op een tablet blijft de gewone tabel staan — daar is de ruimte er wel. Brede grafieken (zoals de instroom per studiejaar) schuift u zijwaarts binnen hun eigen kader; de pagina zelf blijft stilstaan.</p>
+  <h3>De bovenbalk</h3>
+  <p>Past de bovenbalk niet op één regel, dan breekt hij netjes af naar twee regels in plaats van dat er knoppen wegvallen. Op een telefoon worden <b>Modules</b> en <b>Help</b> als icoon getoond en wijkt de weekkalender; uw rol blijft altijd zichtbaar, want die bepaalt wat u mag zien.</p>
+  <div class="tip">Werkt u op een tablet, gebruik hem dan liggend voor schermen met veel kolommen (cijferinvoer, aanwezigheidslijsten). Die zijn met een raster van vakken en weken nu eenmaal breed; liggend heeft u de ruimte die daarbij hoort.</div>
+
   <h2 id="h20">20. Systeemmeldingen (Beheerder)</h2>
   <p>Soms moet iedereen iets weten: <i>"Vandaag is het systeem vanaf 18.00 uur niet beschikbaar wegens onderhoud."</i> De Beheerder plaatst zo'n bericht via <b>Beheer &rarr; Systeemmeldingen</b>. Het verschijnt als een balk <b>bovenaan elke pagina van elke module</b> — u kunt het dus niet missen, waar u ook aan het werk bent.</p>
   <h3>Verschijnt en verdwijnt vanzelf</h3>

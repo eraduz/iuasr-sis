@@ -76,7 +76,12 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
   volgorde. Verder: **student zoeken bij stageplaatsing** (datalist op nummer én
   naam, geen keuzelijst meer) en de **islamitische (hidjri) datum** onder de
   zijbalk-quote (`App\Support\Hidjrikalender`, variant en dagverschuiving
-  instelbaar). 771 tests groen.
+  instelbaar), plus een **islamitisch achtergrondpatroon** (khatam) op het inlog-
+  en modulekeuzescherm. Daarna: **tablet- en telefoonweergave** — breekpunt naar
+  900 px, zijbalk als uitschuifbaar paneel met menuknop, header die afbreekt,
+  tabellen als kaarten, en `min-width: 0` op grid-items (dat laatste was de
+  werkelijke oorzaak van een pagina van 1067 px op een telefoon van 390 px).
+  Geverifieerd met Playwright op 768x1024 en 390x844. 771 tests groen.
 - **Laatst bijgewerkt:** 2026-07-19
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 
