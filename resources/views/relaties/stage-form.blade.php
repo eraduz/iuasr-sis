@@ -27,13 +27,13 @@
   <div class="sis-fld-row sis-fld-row--2">
     <div class="sis-fld">
       <label>Student <span class="req">*</span></label>
-      @php $sid = old('student_id', $stage->student_id); @endphp
-      <select name="student_id" required>
-        <option value="">— kies een student —</option>
-        @foreach ($studenten as $s)
-          <option value="{{ $s->id }}" @selected((int) $sid === $s->id)>{{ $s->studentnummer }} — {{ $s->volledigeNaam() }}</option>
-        @endforeach
-      </select>
+      @php
+        // Voorvullen: na een afgekeurd formulier de getypte tekst terug, anders de
+        // al gekoppelde student in hetzelfde "nummer — naam"-formaat als de lijst.
+        $gekozen = $stage->student ?? $studenten->firstWhere('id', (int) old('student_id', $stage->student_id));
+        $studentWaarde = old('student_zoek', $gekozen ? $gekozen->studentnummer.' — '.$gekozen->volledigeNaam() : '');
+      @endphp
+      @include('partials.studentkiezer', ['naam' => 'student_zoek', 'lijstId' => 'stage-studenten', 'waarde' => $studentWaarde])
     </div>
     <div class="sis-fld">
       <label>Opleiding <span class="req">*</span></label>

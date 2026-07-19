@@ -67,7 +67,17 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
   Systeemmeldingen een balk bovenaan élke pagina van elke module (onderhoud,
   storing), met een venster van/tot dat standaard 24 uur duurt; de melding
   verschijnt en verdwijnt vanzelf op de klok, zonder achtergrondtaak.
-- **Laatst bijgewerkt:** 2026-07-17
+  Daarna (2026-07-19): **HR-zelfservice voor iedere medewerker** — de module HR is
+  ook toegankelijk voor wie geen HR-rol heeft maar wél een personeelsdossier (een
+  docent), opent dan op `hr.mijn` in plaats van het HR-dashboard, en toont geen
+  HR-beheerlinks meer in de zijbalk. Het vaste header-etiket "Studentbeheer" is
+  vervangen door de werkelijke modulenaam (`App\Support\Modulecontext`), en de
+  zijbalkmenu's van alle modules staan nu in onderwerpsgroepen met een vaste
+  volgorde. Verder: **student zoeken bij stageplaatsing** (datalist op nummer én
+  naam, geen keuzelijst meer) en de **islamitische (hidjri) datum** onder de
+  zijbalk-quote (`App\Support\Hidjrikalender`, variant en dagverschuiving
+  instelbaar). 771 tests groen.
+- **Laatst bijgewerkt:** 2026-07-19
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 
 ---
@@ -626,6 +636,13 @@ Niet bouwen tenzij expliciet gevraagd:
   deze data in de ontwikkelomgeving, en zo nee — wat is het opruimplan? Zolang dit
   loopt: **nooit** een rechtstreekse dump naar een publieke omgeving; gebruik
   `sis:demo-anonimiseren` + `sis:demo-controleren`.
+
+- **Islamitische kalender — welke telling houdt IUASR aan?** De hidjri-datum onder
+  de zijbalk-quote volgt nu **Umm al-Qura** (`SIS_HIDJRI_VARIANT`), zonder
+  verschuiving. De varianten lopen één à twee dagen uiteen en de plaatselijke
+  maansobservatie kan daar weer van afwijken; `SIS_HIDJRI_VERSCHUIVING` (-2..2)
+  staat klaar. Te bevestigen met de opdrachtgever welke telling leidend is. De
+  datum is bewust decoratief — er hangen geen bedrijfsregels aan.
 
 - **Bibliotheek — uitleentermijn.** BEVESTIGD 2026-07-15: 21 dagen (student),
   60 dagen (docent). Vastgelegd in `config/sis.php` (env-overschrijfbaar).

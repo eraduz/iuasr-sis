@@ -165,3 +165,23 @@ html[data-theme="dark"] .sis-quote__bron { color: #9A93B5; }
 
 /* --- Systeemmeldingen in donkere modus --------------------------- */
 html[data-theme="dark"] .sis-melding__sluit:hover { background: rgba(255,255,255,0.12); }
+
+/* --- Islamitische (hidjri) datum onder de zijbalk-quote -----------
+   Rustig en klein: het is een gegeven, geen mededeling. De Arabische
+   regel krijgt het goud van de merkkleuren en iets meer regelhoogte,
+   omdat Arabisch schrift anders tegen de regel erboven aan loopt. */
+.sis-hidjri { margin-top: 12px; text-align: center; }
+.sis-hidjri__ar {
+  color: var(--goud, #D69A2D);
+  font-size: 16px; line-height: 1.9; font-weight: 500;
+}
+.sis-hidjri__nl {
+  color: var(--blackAltText, #5B5670);
+  font-size: 12px; letter-spacing: .02em; margin-top: 1px;
+}
+.sis-hidjri__greg {
+  color: var(--blackAltText, #5B5670);
+  font-size: 11px; opacity: .72; margin-top: 2px;
+}
+html[data-theme="dark"] .sis-hidjri__nl,
+html[data-theme="dark"] .sis-hidjri__greg { color: #9A93B5; }

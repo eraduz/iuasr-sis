@@ -160,12 +160,41 @@ class StageController extends Controller
             ->orderBy('achternaam')->orderBy('voornaam')->get();
     }
 
+    /**
+     * Zet het zoekveld `student_zoek` om naar `student_id`. Geaccepteerd worden
+     * "261234 — Naam" (zoals de keuzelijst aanbiedt) en een kaal studentnummer,
+     * zodat wie het nummer uit het hoofd kent niets hoeft te kiezen. Wordt er
+     * niets gevonden, dan blijft `student_id` leeg en meldt de gewone validatie
+     * dat de student verplicht is — geen stille mislukking.
+     */
+    private function vertaalStudentZoek(Request $request, array $opleidingIds): void
+    {
+        if ($request->filled('student_id') || ! $request->filled('student_zoek')) {
+            return;
+        }
+
+        $ingevoerd = trim((string) $request->input('student_zoek'));
+        // Alles vóór de eerste spatie of het gedachtestreepje is het studentnummer.
+        $nummer = trim(preg_split('/\s|—/u', $ingevoerd, 2)[0] ?? '');
+
+        $student = $this->studenten($opleidingIds)->firstWhere('studentnummer', $nummer);
+
+        $request->merge(['student_id' => $student?->id]);
+    }
+
     private function valideer(Request $request, Organisatie $organisatie, bool $metBeoordeling): array
     {
         $opleidingIds = $this->opleidingenVoorOrganisatie($request, $organisatie)->pluck('id')->all();
         $studentIds = $this->studenten($opleidingIds)->pluck('id')->all();
         $stageplaatsIds = $organisatie->stageplaatsen()->pluck('id')->all();
         $contactpersoonIds = $organisatie->contactpersonen()->pluck('id')->all();
+
+        // De student wordt met een zoekveld gekozen ("261234 — Ahmed Yilmaz") in
+        // plaats van een keuzelijst: met honderden studenten is scrollen
+        // onwerkbaar. Hier wordt het studentnummer er weer afgepeld en terug naar
+        // een id vertaald; de controle hieronder (Rule::in) blijft ongewijzigd, dus
+        // een student buiten de eigen opleiding blijft geweigerd.
+        $this->vertaalStudentZoek($request, $opleidingIds);
 
         $regels = [
             'student_id' => ['required', 'integer', Rule::in($studentIds)],

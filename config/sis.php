@@ -422,4 +422,23 @@ return [
         explode(',', (string) env('SIS_TOEGESTANE_IPS', ''))
     )),
 
+    /*
+    |----------------------------------------------------------------------
+    | Islamitische kalender (hidjri)
+    |----------------------------------------------------------------------
+    | De hidjri-datum onder de zijbalk-quote. `variant` is een ICU-kalender:
+    |   islamic-umalqura  Umm al-Qura (Saoedi-Arabië) — de breedst gebruikte
+    |   islamic-civil     rekenkundig/tabellarisch
+    |   islamic           astronomisch
+    | De varianten kunnen een of twee dagen uiteenlopen, en de plaatselijke
+    | maansobservatie kan daar wéér van afwijken. Met `dagen_verschuiving`
+    | (-2 t/m 2) legt u de instellingskalender gelijk aan wat IUASR aanhoudt.
+    | Zet `tonen` op false om de regel te verbergen.
+    */
+    'hidjri' => [
+        'tonen' => (bool) env('SIS_HIDJRI_TONEN', true),
+        'variant' => (string) env('SIS_HIDJRI_VARIANT', 'islamic-umalqura'),
+        'dagen_verschuiving' => (int) env('SIS_HIDJRI_VERSCHUIVING', 0),
+    ],
+
 ];

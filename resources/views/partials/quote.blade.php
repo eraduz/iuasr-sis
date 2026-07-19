@@ -1,7 +1,9 @@
 @php
+    use App\Support\Hidjrikalender;
     use App\Support\Quoteroulatie;
 
     $quote = Quoteroulatie::huidige();
+    $hidjri = config('sis.hidjri.tonen') ? Hidjrikalender::vandaag() : null;
 @endphp
 
 @if ($quote)
@@ -28,6 +30,11 @@
         <div class="sis-quote__bron">{{ $quote->bron }}</div>
       @endif
     </div>
+
+    {{-- De islamitische datum staat BINNEN de quotetegel maar BUITEN de
+         __inner-laag: die wordt bij elke wisseling herschreven, en de datum
+         hoort niet elke vijf minuten weg te knipperen. --}}
+    @includeWhen($hidjri, 'partials.hidjri', ['hidjri' => $hidjri])
   </div>
 
   <script>
@@ -85,4 +92,9 @@
     plan(parseInt(el.dataset.over, 10) || 300);
   })();
   </script>
+@elseif ($hidjri)
+  {{-- Geen quote ingesteld? Dan staat de datum er alleen, met dezelfde rand. --}}
+  <div class="sis-quote">
+    @include('partials.hidjri', ['hidjri' => $hidjri])
+  </div>
 @endif
