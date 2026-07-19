@@ -185,3 +185,42 @@ html[data-theme="dark"] .sis-melding__sluit:hover { background: rgba(255,255,255
 }
 html[data-theme="dark"] .sis-hidjri__nl,
 html[data-theme="dark"] .sis-hidjri__greg { color: #9A93B5; }
+
+/* --- Islamitisch achtergrondpatroon (khatam) ----------------------
+   Achthoekige sterren met ruiten ertussen, in het merkgoud op lage
+   dekking. Alleen op het inlogscherm en het modulekeuzescherm: daar is
+   ruimte en valt het mooi op, terwijl het nooit onder een tabel of
+   formulier komt te liggen.
+
+   Als losse laag via ::before, niet als extra background-image op de
+   container zelf: die heeft in sis.css al een radiaal verloop, en dat
+   zou hier herhaald moeten worden om het niet te overschrijven. */
+.sis-login,
+.sis-modulepage { position: relative; }
+
+.sis-login::before,
+.sis-modulepage::before {
+  content: ""; position: absolute; inset: 0; z-index: 0;
+  background-image: url("../img/patroon-khatam.svg");
+  background-size: 120px 120px;
+  background-repeat: repeat;
+  opacity: .085;
+  pointer-events: none;   /* nooit in de weg zitten bij klikken */
+}
+/* In de donkere modus mag het patroon iets meer aan, anders verdwijnt
+   het goud in de donkere ondergrond. */
+html[data-theme="dark"] .sis-login::before,
+html[data-theme="dark"] .sis-modulepage::before { opacity: .14; }
+
+/* De inhoud boven de laag houden. Zonder dit valt het patroon over de
+   kaart en de tegels heen. */
+.sis-login__card,
+.sis-modulepage__bar,
+.sis-modulepage__body,
+.sis-modulepage > footer { position: relative; z-index: 1; }
+
+/* Papier is geen scherm: het patroon zou alleen inkt kosten. */
+@media print {
+  .sis-login::before,
+  .sis-modulepage::before { display: none; }
+}

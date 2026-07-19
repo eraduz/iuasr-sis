@@ -289,6 +289,12 @@ MAIL_FROM_NAME="IUASR Studentenzaken"</span>
   </table>
   <p><b>Niet gebruiken voor rekenwerk.</b> De datum is decoratief. Inschrijvingen, collegegeldtermijnen, verlof en roosters rekenen op de gregoriaanse kalender; koppel er geen bedrijfsregels aan, al was het maar omdat de verschuiving handmatig is.</p>
 
+  <h2>6f. Achtergrondpatroon (khatam)</h2>
+  <p><code>public/assets/img/patroon-khatam.svg</code> — een naadloze tegel van 120&times;120 px met achthoekige sterren en ruiten, in het merkgoud (<code>#D69A2D</code>). De ster is de klassieke khatam: twee vierkanten 45&deg; over elkaar, waarvan de omtrek een 16-hoek is met buitenstraal R en binnenstraal <code>R&middot;0,765367</code> (het snijpunt van de zijden, exact <code>&radic;((1&minus;1/&radic;2)&sup2;+&frac12;)</code>). <b>Naadloos</b> doordat dezelfde ster op het midden én op alle vier de hoeken staat: de hoeksterren worden door de tegelrand afgesneden en sluiten bij herhaling precies aan.</p>
+  <p><b>De kleur staat in het bestand, niet in de CSS.</b> Een SVG die als <code>background-image</code> wordt geladen is een apart document en erft géén <code>currentColor</code> — vandaar het goud hard in het bestand, met de dekking in CSS (<code>.085</code> licht, <code>.14</code> donker; goud leest in beide thema's).</p>
+  <p>Aangebracht als losse laag via <code>.sis-login::before</code> / <code>.sis-modulepage::before</code> in <code>sis-theme.css</code>, niet als extra <code>background-image</code> op de container zelf: die heeft in <code>sis.css</code> al een radiaal verloop dat anders herhaald zou moeten worden. De laag krijgt <code>pointer-events: none</code>; kaart, balk, body en footer krijgen <code>z-index: 1</code> zodat ze erboven blijven. Verborgen bij <code>@media print</code>. Bewust <b>alleen</b> op het inlog- en modulekeuzescherm: over lijsten en formulieren heen wordt zo'n patroon onrustig.</p>
+  <p><b>Terzijde:</b> <code>auth/login</code> en <code>auth/noodtoegang</code> laadden hun stylesheets zonder <code>?v=filemtime</code> (de app-layout deed dat wel), waardoor een CSS-wijziging daar pas na een harde herlaad zichtbaar werd. Dat is gelijkgetrokken.</p>
+
   <h2>7. Presentie (aanwezigheidsregistratie)</h2>
   <p>De docent registreert per college de aanwezigheid; dit is verplicht. Het model is bewust <b>genormaliseerd</b>: één regel per student &times; vak &times; onderwijsweek — nooit vaste weekkolommen op de inschrijving.</p>
   <table class="kv">
