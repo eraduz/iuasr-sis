@@ -19,8 +19,11 @@
       @elseif ($rol === App\Enums\Rol::Cursusadministratie && $u->gedirigeerdeCursussen->isNotEmpty())
         <span class="sis-pill-soft" style="letter-spacing:.03em;" title="Uw cursus(sen)">{{ $u->gedirigeerdeCursussen->sortBy('code')->pluck('code')->implode(' · ') }}</span>
       @endif
-      @php $inCursus = request()->routeIs('cursussen.*') || request()->routeIs('cursisten*'); @endphp
-      <span class="sis-pill-soft" style="letter-spacing:0.04em;">{{ $inCursus ? 'Cursussen Administratie' : 'Studentbeheer' }}</span>
+      {{-- De module waarin u werkt, met de naam uit de moduleregistry. Stond hier
+           eerder als vast etiket 'Studentbeheer' — een restant van vóór de
+           naamswijziging naar het IUASR Management Systeem, dat in elke andere
+           module de verkeerde indruk wekte. --}}
+      <span class="sis-pill-soft" style="letter-spacing:0.04em;">{{ App\Support\Modulecontext::naam() }}</span>
       <a class="sis-help-link" href="{{ route('modules.kiezen') }}" title="Naar het modulekeuzescherm">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         <span>Modules</span>

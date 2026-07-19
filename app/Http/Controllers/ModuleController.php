@@ -34,7 +34,8 @@ class ModuleController extends Controller
                 'module' => $m,
                 'bruikbaar' => $m->bruikbaarVoor($gebruiker),
                 'toegankelijk' => $m->toegankelijkVoor($gebruiker),
-                'route' => $m->startRoute(),
+                'route' => $m->startRoute($gebruiker),
+                'zelfservice' => $m->isZelfserviceVoor($gebruiker),
             ]),
             'cursussen' => $cursussen,
         ]);

@@ -164,15 +164,23 @@
     // ziet alles. Het actief-patroon per item mag een wildcard zijn zodat
     // sub-schermen de juiste regel oplichten.
     $gebruiker = auth()->user();
+    // Zelfde indeling als de andere modules: waar u kijkt (Overzicht), waarmee u
+    // werkt (Cursussen, Cursisten), het geld (Boekhouding) en wat u erover wilt
+    // weten (Rapportage). De rapportage stond eerder als tweede item onder
+    // 'Cursussen', tussen het dagelijks werk — dat leest rommelig.
     $cursusMenu = [
-        'Cursussen' => [
+        'Overzicht' => [
             ['Overzicht', 'cursussen.dashboard', 'dash', 'cursussen.dashboard'],
-            ['Rapportage', 'cursussen.rapport', 'report', 'cursussen.rapport'],
+        ],
+        'Rapportage' => [
+            ['Cursusrapportage', 'cursussen.rapport', 'report', 'cursussen.rapport'],
         ],
     ];
 
     if ($gebruiker->magCursusBeheer()) {
-        $cursusMenu['Cursussen'][] = ['Cursusbeheer', 'cursussen.beheer', 'book', 'cursussen.beheer,cursussen.create,cursussen.edit'];
+        $cursusMenu['Cursussen'] = [
+            ['Cursusbeheer', 'cursussen.beheer', 'book', 'cursussen.beheer,cursussen.create,cursussen.edit'],
+        ];
         $cursusMenu['Cursisten'] = [
             ['Alle cursisten', 'cursisten', 'students', 'cursisten,cursisten.show,cursisten.edit'],
             ['Cursist toevoegen', 'cursisten.create', 'plus', 'cursisten.create'],
@@ -193,55 +201,90 @@
     // Binnen de module Relatiebeheer & Stage geldt eveneens een eigen, rolbewust
     // menu. De relatiebeheerder/stagecoördinator beheert organisaties; Directie
     // en Bestuur kijken mee (alleen-lezen).
+    // Onderwerpsgroepen: waar u kijkt en zoekt (Overzicht), met wie u samenwerkt
+    // (Relatiebeheer), waar studenten lopen (Stage), uw eigen werkvoorraad
+    // (Agenda & taken) en wat u erover wilt weten (Rapportage).
     $relatieMenu = [
-        'Relatiebeheer' => [
+        'Overzicht' => [
             ['Overzicht', 'relatiebeheer.dashboard', 'dash', 'relatiebeheer.dashboard'],
+            ['Zoeken', 'relatiebeheer.zoeken', 'search', 'relatiebeheer.zoeken'],
+        ],
+        'Relatiebeheer' => [
             ['Organisaties', 'relaties', 'students', 'relaties,relaties.show,relaties.edit'],
+        ],
+        'Stage' => [
             ['Stages', 'stages', 'cert', 'stages,stages.edit,stages.create,stageplaatsen.create,stageplaatsen.edit'],
+        ],
+        'Agenda & taken' => [
             ['Agenda & taken', 'agenda', 'taak', 'agenda,afspraken.create,afspraken.edit,relatietaken.edit'],
-            ['Zoeken', 'relatiebeheer.zoeken', 'eye', 'relatiebeheer.zoeken'],
-            ['Rapportage', 'relatiebeheer.rapport', 'report', 'relatiebeheer.rapport'],
+        ],
+        'Rapportage' => [
+            ['Relatierapportage', 'relatiebeheer.rapport', 'report', 'relatiebeheer.rapport'],
         ],
     ];
     if ($gebruiker->magRelatiebeheer()) {
+        // De aanmaakknop hoort bij de organisaties, niet onderaan de hele lijst.
         $relatieMenu['Relatiebeheer'][] = ['Organisatie toevoegen', 'relaties.create', 'plus', 'relaties.create'];
     }
 
     // Module HR / Personeelszaken — rolbewust menu. HR/Beheer beheren; Bestuur
-    // kijkt mee. De Zelfservice-groep geldt voor elke gekoppelde medewerker.
+    // kijkt mee. De Zelfservice-groep geldt voor ELKE gekoppelde medewerker: een
+    // docent met een personeelsdossier opent de HR-module uitsluitend hiervoor.
     $hrMenu = [
-        'HR / Personeelszaken' => [
-            ['Overzicht', 'hr.dashboard', 'dash', 'hr.dashboard'],
-            ['Zoeken', 'hr.zoeken', 'search', 'hr.zoeken'],
-            ['Medewerkers', 'medewerkers', 'students', 'medewerkers,medewerkers.show,medewerkers.edit,dienstverbanden.edit,dienstverbanden.create'],
-            ['Verlof', 'verlof', 'cert', 'verlof'],
-            ['Verzuim', 'verzuim', 'check', 'verzuim'],
-            ['Signaleringen', 'hr.signaleringen', 'alert', 'hr.signaleringen'],
-            ['Gesprekken', 'gesprekken', 'report', 'gesprekken,gesprekken.show,gesprekken.create'],
-            ['Organisatie', 'hr.organisatie', 'db', 'hr.organisatie'],
-            ['Rapportage', 'hr.rapport', 'report', 'hr.rapport'],
-            ['Verzuim & verlof', 'hr.verzuimverlof', 'cert', 'hr.verzuimverlof'],
-        ],
         'Zelfservice' => [
             ['Mijn HR', 'hr.mijn', 'eye', 'hr.mijn'],
             ['Mijn verlof', 'verlof.mijn', 'taak', 'verlof.mijn,verlof.create'],
         ],
     ];
+    // De beheer- en inzageschermen alleen voor wie ze mag openen (HR, Beheer,
+    // Bestuur). Zonder deze toets kreeg bijvoorbeeld een docent in "Mijn HR" het
+    // volledige HR-menu te zien — links naar medewerkersdossiers en signaleringen
+    // die op een 403 uitkomen en er inhoudelijk niet horen. In onderwerpsgroepen
+    // in plaats van één lange lijst van tien items: waar u kijkt (Overzicht), wie
+    // er werkt (Personeel), wie er weg is (Verzuim & verlof), wat u bespreekt
+    // (Ontwikkeling) en wat u erover wilt weten (Rapportage).
+    if ($gebruiker->magHrInzien()) {
+        $hrMenu = [
+            'Overzicht' => [
+                ['Overzicht', 'hr.dashboard', 'dash', 'hr.dashboard'],
+                ['Zoeken', 'hr.zoeken', 'search', 'hr.zoeken'],
+                ['Signaleringen', 'hr.signaleringen', 'alert', 'hr.signaleringen'],
+            ],
+            'Personeel' => [
+                ['Medewerkers', 'medewerkers', 'students', 'medewerkers,medewerkers.show,medewerkers.edit,dienstverbanden.edit,dienstverbanden.create'],
+                ['Organisatie', 'hr.organisatie', 'db', 'hr.organisatie'],
+            ],
+            'Verzuim & verlof' => [
+                ['Verlof', 'verlof', 'cert', 'verlof'],
+                ['Verzuim', 'verzuim', 'check', 'verzuim'],
+            ],
+            'Ontwikkeling' => [
+                ['Gesprekken', 'gesprekken', 'report', 'gesprekken,gesprekken.show,gesprekken.create'],
+            ],
+            'Rapportage' => [
+                ['Personeelsrapportage', 'hr.rapport', 'report', 'hr.rapport'],
+                ['Verzuim & verlof', 'hr.verzuimverlof', 'cert', 'hr.verzuimverlof'],
+            ],
+        ] + $hrMenu;
+    }
     if ($gebruiker->magHrBeheer()) {
-        $hrMenu['HR / Personeelszaken'][] = ['Medewerker toevoegen', 'medewerkers.create', 'plus', 'medewerkers.create'];
+        // De aanmaakknop hoort bij het personeel, niet onderaan de hele lijst.
+        $hrMenu['Personeel'][] = ['Medewerker toevoegen', 'medewerkers.create', 'plus', 'medewerkers.create'];
     }
 
     // Module Balie/Receptie — één logboek voor telefoon, bezoek en post. De Balie
     // registreert; Directie en Bestuur kijken mee (alleen-lezen), en zien daarom
     // de aanmaakknop niet.
     $balieMenu = [
-        'Balie / Receptie' => [
+        'Overzicht' => [
             ['Overzicht', 'balie.dashboard', 'dash', 'balie.dashboard'],
+        ],
+        'Logboek' => [
             ['Logboek', 'balie', 'report', 'balie,balie.edit'],
         ],
     ];
     if ($gebruiker->magBalieBeheren()) {
-        $balieMenu['Balie / Receptie'][] = ['Nieuwe registratie', 'balie.create', 'plus', 'balie.create'];
+        $balieMenu['Logboek'][] = ['Nieuwe registratie', 'balie.create', 'plus', 'balie.create'];
     }
 
     // Module Bibliotheek — catalogus, tijdschriftartikelen, uitlenen en innemen.
@@ -291,21 +334,28 @@
     // examencommissie werken per stap mee; het Schoolbestuur kijkt mee (alleen-lezen)
     // en ziet daarom de Kandidaten-knop niet.
     $scriptieMenu = [
-        'Scriptie Coördinatie' => [
+        'Overzicht' => [
             ['Overzicht', 'scriptie.dashboard', 'dash', 'scriptie.dashboard'],
+        ],
+        'Trajecten' => [
             ['Trajecten', 'scriptie.trajecten', 'report', 'scriptie.trajecten,scriptie.show'],
         ],
     ];
     if ($gebruiker->magScriptieBeheren()) {
-        $scriptieMenu['Scriptie Coördinatie'][] = ['Scriptie Kandidaten', 'scriptie.kandidaten', 'cert', 'scriptie.kandidaten'];
+        // De kandidaten zijn de instroom van de trajecten en horen daarbij.
+        $scriptieMenu['Trajecten'][] = ['Scriptie Kandidaten', 'scriptie.kandidaten', 'cert', 'scriptie.kandidaten'];
     }
 
     // Module Stichtingsbestuur — bestuursleden/commissarissen en de vergaderingen
     // (onderwerpen, besluiten, aanwezigheid). Bewust een smalle, afgeschermde rol.
     $stichtingsbestuurMenu = [
-        'Stichtingsbestuur' => [
+        'Overzicht' => [
             ['Overzicht', 'stichtingsbestuur.dashboard', 'dash', 'stichtingsbestuur.dashboard'],
+        ],
+        'Bestuur' => [
             ['Leden & RvT', 'stichtingsbestuur.leden', 'cert', 'stichtingsbestuur.leden,stichtingsbestuur.leden.edit,stichtingsbestuur.leden.create'],
+        ],
+        'Vergaderingen' => [
             ['Vergaderingen', 'stichtingsbestuur.vergaderingen', 'report', 'stichtingsbestuur.vergaderingen,stichtingsbestuur.vergaderingen.show,stichtingsbestuur.vergaderingen.edit,stichtingsbestuur.vergaderingen.create'],
         ],
     ];
@@ -360,7 +410,10 @@
     }
 
     $inCursusmodule = request()->routeIs('cursussen.*') || request()->routeIs('cursisten*');
-    $inHrmodule = request()->routeIs('hr.*') || request()->routeIs('medewerkers*') || request()->routeIs('dienstverbanden*') || request()->routeIs('hrdocumenten*') || request()->routeIs('verlof*') || request()->routeIs('verzuim*') || request()->routeIs('ziekmeldingen*') || request()->routeIs('gesprekken*') || request()->routeIs('gespreksdoelen*') || request()->routeIs('competentiescores*') || request()->routeIs('checklist*') || request()->routeIs('hr.*');
+    // Wie HR alleen als zelfservice opent (docent met personeelsdossier) houdt zijn
+    // eigen modulemenu; de Zelfservice-groep staat daar al in. Zo verliest hij bij
+    // "Mijn HR" niet zijn onderwijsmenu en krijgt hij geen HR-beheercontext.
+    $inHrmodule = $gebruiker->magHrInzien() && (request()->routeIs('hr.*') || request()->routeIs('medewerkers*') || request()->routeIs('dienstverbanden*') || request()->routeIs('hrdocumenten*') || request()->routeIs('verlof*') || request()->routeIs('verzuim*') || request()->routeIs('ziekmeldingen*') || request()->routeIs('gesprekken*') || request()->routeIs('gespreksdoelen*') || request()->routeIs('competentiescores*') || request()->routeIs('checklist*') || request()->routeIs('hr.*'));
     $inRelatiemodule = request()->routeIs('relatiebeheer.*') || request()->routeIs('relaties*') || request()->routeIs('contactpersonen*') || request()->routeIs('contactmomenten*') || request()->routeIs('stages*') || request()->routeIs('stageplaatsen*') || request()->routeIs('agenda*') || request()->routeIs('afspraken*') || request()->routeIs('relatietaken*') || request()->routeIs('overeenkomsten*') || request()->routeIs('relatiedocumenten*');
     // Het Schoolbestuur houdt ALTIJD het eigen Bestuur-menu, ook wanneer het een
     // rapportage van een andere module opent. Zo verschijnt er nooit een module-menu
@@ -412,11 +465,17 @@
         'Overzicht',
         'Studenten', 'Onderwijs', 'Cijfers', 'Afstuderen',
         'Cursussen', 'Cursisten',
-        'Relatiebeheer',
-        'HR / Personeelszaken',
-        'Balie / Receptie',
-        'Scriptie Coördinatie',
-        'Stichtingsbestuur',
+        // Module Relatiebeheer & Stage: met wie u samenwerkt, waar studenten
+        // lopen, en uw eigen werkvoorraad.
+        'Relatiebeheer', 'Stage', 'Agenda & taken',
+        // Module HR: van wie er werkt, via wie er weg is, naar wat u bespreekt.
+        'Personeel', 'Verzuim & verlof', 'Ontwikkeling',
+        // Module Balie/Receptie.
+        'Logboek',
+        // Module Scriptie Coördinatie.
+        'Trajecten',
+        // Module Stichtingsbestuur.
+        'Bestuur', 'Vergaderingen',
         // Binnen de bibliotheekmodule: eerst waar de boeken staan, dan wat er
         // in en uit gaat.
         'Collectie', 'Uitlenen',

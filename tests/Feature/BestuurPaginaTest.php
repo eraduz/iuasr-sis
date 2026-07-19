@@ -118,20 +118,27 @@ class BestuurPaginaTest extends TestCase
         // beheerlinks te zien die 403 zouden geven.
         $this->seed([\Database\Seeders\DocentSeeder::class, \Database\Seeders\HrSeeder::class]);
 
+        // Toets op de menulinks zelf, niet op de tekst 'HR / Personeelszaken':
+        // dat is sinds 2026-07-19 ook de modulenaam in de header, en die hoort er
+        // juist wél te staan als u een HR-rapport bekijkt.
         $this->actingAs($this->user(Rol::Bestuur))->get(route('hr.rapport'))
             ->assertOk()
             ->assertSee('Bestuursoverzicht')
-            ->assertDontSee('HR / Personeelszaken');
+            ->assertDontSee(route('medewerkers'), false)
+            ->assertDontSee(route('hr.signaleringen'), false);
     }
 
     public function test_hr_medewerker_ziet_wel_het_modulemenu(): void
     {
         // Regressiecheck: voor de HR-medewerker (die de beheerlinks wél mag) blijft
-        // het HR-module-menu gewoon verschijnen.
+        // het HR-module-menu gewoon verschijnen. Sinds 2026-07-19 staat dat menu in
+        // onderwerpsgroepen in plaats van één groep 'HR / Personeelszaken'.
         $this->seed([\Database\Seeders\DocentSeeder::class, \Database\Seeders\HrSeeder::class]);
 
         $hr = User::where('email', 'n.aslan@iuasr.nl')->firstOrFail();
         $this->actingAs($hr)->get(route('hr.rapport'))
-            ->assertOk()->assertSee('HR / Personeelszaken');
+            ->assertOk()
+            ->assertSee('Personeel')
+            ->assertSee(route('medewerkers'), false);
     }
 }

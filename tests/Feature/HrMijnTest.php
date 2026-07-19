@@ -53,6 +53,76 @@ class HrMijnTest extends TestCase
         $this->actingAs($this->self)->get(route('medewerkers'))->assertForbidden();
     }
 
+    public function test_keuzescherm_toont_hr_aan_medewerker_zonder_hr_rol(): void
+    {
+        // Een docent met personeelsdossier moet de HR-module op het keuzescherm
+        // zien om bij de zelfservice te komen, en opent daar 'Mijn HR' — niet het
+        // HR-dashboard, waarvoor hij geen rechten heeft.
+        $hr = \App\Models\Module::where('sleutel', 'hr')->firstOrFail();
+
+        $this->assertTrue($hr->toegankelijkVoor($this->self));
+        $this->assertTrue($hr->isZelfserviceVoor($this->self));
+        $this->assertSame('hr.mijn', $hr->startRoute($this->self));
+
+        $this->actingAs($this->self)->get(route('modules.kiezen'))
+            ->assertOk()
+            ->assertSee(route('hr.mijn'), false)
+            // Exacte href: route('hr.dashboard') is '/hr' en dus een prefix van
+            // '/hr/mijn' — zonder de aanhalingstekens matcht de toets altijd.
+            ->assertDontSee('href="'.route('hr.dashboard').'"', false);
+    }
+
+    public function test_hr_module_blijft_dicht_zonder_personeelsdossier(): void
+    {
+        $sz = User::where('rol', Rol::Studentenzaken)->firstOrFail(); // geen medewerker
+        $hr = \App\Models\Module::where('sleutel', 'hr')->firstOrFail();
+
+        $this->assertFalse($hr->toegankelijkVoor($sz));
+    }
+
+    public function test_zelfservice_toont_geen_hr_beheerlinks_in_het_menu(): void
+    {
+        // De docent ziet in "Mijn HR" uitsluitend zijn zelfservice-links. Het
+        // volledige HR-menu (medewerkers, signaleringen, organisatie) hoort daar
+        // niet: die schermen zijn niet van hem en geven een 403.
+        $response = $this->actingAs($this->self)->get(route('hr.mijn'))->assertOk();
+
+        $response->assertSee(route('verlof.mijn'), false);
+        $response->assertDontSee(route('medewerkers'), false);
+        $response->assertDontSee(route('hr.signaleringen'), false);
+        $response->assertDontSee(route('hr.organisatie'), false);
+        $response->assertDontSee('href="'.route('hr.dashboard').'"', false);
+    }
+
+    public function test_hr_medewerker_houdt_het_volledige_hr_menu(): void
+    {
+        $hrUser = User::where('rol', Rol::Hrmedewerker)->firstOrFail();
+
+        $this->actingAs($hrUser)->get(route('hr.dashboard'))
+            ->assertOk()
+            ->assertSee(route('medewerkers'), false)
+            ->assertSee(route('hr.signaleringen'), false)
+            ->assertSee(route('hr.mijn'), false);
+    }
+
+    public function test_hr_menu_staat_in_onderwerpsgroepen_op_volgorde(): void
+    {
+        // Het HR-menu is opgesplitst per onderwerp (zoals de bibliotheekmodule) en
+        // staat in een vaste volgorde. Zonder deze toets zakt het terug naar één
+        // lange lijst in de volgorde waarin items toevallig zijn bijgeplakt.
+        $html = $this->actingAs(User::where('rol', Rol::Hrmedewerker)->firstOrFail())
+            ->get(route('hr.dashboard'))->assertOk()->getContent();
+
+        $groepen = ['Overzicht', 'Personeel', 'Verzuim &amp; verlof', 'Ontwikkeling', 'Rapportage', 'Zelfservice'];
+        $vorige = -1;
+        foreach ($groepen as $groep) {
+            $plek = strpos($html, '__title">'.$groep.'<');
+            $this->assertNotFalse($plek, "Menugroep '{$groep}' ontbreekt in het HR-menu");
+            $this->assertGreaterThan($vorige, $plek, "Menugroep '{$groep}' staat op de verkeerde plek");
+            $vorige = $plek;
+        }
+    }
+
     public function test_gebruiker_zonder_dossier_geen_zelfservice(): void
     {
         $sz = User::where('rol', Rol::Studentenzaken)->firstOrFail(); // geen medewerker

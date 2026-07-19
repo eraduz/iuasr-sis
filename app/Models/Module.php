@@ -41,11 +41,33 @@ class Module extends Model
         'stichtingsbestuur' => 'stichtingsbestuur.dashboard',
     ];
 
-    public function startRoute(): ?string
+    /**
+     * De startroute voor deze gebruiker. Doorgaans het moduledashboard, maar wie
+     * de module uitsluitend via de zelfservice mag openen (een docent met een
+     * personeelsdossier), komt op zijn eigen scherm uit — niet op een dashboard
+     * dat hem een 403 geeft.
+     */
+    public function startRoute(?User $gebruiker = null): ?string
     {
         $naam = self::START_ROUTES[$this->sleutel] ?? null;
 
+        if ($this->sleutel === 'hr' && $gebruiker !== null && ! $gebruiker->magHrInzien()) {
+            $naam = 'hr.mijn';
+        }
+
         return $naam !== null && \Illuminate\Support\Facades\Route::has($naam) ? $naam : null;
+    }
+
+    /**
+     * Opent deze gebruiker de module uitsluitend als zelfservice (eigen dossier),
+     * zonder beheer- of inzagerechten op de module zelf? Nu alleen HR: elke
+     * medewerker heeft een personeelsdossier, ook zonder HR-rol.
+     */
+    public function isZelfserviceVoor(User $gebruiker): bool
+    {
+        return $this->sleutel === 'hr'
+            && ! $gebruiker->magHrInzien()
+            && $gebruiker->medewerker !== null;
     }
 
     public function scopeGeordend(Builder $query): Builder
@@ -56,6 +78,14 @@ class Module extends Model
     /** Mag de gebruiker deze module benaderen (los van of hij al gebouwd is)? */
     public function toegankelijkVoor(User $gebruiker): bool
     {
+        // HR is óók toegankelijk voor iedere medewerker met een personeelsdossier,
+        // ongeacht rol: de zelfservice ("Mijn HR", "Mijn verlof") is er voor het
+        // eigen dossier. De beheer- en inzageschermen blijven achter `magHrInzien()`
+        // en hun eigen rol-middleware; dit ontsluit alleen de module zelf.
+        if ($this->sleutel === 'hr' && $gebruiker->medewerker !== null) {
+            return true;
+        }
+
         // Unie over alle rollen: een extra rol kan een module ontsluiten.
         return $gebruiker->magModule($this->sleutel);
     }

@@ -70,7 +70,11 @@
           <a class="sis-moduletile" href="{{ route($rij['route']) }}">
             <span class="sis-moduletile__icon">{!! $icon($m->icoon) !!}</span>
             <span class="sis-moduletile__naam">{{ $m->naam }}</span>
-            <span class="sis-moduletile__oms">{{ $m->omschrijving }}</span>
+            {{-- Zelfservice: wie de module alleen voor het eigen dossier opent, krijgt
+                 die omschrijving te zien en niet die van het volledige beheerpakket. --}}
+            <span class="sis-moduletile__oms">{{ ($rij['zelfservice'] ?? false)
+              ? 'Uw eigen personeelsdossier: gegevens, verlof, agenda en documenten.'
+              : $m->omschrijving }}</span>
             <span class="sis-moduletile__cta">Openen →</span>
           </a>
         @else
