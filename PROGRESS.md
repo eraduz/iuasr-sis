@@ -157,7 +157,12 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
   Rapporten (`RapportController::alleStudentenExport`, route `rapporten.alle-studenten`):
   de hele database ongeacht status, met alleen contactvelden (studentnummer, voor-/
   achternaam, telefoon, e-mail), zonder IBAN/BSN, gelogd, voor SZ/Financiën/Beheer.
-  802 tests groen.
+  Daarna **Alle studenten-lijst navigeerbaar** bij duizenden studenten (zoals de
+  bibliotheekcatalogus): A–Z-index op achternaam (`Student::scopeBeginletter`, '#'
+  voor niet-Latijns), instelbaar aantal per pagina (`App\Support\Paginakeuze`:
+  25/50/100/200) en paginanummers (`->links()` met `vendor.pagination.iuasr`), via
+  de herbruikbare `partials.az-index`. De uitleg "zoeken op studentnummer" staat nu
+  boven de zoekbalk. 803 tests groen.
 - **Laatst bijgewerkt:** 2026-07-22
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 

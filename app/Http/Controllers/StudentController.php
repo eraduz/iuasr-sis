@@ -44,19 +44,23 @@ class StudentController extends Controller
                 fn ($iq) => $laatste($iq)->where('status', $status)))
             ->when($opleidingId, fn ($q) => $q->whereHas('inschrijvingen',
                 fn ($iq) => $laatste($iq)->where('opleiding_id', $opleidingId)))
+            // A–Z-index op achternaam (bladeren bij duizenden studenten).
+            ->when($request->filled('letter'), fn ($q) => $q->beginletter((string) $request->query('letter')))
             ->orderBy('studentnummer')
-            ->paginate(15)
+            ->paginate(\App\Support\Paginakeuze::aantal($request))
             ->withQueryString();
 
         $opleidingen = \App\Models\Opleiding::orderBy('naam')->get(['id', 'naam']);
         $statussen = \App\Enums\InschrijvingStatus::cases();
+        $letterFilter = mb_strtoupper((string) $request->query('letter', ''));
+        $perPagina = \App\Support\Paginakeuze::aantal($request);
 
         // Markeer welke getoonde studenten een betalingsachterstand hebben.
         $schuldIds = $studenten->getCollection()
             ->filter(fn ($s) => \App\Support\Collegegeldstatus::heeftAchterstand($s))
             ->pluck('id')->all();
 
-        return view('studenten.index', compact('studenten', 'zoek', 'status', 'opleidingId', 'opleidingen', 'statussen', 'schuldIds'));
+        return view('studenten.index', compact('studenten', 'zoek', 'status', 'opleidingId', 'opleidingen', 'statussen', 'schuldIds', 'letterFilter', 'perPagina'));
     }
 
     /**

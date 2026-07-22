@@ -18,9 +18,9 @@ class StudentenlijstTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function maakStudent(string $nummer, InschrijvingStatus $status): Student
+    private function maakStudent(string $nummer, InschrijvingStatus $status, ?string $achternaam = null): Student
     {
-        $student = Student::create(['studentnummer' => $nummer, 'voornaam' => 'S', 'achternaam' => $nummer]);
+        $student = Student::create(['studentnummer' => $nummer, 'voornaam' => 'S', 'achternaam' => $achternaam ?? $nummer]);
         Inschrijving::create([
             'student_id' => $student->id,
             'opleiding_id' => Opleiding::where('code', 'ISLTH')->value('id'),
@@ -69,5 +69,19 @@ class StudentenlijstTest extends TestCase
             ->assertOk()
             ->assertSee('260002')
             ->assertDontSee('260001');
+    }
+
+    public function test_az_index_filtert_op_beginletter_van_de_achternaam(): void
+    {
+        $this->seed(ReferentieSeeder::class);
+        $sz = User::create(['naam' => 'SZ', 'email' => 'sz4@iuasr.test', 'rol' => Rol::Studentenzaken]);
+        $this->maakStudent('260010', InschrijvingStatus::Actief, 'Aardappel');
+        $this->maakStudent('260020', InschrijvingStatus::Actief, 'Bakker');
+
+        $this->actingAs($sz)->get('/studenten?letter=A')
+            ->assertOk()->assertSee('260010')->assertDontSee('260020');
+
+        $this->actingAs($sz)->get('/studenten?letter=B')
+            ->assertOk()->assertSee('260020')->assertDontSee('260010');
     }
 }

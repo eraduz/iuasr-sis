@@ -32,7 +32,10 @@
   </div>
 </div>
 
+<p class="sis-tblnote" style="margin:0 0 8px;">Zoeken gebeurt op <b>studentnummer</b> (niet op achternaam) — dat voorkomt verwarring bij gelijke namen (les uit het oude Access-systeem). Bladeren door de hele lijst kan met de <b>A–Z</b>-index en het <b>aantal per pagina</b> hieronder.</p>
+
 <form method="GET" action="{{ route('studenten.index') }}">
+  <input type="hidden" name="per" value="{{ $perPagina }}">
   <div class="iuasr-dash-filters">
     <div class="search" style="grid-column:1 / -1;">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -57,6 +60,8 @@
     </select>
   </div>
 </form>
+
+@include('partials.az-index', ['route' => 'studenten.index', 'letterFilter' => $letterFilter, 'perPagina' => $perPagina])
 
 <div class="iuasr-dash-tbl-card">
   <table class="iuasr-dash-tbl">
@@ -119,16 +124,8 @@
     </tbody>
   </table>
   @if ($studenten->hasPages())
-    <div class="iuasr-dash-pagination">
-      <div class="iuasr-dash-pagination__range">Toont <b>{{ $studenten->firstItem() }}–{{ $studenten->lastItem() }}</b> van <b>{{ $studenten->total() }}</b></div>
-      <div class="iuasr-dash-pagination__nav">
-        <a href="{{ $studenten->previousPageUrl() ?: '#' }}"><button {{ $studenten->onFirstPage() ? 'disabled' : '' }}>‹</button></a>
-        <button class="is-current">{{ $studenten->currentPage() }}</button>
-        <span style="color:var(--blackAltText);font-size:12px;">van {{ $studenten->lastPage() }}</span>
-        <a href="{{ $studenten->nextPageUrl() ?: '#' }}"><button {{ $studenten->hasMorePages() ? '' : 'disabled' }}>›</button></a>
-      </div>
-    </div>
+    <div class="iuasr-dash-pagination__range" style="margin:12px 2px 6px;">Toont <b>{{ $studenten->firstItem() }}–{{ $studenten->lastItem() }}</b> van <b>{{ $studenten->total() }}</b> studenten</div>
+    {{ $studenten->links() }}
   @endif
 </div>
-<p class="sis-tblnote">Zoeken gebeurt op studentnummer (niet op achternaam) — dat voorkomt verwarring bij gelijke namen (les uit het oude Access-systeem).</p>
 @endsection

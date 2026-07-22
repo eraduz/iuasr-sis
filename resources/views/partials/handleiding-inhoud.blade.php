@@ -44,7 +44,8 @@
 
   <h2 id="h5">5. Werken met studenten (Studentenzaken)</h2>
   <h3>Student zoeken</h3>
-  <p>Ga naar <b>Alle studenten</b> en gebruik de zoekbalk (studentnummer of naam). Klik op een student om het dossier te openen.</p>
+  <p>Ga naar <b>Alle studenten</b> en gebruik de zoekbalk. <b>Zoeken gebeurt op studentnummer</b> (bijvoorbeeld 261001) — niet op achternaam; dat voorkomt verwarring bij gelijke namen (een les uit het oude Access-systeem). U kunt wel ook op naam typen. Klik op een student om het dossier te openen.</p>
+  <p>Bij <b>duizenden studenten</b> bladert u door de lijst met de <b>A–Z</b>-index (op achternaam; <b>#</b> vangt niet-Latijnse namen), stelt u het <b>aantal per pagina</b> in (25, 50, 100 of 200) en klikt u door de <b>paginanummers</b> onder aan de lijst. De filters op <b>status</b> en <b>opleiding</b> blijven daarbij behouden.</p>
   <h3>Nieuwe student inschrijven</h3>
   <p>Kies <b>Student inschrijven</b>, vul de gegevens in en bevestig. Het studentnummer wordt automatisch toegekend en de vakken van het studiejaar worden toegewezen. Voor grote aantallen bestaat <b>Bulk inschrijven</b> (CSV-export van het aanmeldportaal), met een controlestap vóór definitief importeren. In die controlestap <b>kiest u het studiejaar</b> waarin de studenten worden ingeschreven (bijvoorbeeld het komende jaar); bij een toekomstig studiejaar wordt de inschrijfdatum automatisch de startdatum (1 september).</p>
   <h3>Gegevens wijzigen</h3>

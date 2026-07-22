@@ -113,6 +113,18 @@ class Student extends Model
             ->whereIn('opleiding_id', $ids));
     }
 
+    /** A–Z-index op achternaam; '#' vangt niet-Latijnse beginletters (Arabisch, cijfers). */
+    public function scopeBeginletter($query, string $letter)
+    {
+        $letter = mb_strtoupper(trim($letter));
+
+        if ($letter === '#') {
+            return $query->whereRaw('UPPER(LEFT(achternaam, 1)) NOT BETWEEN ? AND ?', ['A', 'Z']);
+        }
+
+        return $query->where('achternaam', 'like', $letter.'%');
+    }
+
     /** Mag deze gebruiker dit specifieke studentdossier openen? */
     public function zichtbaarVoor(\App\Models\User $gebruiker): bool
     {
