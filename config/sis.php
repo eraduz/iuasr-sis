@@ -24,7 +24,7 @@ return [
     | onderaan elke pagina getoond zodat testers en beheer weten welke versie
     | draait. Bijwerken bij elke release; houd de wijzigingen bij in CHANGELOG.md.
     */
-    'versie' => '1.26.0',
+    'versie' => '1.28.0',
 
     /*
     |----------------------------------------------------------------------
@@ -218,6 +218,23 @@ return [
         'overgang_drempel_terugval' => null,
         // Herbeoordelingsmomenten leerjaar (semesterstart): eind juli / midden januari.
         'herbeoordeling' => ['juli', 'januari'],
+    ],
+
+    /*
+    |----------------------------------------------------------------------
+    | Herinschrijving — doorstroom & geldigheidsduur EC
+    |----------------------------------------------------------------------
+    | Bij doorstromen naar een HÓGER leerjaar in dezelfde opleiding gelden twee
+    | regels (opdrachtgever 2026-07-22):
+    |  1. Het vorige leerjaar moet zijn gehaald (behaalde EC >= ec_overgang_drempel
+    |     van de opleiding; het overgangsadvies 'positief').
+    |  2. Behaalde EC hebben een geldigheidsduur. Is de pauze sinds de vorige
+    |     inschrijving langer dan `ec_geldigheid_jaren`, dan vervallen de EC en moet
+    |     de student opnieuw beginnen op leerjaar 1 (de oude resultaten blijven als
+    |     historie bewaard, maar tellen niet meer mee).
+    */
+    'herinschrijving' => [
+        'ec_geldigheid_jaren' => (int) env('SIS_EC_GELDIGHEID_JAREN', 5),
     ],
 
     /*

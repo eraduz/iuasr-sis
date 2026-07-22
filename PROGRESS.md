@@ -129,6 +129,20 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
   klein Blade-detail vastgelegd: een directive direct na een woordteken
   (`Stage@if`, `u@endif`) wordt niet gecompileerd — altijd een niet-woordteken
   ervoor. 791 tests groen (`StageperiodeTest`).
+  Daarna **doorstroomtoets bij herinschrijven** (`App\Support\Herinschrijfcontrole`):
+  naar een hóger leerjaar in dezelfde opleiding mag alleen wie (1) het vorige jaar
+  heeft gehaald — behaalde EC ≥ `opleidingen.ec_overgang_drempel` (het bestaande
+  overgangsadvies 'positief'); negatief blokkeert, de Beheerder mag namens de
+  examencommissie met een reden vrijgeven (gelogd via `herinschrijving_override`);
+  voorwaardelijk mag door met waarschuwing; onbekende drempel of een leerjaar zonder
+  vakken mag door met notitie — en (2) van wie de EC nog geldig zijn: is de pauze
+  sinds de vorige inschrijving langer dan `sis.herinschrijving.ec_geldigheid_jaren`
+  (standaard 5), dan vervallen de EC en moet de student opnieuw beginnen op leerjaar 1
+  (oude resultaten blijven als historie bewaard, tellen niet mee). Studiewissel en
+  jaar overdoen vallen buiten de toets. Het herinschrijfscherm toont het
+  overgangsadvies; er is een geel `waarschuwing`-flashkanaal. ReferentieSeeder zet
+  ISLTH `ec_overgang_drempel` op 30 (BSA-norm), dus de toets is actief. 798 tests
+  groen (`HerinschrijvingDoorstroomTest`).
 - **Laatst bijgewerkt:** 2026-07-22
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 

@@ -34,6 +34,9 @@ class BetalingsafspraakTest extends TestCase
         parent::setUp();
         $this->seed([ReferentieSeeder::class, SynthetischVakSeeder::class,
             GebruikerSeeder::class, SynthetischeStudentSeeder::class]);
+        // Deze test gaat over de betalingsblokkade, niet over de doorstroomtoets:
+        // zet de EC-overgangsdrempel uit zodat herinschrijven daar niet op afketst.
+        \App\Models\Opleiding::query()->update(['ec_overgang_drempel' => null]);
         Carbon::setTestNow('2026-01-25'); // sep, nov en jan zijn vervallen (24e)
 
         CollegegeldTarief::create([

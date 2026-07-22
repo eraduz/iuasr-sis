@@ -27,6 +27,9 @@ class VaktoewijzingTest extends TestCase
         parent::setUp();
         $this->seed([ReferentieSeeder::class, SynthetischVakSeeder::class, GebruikerSeeder::class]);
         $this->sz = User::where('rol', Rol::Studentenzaken)->first();
+        // Deze test gaat over vaktoewijzing, niet over de doorstroomtoets: zet de
+        // EC-overgangsdrempel uit zodat een leerjaarwissel niet wordt geblokkeerd.
+        Opleiding::query()->update(['ec_overgang_drempel' => null]);
     }
 
     private function aantalVakken(int $leerjaar): int

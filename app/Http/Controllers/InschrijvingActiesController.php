@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Enums\InschrijvingStatus;
+use App\Enums\Rol;
 use App\Models\Inschrijving;
 use App\Models\Klas;
 use App\Models\Periode;
 use App\Models\Student;
 use App\Support\AuditLogger;
+use App\Support\Herinschrijfcontrole;
+use App\Support\Overgangsbeoordeling;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -213,7 +216,12 @@ class InschrijvingActiesController extends Controller
         // 'tweede' = een tweede (parallelle) opleiding toevoegen naast een lopende.
         $modus = request('modus') === 'tweede' ? 'tweede' : 'herinschrijven';
 
-        return view('inschrijven.herinschrijven', compact('student', 'huidige', 'perioden', 'klassen', 'opleidingen', 'financieel', 'modus'));
+        // Overgangsadvies van de vorige inschrijving (informatief op het formulier);
+        // de doorstroomtoets zelf gebeurt server-side bij het opslaan.
+        $overgang = ($huidige && $modus !== 'tweede') ? Overgangsbeoordeling::voor($huidige) : null;
+        $magOverride = auth()->user()->heeftRol(Rol::Beheerder);
+
+        return view('inschrijven.herinschrijven', compact('student', 'huidige', 'perioden', 'klassen', 'opleidingen', 'financieel', 'modus', 'overgang', 'magOverride'));
     }
 
     public function herinschrijven(Request $request, Student $student): RedirectResponse
@@ -265,6 +273,22 @@ class InschrijvingActiesController extends Controller
             return back()->withInput()->with('fout', 'De student is al afgestudeerd voor deze opleiding en kan zich er niet opnieuw voor inschrijven. Kies een andere opleiding.');
         }
 
+        // Doorstroomtoets: naar een hóger leerjaar in dezelfde opleiding mag alleen
+        // wie het vorige jaar heeft gehaald én van wie de EC nog geldig zijn (pauze
+        // korter dan de geldigheidsduur). Zie Herinschrijfcontrole.
+        $controle = Herinschrijfcontrole::beoordeel(
+            $huidige, (int) $data['opleiding_id'], (int) $data['leerjaar'], $data['inschrijfdatum']
+        );
+        $overrideReden = null;
+        if (! $controle['toegestaan']) {
+            $magOverride = $controle['override_mogelijk'] && auth()->user()->heeftRol(Rol::Beheerder);
+            $overrulen = $magOverride && $request->boolean('override') && filled($request->input('override_reden'));
+            if (! $overrulen) {
+                return back()->withInput()->with('fout', $controle['melding']);
+            }
+            $overrideReden = trim((string) $request->input('override_reden'));
+        }
+
         // Nieuwe inschrijving; studentnummer en persoonsgegevens blijven gelijk.
         // De opleiding kan wijzigen (studiewissel), bijvoorbeeld van een cursus
         // naar een bacheloropleiding.
@@ -290,8 +314,25 @@ class InschrijvingActiesController extends Controller
             'inschrijving_id' => $nieuw->id,
         ]);
 
-        return redirect()->route('studenten.show', $student)->with('status',
-            ($studiewissel ? 'Herinschrijving met studiewissel vastgelegd' : 'Herinschrijving vastgelegd')
-            .' — studentnummer '.$student->studentnummer.' blijft gelijk.');
+        // Een door de Beheerder vrijgegeven doorstroomblokkade wordt apart gelogd
+        // (wie, waarom, welke inschrijving) — het is een uitzondering op de OER-norm.
+        if ($overrideReden !== null) {
+            AuditLogger::log(AuditLogger::WIJZIGING, $student, veld: 'herinschrijving_override', context: [
+                'blokkade' => $controle['blokkade'],
+                'reden' => $overrideReden,
+                'inschrijving_id' => $nieuw->id,
+            ]);
+        }
+
+        $melding = ($studiewissel ? 'Herinschrijving met studiewissel vastgelegd' : 'Herinschrijving vastgelegd')
+            .' — studentnummer '.$student->studentnummer.' blijft gelijk.'
+            .($overrideReden !== null ? ' Doorstroomblokkade vrijgegeven door de Beheerder (gelogd).' : '');
+
+        $redirect = redirect()->route('studenten.show', $student)->with('status', $melding);
+        if ($controle['waarschuwing']) {
+            $redirect->with('waarschuwing', $controle['waarschuwing']);
+        }
+
+        return $redirect;
     }
 }

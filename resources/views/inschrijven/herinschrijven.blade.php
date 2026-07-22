@@ -78,6 +78,15 @@
         </div>
         <div class="sis-fld"><label>Inschrijfdatum <span class="req">*</span></label><input type="date" name="inschrijfdatum" value="{{ old('inschrijfdatum', now()->toDateString()) }}" required></div>
       </fieldset>
+
+      @if (($magOverride ?? false) && ! $tweede)
+        <fieldset class="sis-fieldset">
+          <legend>Doorstroomblokkade vrijgeven (examencommissie/beheer)</legend>
+          <p class="sis-muted" style="font-size:12px;margin:0 0 8px;">Alleen invullen als de doorstroom wordt geblokkeerd omdat het vorige jaar niet is gehaald. Vrijgave is een uitzondering en wordt gelogd. Een blokkade wegens <b>vervallen EC</b> (pauze &gt; 5 jaar) kan niet worden vrijgegeven — kies dan leerjaar 1.</p>
+          <label class="sis-check-inline"><input type="checkbox" name="override" value="1" @checked(old('override'))> Doorstroomblokkade vrijgeven</label>
+          <div class="sis-fld" style="margin-top:8px;"><label>Reden</label><input type="text" name="override_reden" maxlength="255" value="{{ old('override_reden') }}" placeholder="Bijv. besluit examencommissie d.d. …"></div>
+        </fieldset>
+      @endif
       <div class="sis-form__actions">
         <a class="iuasr-dash-btn" href="{{ route('studenten.show', $student) }}">Annuleren</a>
         <div class="right"><button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit" {{ $financieel['geblokkeerd'] ? 'disabled' : '' }}>Herinschrijving vastleggen</button></div>
@@ -98,6 +107,23 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/></svg>
       <span>Het studentnummer en de persoonsgegevens blijven gelijk. U kunt <b>dezelfde opleiding</b> kiezen (vervolg of jaar overdoen) óf een <b>andere opleiding</b> (studiewissel). Er wordt een nieuwe inschrijving gemaakt en de vakken worden op de gekozen opleiding + leerjaar toegewezen. Eerder behaalde resultaten blijven op de vorige inschrijving bewaard.</span>
     </div>
+
+    @if (! $tweede && $huidige && $overgang)
+      @php
+        $status = $overgang['status'];
+        $badge = ['positief' => 's-approved', 'voorwaardelijk' => 's-requested', 'negatief' => 's-rejected', 'onbekend' => 's-submitted'][$status] ?? 's-submitted';
+        $label = ['positief' => 'Positief — vorig jaar gehaald', 'voorwaardelijk' => 'Voorwaardelijk', 'negatief' => 'Negatief — vorig jaar niet gehaald', 'onbekend' => 'Onbekend — drempel niet ingesteld'][$status] ?? $status;
+      @endphp
+      <div class="sis-card" style="margin-top:16px;">
+        <div class="sis-card__hd"><h3>Doorstroom vorig leerjaar</h3></div>
+        <dl class="sis-dl">
+          <dt>Vorig leerjaar</dt><dd>Jaar {{ $huidige->leerjaar }} · {{ $huidige->opleiding?->code }}</dd>
+          <dt>Overgangsadvies</dt><dd><span class="iuasr-dash-status {{ $badge }}">{{ $label }}</span></dd>
+          <dt>Behaalde EC</dt><dd class="tnum">{{ \App\Support\Ec::toon($overgang['behaald']) }}@if($overgang['drempel'] !== null) / {{ $overgang['drempel'] }} vereist@endif</dd>
+        </dl>
+        <p class="sis-tblnote" style="margin-top:8px;">Doorstromen naar een <b>hoger</b> leerjaar kan alleen als het vorige jaar is gehaald. Is de pauze sinds de vorige inschrijving <b>langer dan {{ config('sis.herinschrijving.ec_geldigheid_jaren', 5) }} jaar</b>, dan vervallen de EC en begint de student opnieuw op leerjaar 1. Een <b>jaar overdoen</b> (zelfde leerjaar) of een <b>studiewissel</b> valt buiten deze toets.</p>
+      </div>
+    @endif
   </div>
 </div>
 
