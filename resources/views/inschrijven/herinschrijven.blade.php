@@ -74,7 +74,14 @@
               @endforeach
             </select>
           </div>
-          <div class="sis-fld"><label>Leerjaar <span class="req">*</span></label><input type="number" id="hi-leerjaar" name="leerjaar" min="1" max="10" required value="{{ old('leerjaar', ($huidige->leerjaar ?? 1) + 1) }}"></div>
+          @php
+            // Was de student uitgeschreven, dan hervat hij doorgaans HETZELFDE
+            // leerjaar (hij stopte er middenin); een actieve student gaat naar het
+            // VOLGENDE jaar. De medewerker kan dit altijd aanpassen.
+            $wasUitgeschreven = $huidige && $huidige->status === App\Enums\InschrijvingStatus::Uitgeschreven;
+            $standaardLeerjaar = $huidige ? ($wasUitgeschreven ? $huidige->leerjaar : $huidige->leerjaar + 1) : 1;
+          @endphp
+          <div class="sis-fld"><label>Leerjaar <span class="req">*</span></label><input type="number" id="hi-leerjaar" name="leerjaar" min="1" max="10" required value="{{ old('leerjaar', $standaardLeerjaar) }}">@if($wasUitgeschreven)<small class="sis-muted" style="font-size:12px;">Uitgeschreven student — standaard hetzelfde leerjaar (hervatten). Pas aan als de student het jaar had afgerond.</small>@endif</div>
         </div>
         <div class="sis-fld"><label>Inschrijfdatum <span class="req">*</span></label><input type="date" name="inschrijfdatum" value="{{ old('inschrijfdatum', now()->toDateString()) }}" required></div>
       </fieldset>
@@ -119,7 +126,7 @@
         <dl class="sis-dl">
           <dt>Vorig leerjaar</dt><dd>Jaar {{ $huidige->leerjaar }} · {{ $huidige->opleiding?->code }}</dd>
           <dt>Overgangsadvies</dt><dd><span class="iuasr-dash-status {{ $badge }}">{{ $label }}</span></dd>
-          <dt>Behaalde EC</dt><dd class="tnum">{{ \App\Support\Ec::toon($overgang['behaald']) }}@if($overgang['drempel'] !== null) / {{ $overgang['drempel'] }} vereist@endif</dd>
+          <dt>Behaalde EC</dt><dd class="tnum">{{ \App\Support\Ec::toon($overgang['behaald']) }}@if($overgang['drempel'] !== null) / {{ $overgang['drempel'].' vereist' }}@endif</dd>
         </dl>
         <p class="sis-tblnote" style="margin-top:8px;">Doorstromen naar een <b>hoger</b> leerjaar kan alleen als het vorige jaar is gehaald. Is de pauze sinds de vorige inschrijving <b>langer dan {{ config('sis.herinschrijving.ec_geldigheid_jaren', 5) }} jaar</b>, dan vervallen de EC en begint de student opnieuw op leerjaar 1. Een <b>jaar overdoen</b> (zelfde leerjaar) of een <b>studiewissel</b> valt buiten deze toets.</p>
       </div>

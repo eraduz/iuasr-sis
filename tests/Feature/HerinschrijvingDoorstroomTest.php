@@ -149,6 +149,33 @@ class HerinschrijvingDoorstroomTest extends TestCase
         $this->assertDatabaseHas('inschrijvingen', ['student_id' => $this->student->id, 'leerjaar' => 1]);
     }
 
+    public function test_herinschrijfformulier_rendert_voor_uitgeschreven_student(): void
+    {
+        // Regressie: het herinschrijfformulier gaf een Blade ParseError; het moet
+        // gewoon laden voor een uitgeschreven student.
+        $this->huidige->update(['status' => \App\Enums\InschrijvingStatus::Uitgeschreven]);
+
+        $this->actingAs($this->sz)->get(route('herinschrijven.form', $this->student))
+            ->assertOk()
+            ->assertSee('Herinschrijven');
+    }
+
+    public function test_hervatten_zelfde_jaar_na_lange_pauze_dwingt_leerjaar1(): void
+    {
+        // Uitgeschreven student wil na 7 jaar hetzelfde jaar (2) hervatten: EC
+        // vervallen -> geblokkeerd; opnieuw beginnen op leerjaar 1 mag wel.
+        $this->huidige->update(['status' => \App\Enums\InschrijvingStatus::Uitgeschreven, 'inschrijfdatum' => now()->subYears(7)->toDateString()]);
+
+        $this->herinschrijf($this->sz, $this->payload(['leerjaar' => 2]))
+            ->assertSessionHas('fout');
+        $this->assertDatabaseMissing('inschrijvingen', ['student_id' => $this->student->id, 'periode_id' => $this->doelPeriode->id, 'leerjaar' => 2]);
+
+        $this->herinschrijf($this->sz, $this->payload(['leerjaar' => 1]))
+            ->assertRedirect(route('studenten.show', $this->student))
+            ->assertSessionMissing('fout');
+        $this->assertDatabaseHas('inschrijvingen', ['student_id' => $this->student->id, 'leerjaar' => 1]);
+    }
+
     public function test_geslaagd_vorig_jaar_staat_doorstroom_toe(): void
     {
         $this->islth->update(['ec_overgang_drempel' => 1]);

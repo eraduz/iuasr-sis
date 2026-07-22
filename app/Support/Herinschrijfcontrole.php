@@ -44,13 +44,20 @@ class Herinschrijfcontrole
         ];
 
         $studiewissel = $doelOpleidingId !== (int) $huidige->opleiding_id;
-        $isDoorstroom = ! $studiewissel && $doelLeerjaar > (int) $huidige->leerjaar;
-        if (! $isDoorstroom) {
-            return $resultaat; // studiewissel, jaar overdoen of lager leerjaar: geen doorstroomtoets
+        // Studiewissel of (opnieuw) beginnen op leerjaar 1: geen toets — dan bouwt
+        // de student niet voort op eerder behaalde EC.
+        if ($studiewissel || $doelLeerjaar <= 1) {
+            return $resultaat;
         }
-        $resultaat['is_doorstroom'] = true;
 
-        // 1) Geldigheidsduur EC — pauze langer dan de geldigheidsduur laat de EC vervallen.
+        // Vanaf hier: dezelfde opleiding, leerjaar >= 2 (voortzetten van de studie,
+        // hetzij hervatten van hetzelfde jaar, hetzij doorstromen naar een hoger jaar).
+        $isDoorstroom = $doelLeerjaar > (int) $huidige->leerjaar;
+        $resultaat['is_doorstroom'] = $isDoorstroom;
+
+        // 1) Geldigheidsduur EC — is de pauze te lang, dan vervallen ALLE EC en moet
+        // de student opnieuw op leerjaar 1 beginnen. Geldt zowel bij doorstromen als
+        // bij het hervatten van hetzelfde jaar; harde regel, geen uitzondering.
         $pauze = self::pauzeJaren($huidige, $inschrijfdatum);
         $resultaat['pauze_jaren'] = $pauze;
         if ($pauze > $geldigheid) {
@@ -58,13 +65,18 @@ class Herinschrijfcontrole
             $resultaat['blokkade'] = 'ec_verlopen';
             $resultaat['verplicht_leerjaar'] = 1;
             $resultaat['melding'] = "De vorige inschrijving is {$pauze} jaar geleden (langer dan {$geldigheid} jaar). "
-                .'De eerder behaalde EC zijn vervallen; de student kan niet doorstromen en moet opnieuw beginnen op leerjaar 1. '
+                .'De eerder behaalde EC zijn vervallen; de student kan de studie niet vervolgen en moet opnieuw beginnen op leerjaar 1. '
                 .'De oude resultaten blijven als historie bewaard.';
 
             return $resultaat;
         }
 
-        // 2) Slaag-eis — het vorige leerjaar moet zijn gehaald.
+        // 2) Slaag-eis — alleen bij doorstromen naar een HÓGER leerjaar. Hetzelfde
+        // jaar hervatten/overdoen mag altijd (binnen de geldigheidsduur).
+        if (! $isDoorstroom) {
+            return $resultaat;
+        }
+
         $overgang = Overgangsbeoordeling::voor($huidige);
         $resultaat['overgang'] = $overgang;
 
