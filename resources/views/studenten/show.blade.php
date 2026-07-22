@@ -107,9 +107,97 @@
     </div>
   @endif
 
-  <div class="sis-grid-2" style="align-items:start;">
-    {{-- Linkerkolom --}}
-    <div>
+  {{-- Notities bovenaan voor snelle inzage --}}
+      @php
+        $magNotitiesBeheren = auth()->user()->magInschrijvingBeheren();
+        $magNotitiesZien = $magNotitiesBeheren || in_array(auth()->user()->rol, [App\Enums\Rol::Directie, App\Enums\Rol::Bestuur], true);
+      @endphp
+      @if ($magNotitiesZien)
+        <div class="sis-card" id="notities" style="margin-top:16px;">
+          <div class="sis-card__hd"><h3>Notities</h3><span class="hint">Intern · SZ &amp; Beheer beheren · Directie &amp; Bestuur lezen mee</span></div>
+
+          @if ($magNotitiesBeheren)
+          <form method="POST" action="{{ route('studenten.notities.store', $student) }}" class="iuasr-dash-note-form" style="margin-bottom:12px;">
+            @csrf
+            <div class="iuasr-dash-note-form__hd">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              Nieuwe notitie · {{ now()->format('d-m-Y') }}
+            </div>
+            <textarea name="tekst" required maxlength="2000" placeholder="Bijv. telefonisch contact, gemaakte afspraak, ontbrekend document…">{{ old('tekst') }}</textarea>
+            <div style="display:flex;justify-content:flex-end;">
+              <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Notitie opslaan</button>
+            </div>
+          </form>
+          @endif
+
+          <div class="iuasr-dash-note-list">
+            @forelse ($student->notities as $n)
+              <div class="iuasr-dash-note">
+                <small>{{ $n->created_at->format('d-m-Y · H:i') }} · {{ $n->gebruiker?->naam ?? 'onbekend' }}</small>
+                <div style="display:flex;gap:10px;align-items:flex-start;justify-content:space-between;">
+                  <span style="white-space:pre-wrap;">{{ $n->tekst }}</span>
+                  @if ($magNotitiesBeheren)
+                  <form method="POST" action="{{ route('studenten.notities.destroy', [$student, $n]) }}" onsubmit="return confirm('Deze notitie verwijderen?');" style="flex:none;">
+                    @csrf @method('DELETE')
+                    <button type="submit" title="Verwijderen" style="background:none;border:0;cursor:pointer;color:var(--blackAltText);padding:2px;line-height:0;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                  </form>
+                  @endif
+                </div>
+              </div>
+            @empty
+              <p class="sis-muted" style="font-size:13px;margin:4px 2px;">Nog geen notities voor deze student.</p>
+            @endforelse
+          </div>
+        </div>
+      @endif
+
+      {{-- Notities van de EXAMENCOMMISSIE — hun eigen aantekeningen; uitsluitend
+           zichtbaar/beheerbaar voor de examencommissie (los van de SZ-notities). --}}
+      @if (auth()->user()->magExamencommissieNotities())
+        <div class="sis-card" id="ec-notities" style="margin-top:16px;">
+          <div class="sis-card__hd"><h3>Notities examencommissie</h3><span class="hint">Alleen zichtbaar voor de examencommissie</span></div>
+
+          <form method="POST" action="{{ route('studenten.ec-notities.store', $student) }}" class="iuasr-dash-note-form" style="margin-bottom:12px;">
+            @csrf
+            <div class="iuasr-dash-note-form__hd">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              Nieuwe notitie · {{ now()->format('d-m-Y') }}
+            </div>
+            <textarea name="tekst" required maxlength="2000" placeholder="Bevindingen, overwegingen en aandachtspunten voor de commissie…">{{ old('tekst') }}</textarea>
+            <div style="display:flex;justify-content:flex-end;">
+              <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Notitie opslaan</button>
+            </div>
+          </form>
+
+          <div class="iuasr-dash-note-list">
+            @forelse ($student->examencommissieNotities as $n)
+              <div class="iuasr-dash-note">
+                <small>{{ $n->created_at->format('d-m-Y · H:i') }} · {{ $n->gebruiker?->naam ?? 'onbekend' }}</small>
+                <div style="display:flex;gap:10px;align-items:flex-start;justify-content:space-between;">
+                  <span style="white-space:pre-wrap;">{{ $n->tekst }}</span>
+                  <form method="POST" action="{{ route('studenten.ec-notities.destroy', [$student, $n]) }}" onsubmit="return confirm('Deze notitie verwijderen?');" style="flex:none;">
+                    @csrf @method('DELETE')
+                    <button type="submit" title="Verwijderen" style="background:none;border:0;cursor:pointer;color:var(--blackAltText);padding:2px;line-height:0;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            @empty
+              <p class="sis-muted" style="font-size:13px;margin:4px 2px;">Nog geen notities van de examencommissie.</p>
+            @endforelse
+          </div>
+        </div>
+      @endif
+
+  <style>
+    .sis-masonry { column-count: 2; column-gap: 16px; }
+    .sis-masonry > .sis-card { break-inside: avoid; -webkit-column-break-inside: avoid; page-break-inside: avoid; margin: 0 0 16px !important; width: 100%; }
+    @media (max-width: 900px) { .sis-masonry { column-count: 1; } }
+  </style>
+  <div class="sis-masonry">
       <div class="sis-card">
         <div class="sis-card__hd"><h3>Persoonsgegevens</h3><span class="hint">Bron: inschrijving</span></div>
         <dl class="sis-dl">
@@ -205,10 +293,6 @@
           <p class="sis-tblnote" style="margin-top:6px;">PABO-kennistoetsen · te halen binnen {{ config('sis.kennistoetsen.termijn_jaren', 2) }} jaar.@if ($ktMagBew) Vul een datum in en klik Opslaan; leeg = wissen.@endif</p>
         </div>
       @endif
-    </div>
-
-    {{-- Rechterkolom --}}
-    <div>
       <div class="sis-card">
         <div class="sis-card__hd"><h3>Contact</h3></div>
         <dl class="sis-dl">
@@ -452,95 +536,9 @@
         </div>
       @endif
 
-      @php
-        $magNotitiesBeheren = auth()->user()->magInschrijvingBeheren();
-        $magNotitiesZien = $magNotitiesBeheren || in_array(auth()->user()->rol, [App\Enums\Rol::Directie, App\Enums\Rol::Bestuur], true);
-      @endphp
-      @if ($magNotitiesZien)
-        <div class="sis-card" id="notities" style="margin-top:16px;">
-          <div class="sis-card__hd"><h3>Notities</h3><span class="hint">Intern · SZ &amp; Beheer beheren · Directie &amp; Bestuur lezen mee</span></div>
 
-          @if ($magNotitiesBeheren)
-          <form method="POST" action="{{ route('studenten.notities.store', $student) }}" class="iuasr-dash-note-form" style="margin-bottom:12px;">
-            @csrf
-            <div class="iuasr-dash-note-form__hd">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-              Nieuwe notitie · {{ now()->format('d-m-Y') }}
-            </div>
-            <textarea name="tekst" required maxlength="2000" placeholder="Bijv. telefonisch contact, gemaakte afspraak, ontbrekend document…">{{ old('tekst') }}</textarea>
-            <div style="display:flex;justify-content:flex-end;">
-              <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Notitie opslaan</button>
-            </div>
-          </form>
-          @endif
-
-          <div class="iuasr-dash-note-list">
-            @forelse ($student->notities as $n)
-              <div class="iuasr-dash-note">
-                <small>{{ $n->created_at->format('d-m-Y · H:i') }} · {{ $n->gebruiker?->naam ?? 'onbekend' }}</small>
-                <div style="display:flex;gap:10px;align-items:flex-start;justify-content:space-between;">
-                  <span style="white-space:pre-wrap;">{{ $n->tekst }}</span>
-                  @if ($magNotitiesBeheren)
-                  <form method="POST" action="{{ route('studenten.notities.destroy', [$student, $n]) }}" onsubmit="return confirm('Deze notitie verwijderen?');" style="flex:none;">
-                    @csrf @method('DELETE')
-                    <button type="submit" title="Verwijderen" style="background:none;border:0;cursor:pointer;color:var(--blackAltText);padding:2px;line-height:0;">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                    </button>
-                  </form>
-                  @endif
-                </div>
-              </div>
-            @empty
-              <p class="sis-muted" style="font-size:13px;margin:4px 2px;">Nog geen notities voor deze student.</p>
-            @endforelse
-          </div>
-        </div>
-      @endif
-
-      {{-- Notities van de EXAMENCOMMISSIE — hun eigen aantekeningen; uitsluitend
-           zichtbaar/beheerbaar voor de examencommissie (los van de SZ-notities). --}}
-      @if (auth()->user()->magExamencommissieNotities())
-        <div class="sis-card" id="ec-notities" style="margin-top:16px;">
-          <div class="sis-card__hd"><h3>Notities examencommissie</h3><span class="hint">Alleen zichtbaar voor de examencommissie</span></div>
-
-          <form method="POST" action="{{ route('studenten.ec-notities.store', $student) }}" class="iuasr-dash-note-form" style="margin-bottom:12px;">
-            @csrf
-            <div class="iuasr-dash-note-form__hd">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-              Nieuwe notitie · {{ now()->format('d-m-Y') }}
-            </div>
-            <textarea name="tekst" required maxlength="2000" placeholder="Bevindingen, overwegingen en aandachtspunten voor de commissie…">{{ old('tekst') }}</textarea>
-            <div style="display:flex;justify-content:flex-end;">
-              <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Notitie opslaan</button>
-            </div>
-          </form>
-
-          <div class="iuasr-dash-note-list">
-            @forelse ($student->examencommissieNotities as $n)
-              <div class="iuasr-dash-note">
-                <small>{{ $n->created_at->format('d-m-Y · H:i') }} · {{ $n->gebruiker?->naam ?? 'onbekend' }}</small>
-                <div style="display:flex;gap:10px;align-items:flex-start;justify-content:space-between;">
-                  <span style="white-space:pre-wrap;">{{ $n->tekst }}</span>
-                  <form method="POST" action="{{ route('studenten.ec-notities.destroy', [$student, $n]) }}" onsubmit="return confirm('Deze notitie verwijderen?');" style="flex:none;">
-                    @csrf @method('DELETE')
-                    <button type="submit" title="Verwijderen" style="background:none;border:0;cursor:pointer;color:var(--blackAltText);padding:2px;line-height:0;">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                    </button>
-                  </form>
-                </div>
-              </div>
-            @empty
-              <p class="sis-muted" style="font-size:13px;margin:4px 2px;">Nog geen notities van de examencommissie.</p>
-            @endforelse
-          </div>
-        </div>
-      @endif
-    </div>
-  </div>
-
-  {{-- Documenten van de student (privé opgeslagen; inzage gelogd) — halve breedte --}}
+  {{-- Documenten van de student (privé opgeslagen; inzage gelogd) — volledige breedte --}}
   @if (auth()->user()->magInschrijvingBeheren())
-    <div class="sis-grid-2" style="margin-top:16px;align-items:start;">
       <div class="sis-card" id="documenten">
       <div class="sis-card__hd"><h3>Documenten</h3><span class="hint">identiteitsbewijs, diploma, cijferlijst, pasfoto — privé opgeslagen, inzage gelogd</span></div>
 
@@ -592,8 +590,8 @@
       </div>
       <p class="sis-tblnote" style="margin-top:10px;">Toegestaan: pdf, jpg, png · max 8 MB per bestand. Inzage en afgifte worden gelogd.</p>
       </div>
-    </div>
   @endif
+  </div>{{-- /sis-masonry --}}
 
   {{-- Gevaarlijke acties — uitsluitend Beheerder: student volledig verwijderen --}}
   @if (auth()->user()->rol === App\Enums\Rol::Beheerder)

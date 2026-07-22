@@ -29,6 +29,46 @@
   @endif
 </div>
 
+{{-- Notities (Fase C). --}}
+<div class="sis-card" id="notities" style="margin-bottom:16px;">
+  <div class="sis-card__hd"><b>Notities ({{ $organisatie->notities->count() }})</b></div>
+  <div style="padding:14px 16px;">
+    @if ($magBeheer)
+      <form method="POST" action="{{ route('relaties.notities.store', $organisatie) }}" style="margin-bottom:14px;">
+        @csrf
+        <div class="sis-fld-row sis-fld-row--2">
+          <div class="sis-fld"><label>Categorie</label><input type="text" name="categorie" maxlength="255" placeholder="Optioneel"></div>
+          <div class="sis-fld"><label>Tags</label><input type="text" name="tags" maxlength="255" placeholder="Optioneel, bv. stage, bezoek"></div>
+        </div>
+        <div class="sis-fld"><label>Notitie <span class="req">*</span></label><textarea name="tekst" rows="2" required></textarea></div>
+        <div style="text-align:right;"><button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Notitie toevoegen</button></div>
+      </form>
+    @endif
+    @forelse ($organisatie->notities as $n)
+      <div style="border-top:1px solid var(--border,#e5e5e5); padding:10px 0;">
+        <div style="display:flex; justify-content:space-between; gap:12px;">
+          <div>
+            @if($n->categorie)<span class="sis-pill-soft">{{ $n->categorie }}</span> @endif
+            <span>{{ $n->tekst }}</span>
+            @if($n->tags)<div><small class="sis-muted">Tags: {{ $n->tags }}</small></div>@endif
+          </div>
+          <div style="white-space:nowrap; text-align:right;">
+            <small class="sis-muted">{{ $n->created_at?->format('d-m-Y') }}<br>{{ $n->auteur?->naam }}</small>
+            @if($magBeheer)
+              <form method="POST" action="{{ route('relaties.notities.destroy', $n) }}" onsubmit="return confirm('Notitie verwijderen?');" style="display:inline;">
+                @csrf @method('DELETE')
+                <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" type="submit">×</button>
+              </form>
+            @endif
+          </div>
+        </div>
+      </div>
+    @empty
+      <p class="sis-muted" style="margin:0;">Nog geen notities.</p>
+    @endforelse
+  </div>
+</div>
+
 <div class="sis-card" style="margin-bottom:16px;">
   <div class="sis-card__hd"><b>Organisatiegegevens</b></div>
   <div style="padding:14px 16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px 24px;">
@@ -265,46 +305,6 @@
       </tbody>
     </table>
   @endif
-</div>
-
-{{-- Notities (Fase C). --}}
-<div class="sis-card" id="notities" style="margin-bottom:16px;">
-  <div class="sis-card__hd"><b>Notities ({{ $organisatie->notities->count() }})</b></div>
-  <div style="padding:14px 16px;">
-    @if ($magBeheer)
-      <form method="POST" action="{{ route('relaties.notities.store', $organisatie) }}" style="margin-bottom:14px;">
-        @csrf
-        <div class="sis-fld-row sis-fld-row--2">
-          <div class="sis-fld"><label>Categorie</label><input type="text" name="categorie" maxlength="255" placeholder="Optioneel"></div>
-          <div class="sis-fld"><label>Tags</label><input type="text" name="tags" maxlength="255" placeholder="Optioneel, bv. stage, bezoek"></div>
-        </div>
-        <div class="sis-fld"><label>Notitie <span class="req">*</span></label><textarea name="tekst" rows="2" required></textarea></div>
-        <div style="text-align:right;"><button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Notitie toevoegen</button></div>
-      </form>
-    @endif
-    @forelse ($organisatie->notities as $n)
-      <div style="border-top:1px solid var(--border,#e5e5e5); padding:10px 0;">
-        <div style="display:flex; justify-content:space-between; gap:12px;">
-          <div>
-            @if($n->categorie)<span class="sis-pill-soft">{{ $n->categorie }}</span> @endif
-            <span>{{ $n->tekst }}</span>
-            @if($n->tags)<div><small class="sis-muted">Tags: {{ $n->tags }}</small></div>@endif
-          </div>
-          <div style="white-space:nowrap; text-align:right;">
-            <small class="sis-muted">{{ $n->created_at?->format('d-m-Y') }}<br>{{ $n->auteur?->naam }}</small>
-            @if($magBeheer)
-              <form method="POST" action="{{ route('relaties.notities.destroy', $n) }}" onsubmit="return confirm('Notitie verwijderen?');" style="display:inline;">
-                @csrf @method('DELETE')
-                <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--danger" type="submit">×</button>
-              </form>
-            @endif
-          </div>
-        </div>
-      </div>
-    @empty
-      <p class="sis-muted" style="margin:0;">Nog geen notities.</p>
-    @endforelse
-  </div>
 </div>
 
 {{-- Historie / tijdlijn (Fase C) — afgeleid uit contactmomenten, notities en de audit-log. --}}

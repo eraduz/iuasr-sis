@@ -143,6 +143,15 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
   overgangsadvies; er is een geel `waarschuwing`-flashkanaal. ReferentieSeeder zet
   ISLTH `ec_overgang_drempel` op 30 (BSA-norm), dus de toets is actief. 798 tests
   groen (`HerinschrijvingDoorstroomTest`).
+  Daarna **opmaak studentpagina** (op verzoek): de notitieblokken (SZ +
+  examencommissie) staan nu **bovenaan** (direct onder Acties) voor snelle inzage;
+  de vaste 2-koloms grid van de persoon-tab is vervangen door **masonry-tegels**
+  (`.sis-masonry`, `column-count:2` met `break-inside:avoid`) zodat de kaarten
+  gebalanceerd tegelen en het grote witte gat (korte linkerkolom naast een lange
+  Collegegeld-kolom) verdwijnt; Documenten is een gewone masonry-tegel geworden
+  (halve breedte i.p.v. te breed). Ook de **notitieblokken op HR (medewerkerdossier)
+  en de relatiekaart** naar boven verplaatst. Blade-let op: een directive direct na
+  een woordteken (`u@endif`) compileert niet — altijd een niet-woordteken ervoor.
 - **Laatst bijgewerkt:** 2026-07-22
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 

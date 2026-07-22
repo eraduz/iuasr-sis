@@ -17,6 +17,48 @@
   @endif
 </div>
 
+{{-- Interne notities — HR/Beheer beheren; Bestuur leest mee. Doorlopend logboek
+     van contactmomenten: e-mails, telefoongesprekken, gespreksverslagen. --}}
+@php $magNotitiesBeheren = auth()->user()->magHrBeheer(); @endphp
+<div class="sis-card" id="notities" style="margin-bottom:16px;">
+  <div class="sis-card__hd"><h3>Notities</h3><span class="hint">Intern · contactmomenten (e-mail, telefoon, gespreksverslag) · HR &amp; Beheer beheren · Bestuur leest mee</span></div>
+
+  @if ($magNotitiesBeheren)
+  <form method="POST" action="{{ route('medewerkers.notities.store', $medewerker) }}" class="iuasr-dash-note-form" style="margin-bottom:12px;">
+    @csrf
+    <div class="iuasr-dash-note-form__hd">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+      Nieuwe notitie · {{ now()->format('d-m-Y') }}
+    </div>
+    <textarea name="tekst" required maxlength="5000" placeholder="Bijv. telefoongesprek, e-mailwisseling, verslag van een gesprek…">{{ old('tekst') }}</textarea>
+    <div style="display:flex;justify-content:flex-end;">
+      <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Notitie opslaan</button>
+    </div>
+  </form>
+  @endif
+
+  <div class="iuasr-dash-note-list">
+    @forelse ($medewerker->notities as $n)
+      <div class="iuasr-dash-note">
+        <small>{{ $n->created_at->format('d-m-Y · H:i') }} · {{ $n->gebruiker?->naam ?? 'onbekend' }}</small>
+        <div style="display:flex;gap:10px;align-items:flex-start;justify-content:space-between;">
+          <span style="white-space:pre-wrap;">{{ $n->tekst }}</span>
+          @if ($magNotitiesBeheren)
+          <form method="POST" action="{{ route('medewerkers.notities.destroy', [$medewerker, $n]) }}" onsubmit="return confirm('Deze notitie verwijderen?');" style="flex:none;">
+            @csrf @method('DELETE')
+            <button type="submit" title="Verwijderen" style="background:none;border:0;cursor:pointer;color:var(--blackAltText);padding:2px;line-height:0;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </form>
+          @endif
+        </div>
+      </div>
+    @empty
+      <p class="sis-muted" style="font-size:13px;margin:4px 2px;">Nog geen notities voor deze medewerker.</p>
+    @endforelse
+  </div>
+</div>
+
 <div class="sis-card" style="margin-bottom:16px;">
   <div class="sis-card__hd"><b>Gegevens</b></div>
   <div style="padding:14px 16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px 24px;">
@@ -281,48 +323,6 @@
     </div>
   </div>
 @endforeach
-
-{{-- Interne notities — HR/Beheer beheren; Bestuur leest mee. Doorlopend logboek
-     van contactmomenten: e-mails, telefoongesprekken, gespreksverslagen. --}}
-@php $magNotitiesBeheren = auth()->user()->magHrBeheer(); @endphp
-<div class="sis-card" id="notities" style="margin-bottom:16px;">
-  <div class="sis-card__hd"><h3>Notities</h3><span class="hint">Intern · contactmomenten (e-mail, telefoon, gespreksverslag) · HR &amp; Beheer beheren · Bestuur leest mee</span></div>
-
-  @if ($magNotitiesBeheren)
-  <form method="POST" action="{{ route('medewerkers.notities.store', $medewerker) }}" class="iuasr-dash-note-form" style="margin-bottom:12px;">
-    @csrf
-    <div class="iuasr-dash-note-form__hd">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-      Nieuwe notitie · {{ now()->format('d-m-Y') }}
-    </div>
-    <textarea name="tekst" required maxlength="5000" placeholder="Bijv. telefoongesprek, e-mailwisseling, verslag van een gesprek…">{{ old('tekst') }}</textarea>
-    <div style="display:flex;justify-content:flex-end;">
-      <button class="iuasr-dash-btn iuasr-dash-btn--sm iuasr-dash-btn--primary" type="submit">Notitie opslaan</button>
-    </div>
-  </form>
-  @endif
-
-  <div class="iuasr-dash-note-list">
-    @forelse ($medewerker->notities as $n)
-      <div class="iuasr-dash-note">
-        <small>{{ $n->created_at->format('d-m-Y · H:i') }} · {{ $n->gebruiker?->naam ?? 'onbekend' }}</small>
-        <div style="display:flex;gap:10px;align-items:flex-start;justify-content:space-between;">
-          <span style="white-space:pre-wrap;">{{ $n->tekst }}</span>
-          @if ($magNotitiesBeheren)
-          <form method="POST" action="{{ route('medewerkers.notities.destroy', [$medewerker, $n]) }}" onsubmit="return confirm('Deze notitie verwijderen?');" style="flex:none;">
-            @csrf @method('DELETE')
-            <button type="submit" title="Verwijderen" style="background:none;border:0;cursor:pointer;color:var(--blackAltText);padding:2px;line-height:0;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            </button>
-          </form>
-          @endif
-        </div>
-      </div>
-    @empty
-      <p class="sis-muted" style="font-size:13px;margin:4px 2px;">Nog geen notities voor deze medewerker.</p>
-    @endforelse
-  </div>
-</div>
 
 @if ($magBeheer)
   {{-- Gevaarlijke actie — medewerker volledig verwijderen (foutieve/dubbele records). --}}
