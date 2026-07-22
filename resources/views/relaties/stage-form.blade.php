@@ -69,7 +69,7 @@
 
   <div class="sis-fld-row sis-fld-row--2">
     <div class="sis-fld">
-      <label>Stageplaats</label>
+      <label>Stageplaats <span class="sis-muted" style="font-weight:400;">(optioneel)</span></label>
       @php $spid = old('stageplaats_id', $stage->stageplaats_id); @endphp
       <select name="stageplaats_id">
         <option value="">— geen specifieke plaats —</option>
@@ -77,6 +77,11 @@
           <option value="{{ $sp->id }}" @selected((int) $spid === $sp->id)>{{ $sp->opleiding?->code }}@if($sp->leerjaar) · jaar {{ $sp->leerjaar }}@endif ({{ $sp->bezetting() }}@if($sp->max_studenten)/{{ $sp->max_studenten }}@endif bezet)</option>
         @endforeach
       </select>
+      @if ($stageplaatsen->isEmpty())
+        <small class="sis-muted">{{ $organisatie->naam }} heeft nog geen vastgelegde stageplaatsen (aanbod). De organisatie zelf is al de stageplek; een stageplaats koppelt u alleen als er vooraf capaciteit is vastgelegd. Aanmaken kan op de <a href="{{ route('relaties.show', $organisatie) }}#stageplaatsen">relatiekaart</a>.</small>
+      @else
+        <small class="sis-muted">Optioneel: een vooraf vastgelegd aanbod (capaciteit) binnen {{ $organisatie->naam }}. De organisatie zelf is al de stageplek.</small>
+      @endif
     </div>
     <div class="sis-fld">
       <label>Status <span class="req">*</span></label>
