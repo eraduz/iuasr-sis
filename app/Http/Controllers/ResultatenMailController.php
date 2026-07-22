@@ -43,40 +43,58 @@ class ResultatenMailController extends Controller
         $this->autoriseerOpleiding($request, $opleiding);
         [$teVersturen] = $this->bepaalOntvangers($opleiding);
 
+        $periodeNaam = Periode::where('actief', true)->value('naam') ?? '';
         $aantal = 0;
+        $mislukt = [];
+
         foreach ($teVersturen as $rij) {
             $student = $rij['student'];
-            $transcript = Transcript::voor($student, alleenDefinitief: true);
 
-            $html = view('pdf.cijferlijst', [
-                'student' => $student, 'transcript' => $transcript, 'ondertekenaar' => auth()->user()->naam,
-            ])->render();
+            // Per student afgeschermd: een fout bij één student (ongeldig adres,
+            // mailserver onbereikbaar) mag de rest van de batch niet afbreken.
+            try {
+                $transcript = Transcript::voor($student, alleenDefinitief: true);
 
-            $doc = Documentondertekening::ondertekenHtml($html, [
-                'type' => 'cijferlijst',
-                'titel' => 'Cijferlijst '.$student->studentnummer,
-                'student_id' => $student->id,
-                'ontvanger' => $student->volledigeNaam().' (e-mail)',
-                'uitgegeven_door_id' => auth()->id(),
-            ]);
+                $html = view('pdf.cijferlijst', [
+                    'student' => $student, 'transcript' => $transcript, 'ondertekenaar' => auth()->user()->naam,
+                ])->render();
 
-            $periodeNaam = Periode::where('actief', true)->value('naam') ?? '';
+                $doc = Documentondertekening::ondertekenHtml($html, [
+                    'type' => 'cijferlijst',
+                    'titel' => 'Cijferlijst '.$student->studentnummer,
+                    'student_id' => $student->id,
+                    'ontvanger' => $student->volledigeNaam().' (e-mail)',
+                    'uitgegeven_door_id' => auth()->id(),
+                ]);
 
-            Mail::to($rij['email'])->send(new ResultatenCijferlijstMail(
-                $student->volledigeNaam(),
-                $periodeNaam,
-                Documentondertekening::pdfBytes($doc) ?? '',
-                'Cijferlijst-'.$student->studentnummer.'.pdf',
-            ));
+                Mail::to($rij['email'])->send(new ResultatenCijferlijstMail(
+                    $student->volledigeNaam(),
+                    $periodeNaam,
+                    Documentondertekening::pdfBytes($doc) ?? '',
+                    'Cijferlijst-'.$student->studentnummer.'.pdf',
+                ));
 
-            AuditLogger::log(AuditLogger::UITGIFTE, $student, veld: 'resultaten-email', context: [
-                'opleiding' => $opleiding->code, 'code' => $doc->code,
-            ]);
-            $aantal++;
+                AuditLogger::log(AuditLogger::UITGIFTE, $student, veld: 'resultaten-email', context: [
+                    'opleiding' => $opleiding->code, 'code' => $doc->code,
+                ]);
+                $aantal++;
+            } catch (\Throwable $e) {
+                $mislukt[] = $student->studentnummer;
+                \Illuminate\Support\Facades\Log::error('Cijferlijst-e-mail mislukt', [
+                    'student' => $student->studentnummer, 'opleiding' => $opleiding->code, 'fout' => $e->getMessage(),
+                ]);
+            }
         }
 
-        return redirect()->route('cijferlijst', ['opleiding_id' => $opleiding->id])
+        $redirect = redirect()->route('cijferlijst', ['opleiding_id' => $opleiding->id])
             ->with('status', $aantal.' student(en) van '.$opleiding->code.' hebben hun cijferlijst per e-mail ontvangen.');
+
+        if ($mislukt !== []) {
+            $redirect->with('fout', count($mislukt).' verzending(en) mislukt (studentnummer: '
+                .implode(', ', $mislukt).'). Deze staan in de serverlog; probeer die studenten opnieuw.');
+        }
+
+        return $redirect;
     }
 
     /** Directie mag alleen de eigen opleiding(en) mailen. */
