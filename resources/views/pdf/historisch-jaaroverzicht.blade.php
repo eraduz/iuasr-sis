@@ -63,7 +63,7 @@
           <tr>
             <td>{{ $vak?->code ?? '—' }}</td>
             <td>{{ $vak?->naam ?? '—' }}</td>
-            <td class="r">@if ($r->vrijstelling)VR@elseif ($r->cijfer !== null)<span class="{{ $r->cijfer < $grens ? 'fail' : 'pass' }}">{{ number_format($r->cijfer, 1, ',', '') }}</span>@else —@endif</td>
+            <td class="r">@if ($r->vrijstelling)VR @elseif ($r->cijfer !== null)<span class="{{ $r->cijfer < $grens ? 'fail' : 'pass' }}">{{ number_format($r->cijfer, 1, ',', '') }}</span>@else —@endif</td>
             <td class="c">{{ $r->voldoende ? $ec($vak?->ec ?? 0) : '—' }}</td>
             <td>@if ($r->vrijstelling)Vrijstelling @elseif ($r->voldoende)Voldoende @else Onvoldoende @endif</td>
           </tr>

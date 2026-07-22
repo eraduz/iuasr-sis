@@ -142,7 +142,7 @@
   @if ($afstudeerSignaal->isNotEmpty())
     @php $afstActie = $afstudeerSignaal->where('wachtOpSz', true); @endphp
     <div class="sis-card" style="margin-top:16px;@if($afstActie->isNotEmpty())border-left:3px solid var(--secColor100);@endif">
-      <div class="sis-card__hd"><h3>Afstudeerprocessen</h3><span class="hint">{{ $afstudeerSignaal->count() }} lopend@if($afstActie->isNotEmpty()) · {{ $afstActie->count() }} wacht op u@endif</span></div>
+      <div class="sis-card__hd"><h3>Afstudeerprocessen</h3><span class="hint">{{ $afstudeerSignaal->count() }} lopend{{ $afstActie->isNotEmpty() ? ' · '.$afstActie->count().' wacht op u' : '' }}</span></div>
       <p class="sis-muted" style="font-size:12px;margin:0 0 8px;">Door de examencommissie gestart. Zodra het uw beurt is (diploma klaarmaken of uitreiken) staat er <b>Actie: Studentenzaken</b> — zo mist u geen afstudeeraanvraag.</p>
       <div class="iuasr-dash-tbl-card" style="border:0;">
         <table class="iuasr-dash-tbl">
