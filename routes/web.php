@@ -404,6 +404,8 @@ Route::middleware('auth')->group(function () {
     // Actieve-studenten Excel-export (incl. IBAN, zonder BSN) — Studentenzaken, Financiën, Beheer
     Route::middleware('rol:studentenzaken,financien,beheerder')->group(function () {
         Route::get('/rapporten/actieve-studenten.xlsx', [RapportController::class, 'actieveStudentenExport'])->name('rapporten.actieve-studenten');
+        // Contactlijst van ALLE studenten (hele database, elke status) — naam, telefoon, e-mail
+        Route::get('/rapporten/alle-studenten.xlsx', [RapportController::class, 'alleStudentenExport'])->name('rapporten.alle-studenten');
     });
 
     // --- Studenten inzien: SZ, Beheerder, Examencommissie, Directie ---

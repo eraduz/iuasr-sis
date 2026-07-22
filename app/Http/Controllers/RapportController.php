@@ -114,6 +114,66 @@ class RapportController extends Controller
     }
 
     /**
+     * Excel-contactlijst van ÁLLE studenten in de database — ongeacht de status
+     * van hun inschrijving (actief, uitgeschreven, afgestudeerd, …). Alleen de
+     * contactvelden: naam, telefoon en e-mail. Geen IBAN, geen BSN. Waarden als
+     * tekst zodat telefoonnummers niet worden verminkt. De export wordt gelogd.
+     */
+    public function alleStudentenExport(): StreamedResponse
+    {
+        $studenten = Student::query()
+            ->orderBy('achternaam')->orderBy('voornaam')->orderBy('studentnummer')
+            ->get();
+
+        $kolommen = ['Studentnummer', 'Voornaam', 'Tussenvoegsel', 'Achternaam', 'Telefoon', 'E-mail (IUASR)', 'E-mail privé'];
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Alle studenten');
+
+        foreach ($kolommen as $i => $kop) {
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($i + 1).'1', $kop);
+        }
+        $laatsteKolom = Coordinate::stringFromColumnIndex(count($kolommen));
+        $sheet->getStyle('A1:'.$laatsteKolom.'1')->getFont()->setBold(true);
+
+        $rij = 2;
+        foreach ($studenten as $s) {
+            $waarden = [
+                $s->studentnummer, $s->voornaam, $s->tussenvoegsel, $s->achternaam,
+                $s->telefoon, $s->email, $s->email_prive,
+                // Bewust GEEN IBAN en GEEN BSN in deze contactlijst.
+            ];
+            $kol = 1;
+            foreach ($waarden as $waarde) {
+                $sheet->setCellValueExplicit(
+                    Coordinate::stringFromColumnIndex($kol).$rij,
+                    (string) ($waarde ?? ''),
+                    DataType::TYPE_STRING,
+                );
+                $kol++;
+            }
+            $rij++;
+        }
+
+        foreach (range(1, count($kolommen)) as $c) {
+            $sheet->getColumnDimension(Coordinate::stringFromColumnIndex($c))->setAutoSize(true);
+        }
+
+        AuditLogger::log(AuditLogger::UITGIFTE, 'AlleStudentenContactExport', veld: 'export', context: [
+            'aantal' => $studenten->count(), 'bevat_iban' => false, 'bevat_bsn' => false,
+        ]);
+
+        $bestandsnaam = 'alle-studenten-contact-'.now()->format('Ymd-Hi').'.xlsx';
+
+        return response()->streamDownload(function () use ($spreadsheet) {
+            (new Xlsx($spreadsheet))->save('php://output');
+        }, $bestandsnaam, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    }
+
+    /**
      * Cijferlijst / transcript per student: volledig cijferoverzicht per
      * studiejaar met eindcijfer, EC en status. Cijferinzage → Examencommissie
      * en Directie. Inzage wordt gelogd.

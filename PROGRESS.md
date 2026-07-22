@@ -152,6 +152,12 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
   (halve breedte i.p.v. te breed). Ook de **notitieblokken op HR (medewerkerdossier)
   en de relatiekaart** naar boven verplaatst. Blade-let op: een directive direct na
   een woordteken (`u@endif`) compileert niet — altijd een niet-woordteken ervoor.
+  Daarna, op verzoek: menu-item **Uitschrijven** uit de zijbalk (doet men per student
+  op het dossier), en een nieuwe **Excel-contactlijst van álle studenten** onder
+  Rapporten (`RapportController::alleStudentenExport`, route `rapporten.alle-studenten`):
+  de hele database ongeacht status, met alleen contactvelden (studentnummer, voor-/
+  achternaam, telefoon, e-mail), zonder IBAN/BSN, gelogd, voor SZ/Financiën/Beheer.
+  802 tests groen.
 - **Laatst bijgewerkt:** 2026-07-22
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 

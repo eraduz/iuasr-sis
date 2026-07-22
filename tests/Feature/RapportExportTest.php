@@ -54,4 +54,46 @@ class RapportExportTest extends TestCase
         $this->actingAs(User::where('rol', Rol::Docent)->first())->get(route('rapporten.actieve-studenten'))->assertForbidden();
         $this->actingAs(User::where('rol', Rol::Examencommissie)->first())->get(route('rapporten.actieve-studenten'))->assertForbidden();
     }
+
+    public function test_alle_studenten_contactlijst_bevat_de_hele_database(): void
+    {
+        // Een 'losse' student zonder actieve inschrijving moet óók in de lijst staan.
+        \App\Models\Student::create([
+            'studentnummer' => '999999', 'voornaam' => 'Losse', 'achternaam' => 'Student',
+            'telefoon' => '0612345678', 'email' => 'losse@iuasr.test',
+        ]);
+
+        $sz = User::where('rol', Rol::Studentenzaken)->first();
+        $response = $this->actingAs($sz)->get(route('rapporten.alle-studenten'));
+        $response->assertOk();
+        $this->assertStringContainsString('spreadsheetml', (string) $response->headers->get('content-type'));
+
+        $tmp = tempnam(sys_get_temp_dir(), 'xlsx').'.xlsx';
+        file_put_contents($tmp, $response->streamedContent());
+        $sheet = IOFactory::load($tmp)->getActiveSheet();
+        $koppen = $sheet->rangeToArray('A1:G1', null, true, false)[0];
+        $rijen = $sheet->getHighestRow() - 1; // zonder kopregel
+        $plat = collect($sheet->toArray())->flatten()->filter()->all();
+        @unlink($tmp);
+
+        $this->assertContains('Voornaam', $koppen);
+        $this->assertContains('Achternaam', $koppen);
+        $this->assertContains('Telefoon', $koppen);
+        $this->assertContains('E-mail (IUASR)', $koppen);
+        $this->assertNotContains('IBAN', $koppen);
+        $this->assertNotContains('BSN', $koppen);
+
+        // Hele database: precies alle studenten, incl. de losse zonder inschrijving.
+        $this->assertSame(\App\Models\Student::count(), $rijen);
+        $this->assertContains('999999', $plat);
+
+        $this->assertDatabaseHas('audit_logs', ['veld' => 'export']);
+    }
+
+    public function test_alle_studenten_export_toegang_per_rol(): void
+    {
+        $this->actingAs(User::where('rol', Rol::Beheerder)->first())->get(route('rapporten.alle-studenten'))->assertOk();
+        $this->actingAs(User::where('rol', Rol::Docent)->first())->get(route('rapporten.alle-studenten'))->assertForbidden();
+        $this->actingAs(User::where('rol', Rol::Examencommissie)->first())->get(route('rapporten.alle-studenten'))->assertForbidden();
+    }
 }
