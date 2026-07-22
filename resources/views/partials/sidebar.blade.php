@@ -41,7 +41,6 @@
                 ['Student inschrijven', 'inschrijven', 'plus', 'inschrijven'],
                 ['Bulk inschrijven', 'bulk-inschrijven', 'plus', 'bulk-inschrijven*'],
                 ['Herinschrijven', 'herinschrijven', 'refresh', 'herinschrijven'],
-                ['Uitschrijven', 'uitschrijven', 'userx', 'uitschrijven'],
                 ['Afstuderen', 'afstuderen.kandidaten', 'cert', 'afstuderen.kandidaten'],
                 ['Migratie (import)', 'migratie', 'db', 'migratie'],
             ],
