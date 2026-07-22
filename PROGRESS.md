@@ -121,7 +121,14 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
   nieuw geel kanaal in de layout) als toch een afwijkend leerjaar wordt vastgelegd
   — **niet blokkerend** (opdrachtgever 2026-07-22: vertraagde studenten mogen
   bewust worden geplaatst). Masterstages (leerjaar null) kennen deze controle niet.
-  788 tests groen (`StageperiodeTest`).
+  Daarna **stageverleden op de studentpagina** (nieuw tabblad "Stage",
+  `Student::stages()`): alle stages met stageperiode, organisatie, periode, uren en
+  status. De plaatsingen zijn zichtbaar voor iedereen die de studentpagina mag
+  openen; de gevoelige **beoordeling** alleen voor rollen met stage-inzage
+  (`magRelatieInzien` → Directie/Bestuur/Beheer), opdrachtgever 2026-07-22. Ook een
+  klein Blade-detail vastgelegd: een directive direct na een woordteken
+  (`Stage@if`, `u@endif`) wordt niet gecompileerd — altijd een niet-woordteken
+  ervoor. 791 tests groen (`StageperiodeTest`).
 - **Laatst bijgewerkt:** 2026-07-22
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 

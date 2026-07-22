@@ -165,7 +165,17 @@ class StudentController extends Controller
             ->with(['vak', 'aangemaaktDoor', 'verwerktDoor'])->latest()->get();
         $kennistoetsen = \App\Support\Kennistoetsbewaking::voor($student);
 
-        return view('studenten.show', compact('student', 'huidige', 'actieveInschrijvingen', 'magCijfers', 'cijferVakken', 'financieel', 'termijnen', 'collegegeldInschrijving', 'andereOpleidingen', 'vakHistorie', 'grondslagen', 'besluiten', 'kennistoetsen', 'taken'));
+        // Stageverleden: de plaatsingen zijn zichtbaar voor iedereen die de
+        // studentpagina mag openen; de (gevoelige) beoordeling alleen voor rollen
+        // met stage-inzage (Directie/Bestuur/Beheer). Zie keuze opdrachtgever 2026-07-22.
+        $stages = $student->stages()
+            ->with(['stageperiode', 'organisatie'])
+            ->orderByRaw('startdatum is null, startdatum')
+            ->orderBy('id')
+            ->get();
+        $magStageBeoordeling = auth()->user()->magRelatieInzien();
+
+        return view('studenten.show', compact('student', 'huidige', 'actieveInschrijvingen', 'magCijfers', 'cijferVakken', 'financieel', 'termijnen', 'collegegeldInschrijving', 'andereOpleidingen', 'vakHistorie', 'grondslagen', 'besluiten', 'kennistoetsen', 'taken', 'stages', 'magStageBeoordeling'));
     }
 
     /**

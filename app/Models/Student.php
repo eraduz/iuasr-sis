@@ -155,6 +155,12 @@ class Student extends Model
         return $this->hasMany(Resultaat::class);
     }
 
+    /** Stages (plaatsingen) van deze student — het stageverleden. */
+    public function stages(): HasMany
+    {
+        return $this->hasMany(Stage::class);
+    }
+
     /** Scriptietrajecten van deze student (module Scriptie Coördinatie). */
     public function scripties(): HasMany
     {

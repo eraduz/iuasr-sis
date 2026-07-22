@@ -64,6 +64,7 @@
       <span class="lock"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
     @endunless
   </button>
+  <button class="sis-tab" data-tab="stage" role="tab">Stage @if($stages->isNotEmpty())({{ $stages->count() }})@endif</button>
 </div>
 
 {{-- PANEEL: Persoonsgegevens --}}
@@ -1042,6 +1043,40 @@
       @endif
     </div>
   @endunless
+</section>
+
+{{-- PANEEL: Stage --}}
+<section class="sis-tabpanel" data-panel="stage">
+  <div class="sis-card">
+    <div class="sis-card__hd"><h3>Stageverleden</h3><span class="hint">plaatsingen van deze student</span></div>
+    @if ($stages->isEmpty())
+      <div class="iuasr-dash-empty" style="border:0;"><h3>Geen stages</h3><p class="sis-muted">Voor deze student zijn nog geen stages geregistreerd.</p></div>
+    @else
+      <div class="iuasr-dash-tbl-card" style="border:0;">
+        <table class="iuasr-dash-tbl">
+          <thead><tr><th>Stagenr.</th><th>Stage</th><th>Organisatie</th><th>Periode</th><th>Uren</th><th style="text-align:center;">Status</th>@if($magStageBeoordeling)<th>Beoordeling</th>@endif</tr></thead>
+          <tbody>
+            @foreach ($stages as $stage)
+              <tr>
+                <td class="tnum">{{ $stage->stagenummer }}</td>
+                <td>@if($stage->stageperiode){{ $stage->stageperiode->naam }}@if($stage->stageperiode->leerjaar)<br><small class="sis-muted">jaar {{ $stage->stageperiode->leerjaar }}</small>@endif @else<span class="sis-muted">—</span>@endif</td>
+                <td>{{ $stage->organisatie?->naam ?? '—' }}</td>
+                <td class="dt"><small>{{ $stage->startdatum?->format('d-m-Y') ?? '—' }}@if($stage->einddatum)<br>t/m {{ $stage->einddatum->format('d-m-Y') }}@endif</small></td>
+                <td class="tnum">{{ $stage->uren ?? $stage->stageperiode?->verplichte_uren ?? '—' }}@if($stage->stageperiode) / {{ $stage->stageperiode->verplichte_uren.' u' }}@endif</td>
+                <td style="text-align:center;"><span class="iuasr-dash-status {{ $stage->status?->badge() }}">{{ $stage->status?->label() }}</span></td>
+                @if($magStageBeoordeling)
+                  <td>@if($stage->beoordeling)<span class="iuasr-dash-status {{ $stage->beoordeling === 'voldoende' ? 's-approved' : 's-rejected' }}">{{ ucfirst($stage->beoordeling) }}</span>@else<span class="sis-muted">—</span>@endif</td>
+                @endif
+              </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+      @unless ($magStageBeoordeling)
+        <p class="sis-tblnote">De stage<b>beoordeling</b> (voldoende/onvoldoende) is voorbehouden aan de Directie, het Bestuur en Beheer.</p>
+      @endunless
+    @endif
+  </div>
 </section>
 
 @push('scripts')

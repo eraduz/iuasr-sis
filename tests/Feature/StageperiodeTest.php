@@ -210,4 +210,56 @@ class StageperiodeTest extends TestCase
             ->assertSee('data-leerjaren', false)
             ->assertSee('data-leerjaar=', false);
     }
+
+    /** Maakt een afgeronde stage met beoordeling voor de teststudent. */
+    private function maakBeoordeeldeStage(): Stage
+    {
+        return Stage::create([
+            'stagenummer' => 'S900001',
+            'student_id' => $this->islthStudent->id,
+            'organisatie_id' => $this->islthOrg->id,
+            'opleiding_id' => $this->islthId,
+            'stageperiode_id' => $this->stage1->id,
+            'uren' => 280,
+            'status' => 'afgerond',
+            'beoordeling' => 'voldoende',
+            'beoordeling_toelichting' => 'Sterke stage.',
+        ]);
+    }
+
+    public function test_studentpagina_toont_stageverleden(): void
+    {
+        $this->maakBeoordeeldeStage();
+
+        $this->actingAs($this->beheerder)->get(route('studenten.show', $this->islthStudent))
+            ->assertOk()
+            ->assertSee('Stageverleden')
+            ->assertSee('S900001')
+            ->assertSee('Stage 1')
+            ->assertSee('Moskee An-Nasr');
+    }
+
+    public function test_studentenzaken_ziet_de_plaatsing_maar_niet_de_beoordeling(): void
+    {
+        $this->maakBeoordeeldeStage();
+        $sz = User::where('rol', Rol::Studentenzaken)->firstOrFail();
+
+        $this->actingAs($sz)->get(route('studenten.show', $this->islthStudent))
+            ->assertOk()
+            ->assertSee('S900001')                          // plaatsing wel zichtbaar
+            ->assertSee('voorbehouden aan de Directie')     // uitleg waarom geen beoordeling
+            ->assertDontSee('<th>Beoordeling</th>', false); // beoordeling-kolom verborgen
+    }
+
+    public function test_directie_van_de_opleiding_ziet_de_beoordeling(): void
+    {
+        $this->maakBeoordeeldeStage();
+        $directie = User::where('rol', Rol::Directie)->firstOrFail();
+        $directie->opleidingen()->syncWithoutDetaching([$this->islthId]);
+
+        $this->actingAs($directie)->get(route('studenten.show', $this->islthStudent))
+            ->assertOk()
+            ->assertSee('S900001')
+            ->assertSee('Voldoende');
+    }
 }
