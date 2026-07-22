@@ -53,13 +53,14 @@
 
 <div class="iuasr-dash-tbl-card">
   <table class="iuasr-dash-tbl">
-    <thead><tr><th>Stagenr.</th><th>Student</th><th>Opleiding</th><th>Organisatie</th><th>Begeleiders</th><th>Periode</th><th style="text-align:center;">Status</th><th>Beoordeling</th>@if($magBeheer)<th class="row-act"></th>@endif</tr></thead>
+    <thead><tr><th>Stagenr.</th><th>Student</th><th>Opleiding</th><th>Stage</th><th>Organisatie</th><th>Begeleiders</th><th>Periode</th><th style="text-align:center;">Status</th><th>Beoordeling</th>@if($magBeheer)<th class="row-act"></th>@endif</tr></thead>
     <tbody>
       @forelse ($stages as $stage)
         <tr>
           <td class="tnum">{{ $stage->stagenummer }}</td>
           <td class="nm"><a href="{{ route('relaties.show', $stage->organisatie) }}#stages">{{ $stage->student?->volledigeNaam() ?? '—' }}</a><br><small class="sis-muted">{{ $stage->student?->studentnummer }}</small></td>
           <td>{{ $stage->opleiding?->code ?? '—' }}</td>
+          <td>@if($stage->stageperiode){{ $stage->stageperiode->naam }}<br><small class="sis-muted">{{ $stage->uren ?? $stage->stageperiode->verplichte_uren }} / {{ $stage->stageperiode->verplichte_uren }} u</small>@else<span class="sis-muted">—</span>@endif</td>
           <td>{{ $stage->organisatie?->naam ?? '—' }}</td>
           <td>
             <small>{{ $stage->stagebegeleider?->naam ?? '—' }}<br>{{ $stage->werkplekbegeleider?->volledigeNaam() ?? '—' }}</small>
@@ -70,7 +71,7 @@
           @if($magBeheer)<td class="row-act"><a class="iuasr-dash-btn iuasr-dash-btn--sm" href="{{ route('stages.edit', $stage) }}">Bewerken</a></td>@endif
         </tr>
       @empty
-        <tr><td colspan="{{ $magBeheer ? 9 : 8 }}"><div class="iuasr-dash-empty" style="border:0;"><h3>Geen stages</h3><p class="sis-muted">@if($magBeheer)Gebruik de knop <b>Student plaatsen</b> bovenaan om een student op een organisatie te plaatsen.@else Er zijn nog geen stages binnen uw bereik.@endif</p></div></td></tr>
+        <tr><td colspan="{{ $magBeheer ? 10 : 9 }}"><div class="iuasr-dash-empty" style="border:0;"><h3>Geen stages</h3><p class="sis-muted">@if($magBeheer)Gebruik de knop <b>Student plaatsen</b> bovenaan om een student op een organisatie te plaatsen.@else Er zijn nog geen stages binnen uw bereik.@endif</p></div></td></tr>
       @endforelse
     </tbody>
   </table>

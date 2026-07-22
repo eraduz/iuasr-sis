@@ -17,7 +17,8 @@ class Stage extends Model
 
     protected $fillable = [
         'stagenummer', 'student_id', 'organisatie_id', 'stageplaats_id', 'opleiding_id',
-        'stagebegeleider_id', 'werkplekbegeleider_id', 'startdatum', 'einddatum',
+        'stageperiode_id', 'stagebegeleider_id', 'werkplekbegeleider_id',
+        'startdatum', 'einddatum', 'uren',
         'status', 'beoordeling', 'beoordeling_toelichting',
     ];
 
@@ -27,6 +28,7 @@ class Stage extends Model
             'status' => Stagestatus::class,
             'startdatum' => 'date',
             'einddatum' => 'date',
+            'uren' => 'integer',
         ];
     }
 
@@ -48,6 +50,11 @@ class Stage extends Model
     public function opleiding(): BelongsTo
     {
         return $this->belongsTo(Opleiding::class);
+    }
+
+    public function stageperiode(): BelongsTo
+    {
+        return $this->belongsTo(Stageperiode::class);
     }
 
     public function stagebegeleider(): BelongsTo

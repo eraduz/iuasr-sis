@@ -101,7 +101,7 @@ class OrganisatieController extends Controller
             'contactmomenten' => fn ($q) => $q->with(['type', 'medewerker', 'contactpersoon'])->orderByDesc('datum')->orderByDesc('id'),
             'notities' => fn ($q) => $q->with('auteur')->orderByDesc('created_at'),
             'stageplaatsen' => fn ($q) => $q->with(['opleiding', 'periode', 'stages'])->orderByDesc('actief')->orderBy('id'),
-            'stages' => fn ($q) => $q->with(['student', 'opleiding', 'stagebegeleider', 'werkplekbegeleider'])->orderByDesc('id'),
+            'stages' => fn ($q) => $q->with(['student', 'opleiding', 'stageperiode', 'stagebegeleider', 'werkplekbegeleider'])->orderByDesc('id'),
             'relatietaken' => fn ($q) => $q->with(['toegewezenAan'])->orderByRaw("status='afgerond'")->orderByRaw('vervaldatum is null, vervaldatum asc'),
             'afspraken' => fn ($q) => $q->with(['medewerker', 'stage.student'])->orderByDesc('datum')->orderByDesc('id'),
             'documenten' => fn ($q) => $q->with('geuploadDoor')->orderBy('categorie')->orderByDesc('versie'),

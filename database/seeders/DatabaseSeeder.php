@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             PresentieSeeder::class,
             CollegegeldSeeder::class,
             KennistoetsSeeder::class,
+            StageperiodeSeeder::class,
             OrganisatieSeeder::class,
             NieuwsbronSeeder::class,
             HrSeeder::class,

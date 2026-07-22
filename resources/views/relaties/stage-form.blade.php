@@ -49,6 +49,25 @@
 
   <div class="sis-fld-row sis-fld-row--2">
     <div class="sis-fld">
+      <label>Stageperiode <span class="req" id="periode-req" style="display:none;">*</span></label>
+      @php $sppid = old('stageperiode_id', $stage->stageperiode_id); @endphp
+      <select name="stageperiode_id" id="stageperiode-select">
+        <option value="">— kies een stageperiode —</option>
+        @foreach ($stageperioden as $p)
+          <option value="{{ $p->id }}" data-opleiding="{{ $p->opleiding_id }}" data-uren="{{ $p->verplichte_uren }}" @selected((int) $sppid === $p->id)>{{ $p->keuzelabel() }}</option>
+        @endforeach
+      </select>
+      <small class="sis-muted" id="periode-hint">Kies eerst een opleiding; de bijbehorende stages verschijnen dan.</small>
+    </div>
+    <div class="sis-fld">
+      <label>Gemaakte uren</label>
+      <input type="number" name="uren" id="stage-uren" min="0" max="5000" step="1" value="{{ old('uren', $stage->uren) }}" placeholder="bv. 140">
+      <small class="sis-muted">Wordt voorgevuld met de urennorm van de stageperiode; aan te passen.</small>
+    </div>
+  </div>
+
+  <div class="sis-fld-row sis-fld-row--2">
+    <div class="sis-fld">
       <label>Stageplaats</label>
       @php $spid = old('stageplaats_id', $stage->stageplaats_id); @endphp
       <select name="stageplaats_id">
@@ -120,3 +139,50 @@
   </div>
 </form>
 @endsection
+
+@push('scripts')
+<script>
+  // De stageperiode hoort bij de gekozen opleiding: toon alleen de perioden van
+  // die opleiding, maak de keuze verplicht als er perioden zijn, en vul de
+  // gemaakte uren voor met de urennorm van de gekozen periode.
+  (function () {
+    var opl = document.querySelector('select[name="opleiding_id"]');
+    var per = document.getElementById('stageperiode-select');
+    var uren = document.getElementById('stage-uren');
+    var req = document.getElementById('periode-req');
+    var hint = document.getElementById('periode-hint');
+    if (!opl || !per) return;
+
+    var opties = Array.prototype.slice.call(per.querySelectorAll('option[data-opleiding]'));
+
+    function filter() {
+      var oid = opl.value;
+      var zichtbaar = 0;
+      opties.forEach(function (o) {
+        var match = (o.getAttribute('data-opleiding') === oid);
+        o.hidden = !match;
+        o.disabled = !match;
+        if (match) { zichtbaar++; }
+        if (!match && o.selected) { o.selected = false; per.value = ''; }
+      });
+      per.required = zichtbaar > 0;
+      if (req) { req.style.display = zichtbaar > 0 ? '' : 'none'; }
+      if (hint) {
+        hint.textContent = zichtbaar > 0
+          ? 'Verplicht voor deze opleiding.'
+          : (oid ? 'Deze opleiding heeft nog geen stageperioden.' : 'Kies eerst een opleiding.');
+      }
+    }
+
+    function vulUren() {
+      var o = per.options[per.selectedIndex];
+      var norm = o ? o.getAttribute('data-uren') : null;
+      if (norm) { uren.value = norm; }
+    }
+
+    opl.addEventListener('change', function () { per.value = ''; filter(); });
+    per.addEventListener('change', vulUren);
+    filter();
+  })();
+</script>
+@endpush

@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Opleiding;
 use App\Models\Organisatie;
 use App\Models\Stage;
+use App\Models\Stageperiode;
 use App\Models\Student;
 use App\Models\User;
 use App\Support\AuditLogger;
@@ -29,7 +30,7 @@ class StageController extends Controller
     {
         $stages = Stage::query()
             ->zichtbaarVoor($request->user())
-            ->with(['student', 'organisatie', 'opleiding', 'stagebegeleider', 'werkplekbegeleider'])
+            ->with(['student', 'organisatie', 'opleiding', 'stageperiode', 'stagebegeleider', 'werkplekbegeleider'])
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->query('status')))
             ->when($request->filled('opleiding'), fn ($q) => $q->where('opleiding_id', (int) $request->query('opleiding')))
             ->when($request->filled('organisatie'), fn ($q) => $q->where('organisatie_id', (int) $request->query('organisatie')))
@@ -121,6 +122,9 @@ class StageController extends Controller
             'opleidingen' => $opleidingen,
             'studenten' => $this->studenten($opleidingIds),
             'stageplaatsen' => $organisatie->stageplaatsen()->where('actief', true)->with('opleiding')->get(),
+            // Stageperioden van de beheerbare opleidingen; de view filtert ze per
+            // gekozen opleiding (data-attribuut) en vult de urennorm voor.
+            'stageperioden' => Stageperiode::whereIn('opleiding_id', $opleidingIds)->actief()->geordend()->get(),
             'begeleiders' => User::where('rol', Rol::Docent)->orderBy('naam')->get(),
             'werkplekbegeleiders' => $organisatie->contactpersonen()->where('actief', true)->orderBy('achternaam')->get(),
             'statussen' => Stagestatus::cases(),
@@ -196,14 +200,22 @@ class StageController extends Controller
         // een student buiten de eigen opleiding blijft geweigerd.
         $this->vertaalStudentZoek($request, $opleidingIds);
 
+        // Stageperiode: gebonden aan de GEKOZEN opleiding. Heeft die opleiding
+        // stageperioden, dan is een keuze verplicht (opdrachtgever 2026-07-22);
+        // opleidingen zonder perioden (bv. cursussen, PABO zolang leeg) blijven vrij.
+        $gekozenOpleiding = (int) $request->input('opleiding_id');
+        $periodeIds = Stageperiode::where('opleiding_id', $gekozenOpleiding)->actief()->pluck('id')->all();
+
         $regels = [
             'student_id' => ['required', 'integer', Rule::in($studentIds)],
             'opleiding_id' => ['required', 'integer', Rule::in($opleidingIds)],
+            'stageperiode_id' => [empty($periodeIds) ? 'nullable' : 'required', 'integer', Rule::in($periodeIds)],
             'stageplaats_id' => ['nullable', 'integer', Rule::in($stageplaatsIds)],
             'stagebegeleider_id' => ['nullable', 'integer', Rule::exists('users', 'id')->where('rol', Rol::Docent->value)],
             'werkplekbegeleider_id' => ['nullable', 'integer', Rule::in($contactpersoonIds)],
             'startdatum' => ['nullable', 'date'],
             'einddatum' => ['nullable', 'date', 'after_or_equal:startdatum'],
+            'uren' => ['nullable', 'integer', 'min:0', 'max:5000'],
             'status' => ['required', Rule::in(Stagestatus::waarden())],
         ];
 
@@ -212,11 +224,20 @@ class StageController extends Controller
             $regels['beoordeling_toelichting'] = ['nullable', 'string', 'max:2000'];
         }
 
-        return $request->validate($regels, [], [
+        $data = $request->validate($regels, [], [
             'student_id' => 'student',
             'opleiding_id' => 'opleiding',
+            'stageperiode_id' => 'stageperiode',
             'stageplaats_id' => 'stageplaats',
             'werkplekbegeleider_id' => 'werkplekbegeleider',
         ]);
+
+        // Uren niet ingevuld maar wel een stageperiode gekozen? Neem de urennorm
+        // als startwaarde over (de coördinator kan die later bijstellen).
+        if (($data['stageperiode_id'] ?? null) && ($data['uren'] ?? null) === null) {
+            $data['uren'] = Stageperiode::find($data['stageperiode_id'])?->verplichte_uren;
+        }
+
+        return $data;
     }
 }

@@ -201,6 +201,26 @@ class ReferentieController extends Controller
                     'actief' => ['label' => 'Actief', 'type' => 'checkbox'],
                 ],
             ],
+            'stageperioden' => [
+                'model' => \App\Models\Stageperiode::class, 'enkel' => 'Stageperiode', 'meer' => 'Stageperioden',
+                'kolommen' => [
+                    'Opleiding' => fn ($m) => $m->opleiding?->code ?? '—',
+                    'Naam' => fn ($m) => $m->naam,
+                    'Leerjaar' => fn ($m) => $m->leerjaar ?? '—',
+                    'Uren' => fn ($m) => $m->verplichte_uren,
+                    'Volgorde' => fn ($m) => $m->volgorde,
+                    'Actief' => fn ($m) => $m->actief ? 'Ja' : 'Nee',
+                ],
+                'velden' => [
+                    'opleiding_id' => ['label' => 'Opleiding', 'type' => 'belongsto', 'model' => Opleiding::class, 'toon' => 'naam', 'rules' => 'required|exists:opleidingen,id'],
+                    'naam' => ['label' => 'Naam', 'type' => 'text', 'rules' => 'required|string|max:255', 'hint' => 'Bijv. Verkennende stage, Stage 1, Grote Stage 2'],
+                    'code' => ['label' => 'Code', 'type' => 'text', 'rules' => 'nullable|string|max:30'],
+                    'leerjaar' => ['label' => 'Leerjaar', 'type' => 'number', 'rules' => 'nullable|integer|min:1|max:6', 'hint' => 'Leeg laten voor niet-jaargebonden stages (master)'],
+                    'verplichte_uren' => ['label' => 'Verplichte uren', 'type' => 'number', 'rules' => 'required|integer|min:1|max:2000'],
+                    'volgorde' => ['label' => 'Volgorde', 'type' => 'number', 'rules' => 'nullable|integer|min:0|max:255', 'hint' => 'Bepaalt de volgorde in de keuzelijst'],
+                    'actief' => ['label' => 'Actief', 'type' => 'checkbox'],
+                ],
+            ],
             'afdelingen' => [
                 'model' => Afdeling::class, 'enkel' => 'Afdeling', 'meer' => 'Afdelingen',
                 'kolommen' => [

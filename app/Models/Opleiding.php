@@ -58,4 +58,9 @@ class Opleiding extends Model
     {
         return $this->hasMany(Vak::class);
     }
+
+    public function stageperioden(): HasMany
+    {
+        return $this->hasMany(Stageperiode::class);
+    }
 }

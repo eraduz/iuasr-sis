@@ -133,13 +133,14 @@
     <div style="padding:14px 16px;"><p class="sis-muted" style="margin:0;">Nog geen studenten geplaatst.</p></div>
   @else
     <table class="iuasr-dash-tbl">
-      <thead><tr><th>Stagenr.</th><th>Student</th><th>Opleiding</th><th>Begeleiders</th><th>Periode</th><th style="text-align:center;">Status</th><th>Beoordeling</th>@if($magStage)<th class="row-act"></th>@endif</tr></thead>
+      <thead><tr><th>Stagenr.</th><th>Student</th><th>Opleiding</th><th>Stage</th><th>Begeleiders</th><th>Periode</th><th style="text-align:center;">Status</th><th>Beoordeling</th>@if($magStage)<th class="row-act"></th>@endif</tr></thead>
       <tbody>
         @foreach ($organisatie->stages as $stage)
           <tr>
             <td class="tnum">{{ $stage->stagenummer }}</td>
             <td class="nm">{{ $stage->student?->volledigeNaam() ?? '—' }}<br><small class="sis-muted">{{ $stage->student?->studentnummer }}</small></td>
             <td>{{ $stage->opleiding?->code ?? '—' }}</td>
+            <td>@if($stage->stageperiode)<small>{{ $stage->stageperiode->naam }}<br><span class="sis-muted">{{ $stage->uren ?? $stage->stageperiode->verplichte_uren }} / {{ $stage->stageperiode->verplichte_uren }} u</span></small>@else<span class="sis-muted">—</span>@endif</td>
             <td><small>{{ $stage->stagebegeleider?->naam ?? '—' }}<br>{{ $stage->werkplekbegeleider?->volledigeNaam() ?? '—' }}</small></td>
             <td class="dt"><small>{{ $stage->startdatum?->format('d-m-Y') ?? '—' }}@if($stage->einddatum)<br>t/m {{ $stage->einddatum->format('d-m-Y') }}@endif</small></td>
             <td style="text-align:center;"><span class="iuasr-dash-status {{ $stage->status?->badge() }}">{{ $stage->status?->label() }}</span></td>

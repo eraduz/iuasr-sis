@@ -104,6 +104,18 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
   klopt, gemigreerde resultaten hebben 0 NULL/mismatch `student_id`). Studentenzaken
   ziet cijfers bewust niet (rolscheiding); de docent kan de studentpagina niet openen.
   777 tests groen.
+  Daarna (2026-07-22): **stageperioden per opleiding** in de module Relatiebeheer &
+  Stage. Nieuwe tabel `stageperioden` (opleiding, naam, leerjaar, verplichte_uren,
+  volgorde, actief) — datagedreven, te beheren via Opzoektabellen (Beheer). Geseed:
+  **Bachelor Islamitische Theologie** = Verkennende stage (jaar 2, 140u), Stage 1
+  (jaar 3, 280u), Grote Stage 2 (jaar 4, 560u); **Master IGV (MGV)** = Snuffelstage
+  (40u), Grote stage (480u). PABO volgt (gegevens later). `stages` uitgebreid met
+  `stageperiode_id` + `uren` (gemaakte uren, standaard voorgevuld met de urennorm).
+  Het plaatsingsformulier toont de perioden afhankelijk van de gekozen opleiding
+  (JS-filter) en maakt de keuze verplicht zodra een opleiding perioden heeft
+  (opdrachtgever 2026-07-22). Weergave op de stageslijst en relatiekaart. 784 tests
+  groen (`StageperiodeTest`). Nog te doen: leerjaar-validatie bij plaatsing (alleen
+  studenten van het bij de stageperiode horende leerjaar tonen/toestaan).
 - **Laatst bijgewerkt:** 2026-07-22
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 
