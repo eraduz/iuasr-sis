@@ -2,99 +2,106 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\ResultatenCijferlijstMail;
+use App\Enums\CijferlijstStatus;
+use App\Jobs\VerstuurCijferlijst;
+use App\Models\Cijferlijst;
+use App\Models\Cijferlijstverzending;
 use App\Models\Inschrijving;
 use App\Models\Opleiding;
 use App\Models\Periode;
 use App\Models\Resultaat;
+use App\Models\Vak;
 use App\Support\AuditLogger;
-use App\Support\Documentondertekening;
-use App\Support\Transcript;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 
 /**
- * Verstuurt aan het einde van het blok de definitieve resultaten per e-mail naar
- * de studenten van een opleiding. Elke student krijgt INDIVIDUEEL zijn/haar eigen
- * officiële (ondertekende) cijferlijst als PDF-bijlage. Alleen vastgestelde
- * resultaten tellen mee; studenten zonder vastgestelde resultaten of zonder
- * e-mailadres worden overgeslagen. Voor Examencommissie en Directie; gelogd.
+ * Cijfers mailen (einde blok). De examencommissie/directie ziet per opleiding de
+ * blok-vakken met hun vaststellingsstatus en verstuurt met één klik de officiële
+ * cijferlijst naar de studenten. Elke student krijgt INDIVIDUEEL de eigen
+ * (ondertekende) PDF; alleen vastgestelde resultaten tellen mee.
+ *
+ * Het versturen gaat via de wachtrij ({@see VerstuurCijferlijst}) en wordt per
+ * (student, periode) geregistreerd in {@see Cijferlijstverzending} — dat voorkomt
+ * dubbel versturen en toont de status (in wachtrij / verzonden / mislukt).
  */
 class ResultatenMailController extends Controller
 {
-    /** Controlestap: toon wie een e-mail krijgt en wie wordt overgeslagen. */
+    /** Hub: alle (zichtbare) opleidingen van de actieve periode met status. */
+    public function hub(Request $request): View
+    {
+        $periode = Periode::where('actief', true)->firstOrFail();
+        $gebruiker = $request->user();
+
+        $opleidingen = Opleiding::where('actief', true)
+            ->when($gebruiker->isOpleidingBeperkt(), fn ($q) => $q->whereIn('id', $gebruiker->opleidingIds()))
+            ->orderBy('naam')->get();
+
+        $rijen = $opleidingen->map(function (Opleiding $opleiding) use ($periode) {
+            [$teVersturen, $overgeslagen, $alVerzonden] = $this->categoriseer($opleiding, $periode);
+            $vakken = $this->blokVakken($opleiding, $periode);
+
+            return [
+                'opleiding' => $opleiding,
+                'vakken' => $vakken,
+                'vastgesteld' => $vakken->filter(fn ($v) => $v['status'] === CijferlijstStatus::Vastgesteld)->count(),
+                'teVersturen' => count($teVersturen),
+                'overgeslagen' => count($overgeslagen),
+                'alVerzonden' => count($alVerzonden),
+            ];
+        })->filter(fn ($r) => $r['vakken']->isNotEmpty() || $r['teVersturen'] || $r['alVerzonden'])->values();
+
+        return view('cijfers.mailen', compact('periode', 'rijen'));
+    }
+
+    /** Detailoverzicht per opleiding: wie krijgt een mail, wie is al gemaild, wie overgeslagen. */
     public function overzicht(Request $request): View
     {
         $data = $request->validate(['opleiding_id' => ['required', 'exists:opleidingen,id']]);
         $opleiding = Opleiding::findOrFail($data['opleiding_id']);
         $this->autoriseerOpleiding($request, $opleiding);
-        [$teVersturen, $overgeslagen] = $this->bepaalOntvangers($opleiding);
+        $periode = Periode::where('actief', true)->firstOrFail();
 
-        return view('rapporten.resultaten-mailen', compact('opleiding', 'teVersturen', 'overgeslagen'));
+        [$teVersturen, $overgeslagen, $alVerzonden] = $this->categoriseer($opleiding, $periode);
+
+        return view('rapporten.resultaten-mailen', compact('opleiding', 'periode', 'teVersturen', 'overgeslagen', 'alVerzonden'));
     }
 
-    /** Definitief versturen. */
+    /** Definitief versturen (in de wachtrij). Met ?opnieuw=1 ook de al-gemailden. */
     public function versturen(Request $request): RedirectResponse
     {
         $data = $request->validate(['opleiding_id' => ['required', 'exists:opleidingen,id']]);
         $opleiding = Opleiding::findOrFail($data['opleiding_id']);
         $this->autoriseerOpleiding($request, $opleiding);
-        [$teVersturen] = $this->bepaalOntvangers($opleiding);
+        $periode = Periode::where('actief', true)->firstOrFail();
+        $opnieuw = $request->boolean('opnieuw');
 
-        $periodeNaam = Periode::where('actief', true)->value('naam') ?? '';
+        [$teVersturen] = $this->categoriseer($opleiding, $periode, includeAlVerzonden: $opnieuw);
+
         $aantal = 0;
-        $mislukt = [];
-
         foreach ($teVersturen as $rij) {
             $student = $rij['student'];
-
-            // Per student afgeschermd: een fout bij één student (ongeldig adres,
-            // mailserver onbereikbaar) mag de rest van de batch niet afbreken.
-            try {
-                $transcript = Transcript::voor($student, alleenDefinitief: true);
-
-                $html = view('pdf.cijferlijst', [
-                    'student' => $student, 'transcript' => $transcript, 'ondertekenaar' => auth()->user()->naam,
-                ])->render();
-
-                $doc = Documentondertekening::ondertekenHtml($html, [
-                    'type' => 'cijferlijst',
-                    'titel' => 'Cijferlijst '.$student->studentnummer,
-                    'student_id' => $student->id,
-                    'ontvanger' => $student->volledigeNaam().' (e-mail)',
-                    'uitgegeven_door_id' => auth()->id(),
-                ]);
-
-                Mail::to($rij['email'])->send(new ResultatenCijferlijstMail(
-                    $student->volledigeNaam(),
-                    $periodeNaam,
-                    Documentondertekening::pdfBytes($doc) ?? '',
-                    'Cijferlijst-'.$student->studentnummer.'.pdf',
-                ));
-
-                AuditLogger::log(AuditLogger::UITGIFTE, $student, veld: 'resultaten-email', context: [
-                    'opleiding' => $opleiding->code, 'code' => $doc->code,
-                ]);
-                $aantal++;
-            } catch (\Throwable $e) {
-                $mislukt[] = $student->studentnummer;
-                \Illuminate\Support\Facades\Log::error('Cijferlijst-e-mail mislukt', [
-                    'student' => $student->studentnummer, 'opleiding' => $opleiding->code, 'fout' => $e->getMessage(),
-                ]);
-            }
+            $verzending = Cijferlijstverzending::updateOrCreate(
+                ['student_id' => $student->id, 'periode_id' => $periode->id],
+                [
+                    'opleiding_id' => $opleiding->id, 'status' => 'in_wachtrij', 'ontvanger' => $rij['email'],
+                    'verzonden_door_id' => $request->user()->id, 'verzonden_op' => null, 'foutmelding' => null,
+                ]
+            );
+            VerstuurCijferlijst::dispatch($verzending->id, $request->user()->naam);
+            $aantal++;
         }
 
-        $redirect = redirect()->route('cijferlijst', ['opleiding_id' => $opleiding->id])
-            ->with('status', $aantal.' student(en) van '.$opleiding->code.' hebben hun cijferlijst per e-mail ontvangen.');
+        AuditLogger::log(AuditLogger::UITGIFTE, $opleiding, veld: 'resultaten-email-batch', context: [
+            'opleiding' => $opleiding->code, 'aantal' => $aantal, 'periode' => $periode->naam, 'opnieuw' => $opnieuw,
+        ]);
 
-        if ($mislukt !== []) {
-            $redirect->with('fout', count($mislukt).' verzending(en) mislukt (studentnummer: '
-                .implode(', ', $mislukt).'). Deze staan in de serverlog; probeer die studenten opnieuw.');
-        }
+        $melding = $aantal === 0
+            ? 'Geen studenten om te mailen voor '.$opleiding->code.' (alles is al verstuurd of er zijn geen vastgestelde resultaten).'
+            : $aantal.' cijferlijst(en) van '.$opleiding->code.' zijn in de wachtrij gezet en worden verstuurd.';
 
-        return $redirect;
+        return redirect()->route('cijfers-mailen')->with('status', $melding);
     }
 
     /** Directie mag alleen de eigen opleiding(en) mailen. */
@@ -106,24 +113,54 @@ class ResultatenMailController extends Controller
     }
 
     /**
-     * Splitst de actieve studenten van een opleiding in ontvangers en overgeslagen.
+     * De blok-vakken van een opleiding met hun cijferlijst-status in deze periode.
      *
-     * @return array{0: list<array{student: \App\Models\Student, email: string}>, 1: list<array{student: \App\Models\Student, reden: string}>}
+     * @return \Illuminate\Support\Collection<int, array{vak: Vak, status: CijferlijstStatus}>
      */
-    private function bepaalOntvangers(Opleiding $opleiding): array
+    private function blokVakken(Opleiding $opleiding, Periode $periode)
+    {
+        $vakken = Vak::where('opleiding_id', $opleiding->id)->where('actief', true)
+            ->orderBy('leerjaar')->orderBy('code')->get();
+        $lijsten = Cijferlijst::where('periode_id', $periode->id)->whereIn('vak_id', $vakken->pluck('id'))
+            ->get()->keyBy('vak_id');
+
+        return $vakken->map(fn (Vak $vak) => [
+            'vak' => $vak,
+            'status' => $lijsten[$vak->id]?->status ?? CijferlijstStatus::Concept,
+        ]);
+    }
+
+    /**
+     * Splitst de actieve studenten van een opleiding in: te versturen, overgeslagen
+     * (geen vastgestelde resultaten of geen e-mailadres) en al verzonden (deze periode).
+     *
+     * @return array{0: list<array{student: \App\Models\Student, email: string}>, 1: list<array{student: \App\Models\Student, reden: string}>, 2: list<array{student: \App\Models\Student, verzending: Cijferlijstverzending}>}
+     */
+    private function categoriseer(Opleiding $opleiding, Periode $periode, bool $includeAlVerzonden = false): array
     {
         $studenten = Inschrijving::where('status', 'actief')->where('opleiding_id', $opleiding->id)
             ->with('student')->get()->pluck('student')->filter()->unique('id');
 
+        $verzendingen = Cijferlijstverzending::where('periode_id', $periode->id)
+            ->whereIn('student_id', $studenten->pluck('id'))->get()->keyBy('student_id');
+
         $teVersturen = [];
         $overgeslagen = [];
+        $alVerzonden = [];
         foreach ($studenten as $student) {
-            $email = $student->email ?: $student->email_prive;
+            $v = $verzendingen->get($student->id);
+            $reeds = $v !== null && in_array($v->status, ['verzonden', 'in_wachtrij'], true);
+            if ($reeds && ! $includeAlVerzonden) {
+                $alVerzonden[] = ['student' => $student, 'verzending' => $v];
+
+                continue;
+            }
             if (! Resultaat::where('student_id', $student->id)->where('definitief', true)->exists()) {
                 $overgeslagen[] = ['student' => $student, 'reden' => 'geen vastgestelde resultaten'];
 
                 continue;
             }
+            $email = $student->email ?: $student->email_prive;
             if (! $email) {
                 $overgeslagen[] = ['student' => $student, 'reden' => 'geen e-mailadres'];
 
@@ -132,6 +169,6 @@ class ResultatenMailController extends Controller
             $teVersturen[] = ['student' => $student, 'email' => $email];
         }
 
-        return [$teVersturen, $overgeslagen];
+        return [$teVersturen, $overgeslagen, $alVerzonden];
     }
 }

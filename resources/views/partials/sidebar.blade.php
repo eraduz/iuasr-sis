@@ -25,6 +25,7 @@
             'taak' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>',
             'search' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
             'alert' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+            'mail' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>',
             default => '',
         };
     };
@@ -84,6 +85,8 @@
             'Cijfers' => [
                 ['Cijferoverzicht', 'cijferoverzicht', 'grade', 'cijferoverzicht'],
                 ['Cijferlijst', 'cijferlijst', 'report', 'cijferlijst'],
+                ['Cijfers mailen', 'cijfers-mailen', 'mail', 'cijfers-mailen'],
+                ['E-mailsjabloon', 'cijferlijst-sjabloon', 'report', 'cijferlijst-sjabloon'],
                 ['Leerjaar-herbeoordeling', 'overgang', 'grade', 'overgang'],
                 ['EC-rapport', 'ec-rapport', 'report', 'ec-rapport'],
                 ['Historisch dossier', 'historisch.index', 'db', 'historisch.*'],
@@ -100,6 +103,7 @@
             'Cijfers' => [
                 ['Cijferoverzicht', 'cijferoverzicht', 'eye', 'cijferoverzicht'],
                 ['Cijferlijst', 'cijferlijst', 'report', 'cijferlijst'],
+                ['Cijfers mailen', 'cijfers-mailen', 'mail', 'cijfers-mailen'],
                 ['Leerjaar-herbeoordeling', 'overgang', 'grade', 'overgang'],
                 ['EC-rapport', 'ec-rapport', 'report', 'ec-rapport'],
                 ['Historisch dossier', 'historisch.index', 'db', 'historisch.*'],

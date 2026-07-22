@@ -75,7 +75,49 @@ class ResultatenMailTest extends TestCase
         Mail::assertSent(ResultatenCijferlijstMail::class, 1);
         Mail::assertSent(ResultatenCijferlijstMail::class, fn ($m) => $m->hasTo('yasmin@example.test')
             && $m->hasCc('examencommissie@iuasr.nl')); // afdelings-CC: zichtbaarheid van verzonden post
-        $this->assertDatabaseHas('audit_logs', ['veld' => 'resultaten-email', 'actie' => 'uitgifte']);
+        $this->assertDatabaseHas('audit_logs', ['veld' => 'resultaten-email-batch', 'actie' => 'uitgifte']);
+        // De verzending is per (student, periode) geregistreerd (queue draait sync in tests).
+        $this->assertDatabaseHas('cijferlijstverzendingen', ['student_id' => $this->student->id, 'status' => 'verzonden']);
+    }
+
+    public function test_al_gemaild_deze_periode_wordt_niet_dubbel_verstuurd(): void
+    {
+        Storage::fake('local');
+        Mail::fake();
+        $this->actingAs($this->examencommissie())
+            ->post(route('resultaten-mailen.versturen'), ['opleiding_id' => $this->opleidingId])->assertRedirect();
+        Mail::assertSent(ResultatenCijferlijstMail::class, 1);
+
+        // Tweede keer zonder 'opnieuw' -> student is al verzonden -> geen nieuwe mail.
+        Mail::fake();
+        $this->actingAs($this->examencommissie())
+            ->post(route('resultaten-mailen.versturen'), ['opleiding_id' => $this->opleidingId])->assertRedirect();
+        Mail::assertNothingSent();
+
+        // Met 'opnieuw' wordt hij wél opnieuw verstuurd.
+        Mail::fake();
+        $this->actingAs($this->examencommissie())
+            ->post(route('resultaten-mailen.versturen'), ['opleiding_id' => $this->opleidingId, 'opnieuw' => '1'])->assertRedirect();
+        Mail::assertSent(ResultatenCijferlijstMail::class, 1);
+    }
+
+    public function test_cijfers_mailen_hub_is_bereikbaar(): void
+    {
+        $this->actingAs($this->examencommissie())->get(route('cijfers-mailen'))
+            ->assertOk()->assertSee('Cijfers mailen')->assertSee('te versturen');
+    }
+
+    public function test_alleen_examencommissie_beheert_het_e_mailsjabloon(): void
+    {
+        $this->actingAs($this->examencommissie())->get(route('cijferlijst-sjabloon'))->assertOk()->assertSee('E-mailsjabloon');
+
+        $this->actingAs($this->examencommissie())
+            ->post(route('cijferlijst-sjabloon.update'), ['onderwerp' => 'Uw cijfers', 'inhoud' => 'Beste {{Naam}}, uw resultaten staan klaar.'])
+            ->assertRedirect();
+        $this->assertDatabaseHas('cijferlijstsjablonen', ['onderwerp' => 'Uw cijfers']);
+
+        // Directie verstuurt wel, maar beheert het sjabloon niet.
+        $this->actingAs(User::where('rol', Rol::Directie)->first())->get(route('cijferlijst-sjabloon'))->assertForbidden();
     }
 
     public function test_student_zonder_emailadres_wordt_overgeslagen(): void

@@ -183,7 +183,18 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
   examencommissie zijn — rood, pulseert een paar keer (`@keyframes sisFlits`,
   respecteert `prefers-reduced-motion`) en blijft daarna staan; linkt naar de
   bestaande verwerk-kaart (`#vrijstellingsbesluiten`). 808 tests groen
-  (`VrijstellingsbesluitTest`).
+  (`VrijstellingsbesluitTest`). Daarna **cijfers-mailproces herbouwd**: (1) verzending
+  robuust (per-student try/catch) en daarna volledig **via de wachtrij** (nieuwe job
+  `App\Jobs\VerstuurCijferlijst`, `ShouldQueue`, retry); (2) **"al gemaild deze
+  periode"** via nieuwe tabel `cijferlijstverzendingen` (uniek student×periode,
+  status in_wachtrij/verzonden/mislukt) — dubbel versturen wordt overgeslagen tenzij
+  "Opnieuw versturen"; (3) nieuwe **hub-pagina "Cijfers mailen"** (`cijfers-mailen`,
+  Examencommissie+Directie) met per opleiding de blok-vakken + vaststellingsstatus,
+  ontvangerstellers en één-klik versturen; (4) **bewerkbaar e-mailsjabloon**
+  (`Cijferlijstsjabloon`, onderwerp+tekst met `{{Naam}}/{{Periode}}/{{Opleiding}}`,
+  route `cijferlijst-sjabloon`, **alleen Examencommissie** — opdrachtgever). Menu-items
+  toegevoegd. 811 tests groen (`ResultatenMailTest`). Deploy: vereist `MAIL_*` +
+  draaiende `queue:work`.
 - **Laatst bijgewerkt:** 2026-07-22
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 

@@ -616,12 +616,20 @@ Route::middleware('auth')->group(function () {
         Route::post('/cijferlijst/{student}/pdf', [RapportController::class, 'cijferlijstPdf'])->name('cijferlijst.pdf');
         // EC-rapport (studievoortgang per opleiding/klas).
         Route::get('/ec-rapport', [RapportController::class, 'ecRapport'])->name('ec-rapport');
-        // Definitieve resultaten per e-mail naar studenten (per opleiding).
+        // Cijfers mailen (einde blok): hub met alle opleidingen, blok-vakken + status
+        // en één-klik versturen (via de wachtrij), plus de per-opleiding detailpreview.
+        Route::get('/cijfers-mailen', [App\Http\Controllers\ResultatenMailController::class, 'hub'])->name('cijfers-mailen');
         Route::get('/resultaten-mailen', [App\Http\Controllers\ResultatenMailController::class, 'overzicht'])->name('resultaten-mailen');
         Route::post('/resultaten-mailen', [App\Http\Controllers\ResultatenMailController::class, 'versturen'])->name('resultaten-mailen.versturen');
         // Vrijstellingsbesluit vastleggen en naar Studentenzaken sturen.
         Route::post('/studenten/{student}/vrijstellingsbesluiten', [App\Http\Controllers\VrijstellingsbesluitController::class, 'store'])->name('vrijstellingsbesluiten.store');
         Route::post('/vrijstellingsbesluiten/{besluit}/annuleren', [App\Http\Controllers\VrijstellingsbesluitController::class, 'annuleer'])->name('vrijstellingsbesluiten.annuleren');
+    });
+
+    // --- E-mailsjabloon cijferlijst-mail — alleen de examencommissie ---
+    Route::middleware('rol:examencommissie')->group(function () {
+        Route::get('/cijferlijst-sjabloon', [App\Http\Controllers\CijferlijstsjabloonController::class, 'edit'])->name('cijferlijst-sjabloon');
+        Route::post('/cijferlijst-sjabloon', [App\Http\Controllers\CijferlijstsjabloonController::class, 'update'])->name('cijferlijst-sjabloon.update');
     });
 
     // --- Alumni-rapport — Studentenzaken, Examencommissie, Directie & Schoolbestuur ---
