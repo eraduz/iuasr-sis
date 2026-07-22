@@ -95,7 +95,15 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
   (`poging='herkansing2'`, `poging_nr=3`); de beste van alle pogingen telt mee.
   Geen migratie nodig (kolom `poging` was al vrije string; `Cijferberekening::beste`
   nam al het hoogste cijfer). `Statistiek::herkansingen()` telt nu `poging_nr > 1`.
-  Handleidingen bijgewerkt en opnieuw gegenereerd. 773 tests groen.
+  Handleidingen bijgewerkt en opnieuw gegenereerd. Daarna een **complete
+  cijferworkflow-integratietest** (`CijferworkflowIntegratieTest`) toegevoegd die
+  de vier rollen end-to-end simuleert: docent voert in en dient in → examencommissie
+  ziet en stelt vast → directie (eigen opleiding) leest mee → studentenzaken is
+  afgeschermd. Bevestigd dat door de docent ingevoerde cijfers zichtbaar zijn op de
+  studentpagina (het gemelde "integratieprobleem" bleek geen codefout: de weergave
+  klopt, gemigreerde resultaten hebben 0 NULL/mismatch `student_id`). Studentenzaken
+  ziet cijfers bewust niet (rolscheiding); de docent kan de studentpagina niet openen.
+  777 tests groen.
 - **Laatst bijgewerkt:** 2026-07-22
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 
