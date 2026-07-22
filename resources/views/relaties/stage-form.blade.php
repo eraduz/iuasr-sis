@@ -33,7 +33,8 @@
         $gekozen = $stage->student ?? $studenten->firstWhere('id', (int) old('student_id', $stage->student_id));
         $studentWaarde = old('student_zoek', $gekozen ? $gekozen->studentnummer.' — '.$gekozen->volledigeNaam() : '');
       @endphp
-      @include('partials.studentkiezer', ['naam' => 'student_zoek', 'lijstId' => 'stage-studenten', 'waarde' => $studentWaarde])
+      @include('partials.studentkiezer', ['naam' => 'student_zoek', 'lijstId' => 'stage-studenten', 'waarde' => $studentWaarde, 'leerjaren' => $leerjaren])
+      <small class="sis-muted" id="leerjaar-waarschuwing" style="display:none;color:var(--secColor100,#C8102E);font-weight:600;"></small>
     </div>
     <div class="sis-fld">
       <label>Opleiding <span class="req">*</span></label>
@@ -54,7 +55,7 @@
       <select name="stageperiode_id" id="stageperiode-select">
         <option value="">— kies een stageperiode —</option>
         @foreach ($stageperioden as $p)
-          <option value="{{ $p->id }}" data-opleiding="{{ $p->opleiding_id }}" data-uren="{{ $p->verplichte_uren }}" @selected((int) $sppid === $p->id)>{{ $p->keuzelabel() }}</option>
+          <option value="{{ $p->id }}" data-opleiding="{{ $p->opleiding_id }}" data-uren="{{ $p->verplichte_uren }}" data-leerjaar="{{ $p->leerjaar ?? '' }}" @selected((int) $sppid === $p->id)>{{ $p->keuzelabel() }}</option>
         @endforeach
       </select>
       <small class="sis-muted" id="periode-hint">Kies eerst een opleiding; de bijbehorende stages verschijnen dan.</small>
@@ -180,9 +181,64 @@
       if (norm) { uren.value = norm; }
     }
 
-    opl.addEventListener('change', function () { per.value = ''; filter(); });
-    per.addEventListener('change', vulUren);
+    // --- Leerjaar-filter op de studentenlijst -------------------------------
+    // Stage begint pas in een bepaald leerjaar (bv. jaar 2). Kiest men een
+    // stageperiode met een leerjaar, dan toont de datalist alleen studenten van
+    // dat leerjaar; kiest men toch een ander jaar (kaal nummer getypt), dan een
+    // zichtbare waarschuwing — maar opslaan blijft toegestaan.
+    var studentInput = document.querySelector('input[name="student_zoek"]');
+    var datalist = document.getElementById('stage-studenten');
+    var waarsch = document.getElementById('leerjaar-waarschuwing');
+    var alleOpties = datalist ? Array.prototype.slice.call(datalist.querySelectorAll('option')) : [];
+
+    function jarenVan(optie) {
+      try { return JSON.parse(optie.getAttribute('data-leerjaren') || '{}'); } catch (e) { return {}; }
+    }
+    function nummerVan(waarde) { return (waarde || '').split(/\s|—/)[0].trim(); }
+
+    function gekozenPeriode() {
+      var o = per.options[per.selectedIndex];
+      if (!o || !o.value) return null;
+      var lj = o.getAttribute('data-leerjaar');
+      return { opleiding: o.getAttribute('data-opleiding'), leerjaar: (lj === '' ? null : lj) };
+    }
+
+    function filterStudenten() {
+      if (!datalist) return;
+      var p = gekozenPeriode();
+      datalist.innerHTML = '';
+      alleOpties.forEach(function (o) {
+        var toon = true;
+        if (p && p.leerjaar !== null) {
+          var j = jarenVan(o);
+          toon = (String(j[p.opleiding]) === String(p.leerjaar));
+        }
+        if (toon) datalist.appendChild(o);
+      });
+    }
+
+    function controleerLeerjaar() {
+      if (!waarsch || !studentInput) return;
+      var p = gekozenPeriode();
+      var nr = nummerVan(studentInput.value);
+      if (!p || p.leerjaar === null || !nr) { waarsch.style.display = 'none'; return; }
+      var match = alleOpties.filter(function (o) { return nummerVan(o.value) === nr; })[0];
+      var j = match ? jarenVan(match) : {};
+      var studentJaar = j[p.opleiding];
+      if (studentJaar !== undefined && String(studentJaar) !== String(p.leerjaar)) {
+        waarsch.textContent = 'Let op: deze student staat in jaar ' + studentJaar + ', maar deze stage hoort bij jaar ' + p.leerjaar + '. Opslaan mag, maar controleer dit.';
+        waarsch.style.display = '';
+      } else {
+        waarsch.style.display = 'none';
+      }
+    }
+
+    opl.addEventListener('change', function () { per.value = ''; filter(); filterStudenten(); controleerLeerjaar(); });
+    per.addEventListener('change', function () { vulUren(); filterStudenten(); controleerLeerjaar(); });
+    if (studentInput) { studentInput.addEventListener('input', controleerLeerjaar); }
     filter();
+    filterStudenten();
+    controleerLeerjaar();
   })();
 </script>
 @endpush

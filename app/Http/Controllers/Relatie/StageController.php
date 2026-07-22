@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Relatie;
 use App\Enums\Rol;
 use App\Enums\Stagestatus;
 use App\Http\Controllers\Controller;
+use App\Models\Inschrijving;
 use App\Models\Opleiding;
 use App\Models\Organisatie;
 use App\Models\Stage;
@@ -85,7 +86,12 @@ class StageController extends Controller
 
         AuditLogger::log(AuditLogger::AANMAAK, $stage, veld: 'stage', context: ['stagenummer' => $stage->stagenummer]);
 
-        return redirect()->route('relaties.show', $organisatie)->with('status', 'Stage geplaatst ('.$stage->stagenummer.').');
+        $redirect = redirect()->route('relaties.show', $organisatie)->with('status', 'Stage geplaatst ('.$stage->stagenummer.').');
+        if ($waarschuwing = $this->leerjaarWaarschuwing($stage)) {
+            $redirect->with('waarschuwing', $waarschuwing);
+        }
+
+        return $redirect;
     }
 
     public function edit(Request $request, Stage $stage): View
@@ -108,7 +114,12 @@ class StageController extends Controller
             'status' => $stage->status?->value,
         ] + ($beoordelingGewijzigd ? ['beoordeling' => $stage->beoordeling] : []));
 
-        return redirect()->route('relaties.show', $stage->organisatie)->with('status', 'Stage bijgewerkt.');
+        $redirect = redirect()->route('relaties.show', $stage->organisatie)->with('status', 'Stage bijgewerkt.');
+        if ($waarschuwing = $this->leerjaarWaarschuwing($stage)) {
+            $redirect->with('waarschuwing', $waarschuwing);
+        }
+
+        return $redirect;
     }
 
     private function formData(Request $request, Organisatie $organisatie, Stage $stage): array
@@ -121,6 +132,9 @@ class StageController extends Controller
             'stage' => $stage,
             'opleidingen' => $opleidingen,
             'studenten' => $this->studenten($opleidingIds),
+            // Per student het leerjaar per opleiding (voor de leerjaar-filter op het
+            // studentveld en de live waarschuwing bij een afwijkend leerjaar).
+            'leerjaren' => $this->studentLeerjaren($opleidingIds),
             'stageplaatsen' => $organisatie->stageplaatsen()->where('actief', true)->with('opleiding')->get(),
             // Stageperioden van de beheerbare opleidingen; de view filtert ze per
             // gekozen opleiding (data-attribuut) en vult de urennorm voor.
@@ -162,6 +176,60 @@ class StageController extends Controller
 
         return Student::whereHas('inschrijvingen', fn ($q) => $q->where('status', 'actief')->whereIn('opleiding_id', $opleidingIds))
             ->orderBy('achternaam')->orderBy('voornaam')->get();
+    }
+
+    /**
+     * Per student het actieve leerjaar per opleiding, gesleuteld op studentnummer:
+     * ['261234' => [opleiding_id => leerjaar]]. Voedt de leerjaar-filter op het
+     * studentveld en de waarschuwing bij een afwijkend leerjaar.
+     *
+     * @return array<string, array<int, int>>
+     */
+    private function studentLeerjaren(array $opleidingIds): array
+    {
+        if (empty($opleidingIds)) {
+            return [];
+        }
+
+        return Inschrijving::query()
+            ->where('inschrijvingen.status', 'actief')
+            ->whereIn('inschrijvingen.opleiding_id', $opleidingIds)
+            ->join('studenten', 'studenten.id', '=', 'inschrijvingen.student_id')
+            ->get(['studenten.studentnummer', 'inschrijvingen.opleiding_id', 'inschrijvingen.leerjaar'])
+            ->groupBy('studentnummer')
+            ->map(fn ($rijen) => $rijen->pluck('leerjaar', 'opleiding_id'))
+            ->toArray();
+    }
+
+    /**
+     * Waarschuwing als het leerjaar van de student niet overeenkomt met het
+     * leerjaar van de gekozen stageperiode. Niet-blokkerend (opdrachtgever
+     * 2026-07-22): een vertraagde student mag bewust worden geplaatst. Perioden
+     * zonder leerjaar (master) leveren nooit een waarschuwing.
+     */
+    private function leerjaarWaarschuwing(Stage $stage): ?string
+    {
+        $periode = $stage->stageperiode()->first();
+        if ($periode === null || $periode->leerjaar === null) {
+            return null;
+        }
+
+        $leerjaar = Inschrijving::where('student_id', $stage->student_id)
+            ->where('opleiding_id', $stage->opleiding_id)
+            ->where('status', 'actief')
+            ->value('leerjaar');
+
+        if ($leerjaar === null || (int) $leerjaar === (int) $periode->leerjaar) {
+            return null;
+        }
+
+        return sprintf(
+            '%s staat in jaar %d ingeschreven, maar %s hoort bij jaar %d. De plaatsing is opgeslagen.',
+            $stage->student->volledigeNaam(),
+            $leerjaar,
+            $periode->naam,
+            $periode->leerjaar,
+        );
     }
 
     /**

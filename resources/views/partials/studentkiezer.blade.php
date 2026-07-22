@@ -19,13 +19,15 @@
 @php
     $lijstId = $lijstId ?? ($naam.'-lijst');
     $verplicht = $verplicht ?? true;
+    // Optioneel: per studentnummer het leerjaar per opleiding, voor leerjaar-filters.
+    $leerjaren = $leerjaren ?? [];
 @endphp
 <input type="text" name="{{ $naam }}" list="{{ $lijstId }}" value="{{ $waarde ?? '' }}"
        autocomplete="off" placeholder="Typ een studentnummer of naam…"
        @if ($verplicht) required @endif>
 <datalist id="{{ $lijstId }}">
   @foreach ($studenten as $s)
-    <option value="{{ $s->studentnummer }} — {{ $s->volledigeNaam() }}"></option>
+    <option value="{{ $s->studentnummer }} — {{ $s->volledigeNaam() }}"@isset($leerjaren[$s->studentnummer]) data-leerjaren="{{ json_encode($leerjaren[$s->studentnummer]) }}"@endisset></option>
   @endforeach
 </datalist>
 <small class="sis-muted">{{ $studenten->count() }} {{ $studenten->count() === 1 ? 'student' : 'studenten' }} beschikbaar. Typ een deel van het nummer of de naam en kies uit de lijst.</small>

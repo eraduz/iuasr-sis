@@ -146,4 +146,68 @@ class StageperiodeTest extends TestCase
             'status' => 'aangevraagd',
         ])->assertSessionHasErrors('stageperiode_id');
     }
+
+    /** Zet het leerjaar van de actieve ISLTH-inschrijving van de teststudent. */
+    private function zetLeerjaar(int $leerjaar): void
+    {
+        $this->islthStudent->inschrijvingen()
+            ->where('opleiding_id', $this->islthId)->where('status', 'actief')
+            ->firstOrFail()->update(['leerjaar' => $leerjaar]);
+    }
+
+    public function test_afwijkend_leerjaar_geeft_waarschuwing_maar_slaat_wel_op(): void
+    {
+        // Stage 1 hoort bij jaar 3; de student staat in jaar 1.
+        $this->zetLeerjaar(1);
+
+        $this->actingAs($this->beheerder)->post(route('stages.store', $this->islthOrg), [
+            'student_id' => $this->islthStudent->id,
+            'opleiding_id' => $this->islthId,
+            'stageperiode_id' => $this->stage1->id,
+            'status' => 'aangevraagd',
+        ])->assertRedirect()->assertSessionHas('waarschuwing');
+
+        // Ondanks de waarschuwing is de plaatsing opgeslagen (niet-blokkerend).
+        $this->assertDatabaseHas('stages', [
+            'student_id' => $this->islthStudent->id,
+            'stageperiode_id' => $this->stage1->id,
+        ]);
+    }
+
+    public function test_passend_leerjaar_geeft_geen_waarschuwing(): void
+    {
+        // Stage 1 hoort bij jaar 3; zet de student in jaar 3.
+        $this->zetLeerjaar(3);
+
+        $this->actingAs($this->beheerder)->post(route('stages.store', $this->islthOrg), [
+            'student_id' => $this->islthStudent->id,
+            'opleiding_id' => $this->islthId,
+            'stageperiode_id' => $this->stage1->id,
+            'status' => 'aangevraagd',
+        ])->assertRedirect()->assertSessionMissing('waarschuwing');
+    }
+
+    public function test_stageperiode_zonder_leerjaar_geeft_nooit_een_waarschuwing(): void
+    {
+        $this->zetLeerjaar(1);
+        $vrij = Stageperiode::create([
+            'opleiding_id' => $this->islthId, 'naam' => 'Vrije stage',
+            'verplichte_uren' => 100, 'leerjaar' => null, 'actief' => true,
+        ]);
+
+        $this->actingAs($this->beheerder)->post(route('stages.store', $this->islthOrg), [
+            'student_id' => $this->islthStudent->id,
+            'opleiding_id' => $this->islthId,
+            'stageperiode_id' => $vrij->id,
+            'status' => 'aangevraagd',
+        ])->assertRedirect()->assertSessionMissing('waarschuwing');
+    }
+
+    public function test_studentveld_bevat_leerjaar_data_voor_de_filter(): void
+    {
+        $this->actingAs($this->beheerder)->get(route('stages.create', $this->islthOrg))
+            ->assertOk()
+            ->assertSee('data-leerjaren', false)
+            ->assertSee('data-leerjaar=', false);
+    }
 }

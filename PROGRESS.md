@@ -113,9 +113,15 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
   `stageperiode_id` + `uren` (gemaakte uren, standaard voorgevuld met de urennorm).
   Het plaatsingsformulier toont de perioden afhankelijk van de gekozen opleiding
   (JS-filter) en maakt de keuze verplicht zodra een opleiding perioden heeft
-  (opdrachtgever 2026-07-22). Weergave op de stageslijst en relatiekaart. 784 tests
-  groen (`StageperiodeTest`). Nog te doen: leerjaar-validatie bij plaatsing (alleen
-  studenten van het bij de stageperiode horende leerjaar tonen/toestaan).
+  (opdrachtgever 2026-07-22). Weergave op de stageslijst en relatiekaart. Daarna
+  **leerjaar-koppeling** bij het plaatsen: elke stageperiode heeft een leerjaar;
+  kiest men een periode, dan toont de studentenlijst alleen studenten van dat
+  leerjaar (client-side datalist-filter op `data-leerjaren`), met een live
+  waarschuwing én een server-side flash-waarschuwing (`session('waarschuwing')`,
+  nieuw geel kanaal in de layout) als toch een afwijkend leerjaar wordt vastgelegd
+  — **niet blokkerend** (opdrachtgever 2026-07-22: vertraagde studenten mogen
+  bewust worden geplaatst). Masterstages (leerjaar null) kennen deze controle niet.
+  788 tests groen (`StageperiodeTest`).
 - **Laatst bijgewerkt:** 2026-07-22
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 
