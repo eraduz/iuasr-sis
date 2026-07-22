@@ -178,7 +178,12 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
   geïmporteerde dossiers is er een eenmalig commando `sis:email-prive-corrigeren`
   (proefdraai + `--apply`); daarmee zijn in de dev-database **2.862** adressen van
   `email` naar `email_prive` verplaatst (geen dataverlies). MigratieTest bevestigt
-  de mapping.
+  de mapping. Daarna (opdrachtgever): **opvallende flits-alert** bovenaan het
+  Studentenzaken-dashboard zodra er open **vrijstellingsbesluiten** van de
+  examencommissie zijn — rood, pulseert een paar keer (`@keyframes sisFlits`,
+  respecteert `prefers-reduced-motion`) en blijft daarna staan; linkt naar de
+  bestaande verwerk-kaart (`#vrijstellingsbesluiten`). 808 tests groen
+  (`VrijstellingsbesluitTest`).
 - **Laatst bijgewerkt:** 2026-07-22
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 

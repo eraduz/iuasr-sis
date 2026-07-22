@@ -94,6 +94,28 @@ class VrijstellingsbesluitTest extends TestCase
         $this->assertSame(VrijstellingsbesluitStatus::Open, $besluit->fresh()->status);
     }
 
+    public function test_open_besluit_toont_flits_alert_op_sz_dashboard(): void
+    {
+        Vrijstellingsbesluit::create($this->besluitData() + [
+            'student_id' => $this->student->id,
+            'status' => 'open', 'aangemaakt_door_id' => User::where('rol', Rol::Examencommissie)->first()->id,
+        ]);
+
+        $this->actingAs(User::where('rol', Rol::Studentenzaken)->first())
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('sis-flits-alert', false)     // de opvallende (pulserende) alert
+            ->assertSee('wacht op verwerking');       // de meldingstekst (1 verzoek)
+    }
+
+    public function test_geen_flits_alert_zonder_open_besluiten(): void
+    {
+        $this->actingAs(User::where('rol', Rol::Studentenzaken)->first())
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertDontSee('sis-flits-alert', false);
+    }
+
     public function test_rolscheiding_besluit_workflow(): void
     {
         // Studentenzaken mag GEEN besluit aanmaken (dat is de examencommissie).

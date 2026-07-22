@@ -9,6 +9,27 @@
 
 @section('inhoud')
 
+{{-- Vrijstellingsverzoeken van de examencommissie — een opvallende flits-alert
+     bovenaan zodat Studentenzaken ze niet mist. Flitst een paar keer rood en
+     blijft daarna staan zolang er iets te verwerken is. --}}
+@if (isset($openBesluiten) && $openBesluiten->isNotEmpty())
+  <style>
+    @keyframes sisFlits { 0%, 100% { background: var(--secColor100, #C8102E); color: #fff; } 50% { background: #fff; color: var(--secColor100, #C8102E); } }
+    .sis-flits-alert {
+      display: flex; align-items: center; gap: 12px; text-decoration: none; font-weight: 600;
+      border: 2px solid var(--secColor100, #C8102E); border-radius: 10px; padding: 13px 16px; margin-bottom: 16px;
+      background: var(--secColor100, #C8102E); color: #fff; animation: sisFlits 0.75s ease-in-out 5;
+    }
+    .sis-flits-alert:hover { filter: brightness(0.95); }
+    .sis-flits-alert .pill { background: #fff; color: var(--secColor100, #C8102E); border-radius: 999px; padding: 1px 10px; font-weight: 800; }
+    @media (prefers-reduced-motion: reduce) { .sis-flits-alert { animation: none; } }
+  </style>
+  <a href="#vrijstellingsbesluiten" class="sis-flits-alert">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span>Let op — <span class="pill">{{ $openBesluiten->count() }}</span> vrijstellings{{ $openBesluiten->count() === 1 ? 'verzoek van' : 'verzoeken van' }} de examencommissie {{ $openBesluiten->count() === 1 ? 'wacht' : 'wachten' }} op verwerking. Klik om te verwerken.</span>
+  </a>
+@endif
+
 {{-- Mijn taken — bovenaan het dashboard: dit is het eerste wat een medewerker
      moet zien. Eigen taken plus vrij op te pakken taken, binnen 7 dagen of te laat. --}}
 @if ($mijnTaken->isNotEmpty())
@@ -148,7 +169,7 @@
   @endif
 
   @if ($openBesluiten->isNotEmpty())
-    <div class="sis-card" style="margin-top:16px;border-left:3px solid var(--secColor100);">
+    <div class="sis-card" id="vrijstellingsbesluiten" style="margin-top:16px;border-left:3px solid var(--secColor100);">
       <div class="sis-card__hd"><h3>Vrijstellingsbesluiten van de examencommissie</h3><span class="hint">{{ $openBesluiten->count() }} te verwerken</span></div>
       <div class="iuasr-dash-tbl-card" style="border:0;">
         <table class="iuasr-dash-tbl">
