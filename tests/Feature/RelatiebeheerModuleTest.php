@@ -36,6 +36,15 @@ class RelatiebeheerModuleTest extends TestCase
         $this->beheerder = User::where('rol', Rol::Beheerder)->firstOrFail();
     }
 
+    public function test_az_index_filtert_organisaties_op_naam(): void
+    {
+        // Seed: Basisschool De Regenboog (B) en Moskee An-Nasr (M).
+        $this->actingAs($this->beheerder)->get(route('relaties', ['letter' => 'B', 'status' => 'actief']))
+            ->assertOk()
+            ->assertSee('Basisschool De Regenboog')
+            ->assertDontSee('Moskee An-Nasr');
+    }
+
     public function test_relatiebeheerder_ziet_de_organisatielijst(): void
     {
         $this->actingAs($this->relatiebeheerder)->get(route('relaties'))->assertOk();

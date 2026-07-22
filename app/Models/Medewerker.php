@@ -176,6 +176,18 @@ class Medewerker extends Model
         return $query->whereIn('id', $ids);
     }
 
+    /** A–Z-index op achternaam; '#' vangt niet-Latijnse beginletters. */
+    public function scopeBeginletter($query, string $letter)
+    {
+        $letter = mb_strtoupper(trim($letter));
+
+        if ($letter === '#') {
+            return $query->whereRaw('UPPER(LEFT(achternaam, 1)) NOT BETWEEN ? AND ?', ['A', 'Z']);
+        }
+
+        return $query->where('achternaam', 'like', $letter.'%');
+    }
+
     public function zichtbaarVoor(User $gebruiker): bool
     {
         if (! $gebruiker->isHrTeamBeperkt()) {

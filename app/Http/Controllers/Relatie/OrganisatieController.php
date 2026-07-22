@@ -44,14 +44,17 @@ class OrganisatieController extends Controller
             ->when($request->filled('opleiding'), fn ($q) => $q->whereHas('opleidingen', fn ($o) => $o->where('opleidingen.id', (int) $request->query('opleiding'))))
             ->when($request->query('status', 'actief') === 'actief', fn ($q) => $q->where('actief', true))
             ->when($request->query('status') === 'inactief', fn ($q) => $q->where('actief', false))
+            ->when($request->filled('letter'), fn ($q) => $q->beginletter((string) $request->query('letter')))
             ->orderBy('naam')
-            ->paginate(25)
+            ->paginate(\App\Support\Paginakeuze::aantal($request))
             ->withQueryString();
 
         return view('relaties.index', [
             'organisaties' => $organisaties,
             'zoek' => (string) $request->query('q', ''),
             'status' => (string) $request->query('status', 'actief'),
+            'letterFilter' => mb_strtoupper((string) $request->query('letter', '')),
+            'perPagina' => \App\Support\Paginakeuze::aantal($request),
             'typeFilter' => (int) $request->query('type', 0),
             'opleidingFilter' => (int) $request->query('opleiding', 0),
             'types' => $this->beschikbareTypes($request),

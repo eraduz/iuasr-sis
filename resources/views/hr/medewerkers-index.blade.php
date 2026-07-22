@@ -15,6 +15,7 @@
 </div>
 
 <form method="GET" action="{{ route('medewerkers') }}" class="sis-toolbar" style="margin-bottom:12px; gap:8px; flex-wrap:wrap;">
+  <input type="hidden" name="per" value="{{ $perPagina }}">
   <input type="search" name="q" value="{{ $zoek }}" placeholder="Zoek op naam of personeelsnummer">
   <select name="afdeling"><option value="">Alle afdelingen</option>@foreach ($afdelingen as $a)<option value="{{ $a->id }}" @selected($afdelingFilter === $a->id)>{{ $a->naam }}</option>@endforeach</select>
   <select name="functie"><option value="">Alle functies</option>@foreach ($functies as $f)<option value="{{ $f->id }}" @selected($functieFilter === $f->id)>{{ $f->naam }}</option>@endforeach</select>
@@ -22,6 +23,8 @@
   <select name="soort"><option value="">Personeel + vrijwilligers</option>@foreach ($soorten as $s)<option value="{{ $s->value }}" @selected($soortFilter === $s->value)>{{ $s->label() }}</option>@endforeach</select>
   <button class="iuasr-dash-btn iuasr-dash-btn--sm" type="submit">Filteren</button>
 </form>
+
+@include('partials.az-index', ['route' => 'medewerkers', 'letterFilter' => $letterFilter, 'perPagina' => $perPagina])
 
 <div class="iuasr-dash-tbl-card">
   <table class="iuasr-dash-tbl">

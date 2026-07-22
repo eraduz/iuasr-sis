@@ -111,6 +111,18 @@ class Organisatie extends Model
         return $query->whereHas('opleidingen', fn ($q) => $q->whereIn('opleidingen.id', $ids));
     }
 
+    /** A–Z-index op naam; '#' vangt niet-Latijnse beginletters (cijfers e.d.). */
+    public function scopeBeginletter($query, string $letter)
+    {
+        $letter = mb_strtoupper(trim($letter));
+
+        if ($letter === '#') {
+            return $query->whereRaw('UPPER(LEFT(naam, 1)) NOT BETWEEN ? AND ?', ['A', 'Z']);
+        }
+
+        return $query->where('naam', 'like', $letter.'%');
+    }
+
     /** Mag deze gebruiker deze organisatie inzien? */
     public function zichtbaarVoor(User $gebruiker): bool
     {

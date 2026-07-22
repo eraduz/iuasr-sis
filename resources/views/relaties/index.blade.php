@@ -20,6 +20,7 @@
 </div>
 
 <form method="GET" action="{{ route('relaties') }}" class="sis-toolbar" style="margin-bottom:12px; gap:8px; flex-wrap:wrap;">
+  <input type="hidden" name="per" value="{{ $perPagina }}">
   <input type="search" name="q" value="{{ $zoek }}" placeholder="Zoek op naam, plaats of relatienummer">
   <select name="type">
     <option value="">Alle types</option>
@@ -40,6 +41,8 @@
   </select>
   <button class="iuasr-dash-btn iuasr-dash-btn--sm" type="submit">Filteren</button>
 </form>
+
+@include('partials.az-index', ['route' => 'relaties', 'letterFilter' => $letterFilter, 'perPagina' => $perPagina])
 
 <div class="iuasr-dash-tbl-card">
   <table class="iuasr-dash-tbl">

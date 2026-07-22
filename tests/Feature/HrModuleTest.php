@@ -48,6 +48,15 @@ class HrModuleTest extends TestCase
         $this->actingAs($sz)->get(route('medewerkers'))->assertForbidden();
     }
 
+    public function test_az_index_filtert_medewerkers_op_achternaam(): void
+    {
+        \App\Models\Medewerker::create(['personeelsnummer' => 'P900001', 'voornaam' => 'Test', 'achternaam' => 'Zzytest', 'status' => \App\Enums\MedewerkerStatus::Actief, 'actief' => true]);
+        \App\Models\Medewerker::create(['personeelsnummer' => 'P900002', 'voornaam' => 'Test', 'achternaam' => 'Xxytest', 'status' => \App\Enums\MedewerkerStatus::Actief, 'actief' => true]);
+
+        $this->actingAs($this->hr)->get(route('medewerkers', ['letter' => 'Z']))
+            ->assertOk()->assertSee('Zzytest')->assertDontSee('Xxytest');
+    }
+
     public function test_module_verschijnt_op_het_keuzescherm(): void
     {
         $this->actingAs($this->hr)->get(route('modules.kiezen'))->assertOk()->assertSee('HR / Personeelszaken');

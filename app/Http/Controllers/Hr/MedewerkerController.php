@@ -40,12 +40,15 @@ class MedewerkerController extends Controller
             ->when($request->filled('functie'), fn ($q) => $q->where('functie_id', (int) $request->query('functie')))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->query('status')))
             ->when($request->filled('soort'), fn ($q) => $q->where('soort', $request->query('soort')))
+            ->when($request->filled('letter'), fn ($q) => $q->beginletter((string) $request->query('letter')))
             ->orderBy('achternaam')->orderBy('voornaam')
-            ->paginate(25)->withQueryString();
+            ->paginate(\App\Support\Paginakeuze::aantal($request))->withQueryString();
 
         return view('hr.medewerkers-index', [
             'medewerkers' => $medewerkers,
             'zoek' => (string) $request->query('q', ''),
+            'letterFilter' => mb_strtoupper((string) $request->query('letter', '')),
+            'perPagina' => \App\Support\Paginakeuze::aantal($request),
             'statusFilter' => (string) $request->query('status', ''),
             'soortFilter' => (string) $request->query('soort', ''),
             'afdelingFilter' => (int) $request->query('afdeling', 0),
