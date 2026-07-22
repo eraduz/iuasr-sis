@@ -69,7 +69,9 @@
     <div class="sis-card sis-form">
       <fieldset class="sis-fieldset">
         <legend>Contact</legend>
+        @if (config('sis.velden.iuasr_email_studenten'))
         <div class="sis-fld"><label>E-mail (IUASR)</label><input type="email" name="email" value="{{ old('email', $student->email) }}"></div>
+        @endif
         <div class="sis-fld"><label>E-mail privé</label><input type="email" name="email_prive" value="{{ old('email_prive', $student->email_prive) }}"></div>
         <div class="sis-fld"><label>Telefoon</label><input type="text" name="telefoon" value="{{ old('telefoon', $student->telefoon) }}"></div>
         <div class="sis-fld"><label>IBAN-rekeningnummer</label><input type="text" name="rekeningnummer" value="{{ old('rekeningnummer', $student->rekeningnummer) }}" placeholder="NL00 BANK 0123 4567 89"><div class="help">Versleuteld opgeslagen · alleen bevoegde rollen.</div></div>

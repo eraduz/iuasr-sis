@@ -49,9 +49,12 @@ class RapportController extends Controller
             ->sortBy(fn ($i) => $i->student->studentnummer)
             ->values();
 
+        $iuasrEmailAan = (bool) config('sis.velden.iuasr_email_studenten');
         $kolommen = [
             'Studentnummer', 'Voornaam', 'Tussenvoegsel', 'Achternaam', 'Geboortedatum', 'Geboorteplaats',
-            'Geslacht', 'Nationaliteit', 'E-mail (IUASR)', 'E-mail privé', 'Telefoon',
+            'Geslacht', 'Nationaliteit',
+            ...($iuasrEmailAan ? ['E-mail (IUASR)'] : []),
+            'E-mail privé', 'Telefoon',
             'Straat', 'Huisnummer', 'Postcode', 'Stad', 'Provincie', 'Land', 'IBAN',
             'Hoogst behaalde diploma', 'Onderwijsinstelling', 'Afstudeerjaar',
             'Nederlandse taal', 'Arabische taal', 'NT2 vereist', 'NT2 behaald op',
@@ -74,7 +77,9 @@ class RapportController extends Controller
             $waarden = [
                 $s->studentnummer, $s->voornaam, $s->tussenvoegsel, $s->achternaam,
                 $s->geboortedatum?->format('d-m-Y'), $s->geboorteplaats, $s->geslacht,
-                $s->nationaliteit?->naam, $s->email, $s->email_prive, $s->telefoon,
+                $s->nationaliteit?->naam,
+                ...($iuasrEmailAan ? [$s->email] : []),
+                $s->email_prive, $s->telefoon,
                 $s->adres, $s->huisnummer, $s->postcode, $s->woonplaats, $s->provincie, $s->land?->naam,
                 $s->rekeningnummer, // IBAN — versleuteld opgeslagen, hier ontsleuteld voor boekhouding
                 $s->diploma, $s->vorige_instelling, $s->afstudeerjaar,
@@ -125,7 +130,9 @@ class RapportController extends Controller
             ->orderBy('achternaam')->orderBy('voornaam')->orderBy('studentnummer')
             ->get();
 
-        $kolommen = ['Studentnummer', 'Voornaam', 'Tussenvoegsel', 'Achternaam', 'Telefoon', 'E-mail (IUASR)', 'E-mail privé'];
+        $iuasrEmailAan = (bool) config('sis.velden.iuasr_email_studenten');
+        $kolommen = ['Studentnummer', 'Voornaam', 'Tussenvoegsel', 'Achternaam', 'Telefoon',
+            ...($iuasrEmailAan ? ['E-mail (IUASR)'] : []), 'E-mail privé'];
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -141,7 +148,9 @@ class RapportController extends Controller
         foreach ($studenten as $s) {
             $waarden = [
                 $s->studentnummer, $s->voornaam, $s->tussenvoegsel, $s->achternaam,
-                $s->telefoon, $s->email, $s->email_prive,
+                $s->telefoon,
+                ...($iuasrEmailAan ? [$s->email] : []),
+                $s->email_prive,
                 // Bewust GEEN IBAN en GEEN BSN in deze contactlijst.
             ];
             $kol = 1;

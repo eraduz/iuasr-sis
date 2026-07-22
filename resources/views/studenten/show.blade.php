@@ -296,7 +296,9 @@
       <div class="sis-card">
         <div class="sis-card__hd"><h3>Contact</h3></div>
         <dl class="sis-dl">
+          @if (config('sis.velden.iuasr_email_studenten'))
           <dt>E-mail (IUASR)</dt><dd>{{ $student->email ?? '—' }}</dd>
+          @endif
           <dt>E-mail privé</dt><dd>{{ $student->email_prive ?? '—' }}</dd>
           <dt>Telefoon</dt><dd>{{ $student->telefoon ?? '—' }}</dd>
           <dt>Adres</dt><dd>

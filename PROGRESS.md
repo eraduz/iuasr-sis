@@ -166,6 +166,13 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
   (`Organisatie::scopeBeginletter` op naam, route `relaties`) en **HR-medewerkers**
   (`Medewerker::scopeBeginletter` op achternaam, route `medewerkers`) — beide met
   `partials.az-index` + `Paginakeuze`. 805 tests groen.
+  Daarna (opdrachtgever): het veld **E-mail (IUASR)** voor studenten **uitgezet** via
+  een config-schakelaar `sis.velden.iuasr_email_studenten` (env `SIS_IUASR_EMAIL_STUDENTEN`,
+  standaard false). IUASR geeft nog geen interne studentmailboxen uit; alleen het
+  privé-adres is in gebruik. Uit → het veld verdwijnt uit het wijzigscherm, het
+  studentdossier en beide Excel-exports; bestaande waarden blijven in de database en
+  worden bij het opslaan ongemoeid gelaten (niet gewist). Later weer aan te zetten.
+  806 tests groen.
 - **Laatst bijgewerkt:** 2026-07-22
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 

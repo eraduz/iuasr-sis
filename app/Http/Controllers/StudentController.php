@@ -251,6 +251,13 @@ class StudentController extends Controller
         ]);
         $data['nt2_examen_vereist'] = $request->boolean('nt2_examen_vereist');
 
+        // Staat het IUASR-e-mailveld uit, dan laten we `email` ongemoeid — het veld
+        // is dan niet op het formulier en we willen een eventuele latere waarde niet
+        // per ongeluk op leeg zetten.
+        if (! config('sis.velden.iuasr_email_studenten')) {
+            unset($data['email']);
+        }
+
         // Gewijzigde velden bepalen via Eloquent-dirty-tracking; array_diff_assoc
         // faalt op enum-casts (bv. TaalNiveau kan niet naar string).
         $student->fill($data);

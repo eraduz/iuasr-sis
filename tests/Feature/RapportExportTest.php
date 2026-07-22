@@ -79,7 +79,9 @@ class RapportExportTest extends TestCase
         $this->assertContains('Voornaam', $koppen);
         $this->assertContains('Achternaam', $koppen);
         $this->assertContains('Telefoon', $koppen);
-        $this->assertContains('E-mail (IUASR)', $koppen);
+        $this->assertContains('E-mail privé', $koppen);
+        // IUASR-e-mail staat standaard uit -> kolom niet in de export.
+        $this->assertNotContains('E-mail (IUASR)', $koppen);
         $this->assertNotContains('IBAN', $koppen);
         $this->assertNotContains('BSN', $koppen);
 
@@ -88,6 +90,24 @@ class RapportExportTest extends TestCase
         $this->assertContains('999999', $plat);
 
         $this->assertDatabaseHas('audit_logs', ['veld' => 'export']);
+    }
+
+    public function test_iuasr_email_verschijnt_als_de_schakelaar_aan_staat(): void
+    {
+        config(['sis.velden.iuasr_email_studenten' => true]);
+        \App\Models\Student::create(['studentnummer' => '999998', 'voornaam' => 'Aan', 'achternaam' => 'Test']);
+
+        $response = $this->actingAs(User::where('rol', Rol::Studentenzaken)->first())
+            ->get(route('rapporten.alle-studenten'));
+        $response->assertOk();
+
+        $tmp = tempnam(sys_get_temp_dir(), 'xlsx').'.xlsx';
+        file_put_contents($tmp, $response->streamedContent());
+        $koppen = IOFactory::load($tmp)->getActiveSheet()->rangeToArray('A1:H1', null, true, false)[0];
+        @unlink($tmp);
+
+        $this->assertContains('E-mail (IUASR)', $koppen);
+        $this->assertContains('E-mail privé', $koppen);
     }
 
     public function test_alle_studenten_export_toegang_per_rol(): void

@@ -24,7 +24,7 @@ return [
     | onderaan elke pagina getoond zodat testers en beheer weten welke versie
     | draait. Bijwerken bij elke release; houd de wijzigingen bij in CHANGELOG.md.
     */
-    'versie' => '1.32.0',
+    'versie' => '1.33.0',
 
     /*
     |----------------------------------------------------------------------
@@ -45,6 +45,21 @@ return [
         'volgnummer_lengte' => (int) env('SIS_STUDENTNUMMER_VOLGNUMMER_LENGTE', 4),
         // Nummerbeleid bij heringstroom: behoudt of nieuw nummer? TE BEVESTIGEN.
         'behoud_bij_heringstroom' => null,
+    ],
+
+    /*
+    |----------------------------------------------------------------------
+    | Optionele velden (aan/uit te zetten zonder codewijziging)
+    |----------------------------------------------------------------------
+    | Sommige velden zijn (nog) niet in gebruik. Ze blijven in de database
+    | bestaan (bestaande waarden gaan niet verloren), maar worden in de UI en
+    | in exports verborgen zolang ze uitstaan.
+    */
+    'velden' => [
+        // IUASR-e-mailadres voor studenten. UIT (opdrachtgever 2026-07-22): IUASR
+        // geeft (nog) geen interne studentmailboxen uit; alleen het privé-adres is
+        // in gebruik. Zet op true zodra er wél IUASR-mailboxen zijn.
+        'iuasr_email_studenten' => (bool) env('SIS_IUASR_EMAIL_STUDENTEN', false),
     ],
 
     /*
