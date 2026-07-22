@@ -194,7 +194,15 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
   (`Cijferlijstsjabloon`, onderwerp+tekst met `{{Naam}}/{{Periode}}/{{Opleiding}}`,
   route `cijferlijst-sjabloon`, **alleen Examencommissie** — opdrachtgever). Menu-items
   toegevoegd. 811 tests groen (`ResultatenMailTest`). Deploy: vereist `MAIL_*` +
-  draaiende `queue:work`.
+  draaiende `queue:work`. Daarna **Microsoft 365-mailkoppeling via de Graph API**
+  (opdrachtgever): eigen transport `App\Mail\Transport\MicrosoftGraphTransport`
+  (OAuth2 client-credentials, `Mail.Send`, tokencaching, bijlagen als
+  `fileAttachment`), geregistreerd via `Mail::extend('microsoft-graph', …)` in
+  `AppServiceProvider`; nieuwe `config/mail.php` met mailer **graph** (env
+  `MS_GRAPH_TENANT_ID/CLIENT_ID/CLIENT_SECRET/FROM`). `MS_GRAPH_FROM` forceert de
+  verzendmailbox — werkt met de **gedeelde examencommissie-mailbox** (app access
+  policy). SMTP blijft als terugval. `MicrosoftGraphMailTest` (Http::fake). 812
+  tests groen. Deploy: Entra app-registratie + `MAIL_MAILER=graph`.
 - **Laatst bijgewerkt:** 2026-07-22
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 

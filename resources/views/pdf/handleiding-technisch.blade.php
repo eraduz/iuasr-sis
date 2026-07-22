@@ -128,16 +128,35 @@
   <div class="let"><b>APP_KEY is kritiek.</b> Zonder de originele APP_KEY zijn de versleutelde velden (BSN, rekeningnummer) onherstelbaar. De sleutel zit in <code>.env</code> en wordt meegenomen in de back-up.</div>
 
   <h3>E-mail (resultaten mailen)</h3>
-  <p>De examencommissie kan definitieve resultaten per e-mail naar studenten sturen. In <b>ontwikkeling</b> staat <code>MAIL_MAILER=log</code>: e-mails worden naar <code>storage/logs/laravel.log</code> geschreven, er gaan GEEN echte e-mails uit (AVG, synthetische data). In <b>productie</b> configureert u de IUASR-mailserver in <code>.env</code>:</p>
+  <p>De examencommissie kan definitieve resultaten per e-mail naar studenten sturen. In <b>ontwikkeling</b> staat <code>MAIL_MAILER=log</code>: e-mails worden naar <code>storage/logs/laravel.log</code> geschreven, er gaan GEEN echte e-mails uit (AVG, synthetische data). Elke student ontvangt individueel de eigen (ondertekende) cijferlijst als bijlage; het versturen gaat via de <b>wachtrij</b> — draai daarom een worker (<code>php artisan queue:work</code>, of via de scheduler).</p>
+
+  <h4>Microsoft 365 via de Graph API (aanbevolen)</h4>
+  <p>IUASR gebruikt Microsoft 365. Basic auth (SMTP AUTH) is door Microsoft voor de meeste tenants uitgeschakeld, dus verstuurt het systeem via de <b>Graph API</b> met OAuth2 client-credentials — dat sluit ook aan op de Entra ID-login. Inrichten:</p>
+  <ol>
+    <li><b>Entra ID &rarr; App-registraties</b>: maak een registratie (bv. "IUASR SIS Mail"). Noteer de <b>Directory (tenant) ID</b> en de <b>Application (client) ID</b>.</li>
+    <li><b>Certificaten &amp; geheimen</b>: maak een <b>client secret</b> en noteer de waarde.</li>
+    <li><b>API-machtigingen</b>: voeg <b>Microsoft Graph &rarr; Application permissions &rarr; <code>Mail.Send</code></b> toe en geef <b>admin consent</b>.</li>
+    <li><b>Afschermen (aanbevolen)</b>: maak in Exchange Online een <b>Application Access Policy</b> die de app beperkt tot uitsluitend de verzendmailbox. De examencommissie-mailbox is een <b>gedeelde mailbox</b> — dat werkt: gebruik die (of een dedicated <code>noreply</code>) als verzendadres en neem hem op in de policy (rechtstreeks of via een mail-enabled beveiligingsgroep).</li>
+    <li>Zet in <code>.env</code>:</li>
+  </ol>
+  <span class="cmd">MAIL_MAILER=graph
+MS_GRAPH_TENANT_ID=&lt;directory-tenant-id&gt;
+MS_GRAPH_CLIENT_ID=&lt;application-client-id&gt;
+MS_GRAPH_CLIENT_SECRET=&lt;client-secret&gt;
+MS_GRAPH_FROM=examencommissie@iuasr.nl   # de (gedeelde) verzendmailbox
+MAIL_FROM_ADDRESS=examencommissie@iuasr.nl
+MAIL_FROM_NAME="Examencommissie IUASR"</span>
+  <p><code>MS_GRAPH_FROM</code> bepaalt de <b>verzendmailbox</b> (de <code>{id}</code> in <code>/users/{id}/sendMail</code>) en heeft voorrang op de From van de mail — zo verstuurt de app altijd via de toegestane (gedeelde) mailbox, ook als de app tot die ene mailbox is afgeschermd. Techniek: <code>App\Mail\Transport\MicrosoftGraphTransport</code>, geregistreerd in <code>AppServiceProvider</code> (<code>Mail::extend('microsoft-graph', …)</code>), mailer <code>graph</code> in <code>config/mail.php</code>. Het token wordt ~55 min gecacht; bijlagen (de PDF) gaan als <code>fileAttachment</code> mee. Test: <code>MicrosoftGraphMailTest</code> (met <code>Http::fake</code>).</p>
+
+  <h4>SMTP (terugval)</h4>
+  <p>Werkt alleen als de tenant SMTP AUTH voor de verzendmailbox toestaat (uitzondering, moderne auth vereist meestal een app-wachtwoord):</p>
   <span class="cmd">MAIL_MAILER=smtp
-MAIL_HOST=&lt;smtp.iuasr.nl&gt;
+MAIL_HOST=smtp.office365.com
 MAIL_PORT=587
-MAIL_USERNAME=&lt;gebruiker&gt;
-MAIL_PASSWORD=&lt;wachtwoord&gt;
+MAIL_USERNAME=&lt;mailbox&gt;
+MAIL_PASSWORD=&lt;app-wachtwoord&gt;
 MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=noreply@iuasr.nl
-MAIL_FROM_NAME="IUASR Studentenzaken"</span>
-  <p>Elke student ontvangt individueel de eigen (ondertekende) cijferlijst als bijlage; verzending wordt gelogd. Overweeg voor grote aantallen een queue (<code>QUEUE_CONNECTION</code> + worker).</p>
+MAIL_FROM_ADDRESS=noreply@iuasr.nl</span>
 
   <h2>3. Back-up maken</h2>
   <p>Een volledige back-up wordt gemaakt via de webapplicatie:</p>
