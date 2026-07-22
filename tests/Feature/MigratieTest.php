@@ -66,6 +66,10 @@ CSV;
         $this->assertTrue((bool) $ahmed->diploma);
         $this->assertSame('M', $ahmed->geslacht);
         $this->assertNotNull($ahmed->nationaliteit_id);
+        // De oude Access-'E-mail' hoort in het PRIVÉ-veld (in gebruik/zichtbaar),
+        // niet in het IUASR-veld (dat leeg blijft tot IUASR eigen mailboxen uitgeeft).
+        $this->assertSame('a@x.nl', $ahmed->email_prive);
+        $this->assertNull($ahmed->email);
     }
 
     public function test_import_is_idempotent(): void

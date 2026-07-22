@@ -172,7 +172,13 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
   privé-adres is in gebruik. Uit → het veld verdwijnt uit het wijzigscherm, het
   studentdossier en beide Excel-exports; bestaande waarden blijven in de database en
   worden bij het opslaan ongemoeid gelaten (niet gewist). Later weer aan te zetten.
-  806 tests groen.
+  806 tests groen. Daarna (opdrachtgever, e-mail bij de Access-migratie): de
+  MigratieImport mapt de oude Access-`E-mail` nu naar **`email_prive`** (het
+  persoonlijke, gebruikte veld) i.p.v. het verborgen IUASR-veld. Voor de al eerder
+  geïmporteerde dossiers is er een eenmalig commando `sis:email-prive-corrigeren`
+  (proefdraai + `--apply`); daarmee zijn in de dev-database **2.862** adressen van
+  `email` naar `email_prive` verplaatst (geen dataverlies). MigratieTest bevestigt
+  de mapping.
 - **Laatst bijgewerkt:** 2026-07-22
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 

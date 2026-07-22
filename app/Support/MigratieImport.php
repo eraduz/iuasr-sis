@@ -117,7 +117,10 @@ class MigratieImport
             'postcode' => $this->leeg($this->veld($rij, 'Pc')),
             'woonplaats' => $this->leeg($this->veld($rij, 'Plaats')),
             'telefoon' => $this->leeg($this->veld($rij, 'Tel')),
-            'email' => $this->leeg($this->veld($rij, 'E-mail')),
+            // Oude Access-'E-mail' is het PERSOONLIJKE adres (studenten hadden geen
+            // IUASR-mailbox) -> naar email_prive, het veld dat in gebruik/zichtbaar is.
+            // Het IUASR-veld (email) blijft leeg tot IUASR eigen mailboxen uitgeeft.
+            'email_prive' => $this->leeg($this->veld($rij, 'E-mail')),
             'vooropleiding' => $this->leeg($this->veld($rij, 'Opleiding')), // Access 'Opleiding' = vooropleiding
             'diploma' => $this->boolean($this->veld($rij, 'Diploma')),
             'opmerkingen' => $this->opmerking($rij),
