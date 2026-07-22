@@ -129,6 +129,56 @@ class CijferTest extends TestCase
         $this->assertEqualsWithDelta(7.0, (float) Cijferberekening::beste($eigen, $od->id)->cijfer, 0.01);
     }
 
+    public function test_opslaan_en_indienen_in_een_handeling_bewaart_de_cijfers(): void
+    {
+        // Regressie: de knop 'Opslaan en indienen' stuurt het raster mee, zodat
+        // zojuist ingevoerde cijfers niet verloren gaan bij het indienen.
+        $insch = $this->vak->deelnemers()->first();
+        $payload = ['na_opslaan' => 'indienen', 'cijfer' => [$insch->id => []]];
+        foreach ($this->vak->toetsonderdelen as $od) {
+            $payload['cijfer'][$insch->id][$od->id] = '7,0';
+        }
+
+        $this->actingAs($this->docent)
+            ->post(route('vakken.cijfers.opslaan', $this->vak), $payload)
+            ->assertRedirect(route('vakken.cijfers', $this->vak));
+
+        // De lijst staat ingediend EN de cijfers zijn opgeslagen.
+        $this->assertSame(\App\Enums\CijferlijstStatus::Ingediend, $this->lijst()->status);
+        foreach ($this->vak->toetsonderdelen as $od) {
+            $this->assertDatabaseHas('resultaten', [
+                'inschrijving_id' => $insch->id, 'toetsonderdeel_id' => $od->id, 'cijfer' => 7.0,
+            ]);
+        }
+
+        // De examencommissie ziet de ingediende cijfers op de invoer-/inzagepagina.
+        $this->actingAs($this->examencommissie())->get(route('vakken.cijfers', $this->vak))
+            ->assertOk()->assertSee('7,0');
+    }
+
+    public function test_tweede_herkansing_als_derde_poging_en_beste_telt(): void
+    {
+        $insch = $this->vak->deelnemers()->first();
+        $od = $this->vak->toetsonderdelen->first();
+
+        // 1e poging onvoldoende, herkansing net onvoldoende, 2e herkansing voldoende.
+        $this->actingAs($this->docent)->post(route('vakken.cijfers.opslaan', $this->vak), [
+            'cijfer' => [$insch->id => [$od->id => '4,0']],
+            'herkansing' => [$insch->id => [$od->id => '5,0']],
+            'herkansing2' => [$insch->id => [$od->id => '7,0']],
+        ]);
+
+        $this->assertDatabaseHas('resultaten', [
+            'inschrijving_id' => $insch->id, 'toetsonderdeel_id' => $od->id,
+            'poging' => 'herkansing2', 'poging_nr' => 3, 'cijfer' => 7.0,
+        ]);
+
+        // Drie losse pogingregels; de beste (7,0) telt mee.
+        $eigen = Resultaat::where('inschrijving_id', $insch->id)->where('toetsonderdeel_id', $od->id)->get();
+        $this->assertCount(3, $eigen);
+        $this->assertEqualsWithDelta(7.0, (float) Cijferberekening::beste($eigen, $od->id)->cijfer, 0.01);
+    }
+
     private function examencommissie(): User
     {
         return User::firstOrCreate(['email' => 'ec@iuasr.test'], ['naam' => 'EC', 'rol' => Rol::Examencommissie]);

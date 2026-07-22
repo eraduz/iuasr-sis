@@ -82,7 +82,21 @@ Bouw per fase; ga nooit een fase vooruit zonder akkoord van de opdrachtgever.
   tabellen als kaarten, en `min-width: 0` op grid-items (dat laatste was de
   werkelijke oorzaak van een pagina van 1067 px op een telefoon van 390 px).
   Geverifieerd met Playwright op 768x1024 en 390x844. 771 tests groen.
-- **Laatst bijgewerkt:** 2026-07-19
+  Daarna (2026-07-22, tijdens testen cijferworkflow): **twee cijferinvoer-fixes**.
+  (1) De examencommissie zag ingediende cijfers niet doordat de invoerpagina twee
+  losse formulieren had: klikte de docent op "Indienen" zonder eerst "Cijfers
+  opslaan", dan sprong alleen de status naar *ingediend* en gingen de ingetypte
+  cijfers verloren. De knoppen delen nu één rasterformulier — "Opslaan en indienen
+  bij examencommissie" (docent) en "Opslaan en vaststellen" (examencommissie) slaan
+  altijd eerst de cijfers op en voeren dán de statuswijziging uit
+  (`CijferController::opslaan` met `na_opslaan`). Meteen ook de rolcontroles in
+  `CijferController` op multi-rol (`heeftRol`) gezet i.p.v. alleen de primaire rol.
+  (2) **2e herkansing (3e poging)** toegevoegd: derde invoerveld per toetsonderdeel
+  (`poging='herkansing2'`, `poging_nr=3`); de beste van alle pogingen telt mee.
+  Geen migratie nodig (kolom `poging` was al vrije string; `Cijferberekening::beste`
+  nam al het hoogste cijfer). `Statistiek::herkansingen()` telt nu `poging_nr > 1`.
+  Handleidingen bijgewerkt en opnieuw gegenereerd. 773 tests groen.
+- **Laatst bijgewerkt:** 2026-07-22
 - **Repo:** git@github.com:eraduz/iuasr-sis.git (gepusht naar `main`)
 
 ---

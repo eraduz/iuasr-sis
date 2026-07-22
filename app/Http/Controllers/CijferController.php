@@ -101,6 +101,7 @@ class CijferController extends Controller
                 $perOnderdeel[$od->id] = [
                     'tentamen' => $vanOd->firstWhere('poging', 'tentamen'),
                     'herkansing' => $vanOd->firstWhere('poging', 'herkansing'),
+                    'herkansing2' => $vanOd->firstWhere('poging', 'herkansing2'),
                 ];
             }
 
@@ -126,8 +127,8 @@ class CijferController extends Controller
         $lijst = Cijferlijst::voor($vak, $periode);
         abort_unless($this->magBewerken($vak, $lijst), 403, 'Deze cijferlijst mag u nu niet bewerken.');
 
-        // Kommadecimalen normaliseren voor beide invoervelden (1e poging + herkansing).
-        foreach (['cijfer', 'herkansing'] as $veld) {
+        // Kommadecimalen normaliseren voor alle invoervelden (1e poging + 1e/2e herkansing).
+        foreach (['cijfer', 'herkansing', 'herkansing2'] as $veld) {
             $waarden = $request->input($veld, []);
             array_walk_recursive($waarden, function (&$v) {
                 if (is_string($v)) {
@@ -143,12 +144,13 @@ class CijferController extends Controller
         $request->validate([
             'cijfer.*.*' => ['nullable', 'numeric', "between:$min,$max"],
             'herkansing.*.*' => ['nullable', 'numeric', "between:$min,$max"],
+            'herkansing2.*.*' => ['nullable', 'numeric', "between:$min,$max"],
         ]);
 
         $vak->load('toetsonderdelen');
         $grens = Cijferberekening::voldoendeGrens($vak);
         $deelnemers = $vak->deelnemers()->get();
-        $correctie = auth()->user()->rol === Rol::Examencommissie && $lijst->status === CijferlijstStatus::Vastgesteld;
+        $correctie = auth()->user()->heeftRol(Rol::Examencommissie) && $lijst->status === CijferlijstStatus::Vastgesteld;
 
         // Bestaande resultaten per (inschrijving, onderdeel, poging_nr): meerdere
         // pogingen per onderdeel zijn toegestaan (tentamen = 1, herkansing = 2).
@@ -156,10 +158,11 @@ class CijferController extends Controller
             ->whereIn('inschrijving_id', $deelnemers->pluck('id'))->get()
             ->keyBy(fn ($r) => $r->inschrijving_id.'-'.$r->toetsonderdeel_id.'-'.$r->poging_nr);
 
-        // Poging 1 = reguliere toets, poging 2 = herkansing (aparte regel).
+        // Poging 1 = reguliere toets, 2 = herkansing, 3 = 2e herkansing (elk een aparte regel).
         $pogingen = [
             ['naam' => 'tentamen', 'nr' => 1, 'veld' => 'cijfer'],
             ['naam' => 'herkansing', 'nr' => 2, 'veld' => 'herkansing'],
+            ['naam' => 'herkansing2', 'nr' => 3, 'veld' => 'herkansing2'],
         ];
 
         foreach ($deelnemers as $insch) {
@@ -211,6 +214,29 @@ class CijferController extends Controller
             }
         }
 
+        // Vervolgactie in dezelfde handeling: de docent kan direct indienen en de
+        // examencommissie direct vaststellen. Zo gaan zojuist ingevoerde cijfers
+        // nooit verloren doordat men het opslaan vergeet (de knoppen delen nu één
+        // formulier met het raster).
+        $na = $request->input('na_opslaan');
+        $u = auth()->user();
+
+        if ($na === 'indienen' && $u->heeftRol(Rol::Docent) && $u->docent_id === $vak->docent_id
+            && $lijst->status === CijferlijstStatus::Concept) {
+            $this->voerIndienenUit($lijst, $vak, $u->id);
+
+            return redirect()->route('vakken.cijfers', $vak)
+                ->with('status', 'Cijfers opgeslagen en ingediend bij de examencommissie.');
+        }
+
+        if ($na === 'vaststellen' && $u->heeftRol(Rol::Examencommissie)
+            && $lijst->status === CijferlijstStatus::Ingediend) {
+            $this->voerVaststellenUit($lijst, $vak);
+
+            return redirect()->route('vakken.cijfers', $vak)
+                ->with('status', 'Cijfers opgeslagen en cijferlijst vastgesteld.');
+        }
+
         return redirect()->route('vakken.cijfers', $vak)
             ->with('status', $correctie ? 'Correctie opgeslagen en gelogd.' : 'Cijfers opgeslagen.');
     }
@@ -220,16 +246,10 @@ class CijferController extends Controller
     {
         $lijst = Cijferlijst::voor($vak, $this->actievePeriode());
         $u = auth()->user();
-        abort_unless($u->rol === Rol::Docent && $u->docent_id === $vak->docent_id
+        abort_unless($u->heeftRol(Rol::Docent) && $u->docent_id === $vak->docent_id
             && $lijst->status === CijferlijstStatus::Concept, 403);
 
-        $lijst->update([
-            'status' => CijferlijstStatus::Ingediend,
-            'ingediend_op' => now(),
-            'ingediend_door_id' => $u->id,
-            'opmerking' => null,
-        ]);
-        AuditLogger::log(AuditLogger::WIJZIGING, $vak, veld: 'cijferlijst', context: ['status' => 'ingediend']);
+        $this->voerIndienenUit($lijst, $vak, $u->id);
 
         return redirect()->route('vakken.cijfers', $vak)->with('status', 'Cijferlijst ingediend bij de examencommissie.');
     }
@@ -237,17 +257,36 @@ class CijferController extends Controller
     /** Examencommissie stelt de cijferlijst definitief vast. */
     public function vaststellen(Vak $vak): RedirectResponse
     {
-        abort_unless(auth()->user()->rol === Rol::Examencommissie, 403);
+        abort_unless(auth()->user()->heeftRol(Rol::Examencommissie), 403);
         $lijst = Cijferlijst::voor($vak, $this->actievePeriode());
         abort_unless($lijst->status === CijferlijstStatus::Ingediend, 403, 'Alleen een ingediende lijst kan worden vastgesteld.');
 
+        $this->voerVaststellenUit($lijst, $vak);
+
+        return redirect()->route('vakken.cijfers', $vak)->with('status', 'Cijferlijst vastgesteld.');
+    }
+
+    /** Zet een conceptlijst op 'ingediend' (gedeeld door de losse route en de opslaan+indienen-knop). */
+    private function voerIndienenUit(Cijferlijst $lijst, Vak $vak, int $docentUserId): void
+    {
+        $lijst->update([
+            'status' => CijferlijstStatus::Ingediend,
+            'ingediend_op' => now(),
+            'ingediend_door_id' => $docentUserId,
+            'opmerking' => null,
+        ]);
+        AuditLogger::log(AuditLogger::WIJZIGING, $vak, veld: 'cijferlijst', context: ['status' => 'ingediend']);
+    }
+
+    /** Stelt een ingediende lijst vast en markeert de resultaten definitief (gedeeld). */
+    private function voerVaststellenUit(Cijferlijst $lijst, Vak $vak): void
+    {
         $lijst->update([
             'status' => CijferlijstStatus::Vastgesteld,
             'vastgesteld_op' => now(),
             'vastgesteld_door_id' => auth()->id(),
         ]);
 
-        // Resultaten markeren als definitief.
         $vak->load('toetsonderdelen');
         $deelnemers = $vak->deelnemers()->get();
         Resultaat::whereIn('toetsonderdeel_id', $vak->toetsonderdelen->pluck('id'))
@@ -255,14 +294,12 @@ class CijferController extends Controller
             ->update(['definitief' => true]);
 
         AuditLogger::log(AuditLogger::WIJZIGING, $vak, veld: 'cijferlijst', context: ['status' => 'vastgesteld']);
-
-        return redirect()->route('vakken.cijfers', $vak)->with('status', 'Cijferlijst vastgesteld.');
     }
 
     /** Examencommissie stuurt een ingediende lijst terug naar de docent. */
     public function terugsturen(Request $request, Vak $vak): RedirectResponse
     {
-        abort_unless(auth()->user()->rol === Rol::Examencommissie, 403);
+        abort_unless(auth()->user()->heeftRol(Rol::Examencommissie), 403);
         $lijst = Cijferlijst::voor($vak, $this->actievePeriode());
         abort_unless($lijst->status === CijferlijstStatus::Ingediend, 403);
 
@@ -429,12 +466,14 @@ class CijferController extends Controller
     {
         $u = auth()->user();
 
-        if ($u->rol === Rol::Docent) {
-            return $u->docent_id !== null && $vak->docent_id === $u->docent_id
-                && $lijst->status === CijferlijstStatus::Concept;
+        // Docent van het eigen vak mag bewerken zolang de lijst 'concept' is.
+        if ($u->heeftRol(Rol::Docent) && $u->docent_id !== null && $vak->docent_id === $u->docent_id
+            && $lijst->status === CijferlijstStatus::Concept) {
+            return true;
         }
 
-        if ($u->rol === Rol::Examencommissie) {
+        // Examencommissie mag bij een ingediende (vaststellen) of vastgestelde (correctie) lijst.
+        if ($u->heeftRol(Rol::Examencommissie)) {
             return in_array($lijst->status, [CijferlijstStatus::Ingediend, CijferlijstStatus::Vastgesteld], true);
         }
 
@@ -445,14 +484,13 @@ class CijferController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->rol === Rol::Docent) {
-            abort_unless($user->docent_id !== null && $vak->docent_id === $user->docent_id, 403,
-                'U kunt alleen uw eigen vak inzien.');
-
+        // Docent van het eigen vak: altijd inzage in dat vak.
+        if ($user->heeftRol(Rol::Docent) && $user->docent_id !== null && $vak->docent_id === $user->docent_id) {
             return;
         }
 
-        abort_unless(in_array($user->rol, [Rol::Examencommissie, Rol::Directie], true), 403);
+        abort_unless($user->heeftRol(Rol::Examencommissie) || $user->heeftRol(Rol::Directie), 403,
+            'U kunt alleen uw eigen vak inzien.');
 
         // Directie: alleen vakken van de eigen opleiding(en).
         if ($user->isOpleidingBeperkt()) {

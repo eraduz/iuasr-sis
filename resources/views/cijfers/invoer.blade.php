@@ -60,7 +60,7 @@
         <tr>
           <th style="width:190px;">Student</th>
           @foreach ($vak->toetsonderdelen as $od)
-            <th style="text-align:center;">{{ $od->naam }}<br><span class="sis-weegcell">{{ rtrim(rtrim(number_format($od->weging*100,1),'0'),'.') }}% · 1e / herk.</span></th>
+            <th style="text-align:center;">{{ $od->naam }}<br><span class="sis-weegcell">{{ rtrim(rtrim(number_format($od->weging*100,1),'0'),'.') }}% · 1e / herk. / 2e herk.</span></th>
           @endforeach
           <th style="text-align:center;">Vrijstelling</th>
           <th style="text-align:center;" title="Aanwezigheid t.o.v. de norm; onder de norm mocht de student formeel geen toets afleggen (studiegids §2.3.3)">Aanwezigheid</th>
@@ -77,11 +77,13 @@
                 $res = $rij['resultaten'][$od->id] ?? [];
                 $p1 = ($res['tentamen'] ?? null) && $res['tentamen']->cijfer !== null ? number_format($res['tentamen']->cijfer,1,',','') : '';
                 $ph = ($res['herkansing'] ?? null) && $res['herkansing']->cijfer !== null ? number_format($res['herkansing']->cijfer,1,',','') : '';
+                $ph2 = ($res['herkansing2'] ?? null) && $res['herkansing2']->cijfer !== null ? number_format($res['herkansing2']->cijfer,1,',','') : '';
               @endphp
               <td style="text-align:center;">
                 <div class="sis-od-cell" style="display:flex;flex-direction:column;gap:3px;align-items:center;">
                   <input class="sis-grade-input g1" inputmode="decimal" title="1e poging" name="cijfer[{{ $insch->id }}][{{ $od->id }}]" value="{{ $p1 }}" placeholder="1e" {{ $magInvoeren ? '' : 'disabled' }}>
                   <input class="sis-grade-input gh" inputmode="decimal" title="Herkansing" name="herkansing[{{ $insch->id }}][{{ $od->id }}]" value="{{ $ph }}" placeholder="herk." style="opacity:.9;" {{ $magInvoeren ? '' : 'disabled' }}>
+                  <input class="sis-grade-input gh2" inputmode="decimal" title="2e herkansing" name="herkansing2[{{ $insch->id }}][{{ $od->id }}]" value="{{ $ph2 }}" placeholder="2e herk." style="opacity:.8;" {{ $magInvoeren ? '' : 'disabled' }}>
                 </div>
               </td>
             @endforeach
@@ -123,14 +125,6 @@
   </div>
 @endif
 
-{{-- Workflow-formulieren buiten het grid-formulier (form-attribuut koppelt de knoppen) --}}
-@if ($isDocent && $status === CijferlijstStatus::Concept)
-  <form id="indienenForm" method="POST" action="{{ route('vakken.cijfers.indienen', $vak) }}" hidden>@csrf</form>
-@endif
-@if ($isExamen && $status === CijferlijstStatus::Ingediend)
-  <form id="vaststellenForm" method="POST" action="{{ route('vakken.cijfers.vaststellen', $vak) }}" hidden>@csrf</form>
-@endif
-
 @if ($rijen->isNotEmpty())
   <div class="sis-savebar">
     <span class="status">
@@ -144,11 +138,14 @@
     <span class="grow"></span>
     @if ($magInvoeren)
       <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit" form="cijfergrid">{{ $correctieMode ? 'Correctie opslaan' : 'Cijfers opslaan' }}</button>
+      {{-- Indienen/Vaststellen delen hetzelfde rasterformulier: de cijfers worden
+           altijd eerst opgeslagen, daarna verandert de status. Zo gaat er niets
+           verloren als men het losse opslaan overslaat. --}}
       @if ($isDocent && $status === CijferlijstStatus::Concept)
-        <button class="iuasr-dash-btn" type="submit" form="indienenForm">Indienen bij examencommissie</button>
+        <button class="iuasr-dash-btn" type="submit" form="cijfergrid" name="na_opslaan" value="indienen">Opslaan en indienen bij examencommissie</button>
       @endif
       @if ($isExamen && $status === CijferlijstStatus::Ingediend)
-        <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit" form="vaststellenForm">Vaststellen</button>
+        <button class="iuasr-dash-btn iuasr-dash-btn--primary" type="submit" form="cijfergrid" name="na_opslaan" value="vaststellen">Opslaan en vaststellen</button>
       @endif
     @endif
   </div>
@@ -163,7 +160,7 @@
   @endif
 @endif
 
-<p class="sis-tblnote">Per onderdeel vult u de <b>1e poging</b> en (indien van toepassing) de <b>herkansing</b> in; de <b>beste</b> van beide telt mee. Eindcijfer = gewogen gemiddelde van de deelresultaten (1 decimaal). Bij <b>Vrijstelling</b> vervallen de deelvelden en geldt “VR”.
+<p class="sis-tblnote">Per onderdeel vult u de <b>1e poging</b> en (indien van toepassing) de <b>herkansing</b> en een <b>2e herkansing</b> in; de <b>beste</b> van de ingevulde pogingen telt mee. Eindcijfer = gewogen gemiddelde van de deelresultaten (1 decimaal). Bij <b>Vrijstelling</b> vervallen de deelvelden en geldt “VR”.
 @if (($ecModel ?? 'knockout') === 'compensatorisch')
   EC-model <b>compensatorisch</b>: EC worden toegekend als het <b>gewogen eindcijfer</b> voldoende (≥ cesuur) is.
 @else
@@ -187,12 +184,15 @@ De <b>Aanwezigheid</b>-kolom signaleert wie onder de norm zit (studiegids §2.3.
 
     var som = 0, gew = 0, compleet = true, any = false;
     cells.forEach(function (cell, idx) {
-      var g1 = cell.querySelector('.g1'), gh = cell.querySelector('.gh');
-      var v1 = num(g1), vh = num(gh);
-      if (v1 !== null) g1.classList.add(v1 >= CESUUR ? 'is-pass' : 'is-fail');
-      if (vh !== null) gh.classList.add(vh >= CESUUR ? 'is-pass' : 'is-fail');
-      // Beste poging telt mee voor het eindcijfer.
-      var best = (v1 === null) ? vh : (vh === null ? v1 : Math.max(v1, vh));
+      // Beste van álle pogingen (1e / herk. / 2e herk.) telt mee voor het eindcijfer.
+      var best = null;
+      cell.querySelectorAll('.sis-grade-input').forEach(function (inp) {
+        var v = num(inp);
+        if (v !== null) {
+          inp.classList.add(v >= CESUUR ? 'is-pass' : 'is-fail');
+          best = (best === null) ? v : Math.max(best, v);
+        }
+      });
       if (best !== null) { som += best * WEGING[idx]; gew += WEGING[idx]; any = true; }
       else { compleet = false; }
     });

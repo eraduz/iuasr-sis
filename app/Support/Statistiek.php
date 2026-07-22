@@ -188,7 +188,8 @@ class Statistiek
 
     public static function herkansingen(): int
     {
-        return Resultaat::where('poging', 'herkansing')->count();
+        // Elke poging na de eerste (herkansing én 2e herkansing) telt als herkansing.
+        return Resultaat::where('poging_nr', '>', 1)->count();
     }
 
     public static function vrijstellingen(): int
