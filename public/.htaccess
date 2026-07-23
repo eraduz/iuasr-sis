@@ -8,7 +8,7 @@
     # ── Toegang beperken tot toegestane IP's ──────────────────────────────────
     # Apache ziet het echte bezoekers-IP in REMOTE_ADDR (mod_remoteip). Staat het
     # er niet tussen -> 403. IP toevoegen? Regel aanvullen met |<ip> en push.
-    RewriteCond %{REMOTE_ADDR} !^(37\.251\.61\.41|24\.132\.214\.178|109\.36\.146\.250|178\.226\.112\.182|178\.230\.61\.75|62\.45\.104\.234|178\.230\.61\.122)$
+    RewriteCond %{REMOTE_ADDR} !^(37\.251\.61\.41|24\.132\.214\.178|109\.36\.146\.250|178\.226\.112\.182|178\.230\.61\.75|62\.45\.104\.234|213\.10\.184\.204|178\.230\.61\.122|2001:4c3c:dc02:2a00:b0b8:fc6c:7696:ad79|2001:1c00:d901:c700:746e:2546:bbe:3ad9)$
     RewriteRule ^ - [F]
 
     # Behandel Authorization Header
